@@ -644,7 +644,7 @@ Installs PS1 and PS2 games, plus homebrew apps.
     5. [Clear Art & Icon Cache](#clear-art--icon-cache)
 
 ## Install PSBBN and HOSDMenu
-Installs both **PSBBN** and [HOSDMenu](#hosdmenu). Requires and official Sony Network Adapter:
+Installs both **PSBBN** and [HOSDMenu](#hosdmenu). Requires an official Sony Network Adapter:
 - Formats the drive for a clean installation
 - Prompts you to select a language
 - Downloads and installs the latest versions of the **PSBBN System Software** and **Language Pack** from [archive.org](https://archive.org/)
