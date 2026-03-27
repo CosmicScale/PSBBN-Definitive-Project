@@ -612,6 +612,18 @@ CREATE_PS2_VMC() {
 
         # Create VMC .bin if it doesn't already exist
         if [[ ! -f "${OPL}/VMC/${vmc_file}" ]] && [[ -z "${created_vmcs[$vmc_name]}" ]]; then
+
+            # Check available space (in KB)
+            available_kb=$(df -Pk "${OPL}" | awk 'NR==2 {print $4}')
+            echo >> "${LOG_FILE}"
+            echo "Available space for VMCs: $available_kb" >> "${LOG_FILE}"
+
+            if (( available_kb < 40960 )); then
+                echo
+                echo "ERROR: Not enough free space to create all VMCs." | tee -a "${LOG_FILE}"
+                return 1
+            fi
+
             "${HELPER_DIR}/genvmc" "$vmc_size" "${OPL}/VMC/${vmc_file}" >> "${LOG_FILE}" 2>&1
             created_vmcs["$vmc_name"]=1
         fi
@@ -1792,9 +1804,9 @@ if find "${GAMES_PATH}/CD" "${GAMES_PATH}/DVD" -maxdepth 1 -type f \( -iname "*.
         PS2_VMC="y"
     else
         SPLASH
-        echo "Would you like to use shared VMCs for PS2 games?"
+        echo "Would you like to use Virtual Memory Cards (VMCs) for PS2 games?"
         echo
-        echo "Games that share save data will be assigned to the same virtual memory card."
+        echo "Games that share save data will be assigned to the same VMC."
         echo
         while true; do
             read -p "Yes or No (y/n): " PS2_VMC
