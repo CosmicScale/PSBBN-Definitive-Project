@@ -125,7 +125,7 @@ fi
 (
     python3 -m venv scripts/venv >> "${LOG_FILE}" 2>&1 || error_msg "Failed to create Python virtual environment."
     source scripts/venv/bin/activate || error_msg "Failed to activate the Python virtual environment."
-    pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow >> "${LOG_FILE}" || error_msg "Failed to install Python dependencies."
+    pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow textual >> "${LOG_FILE}" || error_msg "Failed to install Python dependencies."
     deactivate
 ) &
 PID=$!

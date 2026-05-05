@@ -25,7 +25,12 @@
 #  Please report any bugs on GitHub: https://github.com/putnam/binmerge
 #
 #
-import argparse, re, os, subprocess, sys, textwrap, traceback
+import argparse
+import re
+import os
+import sys
+import textwrap
+import traceback
 VERBOSE = False
 VERSION_STRING = "1.0.3"
 
@@ -333,7 +338,7 @@ def main():
   except ZeroBinFilesException:
     e("Unable to parse any bin files in the cuesheet. Is it empty?")
     return False
-  except Exception as exc:
+  except Exception:
     e("Error parsing cuesheet. Is it valid?")
     traceback.print_exc()
     return False

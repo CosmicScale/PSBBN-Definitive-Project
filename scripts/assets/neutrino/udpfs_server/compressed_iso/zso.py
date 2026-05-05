@@ -94,7 +94,7 @@ class ZsoFileWrapper(CompressedFileWrapper):
         offset_data = self.file.read(num_offset_entries * 4)
         
         if len(offset_data) < num_offset_entries * 4:
-            raise ValueError(f"Invalid ZSO: offset table truncated")
+            raise ValueError("Invalid ZSO: offset table truncated")
         
         self.block_offsets = list(struct.unpack(f'<{num_offset_entries}I', offset_data))
     

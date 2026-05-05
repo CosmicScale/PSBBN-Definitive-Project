@@ -77,7 +77,7 @@ class CsoFileWrapper(CompressedFileWrapper):
         offset_data = self.file.read((self._num_blocks + 1) * 4)
         
         if len(offset_data) < (self._num_blocks + 1) * 4:
-            raise ValueError(f"Invalid CSO: offset table truncated")
+            raise ValueError("Invalid CSO: offset table truncated")
         
         self.block_offsets = list(struct.unpack(f'<{self._num_blocks + 1}I', offset_data))
     

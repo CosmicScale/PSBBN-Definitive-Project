@@ -27,18 +27,15 @@ Compression Support:
 
 import argparse
 import errno
-import gzip
 import math
 import os
 import socket
 import struct
 import sys
 import time
-import zlib
-from collections import OrderedDict
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 # Compressed ISO support
 from compressed_iso import CompressedFileWrapper, ZsoFileWrapper, CsoFileWrapper, ChdFileWrapper, LIBCHDR_AVAILABLE
@@ -370,7 +367,7 @@ class UdpfsServer:
 
     def run(self):
         """Main server loop"""
-        print(f"UDPFS Server")
+        print("UDPFS Server")
         if self.root_dir:
             print(f"  Root: {self.root_dir}")
         if BLOCK_DEVICE_HANDLE in self.handles:
@@ -386,7 +383,7 @@ class UdpfsServer:
             formats.append('CSO')
             formats.append('CHD')
             print(f"  Compression: enabled ({', '.join(formats)})")
-        print(f"  Listening...")
+        print("  Listening...")
         print()
 
         while True:

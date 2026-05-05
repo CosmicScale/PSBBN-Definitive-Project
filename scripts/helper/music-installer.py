@@ -38,7 +38,6 @@ from mutagen.easyid3 import EasyID3
 from mutagen.mp4 import MP4
 from mutagen.flac import FLAC
 from tqdm import tqdm
-from collections import defaultdict
 
 MUSIC_DIR = "media/music"
 SQL_PATH = "scripts/tmp/music_dump.sql"
@@ -547,7 +546,7 @@ if __name__ == "__main__":
         existing_footers = extract_music_data()
     else:
         existing_footers = {}
-        error_message = f"No existing database to convert.\n"
+        error_message = "No existing database to convert.\n"
         with open(LOG_PATH, "a", encoding="utf-8") as log_file:
             log_file.write(error_message)
         print(error_message, file=sys.stderr)
