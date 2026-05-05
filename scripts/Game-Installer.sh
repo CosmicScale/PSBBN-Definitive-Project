@@ -146,6 +146,97 @@ prevent_sleep_stop() {
     fi
 }
 
+run_game_selector() {
+    if [ ! -t 1 ] || [ ! -t 0 ]; then
+        echo "Not a terminal. Skipping interactive selector." >> "${LOG_FILE}"
+        return 1
+    fi;
+
+    if ! python3 -c "import textual" 2>/dev/null; then
+        echo | tee -a "${LOG_FILE}"
+        echo "Textual not installed. Proceeding with all games." | tee -a "${LOG_FILE}"
+        echo "Install with: pip install textual" | tee -a "${LOG_FILE}"
+        return 1
+    fi;
+
+    if [ -z "$DEVICE" ] || [ ! -b "$DEVICE" ]; then
+        echo "No valid device selected. Cannot determine disk size." | tee -a "${LOG_FILE}"
+        return 1
+    fi
+
+    # Calculate total disk size in decimal GB (1 GB = 1e9 bytes)
+    local disk_total_gb=0
+    if command -v blockdev >/dev/null 2>&1; then
+        local disk_bytes
+        disk_bytes=$(blockdev --getsize64 "$DEVICE" 2>/dev/null)
+        if [ -n "$disk_bytes" ] && [ "$disk_bytes" -gt 0 ]; then
+            disk_total_gb=$(awk "BEGIN {printf \"%.2f\", $disk_bytes / 1000000000}")
+        fi
+    fi
+    if [ "$disk_total_gb" = "0" ]; then
+        # Fallback to df (may use binary units, but better than nothing)
+        disk_total_gb=$(df -BG "$DEVICE" 2>/dev/null | tail -1 | awk '{print $2}' | tr -d 'G')
+        if [ -z "$disk_total_gb" ]; then
+            echo "Could not determine disk size. Using default 0 GB." | tee -a "${LOG_FILE}"
+            disk_total_gb=0
+        fi
+    fi
+
+    echo | tee -a "${LOG_FILE}"
+    echo "Launching interactive game selector (Disk: ${disk_total_gb} GB)..." | tee -a "${LOG_FILE}"
+
+    local selected_file="${SCRIPTS_DIR}/tmp/selected_games.list"
+    rm -f "$selected_file"
+
+    # Find a terminal emulator that supports -e flag
+    local TERM_EMULATOR=""
+    for cmd in konsole xterm gnome-terminal xfce4-terminal; do
+        if command -v "$cmd" >/dev/null 2>&1; then
+            TERM_EMULATOR="$cmd"
+            break
+        fi
+    done
+
+    if [ -z "$TERM_EMULATOR" ]; then
+        echo "No terminal emulator found. Proceeding with all games." | tee -a "${LOG_FILE}"
+        return 1
+    fi
+
+    # Build the command to run in the terminal emulator
+    local selector_cmd="python3 '${HELPER_DIR}/game-selector.py' '${PS1_LIST}' '${PS2_LIST}' --disk-total-gb '${disk_total_gb}' --games-dir '${GAMES_PATH}' --output '${selected_file}'"
+
+    # Run Textual app in a new terminal window with proper PTY
+    local exit_code=0
+    if [ "$TERM_EMULATOR" = "konsole" ] || [ "$TERM_EMULATOR" = "gnome-terminal" ] || [ "$TERM_EMULATOR" = "xfce4-terminal" ]; then
+        # These terminals accept multiple arguments after -e
+        "$TERM_EMULATOR" -e python3 "${HELPER_DIR}/game-selector.py" \
+            "${PS1_LIST}" "${PS2_LIST}" \
+            --disk-total-gb "$disk_total_gb" \
+            --games-dir "$GAMES_PATH" \
+            --output "$selected_file" 2>>"${LOG_FILE}"
+        exit_code=$?
+    else
+        # xterm and others expect a single command string
+        "$TERM_EMULATOR" -e "bash -c '$selector_cmd'" 2>>"${LOG_FILE}"
+        exit_code=$?
+    fi
+
+    if [ $exit_code -eq 0 ] && [ -s "${selected_file}" ]; then
+        local selected_count
+        selected_count=$(wc -l < "$selected_file")
+        echo "[✓] ${selected_count} games selected." | tee -a "${LOG_FILE}"
+        cp "${selected_file}" "${ALL_GAMES}"
+    else
+        if [ $exit_code -ne 0 ]; then
+            echo "Game selector failed (exit code: $exit_code)." | tee -a "${LOG_FILE}"
+        else
+            echo "No games selected. Keeping all games." | tee -a "${LOG_FILE}"
+        fi
+        return 1
+    fi
+    return 0
+}
+
 clean_up() {
     failure=0
 
@@ -2129,6 +2220,33 @@ if [[ -s "${ALL_GAMES}" ]]; then
     echo >> "${LOG_FILE}"
     echo "master.list:" >> "${LOG_FILE}"
     cat "${ALL_GAMES}" >> "${LOG_FILE}"
+fi
+
+# Ask user if they want to use the interactive game selector
+if [ -t 1 ] && python3 -c "import textual" 2>/dev/null; then
+    echo
+    echo "Would you like to select specific games to install?"
+    echo "This will open an interactive menu where you can choose which games to create assets for."
+    echo "Games not selected will still be on the PS2 drive, but won't appear in the Game Collection."
+    echo
+
+    while true; do
+        read -p "Use interactive game selector? (y/n): " use_selector
+        case "$use_selector" in
+            [Yy])
+                run_game_selector
+                break
+                ;;
+            [Nn])
+                echo "Proceeding with all games." | tee -a "${LOG_FILE}"
+                break
+                ;;
+            *)
+                echo
+                echo "Please enter y or n."
+                ;;
+        esac
+    done
 fi
 
 # Sends a list of apps and games synced/copied to the log file
