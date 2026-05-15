@@ -99,6 +99,23 @@ done
 
 if [ "$MODE" = "install" ]; then
     LOG_FILE="${TOOLKIT_PATH}/logs/PSBBN-installer.log"
+    # Prompt for SCPH-7000x adapter options
+    echo
+    echo "  ┌─────────────────────────────────────────────────────────┐"
+    echo "  │  SCPH-7000x / IDE→SD adapter options                    │"
+    echo "  │  Fixes for third-party HDD adapters and SD cards         │"
+    echo "  │  Only enable if using IDE→SD, IDE→SATA, or similar      │"
+    echo "  └─────────────────────────────────────────────────────────┘"
+    echo
+    read -p "  Create __boot partition for modchip DEV2 auto-boot?  [y/N]: " BOOT_MODE
+    if [[ "$BOOT_MODE" =~ ^[Yy]$ ]]; then
+        BOOT_PARTITION=1
+    fi
+    read -p "  Enable MWDMA2 kernel patch (fixes UDMA write hangs)? [y/N]: " SD_MODE
+    if [[ "$SD_MODE" =~ ^[Yy]$ ]]; then
+        SD_CARD_MWDMA2=1
+    fi
+    [ "$BOOT_PARTITION" = "1" ] || [ "$SD_CARD_MWDMA2" = "1" ] && echo
 else
     LOG_FILE="${TOOLKIT_PATH}/logs/update.log"
 fi
@@ -112,6 +129,9 @@ version_le() { # returns 0 (true) if $1 < $2
 if [ "$MODE" = "install" ]; then
     LINUX_PARTITIONS=("__linux.1" "__linux.4" "__linux.5" "__linux.6" "__linux.7" "__linux.8" "__linux.9" )
     PFS_PARTITIONS=("__contents" "__system" "__sysconf" "__common" )
+    if [ "$BOOT_PARTITION" = "1" ]; then
+        PFS_PARTITIONS+=("__boot")
+    fi
 fi
 
 error_msg() {
@@ -207,6 +227,62 @@ exit_script() {
     if [[ -n "$path_arg" ]]; then
         cp "${LOG_FILE}" "${path_arg}" > /dev/null 2>&1
     fi
+}
+
+# Patch vmlinux kernel to use MWDMA2 instead of UDMA4 for DMA
+# Fixes IDE→SD/SATA adapters on SCPH-7000x that fail on UDMA writes
+patch_vmlinux_mwdma2() {
+    local vmlinux="$1"
+    if [ ! -f "$vmlinux" ]; then
+        echo "  [!] vmlinux not found at $vmlinux" | tee -a "${LOG_FILE}"
+        return 1
+    fi
+    echo "  Patching kernel for MWDMA2 (SD card mode)..." | tee -a "${LOG_FILE}"
+    python3 -c "
+import struct, sys, subprocess
+with open('$vmlinux', 'rb+') as f:
+    data = f.read()
+    sym_addr = None
+    # Try nm first, then readelf
+    for cmd in (['nm', '$vmlinux'], ['readelf', '-s', '$vmlinux']):
+        try:
+            out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode()
+            for line in out.split('\\n'):
+                if 'ide_config_drive_speed' in line:
+                    parts = line.split()
+                    if parts:
+                        try: sym_addr = int(parts[0], 16); break
+                        except: pass
+            if sym_addr: break
+        except: pass
+    if sym_addr:
+        jal = (0x0C << 26) | ((sym_addr >> 2) & 0x3FFFFFF)
+        jal_bytes = struct.pack('<I', jal)
+        old_li = struct.pack('<I', 0x24050044)
+        pattern = jal_bytes + old_li
+        idx = data.find(pattern)
+        if idx >= 0:
+            data = bytearray(data)
+            data[idx + 4] = 0x22
+            f.seek(0); f.write(data); f.truncate()
+            print(f'Patched at file offset 0x{idx+4:x}')
+            sys.exit(0)
+    # Fallback: find JAL + li a1,0x44
+    old_li = struct.pack('<I', 0x24050044)
+    idx = data.find(old_li)
+    while idx >= 0:
+        if idx >= 4:
+            prev = struct.unpack_from('<I', data, idx - 4)[0]
+            if (prev >> 26) == 0x03:
+                data = bytearray(data)
+                data[idx] = 0x22
+                f.seek(0); f.write(data); f.truncate()
+                print(f'Patched at file offset 0x{idx:x}')
+                sys.exit(0)
+        idx = data.find(old_li, idx + 1)
+    print('Pattern not found')
+    sys.exit(1)
+" 2>> "${LOG_FILE}" && echo "  [OK] Kernel patched for MWDMA2" | tee -a "${LOG_FILE}" || echo "  [!] Kernel patch failed - may already be patched" | tee -a "${LOG_FILE}"
 }
 
 get_latest_file() {
@@ -939,6 +1015,9 @@ if [ "$MODE" = "install" ]; then
 
     COMMANDS="device ${DEVICE}\n"
     COMMANDS+="initialize yes\n"
+    if [ "$BOOT_PARTITION" = "1" ]; then
+        COMMANDS+="mkpart __boot 128M PFS\n"
+    fi
     COMMANDS+="mkpart __linux.1 512M EXT2\n"
     COMMANDS+="mkpart __linux.2 128M EXT2SWAP\n"
     COMMANDS+="mkpart __linux.4 512M EXT2\n"
@@ -1227,6 +1306,12 @@ if [ "$OSD_UPDATE" != "no" ]; then
     cp -f "${ASSETS_DIR}/osdmenu/"{hosdmenu.elf,version.txt} "${STORAGE_DIR}/__system/osdmenu/" 2>> "${LOG_FILE}" || error_msg "Failed to copy hosdmenu.elf."
 fi
 
+# Install Dev2 bootloader for auto-boot from __boot partition (if requested)
+if [ "$BOOT_PARTITION" = "1" ] && [ -f "${ASSETS_DIR}/modbo_dev2_boot.elf" ]; then
+    cp -f "${ASSETS_DIR}/modbo_dev2_boot.elf" "${STORAGE_DIR}/__boot/BOOT.ELF" 2>> "${LOG_FILE}" || echo "  [!] Failed to copy Dev2 bootloader." | tee -a "${LOG_FILE}"
+    echo "  [OK] Dev2 bootloader installed to __boot partition." | tee -a "${LOG_FILE}"
+fi
+
 # Check if OSDMBR.CNF exists
 if [ ! -f "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" ]; then
     if sudo "${HDL_DUMP}" toc ${DEVICE} | grep -q "__linux.3"; then
@@ -1386,6 +1471,11 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
     error_msg "Failed to update $SYSCONF_XML";
 
     sudo cp -f "${SYSCONF_XML}" "${STORAGE_DIR}/__linux.4/bn/script/utility/sysconf.xml" || error_msg "Failed to replace sysconf.xml."
+fi
+
+# Apply SD card MWDMA2 kernel patch if selected
+if [ "$SD_CARD_MWDMA2" = "1" ] && [ -f "${STORAGE_DIR}/__system/p2lboot/vmlinux" ]; then
+    patch_vmlinux_mwdma2 "${STORAGE_DIR}/__system/p2lboot/vmlinux"
 fi
 
 UNMOUNT_ALL
