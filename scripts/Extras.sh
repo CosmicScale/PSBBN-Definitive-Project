@@ -1464,6 +1464,7 @@ option_five() {
 }
 
 option_six() {
+    clear
     echo "########################################################################################################" >> "${LOG_FILE}"
     echo "MWDMA2 Kernel Patch:" >> "${LOG_FILE}"
 
@@ -1483,16 +1484,15 @@ option_six() {
         sleep 2
         return 0
     fi
-    echo
-
-    if [ ! -f "${STORAGE_DIR}/__system/p2lboot/vmlinux" ]; then
-        echo "  [!] Kernel not found at __system/p2lboot/vmlinux" | tee -a "${LOG_FILE}"
-        echo "  Make sure PSBBN partitions are mounted."
-        sleep 3
-        return 1
-    fi
+    
+    APA_PARTITIONS=("__system" )
+    mapper_probe && \
+    mount_pfs || return 1
+    sleep 2
 
     patch_vmlinux_mwdma2 "${STORAGE_DIR}/__system/p2lboot/vmlinux"
+    clean_up || return 1
+    
     echo
     read -n 1 -s -r -p "                                    Press any key to return to the menu..." </dev/tty
 }
