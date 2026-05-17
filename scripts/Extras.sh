@@ -589,6 +589,62 @@ cat << "EOF"
 EOF
 }
 
+# Patch vmlinux kernel to use MWDMA2 instead of UDMA4 for DMA
+# Fixes IDE→SD/SATA adapters on SCPH-7000x that fail on UDMA writes
+patch_vmlinux_mwdma2() {
+    local vmlinux="$1"
+    if [ ! -f "$vmlinux" ]; then
+        echo "  [!] vmlinux not found at $vmlinux" | tee -a "${LOG_FILE}"
+        return 1
+    fi
+    echo "  Patching kernel for MWDMA2 (SD card mode)..." | tee -a "${LOG_FILE}"
+    python3 -c "
+import struct, sys, subprocess
+with open('$vmlinux', 'rb+') as f:
+    data = f.read()
+    sym_addr = None
+    # Try nm first, then readelf
+    for cmd in (['nm', '$vmlinux'], ['readelf', '-s', '$vmlinux']):
+        try:
+            out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode()
+            for line in out.split('\\n'):
+                if 'ide_config_drive_speed' in line:
+                    parts = line.split()
+                    if parts:
+                        try: sym_addr = int(parts[0], 16); break
+                        except: pass
+            if sym_addr: break
+        except: pass
+    if sym_addr:
+        jal = (0x0C << 26) | ((sym_addr >> 2) & 0x3FFFFFF)
+        jal_bytes = struct.pack('<I', jal)
+        old_li = struct.pack('<I', 0x24050044)
+        pattern = jal_bytes + old_li
+        idx = data.find(pattern)
+        if idx >= 0:
+            data = bytearray(data)
+            data[idx + 4] = 0x22
+            f.seek(0); f.write(data); f.truncate()
+            print(f'Patched at file offset 0x{idx+4:x}')
+            sys.exit(0)
+    # Fallback: find JAL + li a1,0x44
+    old_li = struct.pack('<I', 0x24050044)
+    idx = data.find(old_li)
+    while idx >= 0:
+        if idx >= 4:
+            prev = struct.unpack_from('<I', data, idx - 4)[0]
+            if (prev >> 26) == 0x03:
+                data = bytearray(data)
+                data[idx] = 0x22
+                f.seek(0); f.write(data); f.truncate()
+                print(f'Patched at file offset 0x{idx:x}')
+                sys.exit(0)
+        idx = data.find(old_li, idx + 1)
+    print('Pattern not found')
+    sys.exit(1)
+" 2>> "${LOG_FILE}" && echo "  [OK] Kernel patched for MWDMA2" | tee -a "${LOG_FILE}" || echo "  [!] Kernel patch failed - may already be patched" | tee -a "${LOG_FILE}"
+}
+
 # Function for Option 1 - Install PS2 Linux
 option_one() {
     echo "########################################################################################################" >> "${LOG_FILE}"
@@ -1407,6 +1463,40 @@ option_five() {
     read -n 1 -s -r -p "                                    Press any key to return to the menu..." </dev/tty
 }
 
+option_six() {
+    echo "########################################################################################################" >> "${LOG_FILE}"
+    echo "MWDMA2 Kernel Patch:" >> "${LOG_FILE}"
+
+    echo
+    echo "  This patches the PS2 Linux kernel to use MWDMA2 instead of UDMA4"
+    echo "  for DMA transfers. Fixes write hangs on SCPH-7000x consoles"
+    echo "  using IDE→SD or IDE→SATA adapters."
+    echo
+    echo "  NOTE: This fixes the PSBBN boot hang, but game launching from"
+    echo "  the PSBBN menu may still freeze on 'Wait while loading' screen."
+    echo "  This is a separate issue under investigation (see PR #575)."
+    echo
+    read -p "  Apply MWDMA2 kernel patch? [y/N]: " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo
+        echo "  Patch cancelled."
+        sleep 2
+        return 0
+    fi
+    echo
+
+    if [ ! -f "${STORAGE_DIR}/__system/p2lboot/vmlinux" ]; then
+        echo "  [!] Kernel not found at __system/p2lboot/vmlinux" | tee -a "${LOG_FILE}"
+        echo "  Make sure PSBBN partitions are mounted."
+        sleep 3
+        return 1
+    fi
+
+    patch_vmlinux_mwdma2 "${STORAGE_DIR}/__system/p2lboot/vmlinux"
+    echo
+    read -n 1 -s -r -p "                                    Press any key to return to the menu..." </dev/tty
+}
+
 EXTRAS_SPLASH() {
 clear
     cat << "EOF"
@@ -1435,6 +1525,8 @@ display_menu() {
                                     4) Change Screen Settings
 
                                     5) Clear Art & Icon Cache
+
+                                    6) Apply MWDMA2 Kernel Patch
 
                                     b) Back to Main Menu
 
@@ -1494,6 +1586,9 @@ while true; do
             ;;
         5)
             option_five
+            ;;
+        6)
+            option_six
             ;;
         b|B)
             break
