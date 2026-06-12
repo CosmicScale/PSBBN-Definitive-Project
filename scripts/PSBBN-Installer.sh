@@ -99,6 +99,8 @@ done
 
 if [ "$MODE" = "install" ]; then
     LOG_FILE="${TOOLKIT_PATH}/logs/PSBBN-installer.log"
+    # Always create a small __boot partition (harmless, usable for modchip DEV2)
+    BOOT_PARTITION=1
 else
     LOG_FILE="${TOOLKIT_PATH}/logs/update.log"
 fi
@@ -111,7 +113,7 @@ version_le() { # returns 0 (true) if $1 < $2
 
 if [ "$MODE" = "install" ]; then
     LINUX_PARTITIONS=("__linux.1" "__linux.4" "__linux.5" "__linux.6" "__linux.7" "__linux.8" "__linux.9" )
-    PFS_PARTITIONS=("__contents" "__system" "__sysconf" "__common" )
+    PFS_PARTITIONS=("__contents" "__system" "__sysconf" "__common" "__boot" )
 fi
 
 error_msg() {
@@ -939,6 +941,7 @@ if [ "$MODE" = "install" ]; then
 
     COMMANDS="device ${DEVICE}\n"
     COMMANDS+="initialize yes\n"
+    COMMANDS+="mkpart __boot 8M PFS\n"
     COMMANDS+="mkpart __linux.1 512M EXT2\n"
     COMMANDS+="mkpart __linux.2 128M EXT2SWAP\n"
     COMMANDS+="mkpart __linux.4 512M EXT2\n"
@@ -1227,6 +1230,8 @@ if [ "$OSD_UPDATE" != "no" ]; then
     cp -f "${ASSETS_DIR}/osdmenu/"{hosdmenu.elf,version.txt} "${STORAGE_DIR}/__system/osdmenu/" 2>> "${LOG_FILE}" || error_msg "Failed to copy hosdmenu.elf."
 fi
 
+# __boot partition is created automatically; users copy their own bootloader if needed
+
 # Check if OSDMBR.CNF exists
 if [ ! -f "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" ]; then
     if sudo "${HDL_DUMP}" toc ${DEVICE} | grep -q "__linux.3"; then
@@ -1387,6 +1392,8 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
 
     sudo cp -f "${SYSCONF_XML}" "${STORAGE_DIR}/__linux.4/bn/script/utility/sysconf.xml" || error_msg "Failed to replace sysconf.xml."
 fi
+
+# MWDMA2 kernel patch is available in the Extras menu for IDE→SD adapter users
 
 UNMOUNT_ALL
 
