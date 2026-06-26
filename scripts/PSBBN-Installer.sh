@@ -97,6 +97,19 @@ for arg in "$@"; do
     fi
 done
 
+# Source unattended configuration if present
+UNATTENDED_CONF="${TOOLKIT_PATH}/psbbn-unattended.conf"
+if [[ -f "$UNATTENDED_CONF" ]]; then
+    source "$UNATTENDED_CONF"
+fi
+
+serialnumber="${serialnumber:-$DEVICE_DISK_SERIAL}"
+
+# Save unattended config values that may be overwritten later
+CONF_CHANNELS="${CHANNELS:-}"
+CONF_SCREEN="${SCREEN:-}"
+CONF_SELECT_WITH_CROSS="${SELECT_WITH_CROSS:-}"
+
 if [ "$MODE" = "install" ]; then
     LOG_FILE="${TOOLKIT_PATH}/logs/PSBBN-installer.log"
 else
@@ -662,83 +675,106 @@ if [ "$MODE" = "install" ]; then
         echo
         echo "Selected drive: $drive_model" | tee -a "${LOG_FILE}"
 
-        while true; do
-            echo
-            echo "Are you sure you want to install to the selected drive?" | tee -a "${LOG_FILE}"
-            echo
-            read -p "This will erase all data on the drive. (yes/no): " CONFIRM
+        if [[ "$SKIP_CONFIRM" == "yes" ]]; then
+            echo "[!] Skipping device confirmation (SKIP_CONFIRM=yes)." | tee -a "${LOG_FILE}"
+        else
+            while true; do
+                echo
+                echo "Are you sure you want to install to the selected drive?" | tee -a "${LOG_FILE}"
+                echo
+                read -p "This will erase all data on the drive. (yes/no): " CONFIRM
 
-            case "$CONFIRM" in
-                yes)
-                    # Valid confirmation → break out of loop and continue
-                    break
-                    ;;
-                no)
-                    echo
-                    read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
-                    echo
-                    exit 1
-                    ;;
-                *)
-                    echo
-                    echo "Please enter 'yes' or 'no'."
-                    ;;
-            esac
-        done
+                case "$CONFIRM" in
+                    yes)
+                        # Valid confirmation → break out of loop and continue
+                        break
+                        ;;
+                    no)
+                        echo
+                        read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
+                        echo
+                        exit 1
+                        ;;
+                    *)
+                        echo
+                        echo "Please enter 'yes' or 'no'."
+                        ;;
+                esac
+            done
+        fi
     fi
 
-    echo
-    echo "Please select a language from the list below:"
-    echo
-    echo "1) English"
-    echo "2) Japanese"
-    echo "3) French"
-    echo "4) German"
-    echo "5) Italian"
-    echo "6) Portuguese (Brazil)"
-    echo "7) Spanish"
-    echo
-    read -p "Enter the number for your chosen language: " choice
+    if [[ -n "$LANG" ]]; then
+        case "$LANG" in
+            eng) LANG_DISPLAY="English" ;;
+            jpn) LANG_DISPLAY="Japanese" ;;
+            fre) LANG_DISPLAY="French" ;;
+            ger) LANG_DISPLAY="German" ;;
+            ita) LANG_DISPLAY="Italian" ;;
+            por) LANG_DISPLAY="Portuguese (Brazil)" ;;
+            spa) LANG_DISPLAY="Spanish" ;;
+            *)
+                echo
+                echo "Invalid LANG value '$LANG' in unattended config. Defaulting to English." | tee -a "${LOG_FILE}"
+                LANG="eng"
+                LANG_DISPLAY="English"
+                ;;
+        esac
+        echo "Language set to: $LANG (from unattended config)" >> "${LOG_FILE}"
+    else
+        echo
+        echo "Please select a language from the list below:"
+        echo
+        echo "1) English"
+        echo "2) Japanese"
+        echo "3) French"
+        echo "4) German"
+        echo "5) Italian"
+        echo "6) Portuguese (Brazil)"
+        echo "7) Spanish"
+        echo
+        read -p "Enter the number for your chosen language: " choice
 
-    case "$choice" in
-        1)
-            LANG="eng"
-            LANG_DISPLAY="English"
-            ;;
-        2)
-            LANG="jpn"
-            LANG_DISPLAY="Japanese"
-            CHAN_UPDATE="yes"
-            ;;
-        3)
-            LANG="fre"
-            LANG_DISPLAY="French"
-            ;;
-        4)
-            LANG="ger"
-            LANG_DISPLAY="German"
-            ;;
-        5)
-            LANG="ita"
-            LANG_DISPLAY="Italian"
-            ;;
-        6)
-            LANG="por"
-            LANG_DISPLAY="Portuguese (Brazil)"
-            ;;
-        7)
-            LANG="spa"
-            LANG_DISPLAY="Spanish"
-            ;;
-        *)
-            echo
-            echo "Invalid selection. Defaulting to English." | tee -a "${LOG_FILE}"
-            LANG="eng"
-            LANG_DISPLAY="English"
-            ;;
-    esac
+        case "$choice" in
+            1)
+                LANG="eng"
+                LANG_DISPLAY="English"
+                ;;
+            2)
+                LANG="jpn"
+                LANG_DISPLAY="Japanese"
+                CHAN_UPDATE="yes"
+                ;;
+            3)
+                LANG="fre"
+                LANG_DISPLAY="French"
+                ;;
+            4)
+                LANG="ger"
+                LANG_DISPLAY="German"
+                ;;
+            5)
+                LANG="ita"
+                LANG_DISPLAY="Italian"
+                ;;
+            6)
+                LANG="por"
+                LANG_DISPLAY="Portuguese (Brazil)"
+                ;;
+            7)
+                LANG="spa"
+                LANG_DISPLAY="Spanish"
+                ;;
+            *)
+                echo
+                echo "Invalid selection. Defaulting to English." | tee -a "${LOG_FILE}"
+                LANG="eng"
+                LANG_DISPLAY="English"
+                ;;
+        esac
 
-    echo "Language set to: $LANG" >> "${LOG_FILE}"
+        echo "Language set to: $LANG" >> "${LOG_FILE}"
+    fi
 else
 
     UPDATE_SPLASH
@@ -839,11 +875,14 @@ if [ "$OS" = "PSBBN" ]; then
         LANG_PACK="${ASSETS_DIR}/${LATEST_FILE}"
     fi
 
-    if [[ "$LANG" == "jpn" ]]; then
-        get_latest_file "channels-$LANG" "$LANG_DISPLAY channels"
+    if [[ "$LANG" == "jpn" ]] || [[ "$CONF_CHANNELS" == "yes" ]]; then
+        get_latest_file "channels-jpn" "Channels"
 
         echo "Current channels version: $CHAN_VER" | tee -a "${LOG_FILE}"
-        if [ "$(printf '%s\n' "$LATEST_CHAN" "$CHAN_VER" | sort -V | tail -n1)" = "$CHAN_VER" ]; then
+        if [[ "$CONF_CHANNELS" == "yes" && "$LANG" != "jpn" ]]; then
+            echo "Forcing channels installation (CHANNELS=yes)." | tee -a "${LOG_FILE}"
+            CHAN_UPDATE="yes"
+        elif [ "$(printf '%s\n' "$LATEST_CHAN" "$CHAN_VER" | sort -V | tail -n1)" = "$CHAN_VER" ]; then
             echo
             echo "You already have the latest game channels installed." | tee -a "${LOG_FILE}"
             CHAN_UPDATE="no"
@@ -909,7 +948,7 @@ if [ "$PSBBN_UPDATE" != "no" ] || [ "$MODE" != "update" ]; then
         - The selected game launcher (OPL or NHDDL) is assigned to the SQUARE startup button
         - VMCs can be created for PS2 games, with support for VMC groups
         - An OPL configuration file is created on your drive; BDM HDD, apps, and artwork are enabled
-        - Games in ZSO format have “Compatibility Mode 1” automatically enabled in OPL
+        - Games in ZSO format have "Compatibility Mode 1" automatically enabled in OPL
         - Multiple games with the same Title ID can now be installed, allowing support for mods
         - PS1 games feature a new PSN-style border in the PSBBN Game Collection
         - Automatic installation of HugoPocked POPStarter fixes for improved PS1 compatibility
@@ -918,7 +957,7 @@ if [ "$PSBBN_UPDATE" != "no" ] || [ "$MODE" != "update" ]; then
 
         Watch the latest update video: https://youtu.be/oRm3QIwdf1o
 
-==============================================================================================================
+    ==============================================================================================================
 EOF
     fi
     echo
@@ -969,167 +1008,244 @@ if [ "$MODE" = "install" ]; then
     max_pops=$(((available - 2048) / 1024))
 
     echo | tee -a "${LOG_FILE}"
-    # Prompt user for partition size for POPS, Music and Contents, validate input, and keep asking until valid input is provided
-    while true; do
-        INSTALL_SPLASH
-        echo "========================================== Partitioning the Drive =========================================="
-        echo
-        echo "Space available for APA partitions: $free_space GB" | tee -a "${LOG_FILE}"
-        echo
-        echo "What size would you like the \"POPS\" partition to be?"
-        echo "This partition is used to store PS1 games. A typical game requires between 200 and 700 MB."
-        echo
-        echo "Minimum 1 GB, maximum $max_pops GB"
-        echo
-        read -p "Enter partition size (in GB): " pops_gb
+    # Determine partition sizes (interactive or unattended)
+    if [[ -n "$POPS_GB" && -n "$MUSIC_GB" && -n "$CONTENTS_GB" ]]; then
+        # Use values from unattended config
+        pops_gb="$POPS_GB"
+        music_gb="$MUSIC_GB"
+        contents_gb="$CONTENTS_GB"
 
-        if [[ ! "$pops_gb" =~ ^[0-9]+$ ]]; then
-            echo
-            echo -n "Invalid input. Please enter a valid number."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
+        # Validate POPS_GB
+        if [[ ! "$pops_gb" =~ ^[0-9]+$ ]] || (( pops_gb < 1 || pops_gb > max_pops )); then
+            error_msg "Invalid POPS_GB value '$pops_gb' in unattended config. Must be between 1 and $max_pops."
         fi
 
-        if (( pops_gb < 1 || pops_gb > max_pops )); then
-            echo
-            echo -n "Invalid size. Please enter a value between 1 and $max_pops GB."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
+        # Validate MUSIC_GB against remaining space
+        if [[ ! "$music_gb" =~ ^[0-9]+$ ]] || (( music_gb < 1 || music_gb > free_space - pops_gb - 1 )); then
+            error_msg "Invalid MUSIC_GB value '$music_gb' in unattended config."
         fi
 
-        remaining_gb=$((free_space - pops_gb -1))
-        echo
-        echo "What size would you like the \"Music\" partition to be?"
-        echo "Music is stored in lossless PCM audio. An album typically requires between 650 and 700 MB."
-        echo
-        echo "Minimum 1 GB, maximum $remaining_gb GB"
-        echo
-        read -p "Enter partition size (in GB): " music_gb
-
-        if [[ ! "$music_gb" =~ ^[0-9]+$ ]]; then
-            echo
-            echo -n "Invalid input. Please enter a valid number."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
+        # Validate CONTENTS_GB against remaining space
+        if [[ ! "$contents_gb" =~ ^[0-9]+$ ]] || (( contents_gb < 1 || contents_gb > free_space - pops_gb - music_gb )); then
+            error_msg "Invalid CONTENTS_GB value '$contents_gb' in unattended config."
         fi
 
-        if (( music_gb < 1 || music_gb > remaining_gb )); then
-            echo
-            echo -n "Invalid size. Please enter a value between 1 and $remaining_gb GB."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
-        fi
+        remaining_gb=$((free_space - pops_gb - music_gb - contents_gb))
 
-        remaining_gb=$((free_space - pops_gb - music_gb))
-        echo
-        echo "What size would you like the \"Contents\" partition to be?"
-        echo "This partition is used to store movies and photos. Movies typically use about 1.3 GB per hour."
-        echo
-        echo "Minimum 1 GB, maximum $remaining_gb GB"
-        echo
-        read -p "Enter partition size (in GB): " contents_gb
-
-        if [[ ! "$contents_gb" =~ ^[0-9]+$ ]]; then
-            echo
-            echo -n "Invalid input. Please enter a valid number."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
-        fi
-
-        if (( contents_gb < 1 || contents_gb > remaining_gb )); then
-            echo
-            echo -n "Invalid size. Please enter a value between 1 and $remaining_gb GB."
-            sleep 3
-            echo | tee -a "${LOG_FILE}"
-            continue
-        fi
-
-        remaining_gb=$((free_space - pops_gb - music_gb - contents_gb ))
-
-        if (( remaining_gb > 0 )); then
-            echo
-            echo "Would you like to reserve space on your drive for future APA partitions?"
-            echo "You'll need at least 3 GB reserved to install PS2 Linux."
-            echo
-            read -p "Reserve space? (y/n): " answer
-
-            if [[ "$answer" =~ ^[Yy]$ ]]; then
-                echo
-                echo "How much space would you like to reserve?"
-                echo "Minimum 1 GB, maximum $remaining_gb GB"
-                echo
-                read -rp "Enter partition size (in GB): " reserve_gb
-
-                # Check if input is a valid number
-                if [[ ! "$reserve_gb" =~ ^[0-9]+$ ]]; then
-                    echo
-                    echo "Invalid input. Please enter a valid number."
-                    sleep 3
-                    echo | tee -a "${LOG_FILE}"
-                    continue
-                fi
-
-                # Check if input is within valid range
-                if (( reserve_gb < 1 || reserve_gb > remaining_gb )); then
-                    echo
-                    echo "Invalid size. Please enter a value between 1 and $remaining_gb GB."
-                    sleep 3
-                    echo | tee -a "${LOG_FILE}"
-                    continue
-                fi
-            elif [[ "$answer" =~ ^[Nn]$ ]]; then
-                reserve_gb="0"
-            else
-                echo
-                echo -n "Invalid input. Please enter y or n."
-                sleep 3
-                echo | tee -a "${LOG_FILE}"
-                continue
+        # Handle reserve space from unattended config
+        if [[ "$RESERVE_SPACE_PS2_LINUX" == "y" ]]; then
+            if [[ -z "$RESERVE_GB_PS2_LINUX" ]]; then
+                error_msg "RESERVE_SPACE_PS2_LINUX is set to 'y' but RESERVE_GB_PS2_LINUX is not set."
+            fi
+            reserve_gb="$RESERVE_GB_PS2_LINUX"
+            if [[ ! "$reserve_gb" =~ ^[0-9]+$ ]] || (( reserve_gb < 1 || reserve_gb > remaining_gb )); then
+                error_msg "Invalid RESERVE_GB_PS2_LINUX value '$reserve_gb' in unattended config."
             fi
         else
             reserve_gb="0"
         fi
 
+        # Compute and display partition summary
         allocated_mb=$(( (music_gb + pops_gb + contents_gb + reserve_gb) * 1024 ))
         APA_MiB=$(( allocated_mb + used + 6400 +128 ))
         DIFF_MB=$(( SIZE_MB - APA_MiB - 32 ))
 
-        # Convert to GiB for display (1 GiB = 1024 MiB) with 2 decimal places
         OPL_GB=$(awk "BEGIN { printf \"%.2f\", ${DIFF_MB}/1024 }")
 
         if awk "BEGIN {exit !($OPL_GB >= 1000)}"; then
-            # Store difference as TB with one decimal
             difference="$(awk "BEGIN {printf \"%.1f TB\", $OPL_GB/1024}")"
-            # Cap at 2 TB
             CAP=$(awk "BEGIN {print ($difference > 2.0) ? 2.0 : $difference}")
             OPL_SIZE="${CAP} TB"
         else
-            # Store as GB
             OPL_SIZE="${OPL_GB} GB"
         fi
 
-        echo
-        echo "The following partitions will be created:"
-        echo "- OPL partition: $OPL_SIZE"
-        echo "- POPS partition: $pops_gb GB"
-        echo "- Music partition: $music_gb GB"
-        echo "- Contents partition: $contents_gb GB"
-        echo "- Reserved space: $reserve_gb GB"
-        echo
-        read -p "Do you wish to proceed? (y/n): " confirm
-        if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        echo | tee -a "${LOG_FILE}"
+        echo "The following partitions will be created:" | tee -a "${LOG_FILE}"
+        echo "- OPL partition: $OPL_SIZE" | tee -a "${LOG_FILE}"
+        echo "- POPS partition: $pops_gb GB" | tee -a "${LOG_FILE}"
+        echo "- Music partition: $music_gb GB" | tee -a "${LOG_FILE}"
+        echo "- Contents partition: $contents_gb GB" | tee -a "${LOG_FILE}"
+        echo "- Reserved space: $reserve_gb GB" | tee -a "${LOG_FILE}"
+
+        if [[ "$SKIP_CONFIRM" == "yes" ]]; then
+            echo "[!] Skipping partition confirmation (SKIP_CONFIRM=yes)." | tee -a "${LOG_FILE}"
             music_partition=$((music_gb * 1024))
             pops_partition=$((pops_gb * 1024))
             contents_partition=$((contents_gb * 1024))
             reserved_space=$((reserve_gb * 1024))
-            break
+        else
+            echo
+            read -p "Do you wish to proceed? (y/n): " confirm
+            if [[ "$confirm" =~ ^[Yy]$ ]]; then
+                music_partition=$((music_gb * 1024))
+                pops_partition=$((pops_gb * 1024))
+                contents_partition=$((contents_gb * 1024))
+                reserved_space=$((reserve_gb * 1024))
+            else
+                echo
+                read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
+                echo
+                exit 1
+            fi
         fi
-    done
+    else
+        # Interactive partition sizing
+        while true; do
+            INSTALL_SPLASH
+            echo "========================================== Partitioning the Drive =========================================="
+            echo
+            echo "Space available for APA partitions: $free_space GB" | tee -a "${LOG_FILE}"
+            echo
+            echo "What size would you like the \"POPS\" partition to be?"
+            echo "This partition is used to store PS1 games. A typical game requires between 200 and 700 MB."
+            echo
+            echo "Minimum 1 GB, maximum $max_pops GB"
+            echo
+            read -p "Enter partition size (in GB): " pops_gb
+
+            if [[ ! "$pops_gb" =~ ^[0-9]+$ ]]; then
+                echo
+                echo -n "Invalid input. Please enter a valid number."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            if (( pops_gb < 1 || pops_gb > max_pops )); then
+                echo
+                echo -n "Invalid size. Please enter a value between 1 and $max_pops GB."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            remaining_gb=$((free_space - pops_gb -1))
+            echo
+            echo "What size would you like the \"Music\" partition to be?"
+            echo "Music is stored in lossless PCM audio. An album typically requires between 650 and 700 MB."
+            echo
+            echo "Minimum 1 GB, maximum $remaining_gb GB"
+            echo
+            read -p "Enter partition size (in GB): " music_gb
+
+            if [[ ! "$music_gb" =~ ^[0-9]+$ ]]; then
+                echo
+                echo -n "Invalid input. Please enter a valid number."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            if (( music_gb < 1 || music_gb > remaining_gb )); then
+                echo
+                echo -n "Invalid size. Please enter a value between 1 and $remaining_gb GB."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            remaining_gb=$((free_space - pops_gb - music_gb))
+            echo
+            echo "What size would you like the \"Contents\" partition to be?"
+            echo "This partition is used to store movies and photos. Movies typically use about 1.3 GB per hour."
+            echo
+            echo "Minimum 1 GB, maximum $remaining_gb GB"
+            echo
+            read -p "Enter partition size (in GB): " contents_gb
+
+            if [[ ! "$contents_gb" =~ ^[0-9]+$ ]]; then
+                echo
+                echo -n "Invalid input. Please enter a valid number."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            if (( contents_gb < 1 || contents_gb > remaining_gb )); then
+                echo
+                echo -n "Invalid size. Please enter a value between 1 and $remaining_gb GB."
+                sleep 3
+                echo | tee -a "${LOG_FILE}"
+                continue
+            fi
+
+            remaining_gb=$((free_space - pops_gb - music_gb - contents_gb ))
+
+            if (( remaining_gb > 0 )); then
+                echo
+                echo "Would you like to reserve space on your drive for future APA partitions?"
+                echo "You'll need at least 3 GB reserved to install PS2 Linux."
+                echo
+                read -p "Reserve space? (y/n): " answer
+
+                if [[ "$answer" =~ ^[Yy]$ ]]; then
+                    echo
+                    echo "How much space would you like to reserve?"
+                    echo "Minimum 1 GB, maximum $remaining_gb GB"
+                    echo
+                    read -rp "Enter partition size (in GB): " reserve_gb
+
+                    if [[ ! "$reserve_gb" =~ ^[0-9]+$ ]]; then
+                        echo
+                        echo "Invalid input. Please enter a valid number."
+                        sleep 3
+                        echo | tee -a "${LOG_FILE}"
+                        continue
+                    fi
+
+                    if (( reserve_gb < 1 || reserve_gb > remaining_gb )); then
+                        echo
+                        echo "Invalid size. Please enter a value between 1 and $remaining_gb GB."
+                        sleep 3
+                        echo | tee -a "${LOG_FILE}"
+                        continue
+                    fi
+                elif [[ "$answer" =~ ^[Nn]$ ]]; then
+                    reserve_gb="0"
+                else
+                    echo
+                    echo -n "Invalid input. Please enter y or n."
+                    sleep 3
+                    echo | tee -a "${LOG_FILE}"
+                    continue
+                fi
+            else
+                reserve_gb="0"
+            fi
+
+            allocated_mb=$(( (music_gb + pops_gb + contents_gb + reserve_gb) * 1024 ))
+            APA_MiB=$(( allocated_mb + used + 6400 +128 ))
+            DIFF_MB=$(( SIZE_MB - APA_MiB - 32 ))
+
+            OPL_GB=$(awk "BEGIN { printf \"%.2f\", ${DIFF_MB}/1024 }")
+
+            if awk "BEGIN {exit !($OPL_GB >= 1000)}"; then
+                difference="$(awk "BEGIN {printf \"%.1f TB\", $OPL_GB/1024}")"
+                CAP=$(awk "BEGIN {print ($difference > 2.0) ? 2.0 : $difference}")
+                OPL_SIZE="${CAP} TB"
+            else
+                OPL_SIZE="${OPL_GB} GB"
+            fi
+
+            echo
+            echo "The following partitions will be created:"
+            echo "- OPL partition: $OPL_SIZE"
+            echo "- POPS partition: $pops_gb GB"
+            echo "- Music partition: $music_gb GB"
+            echo "- Contents partition: $contents_gb GB"
+            echo "- Reserved space: $reserve_gb GB"
+            echo
+            read -p "Do you wish to proceed? (y/n): " confirm
+            if [[ "$confirm" =~ ^[Yy]$ ]]; then
+                music_partition=$((music_gb * 1024))
+                pops_partition=$((pops_gb * 1024))
+                contents_partition=$((contents_gb * 1024))
+                reserved_space=$((reserve_gb * 1024))
+                break
+            fi
+        done
+    fi
 
     echo >> "${LOG_FILE}"
     echo "##########################################################################" >> "${LOG_FILE}"
@@ -1338,7 +1454,7 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ] && version_le "${psbbn_version:
 fi
 
 if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
-    if [[ "$ENTER" == "O" ]] || { [[ -z "$ENTER" ]] && [[ "$LANG" == "jpn" ]]; }; then
+    if [[ "$CONF_SELECT_WITH_CROSS" == "false" ]] || [[ "$ENTER" == "O" ]] || { [[ -z "$ENTER" ]] && [[ "$LANG" == "jpn" ]]; }; then
         if sudo cp -f "${ASSETS_DIR}/kernel/vmlinux_jpn" "${STORAGE_DIR}/__system/p2lboot/vmlinux" >> "${LOG_FILE}" 2>&1 \
             && sudo cp -f "${ASSETS_DIR}/kernel/o.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_r.tm2" >> "${LOG_FILE}" 2>&1 \
             && sudo cp -f "${ASSETS_DIR}/kernel/x.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_d.tm2" >> "${LOG_FILE}" 2>&1 ; then
@@ -1346,7 +1462,7 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
         else
             error_msg "Failed to swap enter button. See log for details."
         fi
-    elif [[ "$ENTER" == "X" ]] || { [[ -z "$ENTER" ]] && [[ "$LANG" != "jpn" ]]; }; then
+    elif [[ "$CONF_SELECT_WITH_CROSS" == "true" ]] || [[ "$ENTER" == "X" ]] || { [[ -z "$ENTER" ]] && [[ "$LANG" != "jpn" ]]; }; then
         if sudo cp -f "${ASSETS_DIR}/kernel/vmlinux" "${STORAGE_DIR}/__system/p2lboot/vmlinux" >> "${LOG_FILE}" 2>&1 \
             && sudo cp -f "${ASSETS_DIR}/kernel/x.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_r.tm2" >> "${LOG_FILE}" 2>&1 \
             && sudo cp -f "${ASSETS_DIR}/kernel/o.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_d.tm2" >> "${LOG_FILE}" 2>&1 ; then
@@ -1356,7 +1472,13 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
         fi
     fi
 
-    if [[ "$SCREEN" == "full" ]]; then
+    if [[ -n "$CONF_SCREEN" ]]; then
+        case "$CONF_SCREEN" in
+            full) SIZE_NAME="Full" ;;
+            16:9) SIZE_NAME="16:9" ;;
+            *) SIZE_NAME="4:3" ;;
+        esac
+    elif [[ "$SCREEN" == "full" ]]; then
         case "$LANG" in
             eng) SIZE_NAME="Full" ;;
             fre) SIZE_NAME="Plein écran" ;;
@@ -1499,12 +1621,22 @@ if [ "$MODE" = "install" ]; then
     echo "LANG = $LANG" >> "${OPL}/version.txt"
     echo "LANG_VER = $LATEST_LANG" >> "${OPL}/version.txt"
     echo "CHAN_VER = $LATEST_CHAN" >> "${OPL}/version.txt"
-    if [[ "$LANG" == "jpn" ]]; then
+    if [[ -n "$CONF_SELECT_WITH_CROSS" ]]; then
+        if [[ "$CONF_SELECT_WITH_CROSS" == "true" ]]; then
+            echo "ENTER = X" >> "$OPL/version.txt"
+        elif [[ "$CONF_SELECT_WITH_CROSS" == "false" ]]; then
+            echo "ENTER = O" >> "$OPL/version.txt"
+        fi
+    elif [[ "$LANG" == "jpn" ]]; then
         echo "ENTER = O" >> "$OPL/version.txt"
     else
         echo "ENTER = X" >> "$OPL/version.txt"
     fi
-    echo "SCREEN = 4:3" >> "$OPL/version.txt"
+    if [[ -n "$CONF_SCREEN" ]]; then
+        echo "SCREEN = $CONF_SCREEN" >> "$OPL/version.txt"
+    else
+        echo "SCREEN = 4:3" >> "$OPL/version.txt"
+    fi
 fi
 
 if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
@@ -1536,7 +1668,14 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
             echo "CHAN_VER = $LATEST_CHAN" >> "${OPL}/version.txt"
         fi
 
-        if [[ -z "$ENTER" ]]; then
+        if [[ -n "$CONF_SELECT_WITH_CROSS" ]]; then
+            sed -i "/^ENTER =/d" "$OPL/version.txt" 2>/dev/null || true
+            if [[ "$CONF_SELECT_WITH_CROSS" == "true" ]]; then
+                echo "ENTER = X" >> "$OPL/version.txt"
+            else
+                echo "ENTER = O" >> "$OPL/version.txt"
+            fi
+        elif [[ -z "$ENTER" ]]; then
             if [[ "$LANG" == "jpn" ]]; then
                 echo "ENTER = O" >> "$OPL/version.txt"
             else
@@ -1544,7 +1683,10 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
             fi
         fi
 
-        if [[ -z "$SCREEN" ]]; then
+        if [[ -n "$CONF_SCREEN" ]]; then
+            sed -i "/^SCREEN =/d" "$OPL/version.txt" 2>/dev/null || true
+            echo "SCREEN = $CONF_SCREEN" >> "$OPL/version.txt"
+        elif [[ -z "$SCREEN" ]]; then
             echo "SCREEN = 4:3" >> "$OPL/version.txt"
         fi
 
@@ -1617,7 +1759,7 @@ else
         echo "   This will improve game startup times and add apps to the HOSDMenu System Menu."
     fi
 
-    if [[ ( "$PSBBN_UPDATE" != "no" || "$LANG_UPDATE" != "no" ) && -z "$ENTER" ]]; then
+    if [[ ( "$PSBBN_UPDATE" != "no" || "$LANG_UPDATE" != "no" ) && -z "$ENTER" && -z "$CONF_SELECT_WITH_CROSS" ]]; then
         echo
         echo "   NOTE: If you previously swapped the X and O buttons, you will need to do so again in the Extras menu."
     fi

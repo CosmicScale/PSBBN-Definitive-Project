@@ -1500,6 +1500,12 @@ if ! echo "#####################################################################
     fi
 fi
 
+# Source unattended configuration if present
+UNATTENDED_CONF="${TOOLKIT_PATH}/psbbn-unattended.conf"
+if [[ -f "$UNATTENDED_CONF" ]]; then
+    source "$UNATTENDED_CONF"
+fi
+
 date >> "${LOG_FILE}"
 echo >> "${LOG_FILE}"
 echo "Tootkit path: $TOOLKIT_PATH" >> "${LOG_FILE}"

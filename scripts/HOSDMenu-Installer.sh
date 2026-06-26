@@ -62,6 +62,14 @@ for arg in "$@"; do
     fi
 done
 
+# Source unattended configuration if present
+UNATTENDED_CONF="${TOOLKIT_PATH}/psbbn-unattended.conf"
+if [[ -f "$UNATTENDED_CONF" ]]; then
+    source "$UNATTENDED_CONF"
+fi
+
+serialnumber="${serialnumber:-$DEVICE_DISK_SERIAL}"
+
 APA_PARTITIONS=("__system" "__common" "__sysconf" )
 
 error_msg() {
@@ -413,75 +421,80 @@ else
     echo
     echo "Selected drive: $drive_model" | tee -a "${LOG_FILE}"
 
-    while true; do
-        echo
-        echo "Are you sure you want to install to the selected drive?" | tee -a "${LOG_FILE}"
-        echo
-        read -p "This will erase all data on the drive. (yes/no): " CONFIRM
+    if [[ "$SKIP_CONFIRM" == "yes" ]]; then
+        echo "[!] Skipping drive confirmation (SKIP_CONFIRM=yes)." | tee -a "${LOG_FILE}"
+    else
+        while true; do
+            echo
+            echo "Are you sure you want to install to the selected drive?" | tee -a "${LOG_FILE}"
+            echo
+            read -p "This will erase all data on the drive. (yes/no): " CONFIRM
 
-        case "$CONFIRM" in
-            yes)
-                # Valid confirmation → break out of loop and continue
-                break
-                ;;
-            no)
-                echo
-                read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
-                echo
-                exit 1
-                ;;
-            *)
-                echo
-                echo "Please enter 'yes' or 'no'."
-                ;;
-        esac
-    done
+            case "$CONFIRM" in
+                yes)
+                    break
+                    ;;
+                no)
+                    echo
+                    read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
+                    echo
+                    exit 1
+                    ;;
+                *)
+                    echo
+                    echo "Please enter 'yes' or 'no'."
+                    ;;
+            esac
+        done
+    fi
 fi
 
 UNMOUNT_ALL
 clean_up
 
-echo
-echo "Please select a language from the list below:"
-echo
-echo "1) English"
-echo "2) Japanese"
-echo "3) French"
-echo "4) German"
-echo "5) Italian"
-echo "6) Portuguese (Brazil)"
-echo "7) Spanish"
-echo
-read -p "Enter the number for your chosen language: " choice
+if [[ -z "$LANG" ]]; then
+    echo
+    echo "Please select a language from the list below:"
+    echo
+    echo "1) English"
+    echo "2) Japanese"
+    echo "3) French"
+    echo "4) German"
+    echo "5) Italian"
+    echo "6) Portuguese (Brazil)"
+    echo "7) Spanish"
+    echo
+    read -p "Enter the number for your chosen language: " choice
 
-case "$choice" in
-    1)
-        LANG="eng"
-        ;;
-    2)
-        LANG="jpn"
-        ;;
-    3)
-        LANG="fre"
-        ;;
-    4)
-        LANG="ger"
-        ;;
-    5)
-        LANG="ita"
-        ;;
-    6)
-        LANG="por"
-        ;;
-    7)
-        LANG="spa"
-        ;;
-    *)
-        echo
-        echo "Invalid selection. Defaulting to English." | tee -a "${LOG_FILE}"
-        LANG="eng"
-        ;;
-esac
+    case "$choice" in
+        1)
+            LANG="eng"
+            ;;
+        2)
+            LANG="jpn"
+            ;;
+        3)
+            LANG="fre"
+            ;;
+        4)
+            LANG="ger"
+            ;;
+        5)
+            LANG="ita"
+            ;;
+        6)
+            LANG="por"
+            ;;
+        7)
+            LANG="spa"
+            ;;
+        *)
+            echo
+            echo "Invalid selection. Defaulting to English." | tee -a "${LOG_FILE}"
+            LANG="eng"
+            ;;
+    esac
+fi
 
 echo "Language set to: $LANG" >> "${LOG_FILE}"
 
@@ -527,61 +540,92 @@ echo | tee -a "${LOG_FILE}"
 SPLASH
 echo "    ====================================== Partitioning the Drive ======================================"
 
-# Prompt user for partition size for POPS, Music and Contents, validate input, and keep asking until valid input is provided
-while true; do
-    echo | tee -a "${LOG_FILE}"
-    echo "What size would you like the \"POPS\" partition to be?"
-    echo "This partition is used to store PS1 games. A typically game requires between 200 and 700 MB."
-    echo
-    echo "Minimum 1 GB, maximum $max_pops GB"
-    echo
-    read -p "Enter partition size (in GB): " pops_gb
-
-    if [[ ! "$pops_gb" =~ ^[0-9]+$ ]]; then
-        echo
-        echo -n "Invalid input. Please enter a valid number."
-        sleep 3
-        echo
-        continue
+# Determine POPS partition size (interactive or unattended)
+if [[ -n "$POPS_GB" ]]; then
+    pops_gb="$POPS_GB"
+    if [[ ! "$pops_gb" =~ ^[0-9]+$ ]] || (( pops_gb < 1 || pops_gb > max_pops )); then
+        error_msg "Invalid POPS_GB value '$pops_gb' in unattended config. Must be between 1 and $max_pops."
     fi
-
-    if (( pops_gb < 1 || pops_gb > max_pops )); then
-        echo
-        echo -n "Invalid size. Please enter a value between 1 and $max_pops GB."
-        sleep 3
-        echo
-        continue
-    fi
-
-    # Convert bytes to MB
     pops_partition=$(( pops_gb * 1024 ))
     APA_MiB=$(( pops_partition + used + 6400 +128 ))
     DIFF_MB=$(( capacity - APA_MiB - 32 ))
-
-    # Convert to GiB for display (1 GiB = 1024 MiB) with 2 decimal places
     OPL_GB=$(awk "BEGIN { printf \"%.2f\", ${DIFF_MB}/1024 }")
-
     if awk "BEGIN {exit !($OPL_GB >= 1000)}"; then
-        # Store difference as TB with one decimal
         difference="$(awk "BEGIN {printf \"%.1f TB\", $OPL_GB/1024}")"
-        # Cap at 2 TB
         CAP=$(awk "BEGIN {print ($difference > 2.0) ? 2.0 : $difference}")
         OPL_SIZE="${CAP} TB"
     else
-        # Store as GB
         OPL_SIZE="${OPL_GB} GB"
     fi
 
-    echo
-    echo "The following partitions will be created:"
-    echo "- POPS partition: $pops_gb GB"
-    echo "- OPL partition: $OPL_SIZE"
-    echo
-    read -p "Do you wish to proceed? (y/n): " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        break
+    echo | tee -a "${LOG_FILE}"
+    echo "The following partitions will be created:" | tee -a "${LOG_FILE}"
+    echo "- POPS partition: $pops_gb GB" | tee -a "${LOG_FILE}"
+    echo "- OPL partition: $OPL_SIZE" | tee -a "${LOG_FILE}"
+
+    if [[ "$SKIP_CONFIRM" == "yes" ]]; then
+        echo "[!] Skipping partition confirmation (SKIP_CONFIRM=yes)." | tee -a "${LOG_FILE}"
+    else
+        echo
+        read -p "Do you wish to proceed? (y/n): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo
+            read -n 1 -s -r -p "Aborted. Press any key to return to the menu..." </dev/tty
+            echo
+            exit 1
+        fi
     fi
+else
+    while true; do
+        echo | tee -a "${LOG_FILE}"
+        echo "What size would you like the \"POPS\" partition to be?"
+        echo "This partition is used to store PS1 games. A typically game requires between 200 and 700 MB."
+        echo
+        echo "Minimum 1 GB, maximum $max_pops GB"
+        echo
+        read -p "Enter partition size (in GB): " pops_gb
+
+        if [[ ! "$pops_gb" =~ ^[0-9]+$ ]]; then
+            echo
+            echo -n "Invalid input. Please enter a valid number."
+            sleep 3
+            echo
+            continue
+        fi
+
+        if (( pops_gb < 1 || pops_gb > max_pops )); then
+            echo
+            echo -n "Invalid size. Please enter a value between 1 and $max_pops GB."
+            sleep 3
+            echo
+            continue
+        fi
+
+        pops_partition=$(( pops_gb * 1024 ))
+        APA_MiB=$(( pops_partition + used + 6400 +128 ))
+        DIFF_MB=$(( capacity - APA_MiB - 32 ))
+
+        OPL_GB=$(awk "BEGIN { printf \"%.2f\", ${DIFF_MB}/1024 }")
+
+        if awk "BEGIN {exit !($OPL_GB >= 1000)}"; then
+            difference="$(awk "BEGIN {printf \"%.1f TB\", $OPL_GB/1024}")"
+            CAP=$(awk "BEGIN {print ($difference > 2.0) ? 2.0 : $difference}")
+            OPL_SIZE="${CAP} TB"
+        else
+            OPL_SIZE="${OPL_GB} GB"
+        fi
+
+        echo
+        echo "The following partitions will be created:"
+        echo "- POPS partition: $pops_gb GB"
+        echo "- OPL partition: $OPL_SIZE"
+        echo
+        read -p "Do you wish to proceed? (y/n): " confirm
+        if [[ "$confirm" =~ ^[Yy]$ ]]; then
+            break
+        fi
     done
+fi
 
 echo >> "${LOG_FILE}"
 echo "##########################################################################" >> "${LOG_FILE}"

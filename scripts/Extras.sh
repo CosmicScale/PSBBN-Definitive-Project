@@ -43,6 +43,16 @@ LOG_FILE="${TOOLKIT_PATH}/logs/extras.log"
 path_arg="$1"
 arch="$(uname -m)"
 
+# Source unattended configuration if present
+UNATTENDED_CONF="${TOOLKIT_PATH}/psbbn-unattended.conf"
+if [[ -f "$UNATTENDED_CONF" ]]; then
+    source "$UNATTENDED_CONF"
+fi
+
+CONF_LANG="${LANG:-}"
+CONF_SCREEN="${SCREEN:-}"
+CONF_SELECT_WITH_CROSS="${SELECT_WITH_CROSS:-}"
+
 URL="https://archive.org/download/psbbn-definitive-patch-v4.1"
 
 if [[ "$arch" = "x86_64" ]]; then
@@ -824,10 +834,20 @@ option_two() {
         return 1
     fi
 
-    choice=""
-    while :; do
-        SWAP_SPLASH
-        cat << "EOF"
+    if [[ -n "$CONF_SELECT_WITH_CROSS" ]]; then
+        if [[ "$CONF_SELECT_WITH_CROSS" == "true" ]]; then
+            BUTTON="X"
+            choice="1"
+        else
+            BUTTON="O"
+            choice="2"
+        fi
+        echo "[!] Using button layout from unattended config: Cross=$( [[ "$CONF_SELECT_WITH_CROSS" == "true" ]] && echo "Enter" || echo "Back" )" | tee -a "${LOG_FILE}"
+    else
+        choice=""
+        while :; do
+            SWAP_SPLASH
+            cat << "EOF"
                                       Please select a button layout:
 
                                       1) Cross = Enter, Circle = Back
@@ -837,23 +857,24 @@ option_two() {
                                       b) Back
 
 EOF
-        read -rp "                                      Select an option: " choice
+            read -rp "                                      Select an option: " choice
 
-            case "$choice" in
-            1|2|b|B)
-                break
-                ;;
-            *)
-                echo "                                      Invalid choice, please enter 1, 2, or b."
-                sleep 3
-                ;;
-        esac
-    done
+                case "$choice" in
+                1|2|b|B)
+                    break
+                    ;;
+                *)
+                    echo "                                      Invalid choice, please enter 1, 2, or b."
+                    sleep 3
+                    ;;
+            esac
+        done
 
-    if [[ "$choice" == "1" ]]; then
-        BUTTON="X"
-    else
-        BUTTON="O"
+        if [[ "$choice" == "1" ]]; then
+            BUTTON="X"
+        else
+            BUTTON="O"
+        fi
     fi
 
     if grep -q '^ENTER =' "$OPL/version.txt"; then
@@ -967,9 +988,23 @@ option_three() {
         fi
     fi
 
-    while :; do
-        LANGUAGE_SPLASH
-        cat << "EOF"
+    if [[ -n "$CONF_LANG" ]]; then
+        LANG="$CONF_LANG"
+        case "$LANG" in
+            eng) LANG_DISPLAY="English" ;;
+            jpn) LANG_DISPLAY="Japanese" ;;
+            fre) LANG_DISPLAY="French" ;;
+            ger) LANG_DISPLAY="German" ;;
+            ita) LANG_DISPLAY="Italian" ;;
+            por) LANG_DISPLAY="Portuguese (Brazil)" ;;
+            spa) LANG_DISPLAY="Spanish" ;;
+            *) LANG_DISPLAY="$LANG" ;;
+        esac
+        echo "[!] Using language from unattended config: $LANG_DISPLAY" | tee -a "${LOG_FILE}"
+    else
+        while :; do
+            LANGUAGE_SPLASH
+            cat << "EOF"
                                Please select a language from the list below:
 
                                1) English
@@ -989,55 +1024,56 @@ option_three() {
                                b) Back
 
 EOF
-        read -rp "                               Select an option: " choice
+            read -rp "                               Select an option: " choice
 
-        case "$choice" in
-            1)
-                LANG="eng"
-                LANG_DISPLAY="English"
-                break
-                ;;
-            2)
-                LANG="jpn"
-                LANG_DISPLAY="Japanese"
-                break
-                ;;
-            3)
-                LANG="fre"
-                LANG_DISPLAY="French"
-                break
-                ;;
-            4)
-                LANG="ger"
-                LANG_DISPLAY="German"
-                break
-                ;;
-            5)
-                LANG="ita"
-                LANG_DISPLAY="Italian"
-                break
-                ;;
-            6)
-                LANG="por"
-                LANG_DISPLAY="Portuguese (Brazil)"
-                break
-                ;;
-            7)
-                LANG="spa"
-                LANG_DISPLAY="Spanish"
-                break
-                ;;
-            b|B)
-                UNMOUNT_OPL
-                return 0
-                ;;
-            *)
-                echo
-                echo -n "                               Invalid choice, enter a number between 1 and 7."
-                sleep 3
-                ;;
-        esac
-    done
+            case "$choice" in
+                1)
+                    LANG="eng"
+                    LANG_DISPLAY="English"
+                    break
+                    ;;
+                2)
+                    LANG="jpn"
+                    LANG_DISPLAY="Japanese"
+                    break
+                    ;;
+                3)
+                    LANG="fre"
+                    LANG_DISPLAY="French"
+                    break
+                    ;;
+                4)
+                    LANG="ger"
+                    LANG_DISPLAY="German"
+                    break
+                    ;;
+                5)
+                    LANG="ita"
+                    LANG_DISPLAY="Italian"
+                    break
+                    ;;
+                6)
+                    LANG="por"
+                    LANG_DISPLAY="Portuguese (Brazil)"
+                    break
+                    ;;
+                7)
+                    LANG="spa"
+                    LANG_DISPLAY="Spanish"
+                    break
+                    ;;
+                b|B)
+                    UNMOUNT_OPL
+                    return 0
+                    ;;
+                *)
+                    echo
+                    echo -n "                         Invalid choice. Please select a number between 1 and 7."
+                    sleep 3
+                    ;;
+            esac
+        done
+    fi
 
     echo "Language selected: $LANG_DISPLAY" >> "${LOG_FILE}"
     LANGUAGE_SPLASH
@@ -1227,9 +1263,18 @@ option_four() {
     LANG=$(awk -F' *= *' '$1=="LANG"{print $2}' "${OPL}/version.txt")
     echo "Language: $LANG" >> "${LOG_FILE}"
 
+    if [[ -n "$CONF_SCREEN" ]]; then
+        SCREEN_SIZE="$CONF_SCREEN"
+        case "$SCREEN_SIZE" in
+            full) SIZE_NAME="Full" ;;
+            16:9) SIZE_NAME="16:9" ;;
+            *) SCREEN_SIZE="4:3"; SIZE_NAME="4:3" ;;
+        esac
+        echo "[!] Using screen size from unattended config: $SCREEN_SIZE" | tee -a "${LOG_FILE}"
+    else
         while :; do
-        SCREEN_SPLASH
-        cat << "EOF"
+            SCREEN_SPLASH
+            cat << "EOF"
                               Please select a screen size from the list below:
 
                               1) 4:3
@@ -1241,44 +1286,45 @@ option_four() {
                               b) Back
 
 EOF
-        read -rp "                              Select an option: " choice
+            read -rp "                              Select an option: " choice
 
-        case "$choice" in
-            1)
-                SCREEN_SIZE="4:3"
-                SIZE_NAME="4:3"
-                break
-                ;;
-            2)
-                SCREEN_SIZE="full"
-                SIZE_NAME="Full"
-                case "$LANG" in
-                    jpn) SIZE_NAME="フル" ;;
-                    fre) SIZE_NAME="Plein écran" ;;
-                    spa) SIZE_NAME="Pantalla Completa" ;;
-                    ger) SIZE_NAME="Ganzer Bildschirm" ;;
-                    ita) SIZE_NAME="Schermo Intero" ;;
-                    dut) SIZE_NAME="Volledig" ;;
-                    por) SIZE_NAME="Completo" ;;
-                esac
-                break
-                ;;
-            3)
-                SCREEN_SIZE="16:9"
-                SIZE_NAME="16:9"
-                break
-                ;;
-            b|B)
-                UNMOUNT_OPL
-                return 0
-                ;;
-            *)
-                echo
-                echo -n "                               Invalid choice, enter a number between 1 and 3."
-                sleep 3
-                ;;
-        esac
-    done
+            case "$choice" in
+                1)
+                    SCREEN_SIZE="4:3"
+                    SIZE_NAME="4:3"
+                    break
+                    ;;
+                2)
+                    SCREEN_SIZE="full"
+                    SIZE_NAME="Full"
+                    case "$LANG" in
+                        jpn) SIZE_NAME="フル" ;;
+                        fre) SIZE_NAME="Plein écran" ;;
+                        spa) SIZE_NAME="Pantalla Completa" ;;
+                        ger) SIZE_NAME="Ganzer Bildschirm" ;;
+                        ita) SIZE_NAME="Schermo Intero" ;;
+                        dut) SIZE_NAME="Volledig" ;;
+                        por) SIZE_NAME="Completo" ;;
+                    esac
+                    break
+                    ;;
+                3)
+                    SCREEN_SIZE="16:9"
+                    SIZE_NAME="16:9"
+                    break
+                    ;;
+                b|B)
+                    UNMOUNT_OPL
+                    return 0
+                    ;;
+                *)
+                    echo
+                    echo -n "                               Invalid choice, enter a number between 1 and 3."
+                    sleep 3
+                    ;;
+            esac
+        done
+    fi
 
     echo "Screen size selected: $SCREEN_SIZE" >> "${LOG_FILE}"
     echo "Screen size name: $SIZE_NAME" >> "${LOG_FILE}"

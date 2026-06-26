@@ -83,6 +83,13 @@ if [[ "$1" == "-wsl" ]]; then
     done
 fi
 
+# Source unattended configuration if present
+UNATTENDED_CONF="${TOOLKIT_PATH}/psbbn-unattended.conf"
+if [[ -f "$UNATTENDED_CONF" ]]; then
+    source "$UNATTENDED_CONF"
+    serialnumber="${serialnumber:-$DEVICE_DISK_SERIAL}"
+fi
+
 error_msg() {
   error_1="$1"
   error_2="$2"
@@ -621,6 +628,14 @@ else
 
     if [[ -n "$psbbn_version" || -n $osdmenu_version || -n "$LANG_VER" || -n "$CHAN_VER" ]]; then
 
+        if [[ -n "$osdmenu_version" ]]; then
+            LATEST_OSD=$(<"${ASSETS_DIR}/osdmenu/version.txt")
+            
+            if [ "$(printf '%s\n' "$LATEST_OSD" "$osdmenu_version" | sort -V | tail -n1)" != "$osdmenu_version" ]; then
+                OSD_UPDATE="YES"
+            fi
+        fi
+
         HTML_FILE=$(mktemp)
         timeout 20 wget -O "$HTML_FILE" "$URL" -o - >> "$LOG_FILE" 2>&1
 
@@ -645,14 +660,6 @@ else
 
             if [ "$(printf '%s\n' "$LATEST_CHAN" "$CHAN_VER" | sort -V | tail -n1)" != "$CHAN_VER" ]; then
                 CHAN_UPDATE="YES"
-            fi
-        fi
-
-        if [[ -n "$osdmenu_version" ]]; then
-            LATEST_OSD=$(<"${ASSETS_DIR}/osdmenu/version.txt")
-            
-            if [ "$(printf '%s\n' "$LATEST_OSD" "$osdmenu_version" | sort -V | tail -n1)" != "$osdmenu_version" ]; then
-                OSD_UPDATE="YES"
             fi
         fi
 
