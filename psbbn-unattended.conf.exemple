@@ -1,0 +1,108 @@
+###############################################################################
+#  PSBBN Unattended Configuration File
+#  =====================================
+#  Place this file in the project root (same directory as
+#  PSBBN-Definitive-Patch.sh). When present, the installer reads these
+#  variables and skips the corresponding interactive prompts.
+#
+#  Use "" (empty quotes) or remove the line to keep the prompt active
+#  for that item.
+#
+#  All possible values are documented in each variable below.
+###############################################################################
+
+# ---------------------------------------------------------------------------
+# DEVICE DISK SERIAL
+# ---------------------------------------------------------------------------
+# Serial number of the PS2 HDD (e.g., 123456789ABC). The installer will
+# automatically find the devpath (/dev/sdX) using this serial.
+#
+# To discover your disk's serial, run:
+#   lsblk -o NAME,SERIAL,MODEL,SIZE
+#
+# Leave empty "" for interactive manual selection.
+# ---------------------------------------------------------------------------
+DEVICE_DISK_SERIAL="S313J9GF543923"
+
+# ---------------------------------------------------------------------------
+# LANGUAGE
+# ---------------------------------------------------------------------------
+# Installation language. Valid values:
+#   eng  - English
+#   jpn  - Japanese
+#   fre  - French
+#   ger  - German
+#   ita  - Italian
+#   por  - Portuguese (Brazil)
+#   spa  - Spanish
+# ---------------------------------------------------------------------------
+LANG="por"
+
+# ---------------------------------------------------------------------------
+# PARTITION SIZES (in GB)
+# ---------------------------------------------------------------------------
+# Size of the PS1 (POPS) partition. Must be an integer >= 1.
+# The maximum allowed is calculated automatically based on available disk
+# space.
+# ---------------------------------------------------------------------------
+POPS_GB="1"
+
+# ---------------------------------------------------------------------------
+# Music partition size. Integer >= 1.
+# ---------------------------------------------------------------------------
+MUSIC_GB="1"
+
+# ---------------------------------------------------------------------------
+# Content (movies/photos) partition size. Integer >= 1.
+# ---------------------------------------------------------------------------
+CONTENTS_GB="5"
+
+# ---------------------------------------------------------------------------
+# APA RESERVED SPACE FOR PS2 LINUX
+# ---------------------------------------------------------------------------
+# Reserve unpartitioned APA space for future use (PS2 Linux)?
+# Valid values: "y" or "n".
+# If "y", also set RESERVE_GB_PS2_LINUX to the desired size.
+# ---------------------------------------------------------------------------
+RESERVE_SPACE_PS2_LINUX="n"
+RESERVE_GB_PS2_LINUX=""
+
+# ---------------------------------------------------------------------------
+# GAME CHANNELS
+# ---------------------------------------------------------------------------
+# Install game channels on the main screen?
+# Valid values: "yes" or "no".
+# Note: channels are currently only available for Japanese language, but
+# setting this to "yes" overrides that limitation.
+# ---------------------------------------------------------------------------
+CHANNELS="no"
+
+# ---------------------------------------------------------------------------
+# CONFIRMATION BUTTON (Cross = Enter?)
+# ---------------------------------------------------------------------------
+# Defines which button confirms (Enter) and which cancels.
+#   true  - Cross = Enter, Circle = Cancel  (Western layout)
+#   false - Circle = Enter, Cross = Cancel   (Japanese layout)
+# ---------------------------------------------------------------------------
+SELECT_WITH_CROSS="true"
+
+# ---------------------------------------------------------------------------
+# SCREEN SIZE
+# ---------------------------------------------------------------------------
+# Display mode. Valid values:
+#   4:3   - traditional ratio
+#   full  - fill the screen (stretch)
+#   16:9  - widescreen
+# ---------------------------------------------------------------------------
+SCREEN="4:3"
+
+
+# ---------------------------------------------------------------------------
+# SKIP CONFIRMATION PROMPTS
+# ---------------------------------------------------------------------------
+# If "yes", skips all "Are you sure?" and "Proceed?" confirmation prompts.
+# WARNING: with SKIP_CONFIRM=yes, the installation starts immediately
+# without asking for partition layout confirmation or warning that the
+# disk will be wiped, configure DEVICE_DISK_SERIAL first to use right device.
+# ---------------------------------------------------------------------------
+SKIP_CONFIRM="no"
