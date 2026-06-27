@@ -2061,13 +2061,11 @@ run_game_selector() {
     if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import textual" 2>/dev/null || \
        ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import tkinter" 2>/dev/null; then
         echo | tee -a "${LOG_FILE}"
-        if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import textual" 2>/dev/null; then
-            echo "Textual not installed. Install with: pip install textual" | tee -a "${LOG_FILE}"
-        fi
-        if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import tkinter" 2>/dev/null; then
-            echo "tkinter not installed. Install system package: python3-tk (apt) / python3-tkinter (dnf) / tk (pacman)" | tee -a "${LOG_FILE}"
-        fi
-        echo "Proceeding with all games." | tee -a "${LOG_FILE}"
+        echo "Missing game selector dependencies. Install with:" | tee -a "${LOG_FILE}"
+        echo "  pip install textual" | tee -a "${LOG_FILE}"
+        echo "  sudo apt install python3-tk   (Debian/Ubuntu)" | tee -a "${LOG_FILE}"
+        echo "  sudo dnf install python3-tkinter (Fedora)" | tee -a "${LOG_FILE}"
+        echo "  sudo pacman -S tk             (Arch)" | tee -a "${LOG_FILE}"
         return 1
     fi
 
@@ -2142,12 +2140,11 @@ run_game_selector() {
         GAME_SELECTOR="y"
     else
         if [ $exit_code -ne 0 ]; then
-            echo "Game selector failed (exit code: $exit_code)." | tee -a "${LOG_FILE}"
+            echo "Game selector failed (exit code: $exit_code). Aborting." | tee -a "${LOG_FILE}"
         else
-            echo "No games selected. Keeping all games." | tee -a "${LOG_FILE}"
+            echo "No games selected. Aborting." | tee -a "${LOG_FILE}"
         fi
-        GAME_SELECTOR="n"
-        return 1
+        exit 0
     fi
     return 0
 }
