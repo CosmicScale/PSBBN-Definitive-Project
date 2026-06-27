@@ -70,3 +70,6 @@ gamepath.cfg
 media.cfg
 bnupdate.tar.gz
 path.cfg
+**/__pycache__/**
+**.pyc
+icons/**

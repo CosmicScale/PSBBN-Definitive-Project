@@ -334,6 +334,7 @@ check_dep(){
         check_python_pkg icu
         check_python_pkg pykakasi
         check_python_pkg PIL
+        check_python_pkg textual
     fi
 
     if { ldconfig -p 2>/dev/null | grep -q "libfuse.so.2"; } || pkg-config --exists fuse 2>/dev/null; then

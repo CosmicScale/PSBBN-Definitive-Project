@@ -1736,13 +1736,20 @@ echo "     - Installs new games and apps found in the games folder on your PC."
 echo "     - Scans for newly added or removed games and apps, then updates the game list"
 echo "       in the PSBBN Game Collection and HDD-OSD accordingly."
 echo
+echo "  3) Select Specific Games:"
+echo
+echo "     - Synchronizes all games from your PC to the PS2 drive."
+echo "     - After synchronization, opens an interactive selector to choose"
+echo "       individual games for installation."
+echo
 
 while true; do
-    read -p "Enter 1 or 2: " choice
+    read -p "Enter 1, 2, or 3: " choice
     case "$choice" in
         1) INSTALL_TYPE="sync" DESC1="Synchronize"; break ;;
         2) INSTALL_TYPE="copy" DESC1="Add Games and Apps"; break ;;
-        *) echo; echo "Invalid choice. Please enter 1 or 2." ;;
+        3) INSTALL_TYPE="sync" SELECT_SPECIFIC="y" DESC1="Select Specific Games"; break ;;
+        *) echo; echo "Invalid choice. Please enter 1, 2, or 3." ;;
     esac
 done
 
@@ -2026,12 +2033,164 @@ fi
 
 convert_bin
 
+# ═══════════════════════════════════════════════════════════════
+# Game selector
+# ═══════════════════════════════════════════════════════════════
+
+if [[ "$SELECT_SPECIFIC" == "y" ]]; then
+    GAME_SELECTOR="y"
+elif [[ -s "${PS1_LIST}" || -s "${PS2_LIST}" ]]; then
+    SPLASH
+    echo "Would you like to select specific games to install?"
+    echo
+    echo "This scans your local games folder and opens an interactive"
+    echo "selector (keyboard required) where you can choose individual"
+    echo "games with checkboxes."
+    echo
+    while true; do
+        read -p "Yes or No (y/n): " choice
+        case "$choice" in
+            [Yy]) GAME_SELECTOR="y"; break ;;
+            [Nn]) GAME_SELECTOR="n"; break ;;
+            *) echo "Please enter y or n." ;;
+        esac
+    done
+fi
+
+run_game_selector() {
+    if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import textual" 2>/dev/null || \
+       ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import tkinter" 2>/dev/null; then
+        echo | tee -a "${LOG_FILE}"
+        if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import textual" 2>/dev/null; then
+            echo "Textual not installed. Install with: pip install textual" | tee -a "${LOG_FILE}"
+        fi
+        if ! "${SCRIPTS_DIR}/venv/bin/python3" -c "import tkinter" 2>/dev/null; then
+            echo "tkinter not installed. Install system package: python3-tk (apt) / python3-tkinter (dnf) / tk (pacman)" | tee -a "${LOG_FILE}"
+        fi
+        echo "Proceeding with all games." | tee -a "${LOG_FILE}"
+        return 1
+    fi
+
+    local disk_total_gb=0
+    if mountpoint -q "${OPL}" 2>/dev/null; then
+        disk_total_gb=$(df -BG --output=size "${OPL}" | tail -n 1 | sed 's/G//' | tr -d ' ')
+    fi
+    if [ -z "$disk_total_gb" ] || [ "$disk_total_gb" = "0" ]; then
+        echo "Could not determine disk size. Using default 0 GB." | tee -a "${LOG_FILE}"
+        disk_total_gb=0
+    fi
+
+    echo | tee -a "${LOG_FILE}"
+    echo "Launching interactive game selector in a new window (Disk: ${disk_total_gb} GB)..." | tee -a "${LOG_FILE}"
+
+    local selected_file="${SCRIPTS_DIR}/tmp/selected_games.list"
+    rm -f "$selected_file"
+
+    local TERM_EMULATOR=""
+    for cmd in konsole xterm gnome-terminal xfce4-terminal; do
+        if command -v "$cmd" >/dev/null 2>&1; then
+            TERM_EMULATOR="$cmd"
+            break
+        fi
+    done
+
+    if [ -z "$TERM_EMULATOR" ]; then
+        echo "No terminal emulator found. Proceeding with all games." | tee -a "${LOG_FILE}"
+        return 1
+    fi
+
+    local selector_cmd
+    printf -v selector_cmd '%s -u %s --games-dir %s --output %s --disk-total-gb %s' \
+        "${SCRIPTS_DIR}/venv/bin/python3" \
+        "${HELPER_DIR}/game-selector.py" \
+        "${GAMES_PATH}" \
+        "${selected_file}" \
+        "${disk_total_gb}"
+
+    local exit_code=0
+    case "$TERM_EMULATOR" in
+        konsole)
+            # -e waits for command to finish; auto-closes when done
+            "$TERM_EMULATOR" -e bash -c "$selector_cmd" 2>>"${LOG_FILE}"
+            exit_code=$?
+            ;;
+        gnome-terminal)
+            # --wait ensures we don't return until the child exits
+            "$TERM_EMULATOR" --wait -e bash -c "$selector_cmd" 2>>"${LOG_FILE}"
+            exit_code=$?
+            ;;
+        xfce4-terminal)
+            # --disable-server prevents forking via D-Bus
+            "$TERM_EMULATOR" --disable-server -e bash -c "$selector_cmd" 2>>"${LOG_FILE}"
+            exit_code=$?
+            ;;
+        *)
+            # xterm and others
+            "$TERM_EMULATOR" -e bash -c "$selector_cmd" 2>>"${LOG_FILE}"
+            exit_code=$?
+            ;;
+    esac
+
+    if [ $exit_code -eq 2 ]; then
+        echo "Game selection cancelled by user. Aborting." | tee -a "${LOG_FILE}"
+        exit 0
+    elif [ $exit_code -eq 0 ] && [ -s "$selected_file" ]; then
+        local selected_count
+        selected_count=$(wc -l < "$selected_file")
+        echo "[✓] ${selected_count} games selected." | tee -a "${LOG_FILE}"
+        cp "$selected_file" "${ALL_GAMES}"
+        GAME_SELECTOR="y"
+    else
+        if [ $exit_code -ne 0 ]; then
+            echo "Game selector failed (exit code: $exit_code)." | tee -a "${LOG_FILE}"
+        else
+            echo "No games selected. Keeping all games." | tee -a "${LOG_FILE}"
+        fi
+        GAME_SELECTOR="n"
+        return 1
+    fi
+    return 0
+}
+
+if [[ "$GAME_SELECTOR" == "y" ]]; then
+    rm -f "${ALL_GAMES}"
+    run_game_selector
+fi
+
+# Create rsync filter files from selected games
+SELECTED_CD=""
+SELECTED_DVD=""
+if [[ "$GAME_SELECTOR" == "y" && -s "${ALL_GAMES}" ]]; then
+    SELECTED_CD=$(mktemp)
+    SELECTED_DVD=$(mktemp)
+    awk -F'|' '$4 == "CD" { print $5 }' "${ALL_GAMES}" > "${SELECTED_CD}" 2>/dev/null
+    awk -F'|' '$4 == "DVD" { print $5 }' "${ALL_GAMES}" > "${SELECTED_DVD}" 2>/dev/null
+    echo "CD games selected: $(wc -l < "${SELECTED_CD}")" | tee -a "${LOG_FILE}"
+    echo "DVD games selected: $(wc -l < "${SELECTED_DVD}")" | tee -a "${LOG_FILE}"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# Synchronize PS2 Games
+# ═══════════════════════════════════════════════════════════════
+
 if [ "$INSTALL_TYPE" = "sync" ]; then
-    cd=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/")
-    dvd=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/")
+    if [[ "$GAME_SELECTOR" == "y" ]]; then
+        cd=""
+        dvd=""
+        [[ -s "${SELECTED_CD}" ]] && cd=$(rsync -dL --dry-run --delete --itemize-changes --files-from="${SELECTED_CD}" "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}")
+        [[ -s "${SELECTED_DVD}" ]] && dvd=$(rsync -dL --dry-run --delete --itemize-changes --files-from="${SELECTED_DVD}" "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}")
+    else
+        cd=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/")
+        dvd=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/")
+    fi
 elif [ "$INSTALL_TYPE" = "copy" ]; then
-    cd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/")
-    dvd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/")
+    if [[ "$GAME_SELECTOR" == "y" ]]; then
+        cd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --files-from="${SELECTED_CD}" "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}")
+        dvd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --files-from="${SELECTED_DVD}" "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}")
+    else
+        cd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/")
+        dvd=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/")
+    fi
 fi
 
 if [ -n "$cd" ] || [ -n "$dvd" ]; then
@@ -2041,16 +2200,44 @@ if [ -n "$cd" ] || [ -n "$dvd" ]; then
     echo "Available space: $available_mb MB" | tee -a "${LOG_FILE}"
     echo | tee -a "${LOG_FILE}"
     if [ "$INSTALL_TYPE" = "sync" ]; then
-        rsync -dL --progress --delete --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
-        cd_status=${PIPESTATUS[0]}
-        rsync -dL --progress --delete --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
-        dvd_status=${PIPESTATUS[0]}
+        if [[ "$GAME_SELECTOR" == "y" ]]; then
+            cd_status=0; dvd_status=0
+            if [[ -s "${SELECTED_CD}" ]]; then
+                rsync -dL --progress --delete --files-from="${SELECTED_CD}" "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}"
+                cd_status=$?
+                echo "CD games synced." | tee -a "${LOG_FILE}"
+            fi
+            if [[ -s "${SELECTED_DVD}" ]]; then
+                rsync -dL --progress --delete --files-from="${SELECTED_DVD}" "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}"
+                dvd_status=$?
+                echo "DVD games synced." | tee -a "${LOG_FILE}"
+            fi
+        else
+            rsync -dL --progress --delete --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+            cd_status=${PIPESTATUS[0]}
+            rsync -dL --progress --delete --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+            dvd_status=${PIPESTATUS[0]}
+        fi
         ps2_rsync_check Synced
     else
-        rsync -dL --progress --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
-        cd_status=${PIPESTATUS[0]}
-        rsync -dL --progress --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
-        dvd_status=${PIPESTATUS[0]}
+        if [[ "$GAME_SELECTOR" == "y" ]]; then
+            cd_status=0; dvd_status=0
+            if [[ -s "${SELECTED_CD}" ]]; then
+                rsync -dL --progress --ignore-existing --files-from="${SELECTED_CD}" "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}"
+                cd_status=$?
+                echo "CD games synced." | tee -a "${LOG_FILE}"
+            fi
+            if [[ -s "${SELECTED_DVD}" ]]; then
+                rsync -dL --progress --ignore-existing --files-from="${SELECTED_DVD}" "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}"
+                dvd_status=$?
+                echo "DVD games synced." | tee -a "${LOG_FILE}"
+            fi
+        else
+            rsync -dL --progress --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+            cd_status=${PIPESTATUS[0]}
+            rsync -dL --progress --ignore-existing --include='*.iso' --include='*.ISO' --include='*.zso' --include='*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+            dvd_status=${PIPESTATUS[0]}
+        fi
         ps2_rsync_check Copied
     fi
 else
@@ -2107,13 +2294,15 @@ if [[ ! -s "${PS1_LIST}" && ! -s "${PS2_LIST}" ]] && find "${GAMES_PATH}/CD" "${
     error_msg "Error" "Failed to create games list."
 fi
 
-if [[ -s "${PS1_LIST}" ]] && [[ ! -s "${PS2_LIST}" ]]; then
-    { cat "${PS1_LIST}" > "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
-elif [[ ! -s "${PS1_LIST}" ]] && [[ -s "${PS2_LIST}" ]]; then
-    { cat "${PS2_LIST}" >> "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
-elif [[ -s "${PS1_LIST}" ]] && [[ -s "${PS2_LIST}" ]]; then
-    { cat "${PS1_LIST}" > "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
-    { cat "${PS2_LIST}" >> "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
+if [[ "$GAME_SELECTOR" != "y" ]]; then
+    if [[ -s "${PS1_LIST}" ]] && [[ ! -s "${PS2_LIST}" ]]; then
+        { cat "${PS1_LIST}" > "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
+    elif [[ ! -s "${PS1_LIST}" ]] && [[ -s "${PS2_LIST}" ]]; then
+        { cat "${PS2_LIST}" >> "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
+    elif [[ -s "${PS1_LIST}" ]] && [[ -s "${PS2_LIST}" ]]; then
+        { cat "${PS1_LIST}" > "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
+        { cat "${PS2_LIST}" >> "${ALL_GAMES}"; } 2>> "${LOG_FILE}"
+    fi
 fi
 
 rm -f "${OPL}/ps1.list"
