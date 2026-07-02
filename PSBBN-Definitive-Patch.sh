@@ -109,7 +109,7 @@ copy_log() {
 git_update() {
     # Check if the current directory is a Git repository
     if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-        error_msg "This script cannot continue due to an unsupported installation." "The PSBBN Definitive Project is a rolling release." "To ensure you are always running the latest version, follow the installation instructions here:" "https://github.com/CosmicScale/PSBBN-Definitive-Project?tab=readme-ov-file#user-guide"
+        return 1
     else
         # Fetch updates from the remote
         git fetch >> "${LOG_FILE}" 2>&1

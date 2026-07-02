@@ -24,7 +24,7 @@ $oplVolumeName = "OPL"
 $defaultFolders = @('DVD', 'CD', 'POPS', 'APPS', 'music', 'movie', 'photo')
 
 # the specific git branch to be checked out
-$gitBranch = "main"
+$gitBranch = "release-v4.2.0"
 
 # the console size that is set at the start of the script
 $consoleWidth = 110
