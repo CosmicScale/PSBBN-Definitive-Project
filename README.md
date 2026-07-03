@@ -363,7 +363,7 @@ The recommended way to install the PSBBN Definitive Patch on Windows 10 and 11 i
 **Enabling Virtualization:**  
 It may be necessary to enable SVM Mode (for AMD CPUs) or VT-x (for Intel CPUs) in your BIOS settings if they are not already enabled. Instructions on how to do this can be found [here](https://www.elevenforum.com/t/enable-or-disable-cpu-virtualization-in-uefi-bios-firmware-settings-on-windows-pc.4928/).
 
-Download the **PSBBN Launcher for Windows** [here](https://raw.githubusercontent.com/CosmicScale/PSBBN-Definitive-English-Patch/refs/heads/main/scripts/PSBBN-Launcher-For-Windows.ps1) (Right-click and select **Save link as**).
+Download the **PSBBN Launcher for Windows** [here](https://raw.githubusercontent.com/CosmicScale/PSBBN-Definitive-Project/refs/heads/release-v3.00/scripts/PSBBN-Launcher-For-Windows.ps1) (Right-click and select **Save link as**).
 
 **Set the PowerShell Execution Policy:**  
 Before running the script for the first time, you must change the execution policy in PowerShell:
