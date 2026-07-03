@@ -625,7 +625,7 @@ The recommended way to install the **PSBBN Definitive Project** on Windows is by
 **Enabling Virtualization:**  
 It may be necessary to enable SVM Mode (for AMD CPUs) or VT-x (for Intel CPUs) in your BIOS settings if it is not already enabled. Instructions on how to do this can be found [here](https://www.elevenforum.com/t/enable-or-disable-cpu-virtualization-in-uefi-bios-firmware-settings-on-windows-pc.4928/).
 
-Download the **PSBBN Launcher for Windows [here](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)**.
+Download the PSBBN Launcher for Windows [here](https://raw.githubusercontent.com/CosmicScale/PSBBN-Definitive-Project/refs/heads/release-v4.2.0/scripts/PSBBN-Launcher-For-Windows.ps1) (Right-click and select Save link as).
 
 **Set the PowerShell Execution Policy:**  
 Before running the script for the first time, you must change the execution policy in PowerShell:
