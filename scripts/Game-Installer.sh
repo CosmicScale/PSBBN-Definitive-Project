@@ -2600,43 +2600,6 @@ if [ -f "$ALL_GAMES" ]; then
     done
 fi
 
-################################### Submit missing artwork to the PSBBN Art Database ###################################
-
-cp "${MISSING_ART}" "${ARTWORK_DIR}/tmp" >> "${LOG_FILE}" 2>&1
-cp "${MISSING_APP_ART}" "${ARTWORK_DIR}/tmp" >> "${LOG_FILE}" 2>&1
-cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
-cp "${MISSING_VMC}" "${ICONS_DIR}/ico/tmp/" >> "${LOG_FILE}" 2>&1
-cd "${ICONS_DIR}/ico/tmp/"
-rm *.png >/dev/null 2>&1
-if [ -d "${ICONS_DIR}/ico/tmp/vmc" ] && [ -z "$(ls -A "${ICONS_DIR}/ico/tmp/vmc")" ]; then
-    rmdir "${ICONS_DIR}/ico/tmp/vmc"
-fi
-zip -r "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
-cd "${ARTWORK_DIR}/tmp/" 
-zip -r "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
-
-if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
-    echo | tee -a "${LOG_FILE}"
-    echo "Contributing to the PSBBN art & HDD-OSD databases..." | tee -a "${LOG_FILE}"
-    # Upload the file using transfer.sh
-    upload_url=$(curl -F "reqtype=fileupload" -F "time=72h" -F "fileToUpload=@${ARTWORK_DIR}/tmp/art.zip" https://litterbox.catbox.moe/resources/internals/api.php)
-
-    if [[ "$upload_url" == https://* ]]; then
-        echo "[✓] File uploaded successfully: $upload_url" | tee -a "${LOG_FILE}"
-
-    # Send a POST request to Webhook.site with the uploaded file URL
-    webhook_url="https://webhook.site/PSBBN"
-    curl -X POST -H "Content-Type: application/json" \
-        -d "{\"url\": \"$upload_url\"}" \
-        "$webhook_url" >/dev/null 2>&1
-    else
-        error_msg "Warning" "Failed to upload the file."
-    fi
-else
-    echo | tee -a "${LOG_FILE}"
-    echo "No art work or icons to contribute." | tee -a "${LOG_FILE}"
-fi
-
 HDL_TOC
 cat "$hdl_output" >> "${LOG_FILE}"
 rm -f "$hdl_output"
