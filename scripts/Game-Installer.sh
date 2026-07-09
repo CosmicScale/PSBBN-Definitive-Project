@@ -732,7 +732,7 @@ OPL_SIZE_CKECK() {
     if [ "$INSTALL_TYPE" = "sync" ]; then
         opl_size=$(df -m --output=size "${OPL}" | tail -n 1 | awk '{$1=$1};1')
         available_mb=$((opl_size - 128))
-        needed_mb=$(find "${GAMES_PATH}/CD" "${GAMES_PATH}/DVD" "${GAMES_PATH}/POPS" -type f ! -path '*/.*' \( -iname '*.iso' -o -iname '*.zso' \) -printf '%s\n' | awk '{s+=$1} END {print int((s + 1048575) / 1048576)}')
+        needed_mb=$(find "${GAMES_PATH}/CD/" "${GAMES_PATH}/DVD/" "${GAMES_PATH}/POPS/" -type f ! -path '*/.*' \( -iname '*.iso' -o -iname '*.zso' \) -printf '%s\n' | awk '{s+=$1} END {print int((s + 1048575) / 1048576)}')
 
     elif [ "$INSTALL_TYPE" = "copy" ]; then
         opl_freespace=$(df -m "${OPL}/" | awk 'NR==2 {print $4}')
@@ -1109,7 +1109,7 @@ convert_zso() {
                 base_name="${opl_file##*/}"
                 base_name="${base_name%.*}"
 
-                if find "${GAMES_PATH}/${dir}" -maxdepth 1 -type f \
+                if find "${GAMES_PATH}/${dir}/" -maxdepth 1 -type f \
                     -iname "${base_name}.zso" | grep -q .; then
                     echo "[!] Removing duplicate ZSO from OPL directory: $opl_file" >> "${LOG_FILE}"
                     rm -f -- "$opl_file"
@@ -2409,9 +2409,9 @@ done
 get_display_path
 
 if [ "$INSTALL_TYPE" = "sync" ] && \
-   ! find "${GAMES_PATH}/POPS" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
-   ! find "${GAMES_PATH}/CD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
-   ! find "${GAMES_PATH}/DVD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) -print -quit | grep -q .; then
+   ! find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
+   ! find "${GAMES_PATH}/CD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
+   ! find "${GAMES_PATH}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) -print -quit | grep -q .; then
     echo
     echo "${UI_TEXT[GAME_INSTALLER_13]} ${display_path}"
     echo "${UI_TEXT[GAME_INSTALLER_14]}"
@@ -2450,7 +2450,7 @@ while true; do
     esac
 done
 
-if { find "${GAMES_PATH}/POPS" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" \) | grep -q .; } ||
+if { find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" \) | grep -q .; } ||
    { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/POPS" -maxdepth 1 -type f -iname "*.vcd" | grep -q .; }
 then
     ps1_games_found=true
@@ -2478,8 +2478,8 @@ then
     done
 fi
 
-if { find "${GAMES_PATH}/CD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" \) | grep -q .; } ||
-   { find "${GAMES_PATH}/DVD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; } ||
+if { find "${GAMES_PATH}/CD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" \) | grep -q .; } ||
+   { find "${GAMES_PATH}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; } ||
    { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/CD" "${OPL}/DVD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; }
 then
     # Ask about PS2 VMCs if PS2 games exist
