@@ -125,7 +125,7 @@ Ambas as opções de instalação oferecem:
 - Jogos no formato `ZSO` agora têm o "Modo de Compatibilidade 1" ativado automaticamente em suas configurações individuais do **[OPL](#open-ps2-loader-opl)**
 - Múltiplos jogos que compartilham o mesmo Title ID agora podem ser instalados, permitindo a instalação de uma variedade de modificações (mods)
 - Jogos de PS1 agora apresentam uma nova borda no estilo PSN na **[Coleção de Jogos](#coleção-de-jogos)** do PSBBN, tornando mais fácil distinguir entre jogos de PS1 e PS2
-- Instalação automática das **[correções do HugoPocked POPStarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/)**, melhorando a compatibilidade com mais de 100 jogos de PS1
+- Instalação automática das **[correções do HugoPocked POPStarter](http://web.archive.org/web/20260418164005/https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/)**, melhorando a compatibilidade com mais de 100 jogos de PS1
 
 **Correções de Bugs:**
 - O **OSDMenu Configurator** agora possui a arte correta na aba de Apps dentro do **[OPL](#open-ps2-loader-opl)**
