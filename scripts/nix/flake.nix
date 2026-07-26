@@ -32,7 +32,7 @@
             PyICU
             pykakasi
             pillow
-            Unidecode
+            unidecode
             textual
             wcwidth
           ]
