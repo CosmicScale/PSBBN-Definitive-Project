@@ -1211,8 +1211,27 @@ convert_vcd(){
                 continue
             fi
 
-            # Count all .bin files starting with the same base name
-            bin_count=$(find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f -iname "$(basename "$base")*.bin" | wc -l)
+            # Count BINs referenced by the CUE and verify they exist
+            bin_count=0
+            missing=0
+
+            while IFS= read -r binfile; do
+                ((bin_count++))
+
+                if [[ ! -f "$(dirname "$cue")/$binfile" ]]; then
+                    echo "Missing BIN referenced by $(basename "$cue"): $binfile" >> "${LOG_FILE}"
+                    missing=1
+                fi
+            done < <(
+                sed -n 's/^[[:space:]]*FILE "\(.*\)" .*/\1/pI' "$cue"
+            )
+
+            if (( missing )); then
+                echo "Skipping $(basename "$cue") because one or more referenced BIN files are missing." >> "${LOG_FILE}"
+                i=$((i + 1))
+                show_progress "$i" "$cue_count"
+                continue
+            fi
 
             if (( bin_count > 1 )); then
                 echo "Merging '$(basename "$cue")'..." >> "${LOG_FILE}"
@@ -1222,20 +1241,16 @@ convert_vcd(){
                 echo "Converting '$(basename "$cue")' to VCD..." >> "${LOG_FILE}"
                 "${CUE2POPS}" "${SCRIPTS_DIR}/tmp/$merged.cue" "${GAMES_PATH}/POPS/$merged.VCD" >> "${LOG_FILE}"
                 rm "${SCRIPTS_DIR}/tmp/${merged}.cue" "${SCRIPTS_DIR}/tmp/${merged}.bin"
-                i=$((i + 1))
-                show_progress "$i" "$cue_count"
-            elif (( bin_count == 0 )); then
-                echo "Skipping $(basename "$cue") because it has $bin_count BIN file(s)." >> "${LOG_FILE}"
-                i=$((i + 1))
-                show_progress "$i" "$cue_count"
             else
                 echo "No merge required. $(basename "$cue") has $bin_count BIN file(s)." >> "${LOG_FILE}"
                 cd "${GAMES_PATH}/POPS"
                 echo "Converting '$(basename "$cue")' to VCD..." >> "${LOG_FILE}"
                 "${CUE2POPS}" "$cue" "$vcd" >> "${LOG_FILE}" 2>&1
-                i=$((i + 1))
-                show_progress "$i" "$cue_count"
             fi
+
+            i=$((i + 1))
+            show_progress "$i" "$cue_count"
+            
         done < <(find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f ! -path '*/.*' -iname "*.cue" -print0)
     else
         echo "No PS1 .cue files to convert in ${GAMES_PATH}/POPS." >> "${LOG_FILE}"
@@ -1783,19 +1798,19 @@ create_game_assets() {
 
                 if [[ ! -s "$png_file_lab" ]]; then
                     if [[ "${game_id:2:1}" == "E" ]]; then
-                        if [[ "$disc_type" != "POPS" || "$disc_type" != "__.POPS" || "$disc_type" != "SMB" ]]; then
+                        if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
                             cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_PAL.png" "${png_file_lab}"
                         else
                             cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_PAL.png" "${png_file_lab}"
                         fi
                     elif [[ "${game_id:2:1}" == "U" || "${game_id:0:1}" == "L" ]]; then
-                        if [[ "$disc_type" != "POPS" || "$disc_type" != "__.POPS" || "$disc_type" != "SMB" ]]; then
+                        if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
                             cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_USA.png" "${png_file_lab}"
                     else
                             cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_USA.png" "${png_file_lab}"
                         fi
                     else
-                        if [[ "$disc_type" != "POPS" || "$disc_type" != "__.POPS" || "$disc_type" != "SMB" ]]; then
+                        if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
                             cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_JPN.png" "${png_file_lab}"
                         else
                             cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_JPN.png" "${png_file_lab}"
@@ -1805,7 +1820,7 @@ create_game_assets() {
 
                 if [[ -s "$png_file_cov" && -s "$png_file_cov2" && -s "$png_file_lab" ]]; then
                     echo "Creating HDD-OSD icon for $game_id..." >> "${LOG_FILE}"
-                    if [[ "$disc_type" != "POPS" || "$disc_type" != "__.POPS" || "$disc_type" != "SMB" ]]; then
+                    if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
                         if [[ "${game_id:2:1}" == "E" ]]; then
                             "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 2
                         else
