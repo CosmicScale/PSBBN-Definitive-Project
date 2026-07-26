@@ -74,9 +74,6 @@
           shellHook = ''
             ${pkgs.patchelf}/bin/patchelf --set-rpath "${pkgs.fuse2.out}/lib" "./scripts/helper/PFS Fuse.elf"
 
-            # patch ps2str to use 32-bit glibc from Nix
-            ${pkgs.patchelf}/bin/patchelf --set-interpreter ${pkgs.pkgsi686Linux.glibc}/lib/ld-linux.so.2 ./scripts/helper/ps2str
-
             mkdir -p scripts/venv/
             ln -sfn ${pythonEnv}/* ./scripts/venv/
 
