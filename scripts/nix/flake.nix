@@ -29,7 +29,7 @@
             natsort
             mutagen
             tqdm
-            PyICU
+            pyicu
             pykakasi
             pillow
             unidecode
