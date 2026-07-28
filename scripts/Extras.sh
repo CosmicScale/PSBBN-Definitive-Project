@@ -819,7 +819,7 @@ option_one() {
 
     if [ "$linux3" == "yes" ]; then
         HDL_TOC || return 1
-        LINUX_SIZE=$(grep '__\linux.3' "$hdl_output" | awk '{print $4}' | grep -oE '[0-9]+')
+        LINUX_SIZE=$(grep '__linux\.3' "$hdl_output" | awk '{print $4}' | grep -oE '[0-9]+')
         if [ "$LINUX_SIZE" -gt 2048 ]; then
             COMMANDS="device ${DEVICE}\n"
             COMMANDS+="rmpart __linux.3\n"
