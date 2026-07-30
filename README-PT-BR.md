@@ -64,6 +64,8 @@ Ambas as opções de instalação oferecem:
 **29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!**
 <p></p>
 
+[![Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
+
 **[Seletor de jogos:](#saindo-dos-jogos)**
 - Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
 - Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
