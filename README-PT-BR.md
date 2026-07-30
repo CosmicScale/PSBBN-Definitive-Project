@@ -64,6 +64,8 @@ Ambas as opções de instalação oferecem:
 **29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!**
 <p></p>
 
+[![PSBBN Update: Game Selector v2, OSDMenu 1.3.0 & more!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
+
 **[Seletor de jogos:](#saindo-dos-jogos)**
 - Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
 - Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
@@ -84,7 +86,8 @@ Outras alterações:
 - Adicionada uma tradução em português do Brasil do README do PSBBN Definitive Project.
 - Diversas correções de bugs e limpeza de código.
 
-**02 de julho de 2026 - Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader, wLaunchELF-R3Z e R3CONFIGURATOR**
+<details>
+<summary><b>02 de julho de 2026 - Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader, wLaunchELF-R3Z e R3CONFIGURATOR</summary></b>
 <p></p>
 
 [![Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader e Mais!](https://github.com/user-attachments/assets/c1828dbf-e1ba-4c67-8ae0-ccff79f4a524)](https://youtu.be/Bqf8XCfa0QM)  
@@ -130,6 +133,7 @@ Outras alterações:
 - Lida corretamente com IDs de jogos duplicados, mesmo quando os arquivos estão em pastas diferentes.
 - Corrigido o truncamento incorreto de títulos de jogos japoneses no [Navegador](#hosdmenu).
 - A montagem de `__linux.9` agora é ignorada para instalações não japonesas, permitindo o suporte a unidades menores.
+</details>
 
 <details>
 <summary><b>16 de abril de 2026 - Compatibilidade de PS1 Aprimorada, VMCs de PS2, Atualização do OPL e Mais!</summary></b> 
