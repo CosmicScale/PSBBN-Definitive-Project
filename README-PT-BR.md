@@ -61,6 +61,29 @@ Ambas as opções de instalação oferecem:
 
 # Histórico de Alterações
 
+**29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!**
+<p></p>
+
+**[Seletor de jogos:](#saindo-dos-jogos)**
+- Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
+- Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
+- Personalize a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da sua biblioteca.
+
+**OSDMenu:**
+- [OSDMenu MBR](#osdmenu-mbr) e [HOSDMenu](#hosdmenu) atualizados para a versão [v1.3.0](#https://github.com/pcm720/OSDMenu/releases/tag/v1.3.0).
+- Melhorados os tempos de inicialização do [PSBBN](#psbbn) e do [HOSDMenu](#hosdmenu).
+- Adicionado suporte para [botões adicionais de inicialização pelo controle](#opções-de-inicialização). Agora todas as teclas são suportadas, exceto L3 e R3.
+- [R3CONFIGURATOR](#r3configurator) atualizado para a versão [v1.3.0](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.0).
+
+Outras alterações:
+- [POPSLoader](#popsloader) atualizado para a versão contínua mais recente.
+- Instalação mais fácil dos [drivers ATA BDM Assault](#instalando-o-ata-bdm-assault) com o [POPSLoader](#popsloader).
+- [wLaunchELF_R3Z](#wlaunchelf-r3z) atualizado para a v4.75.
+- A configuração de idioma do [wLaunchELF_R3Z](#wlaunchelf-r3z) e do [POPSLoader](#popsloader) agora é definida automaticamente.
+- O idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) para o [wLaunchELF_R3Z](#wlaunchelf-r3z) agora são definidos automaticamente
+- Adicionada uma tradução em português do Brasil do README do PSBBN Definitive Project.
+- Diversas correções de bugs e limpeza de código.
+
 **02 de julho de 2026 - Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader, wLaunchELF-R3Z e R3CONFIGURATOR**
 <p></p>
 
@@ -834,12 +857,20 @@ Selecionar **Adicionar Jogos e Aplicativos Adicionais** baixa metadados e artes 
 Jogos e aplicativos podem ser excluídos manualmente do sistema de arquivos exFAT da unidade do PS2. Selecionar **Add Additional Games and Apps** também removerá quaisquer títulos excluídos da [Coleção de Jogos](#coleção-de-jogos) e do [HOSDMenu](#hosdmenu).
 
 ### Seletor de Jogos
-Ao executar o Instalador de Jogos, será apresentada uma lista de todos os jogos instalados, permitindo que você selecione quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Se você tiver uma grande coleção, limitar o número de jogos exibidos pode melhorar sua experiência de navegação.
+Ao executar o Instalador de Jogos, será apresentada uma lista de todos os títulos instalados, permitindo que você selecione quais títulos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Se você tiver uma grande coleção, limitar o número de títulos exibidos pode melhorar sua experiência de navegação.
 
 Até 800 títulos podem ser exibidos na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Todos os jogos de PS2 permanecerão disponíveis no iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)), e todos os jogos de PS1 permanecerão disponíveis no [POPSLoader](#popsloader).
 
+Você também pode personalizar a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da sua biblioteca.
+
 ### Instalando o ATA BDM Assault
-Para jogar jogos de PS1, você deve instalar os **drivers do ATA BDM Assault** em um Memory Card de PS2. Baixe tanto o `usbd.irx` quanto o `usbhdfsd.irx` da [página de lançamentos do ATA Assault](https://github.com/saildot4k/ATA-Assault/releases/tag/latest) e copie-os para `mc?:/POPSTARTER` no Memory Card de PS2.
+Para iniciar jogos de PS1 pela Coleção de Jogos ou pela Rotina de pesquisa, você deve primeiro instalar os drivers ATA BDM Assault em um PS2 Memory Card.
+
+1. Insira um PS2 Memory Card no seu console PS2.
+2. Inicie o POPSLoader.
+3. Inicie qualquer jogo de PS1.
+
+Os drivers necessários serão instalados automaticamente no PS2 Memory Card.
 
 ### Iniciando Jogos de PS1 via SMB
 Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu). Antes de executar o Instalador de Jogos:
@@ -1281,7 +1312,7 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 - [POPStarter](https://www.psx-place.com/resources/popstarter.683/) de [KrHACKen](https://www.psx-place.com/members/krhacken.98/)
 - [POPSLoader](https://github.com/NathanNeurotic/POPSLoader) feito por [NathanNeurotic (Ripto)](https://github.com/NathanNeurotic)
 - [Correções do HugoPocked POPStarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/) feitas por [HugoPocked](https://ko-fi.com/hugopocked)
-- [ATA Assault](#https://github.com/saildot4k/ATA-Assault) de [R3Z3N](https://github.com/saildot4k)
+- [ATA BDM Assault](https://github.com/saildot4k/ATA-Assault) de [R3Z3N](https://github.com/saildot4k)
 - [wLaunchELF_R3Z](https://github.com/saildot4k/wLaunchELF_R3Z) de [R3Z3N](https://github.com/saildot4k)
 - [R3CONFIGURATOR](https://github.com/saildot4k/R3CONFIGURATOR) de [R3Z3N](https://github.com/saildot4k)
 - Artes de capa de PS2 retiradas dos [backups do Banco de Artes do OPL Manager](https://oplmanager.com/site/index.php?backups)

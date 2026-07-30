@@ -344,7 +344,7 @@ error_msg() {
   [ -n "$error_4" ] && echo "$error_4"
   echo
   echo "${UI_TEXT[ERROR_TROUBLE]}"
-  echo "https://github.com/CosmicScale/PSBBN-Definitive-Project#troubleshooting"
+  echo "${UI_TEXT[TROUBLE_URL]}"
   echo
   read -n 1 -s -r -p "${UI_TEXT[EXIT_KEY]}" </dev/tty
   echo
@@ -361,7 +361,7 @@ git_update() {
     # Check if the current directory is a Git repository
     if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
         echo "[X] Error: This script cannot continue due to an unsupported installation." >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[ERROR_UNSUPPORTED_1]}" "${UI_TEXT[ERROR_UNSUPPORTED_2]}" "${UI_TEXT[ERROR_UNSUPPORTED_3]}" "https://github.com/CosmicScale/PSBBN-Definitive-Project#installation-guide"
+        error_msg "${UI_TEXT[ERROR_UNSUPPORTED_1]}" "${UI_TEXT[ERROR_UNSUPPORTED_2]}" "${UI_TEXT[ERROR_UNSUPPORTED_3]}" "${UI_TEXT[INSTALL_URL]}"
     else
         # Fetch updates from the remote
         git fetch >> "${LOG_FILE}" 2>&1
@@ -970,12 +970,12 @@ if [ -f "${ASSETS_DIR}/lang/changelog_main_$LANG_FILE.txt" ]; then
     echo
     center_text "${UI_TEXT[CHANGELOG_1]}"
     echo "$text"
-    center_text "https://github.com/CosmicScale/PSBBN-Definitive-Project/tree/main#changelog"
+    center_text "${UI_TEXT[CHANGE_URL]}"
     echo "$text"
     echo
     center_text "${UI_TEXT[CHANGELOG_2]}"
     echo "$text"
-    center_text "https://youtu.be/Bqf8XCfa0QM"
+    center_text "https://youtu.be/UEsqDorgbew"
     echo "$text"
     echo
     echo "=============================================================================================================="

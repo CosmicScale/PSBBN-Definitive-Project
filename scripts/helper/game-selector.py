@@ -22,18 +22,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import sys
 import argparse
 from pathlib import Path
-
+from wcwidth import wcswidth
+from rich.text import Text
 from textual.app import App, ComposeResult
-from textual.widgets import SelectionList, Button, Header, Footer, Static
+from textual.widgets import SelectionList, Button, Static
 from textual.widgets._selection_list import Selection
-from textual.containers import Horizontal, Vertical
-from textual import on
+from textual.containers import Horizontal, Vertical, Container, ScrollableContainer
+from textual.message import Message
 
-
-# ---------------- LANGUAGE LOADER ----------------
+# ---------------- LANGUAGE LOADING ----------------
 
 def load_language(lang: str) -> dict[str, str]:
     lang_file = Path(f"./scripts/assets/lang/{lang}.txt")
@@ -54,277 +53,739 @@ def load_language(lang: str) -> dict[str, str]:
 
     return strings
 
+def fit_text(text: str, width: int) -> str:
+    available = width - 1
 
-class GameSelector(App[None]):
-    TITLE = "Game Selector"
-    """Interactive game selector with language-aware titles."""
+    if wcswidth(text) > available:
+        while wcswidth(text + "...") > available - 1:
+            text = text[:-1]
+
+        text = text.rstrip()
+        text += "..."
+
+    padding = max(0, available - wcswidth(text))
+
+    return text + (" " * (padding + 1))
+
+# ---------------- DATA LOADING ----------------
+
+def parse(data, lang):
+    ps1, ps2 = [], []
+    apps, launchers, smb = [], [], []
+
+    for line in data.splitlines():
+        parts = line.split("|")
+
+        fallback_title = parts[0]
+        title_id = parts[1].strip()
+        media = parts[3].strip()
+
+        using_jpn_title = (
+            lang == "jpn"
+            and len(parts) > 5
+            and parts[5].strip()
+        )
+
+        title = parts[5].strip() if using_jpn_title else fallback_title
+
+        display_title = f"{fit_text(title, 87)}{title_id}"
+
+        item = (display_title, line)
+
+        if media == "INC":
+            launchers.append(item)
+        elif media == "APP":
+            apps.append(item)
+        elif media in ("DVD", "CD"):
+            ps2.append(item)
+        elif media in ("POPS", "__.POPS"):
+            ps1.append(item)
+        elif media == "SMB":
+            smb.append(item)
+
+    return ps1, ps2, apps, launchers, smb
+
+def load_exclusions(path):
+    excluded = set()
+    section_order = []
+
+    if not path:
+        return excluded, section_order
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+
+                if line.startswith("#SECTION_ORDER="):
+                    section_order = (
+                        line.replace("#SECTION_ORDER=", "")
+                        .split(",")
+                    )
+                elif line:
+                    excluded.add(line)
+
+    except FileNotFoundError:
+        pass
+
+    return excluded, section_order
+
+
+class ClickableStatic(Static):
+    can_focus = True
+
+    class Clicked(Message):
+        def __init__(self, widget: "ClickableStatic") -> None:
+            super().__init__()
+            self.widget = widget
+
+    def on_click(self) -> None:
+        self.post_message(self.Clicked(self))
+
+def load_data(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read().strip()
+    
+# ---------------- UI ----------------
+
+class GameSelector(App):
 
     CSS = """
-    #layout {
-        height: 1fr;
+    Screen {
+        layout: vertical;
+        background: $background;
+        color: $text;
     }
 
-    #game_list {
-        height: 1fr;
-    }
-
-    #status {
-        padding: 0 1;
-    }
-
-    #progress_label {
-        padding: 0 1;
+    #title_bar {
+        width: 100%;
         text-align: center;
-        margin-top: 1;
+        text-style: bold;
+        background: $panel;
+        color: $text;
+        padding: 0 1;
         margin-bottom: 1;
     }
 
-    #bottom {
-        dock: bottom;
+    SelectionList {
         height: auto;
+        min-height: 1;
+        padding: 0;
+        margin: 0;
+    }
+
+    SelectionList .option-list--option-highlighted {
+        background: transparent;
+    }
+
+    #header {
+        height: auto;
+        max-height: 10;
         padding: 0 1;
+        align: center middle;
+        text-align: center;
     }
 
-    #controls {
-        width: 1fr;
-        align: right middle;
+    #header Horizontal {
+        height: 1;
+        width: 100%;
     }
 
-    #bulk_controls {
+    #header Horizontal Static:first-child {
+        width: auto;
+    }
+
+    #selected_count {
         width: 1fr;
+        text-align: right;
+    }
+
+    #header Static {
+        height: auto;
+    }
+
+    #buttons {
+        height: auto;
+        padding: 0;
+        align: center middle;
+    }
+
+    #list_frame {
+        height: 1fr;
+        border: round $panel;
+        padding: 0;
+    }
+
+    .section {
+        width: 100%;
+        height: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    .section_header {
+        width: 100%;
+        height: 3;
+        min-height: 3;
+        padding: 0;
+        margin: 0;
         align: left middle;
     }
 
-    #controls Button,
-    #bulk_controls Button {
-        margin-left: 1;
-        margin-right: 1;
+    .title {
+        width: 1fr;
+        padding: 0 1;
+        text-style: bold;
+        color: $text;
     }
 
-    Horizontal {
-        height: auto;
+    .move_btn {
+        width: 3;
+        height: 1;
+        min-width: 3;
+        min-height: 1;
+        content-align: center middle;
+        padding: 0;
     }
+
+    #title_counts {
+        width: 100%;
+        height: 1;
+    }
+
+    #title_counts Static:first-child {
+        width: auto;
+    }
+
+    #selected_count {
+        width: 1fr;
+        text-align: right;
+    }
+
     """
 
     def __init__(
         self,
-        list_file: str,
-        max_games: int,
+        games_file,
+        exclude_file=None,
+        max_games=None,
         lang: str = "eng",
-        exclude_file: str | None = None,
-    ) -> None:
+    ):
         super().__init__()
-        self.list_file = Path(list_file)
+
+        self.games_file = games_file
+        self.exclude_file = exclude_file
         self.max_games = max_games
         self.lang = lang.lower()
-
-        self.exclude_file = Path(exclude_file) if exclude_file else None
-        self.excluded: set[str] = set()
-
-        self.games: list[tuple[str, str]] = []
-
-        # -------- LANGUAGE INIT --------
         self.lang_strings = load_language(self.lang)
 
-        self._load_games()
-        self._load_excluded()
-
-        # set runtime title (replaces static TITLE usage)
-        self.title = self.tr("GAME_SELECTOR_1")
+        (
+            self.excluded_games,
+            self.section_order,
+        ) = load_exclusions(exclude_file)
 
     # ---------------- TRANSLATION ----------------
 
     def tr(self, key: str) -> str:
         return self.lang_strings.get(key, key)
 
-    # ---------------- DATA LOADING ----------------
-
-    def _load_games(self) -> None:
-        if not self.list_file.is_file():
-            print(f"Error: File not found: {self.list_file}", file=sys.stderr)
-            sys.exit(1)
-
-        for line in self.list_file.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line:
-                continue
-
-            parts = line.split("|")
-
-            if len(parts) >= 5:
-                fallback_title = parts[0]
-                game_id = parts[1]
-                game_type = parts[3]
-
-                if self.lang == "jpn":
-                    title = parts[5].strip() if len(parts) > 5 and parts[5].strip() else fallback_title
-                else:
-                    title = fallback_title
-
-                display = f"{title} ({game_id})"
-                self.games.append((display, line))
-            else:
-                self.games.append((line, line))
-
-    def _load_excluded(self) -> None:
-        if not self.exclude_file or not self.exclude_file.is_file():
-            return
-
-        for line in self.exclude_file.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line:
-                self.excluded.add(line)
-
-    # ---------------- UI ----------------
-
     def compose(self) -> ComposeResult:
-        yield Header()
+        with Vertical(id="header"):
+            yield Static(
+                self.tr("GAME_SELECTOR_1"),
+                id="title_bar",
+            )
 
-        yield Static(
-            "\n"
-            f" {self.tr('GAME_SELECTOR_2')}\n"
-            f" {self.tr('GAME_SELECTOR_3')}\n"
-            f" {self.tr('GAME_SELECTOR_4')}"
-            "\n",
-            id="top_info"
+            yield Static(
+                f"{self.tr('GAME_SELECTOR_2')}\n"
+                f"{self.tr('GAME_SELECTOR_3')}\n"
+                f"{self.tr('GAME_SELECTOR_4')}"
+                "\n",
+            )
+
+            with Horizontal(id="title_counts"):
+                self.file_count = Static(
+                    "",
+                )
+                yield self.file_count
+
+                self.selected_count = Static(
+                    "",
+                    id="selected_count",
+                )
+                yield self.selected_count
+
+        self.sections_container = ScrollableContainer(
+            id="list_frame"
+        )
+        yield self.sections_container
+
+        with Horizontal(id="buttons"):
+            yield Button(
+                self.tr("GAME_SELECTOR_12"),
+                id="confirm",
+                variant="primary",
+            )
+
+    # ---------------- INIT ----------------
+
+    def on_mount(self):
+        raw = load_data(self.games_file)
+
+        line_count = len(raw.splitlines())
+
+        self.file_count.update(
+            f"{self.tr('GAME_SELECTOR_5')} {line_count}"
         )
 
-        yield Static(f"{self.tr('GAME_SELECTOR_5')} {len(self.games)}", id="status")
+        (
+            self.ps1,
+            self.ps2,
+            self.apps,
+            self.launchers,
+            self.smb,
+        ) = parse(raw, self.lang)
 
-        with Vertical(id="layout"):
-            self.list_widget = SelectionList[int](id="game_list")
+        self.section_widgets = {}
 
-            for idx, (display, _) in enumerate(self.games):
-                self.list_widget.add_option(Selection(display, idx))
+        sections = {
+            "ps2": (f"🎮 {self.tr('GAME_SELECTOR_7')}", self.ps2),
+            "ps1": (f"🎮 {self.tr('GAME_SELECTOR_8')}", self.ps1),
+            "smb": (f"🔗 {self.tr('GAME_SELECTOR_9')}", self.smb),
+            "launchers": (f"🚀 {self.tr('GAME_SELECTOR_10')}", self.launchers),
+            "apps": (f"🔧 {self.tr('GAME_SELECTOR_11')}", self.apps),
+        }
 
-            yield self.list_widget
+        # Use saved order if available
+        if self.section_order:
+            section_ids = list(self.section_order)
 
-            yield Static("", id="progress_label")
+            # Add any new sections that were not present in the saved order
+            for section_id in sections:
+                if section_id not in section_ids:
+                    section_ids.append(section_id)
 
-            with Horizontal(id="bottom"):
+        else:
+            section_ids = list(sections.keys())
 
-                with Horizontal(id="bulk_controls"):
-                    yield Button(self.tr("GAME_SELECTOR_7"), id="select_all")
-                    yield Button(self.tr("GAME_SELECTOR_8"), id="select_none")
 
-                with Horizontal(id="controls"):
-                    yield Button(self.tr("GAME_SELECTOR_9"), id="confirm", variant="primary")
+        for section_id in section_ids:
+            if section_id not in sections:
+                continue
 
-        yield Footer()
+            title, items = sections[section_id]
 
-    # ---------------- LIFECYCLE ----------------
+            if not items:
+                continue
 
-    def on_mount(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
+            self.create_section(
+                section_id,
+                title,
+                items,
+                locked=(section_id == "launchers"),
+            )
 
-        # Start with EVERYTHING selected
-        for idx in range(len(self.games)):
-            sl.select(idx)
+        self.enforce_initial_max_games()
 
-        # Unselect excluded entries
-        for idx, (_, line) in enumerate(self.games):
-            if line in self.excluded:
-                sl.deselect(idx)
+        self.call_after_refresh(self.update_selected_count)
 
-        self._update_label()
+    # ---------------- SECTIONS ----------------
 
-    # ---------------- LOGIC ----------------
+    def create_section(
+        self,
+        section_id,
+        title,
+        items,
+        locked=False,
+    ):
+        selection_list = SelectionList[str]()
 
-    def _get_prefix(self, selected: int) -> str:
-        if self.max_games == 0:
-            return ""
+        for game_title, raw in items:
+            selection_list.add_option(
+                Selection(
+                    Text(game_title),
+                    raw,
+                    initial_state=(
+                        True
+                        if locked
+                        else raw not in self.excluded_games
+                    ),
+                )
+            )
 
-        if selected >= self.max_games:
+        if locked:
+            selection_list.disabled = True
+
+        header_children = [
+            Static(
+                title,
+                classes="title",
+            )
+        ]
+
+        if not locked:
+            header_children.append(
+                ClickableStatic(
+                    "☑",
+                    id=f"select_{section_id}",
+                    classes="move_btn",
+                )
+            )
+
+        header_children.extend(
+            [
+                ClickableStatic(
+                    "▲",
+                    id=f"up_{section_id}",
+                    classes="move_btn",
+                ),
+                ClickableStatic(
+                    "▼",
+                    id=f"down_{section_id}",
+                    classes="move_btn",
+                ),
+            ]
+        )
+
+        header = Horizontal(
+            *header_children,
+            classes="section_header",
+        )
+
+        section = Container(
+            header,
+            selection_list,
+            classes="section",
+        )
+
+        self.section_widgets[section_id] = section
+
+        self.sections_container.mount(section)
+
+        if not locked:
+            self.call_after_refresh(
+                self.update_select_button,
+                section_id,
+            )
+
+    # ---------------- SELECTION COUNTS ----------------
+
+    def get_total_selected_count(self):
+        total = 0
+
+        for section in self.sections_container.children:
+            for child in section.children:
+                if isinstance(child, SelectionList):
+                    total += len(child.selected)
+
+        return total
+    
+    def get_selected_status_icon(self):
+        selected = self.get_total_selected_count()
+
+        if self.max_games is not None and selected >= self.max_games:
             return "🔴"
         elif selected > 500:
             return "🟡"
         return "🟢"
+    
+    def update_selected_count(self):
+        icon = self.get_selected_status_icon()
+        selected = self.get_total_selected_count()
 
-    def _update_label(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
-        count = len(sl.selected)
+        if self.max_games is None:
+            self.selected_count.update(
+                f"{icon} {self.tr('GAME_SELECTOR_6')} {selected}"
+            )
+        else:
+            self.selected_count.update(
+                f"{icon} {self.tr('GAME_SELECTOR_6')} {selected}/{self.max_games}"
+            )
 
-        label = self.query_one("#progress_label", Static)
-        label.update(
-            f"{self._get_prefix(count)} {self.tr('GAME_SELECTOR_6')}: {count} / {self.max_games}"
+    def enforce_initial_max_games(self):
+        if self.max_games is None:
+            return
+
+        total_selected = self.get_total_selected_count()
+
+        if total_selected <= self.max_games:
+            return
+
+        remaining_to_remove = (
+            total_selected - self.max_games
         )
 
-    # ---------------- EVENTS ----------------
+        sections = list(
+            self.sections_container.children
+        )
 
-    @on(SelectionList.SelectedChanged)
-    def on_selection_changed(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
+        for section in reversed(sections):
 
-        if len(sl.selected) > self.max_games:
-            sl.deselect(list(sl.selected)[-1])
+            if section == self.section_widgets.get(
+                "launchers"
+            ):
+                continue
 
-        self._update_label()
+            selection_list = next(
+                (
+                    child
+                    for child in section.children
+                    if isinstance(
+                        child,
+                        SelectionList,
+                    )
+                ),
+                None,
+            )
 
-    # ---------------- BUTTONS ----------------
+            if selection_list is None:
+                continue
 
-    @on(Button.Pressed, "#select_all")
-    def on_select_all(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
-        sl.deselect_all()
+            selected_values = list(
+                selection_list.selected
+            )
 
-        for idx in range(min(self.max_games, len(self.games))):
-            sl.select(idx)
+            for value in reversed(selected_values):
 
-        self._update_label()
+                if remaining_to_remove <= 0:
+                    return
 
-    @on(Button.Pressed, "#select_none")
-    def on_select_none(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
-        sl.deselect_all()
-        self._update_label()
+                selection_list.deselect(value)
+                remaining_to_remove -= 1
 
-    @on(Button.Pressed, "#confirm")
-    def on_confirm(self) -> None:
-        sl = self.query_one("#game_list", SelectionList)
+    def can_select_more(self):
+        if self.max_games is None:
+            return True
 
-        selected = set(sl.selected)
-        all_indices = set(range(len(self.games)))
+        return (
+            self.get_total_selected_count()
+            < self.max_games
+        )    
 
-        excluded_indices = all_indices - selected
+    # ---------------- SELECT ALL / TOGGLE SECTION ----------------
 
-        selected_lines = [self.games[i][1] for i in sorted(selected)]
-        excluded_lines = [self.games[i][1] for i in sorted(excluded_indices)]
+    def toggle_section_selection(self, section_id):
+        section = self.section_widgets[section_id]
 
-        # --- MAIN LIST (must always exist OR be deleted if empty) ---
-        if selected_lines:
-            with open(self.list_file, "w", encoding="utf-8") as f:
-                f.write("\n".join(selected_lines) + "\n")
+        selection_list = None
+
+        for child in section.children:
+            if isinstance(child, SelectionList):
+                selection_list = child
+                break
+
+        if selection_list is None:
+            return
+
+        has_selected = bool(selection_list.selected)
+
+        if has_selected:
+            selection_list.deselect_all()
         else:
-            self.list_file.unlink(missing_ok=True)
+            for option in selection_list.options:
 
-        # --- EXCLUDE FILE (optional output) ---
+                if option.value in selection_list.selected:
+                    continue
+
+                if not self.can_select_more():
+                    break
+
+                selection_list.select(option.value)
+
+        self.update_select_button(section_id)
+        self.update_selected_count()
+
+    def update_select_button(self, section_id):
+        section = self.section_widgets[section_id]
+
+        for child in section.children:
+            if isinstance(child, SelectionList):
+
+                button = self.query_one(
+                    f"#select_{section_id}",
+                    ClickableStatic,
+                )
+
+                button.update(
+                    "☐"
+                    if child.selected
+                    else "☑"
+                )
+
+    # ---------------- SECTION REORDERING ----------------
+
+    def move_section(self, section_id: str, direction: int):
+        section = self.section_widgets[section_id]
+
+        children = list(self.sections_container.children)
+
+        current = children.index(section)
+        target = current + direction
+
+        if not (0 <= target < len(children)):
+            return
+
+        target_widget = children[target]
+
+        if direction < 0:
+            self.sections_container.move_child(
+                section,
+                before=target_widget,
+            )
+        else:
+            self.sections_container.move_child(
+                section,
+                after=target_widget,
+            )
+
+    # ---------------- EXPORT ----------------
+
+    def export(self):
+        selected = []
+        excluded = []
+
+        for section in self.sections_container.children:
+            for child in section.children:
+                if not isinstance(child, SelectionList):
+                    continue
+
+                selected_set = set(child.selected)
+
+                for option in child.options:
+                    value = option.value
+
+                    if value in selected_set:
+                        selected.append(value)
+                    else:
+                        excluded.append(value)
+
+        section_order = []
+
+        for section in self.sections_container.children:
+            for section_id, widget in self.section_widgets.items():
+                if widget == section:
+                    section_order.append(section_id)
+
+        output_file = Path(self.games_file).parent / "selected.list"
+
+        with open(
+            output_file,
+            "w",
+            encoding="utf-8",
+        ) as f:
+            if selected:
+                f.write("\n".join(selected) + "\n")
+
         if self.exclude_file:
-            if excluded_lines:
-                with open(self.exclude_file, "w", encoding="utf-8") as f:
-                    f.write("\n".join(excluded_lines) + "\n")
-            else:
-                self.exclude_file.unlink(missing_ok=True)
+            with open(
+                self.exclude_file,
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write(
+                    "#SECTION_ORDER="
+                    + ",".join(section_order)
+                    + "\n"
+                )
+
+                if excluded:
+                    f.write("\n")
+                    f.write("\n".join(excluded))
 
         self.exit()
 
-# ---------------- MAIN ----------------
+    # ---------------- EVENTS ----------------
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("list_file")
-    parser.add_argument("--max-games", type=int, required=True)
-    parser.add_argument("--lang", default="eng")
+    def on_button_pressed(self, event: Button.Pressed):
+        if event.button.id == "confirm":
+            self.export()
 
-    args, unknown = parser.parse_known_args()
-    exclude_file = unknown[0] if unknown else None
+        self.set_focus(None)
 
-    GameSelector(
-        args.list_file,
-        args.max_games,
-        args.lang,
-        exclude_file,
-    ).run()
 
+    def on_clickable_static_clicked(
+        self,
+        event: ClickableStatic.Clicked,
+    ):
+        widget_id = event.widget.id
+
+        if widget_id.startswith("select_"):
+            self.toggle_section_selection(
+                widget_id[7:]
+            )
+
+        elif widget_id.startswith("up_"):
+            self.move_section(
+                widget_id[3:],
+                -1,
+            )
+
+        elif widget_id.startswith("down_"):
+            self.move_section(
+                widget_id[5:],
+                1,
+            )
+
+        self.set_focus(None)
+
+    def on_selection_list_selection_toggled(
+        self,
+        event: SelectionList.SelectionToggled,
+    ):
+        if self.max_games is not None:
+
+            if (
+                event.selection.value
+                in event.selection_list.selected
+            ):
+                if (
+                    self.get_total_selected_count()
+                    > self.max_games
+                ):
+                    event.selection_list.deselect(
+                        event.selection.value
+                    )
+                    return
+
+        for section_id, section in self.section_widgets.items():
+            if event.selection_list in section.children:
+                self.update_select_button(section_id)
+                self.update_selected_count()
+                break
+
+# ---------------- COMMAND LINE ENTRY ----------------
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="PSBBN Game Collection selector"
+    )
+
+    parser.add_argument(
+        "file",
+        help="Input game list file",
+    )
+
+    parser.add_argument(
+        "--exclude-file",
+        help="File containing games that should start unchecked",
+    )
+
+    parser.add_argument(
+    "--max-games",
+    type=int,
+    help=(
+        "Maximum number of checked items "
+        "allowed across all sections"
+    ),
+    )
+
+    parser.add_argument("--lang", default="eng")
+
+    args = parser.parse_args()
+
+    GameSelector(
+        games_file=args.file,
+        exclude_file=args.exclude_file,
+        max_games=args.max_games,
+        lang=args.lang,
+    ).run()

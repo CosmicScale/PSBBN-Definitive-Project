@@ -133,7 +133,7 @@ error_msg() {
     [ -n "$error_4" ] && echo "$error_4"
     echo
     echo "${UI_TEXT[ERROR_TROUBLE]}"
-    echo "https://github.com/CosmicScale/PSBBN-Definitive-Project#troubleshooting"
+    echo "${UI_TEXT[TROUBLE_URL]}"
     echo
     read -n 1 -s -r -p "${UI_TEXT[MENU_RETURN]}" </dev/tty
     echo
@@ -700,6 +700,7 @@ cp "${ASSETS_DIR}/extras"/{OSDSYS_A.XLF,FNTOSD,ICOIMAGE,JISUCS,SKBIMAGE,SNDIMAGE
 
 cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" <<'EOL'
 boot_auto = $HOSDSYS
+boot_auto_arg1 = -dev9=NICHDD
 boot_cross =
 boot_circle =
 boot_square =
@@ -722,7 +723,6 @@ fi
 cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMENU.CNF" <<'EOL'
 boot_auto = $HOSDSYS
 OSDSYS_video_mode = AUTO
-OSDSYS_Inner_Browser = 0
 OSDSYS_selected_color = 0x10,0x80,0xE0,0x80
 OSDSYS_unselected_color = 0x33,0x33,0x33,0x80
 OSDSYS_scroll_menu = 1
@@ -740,7 +740,6 @@ OSDSYS_menu_top_delimiter =
 OSDSYS_menu_bottom_delimiter =
 OSDSYS_num_displayed_items = 5
 OSDSYS_Skip_Disc = 0
-OSDSYS_Skip_Logo = 0
 cdrom_skip_ps2logo = 0
 cdrom_disable_gameid = 0
 cdrom_use_dkwdrv = 0

@@ -1,15 +1,19 @@
-• Foi adicionada a localização completa para inglês, japonês, francês, espanhol, alemão, italiano e português brasileiro. O idioma é detectado automaticamente, com inglês como padrão. (Usuários do Windows devem atualizar para a versão mais recente do PSBBN Launcher.)
+Seletor de jogos:
+• Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
+• Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
+• Personalize a ordem em que as categorias aparecem, tendo controle total sobre a organização da sua biblioteca.
 
-• Foi adicionado um Seletor de Jogos, permitindo escolher quais jogos aparecem na Coleção de Jogos e no Navegador.
+OSDMenu:
+• OSDMenu MBR e HOSDMenu atualizados para a versão v1.3.0.
+• Tempo de inicialização do PSBBN reduzido.
+• Adicionado suporte para botões adicionais de inicialização pelo controle. Agora todas as teclas são suportadas, exceto L3 e R3.
+• R3CONFIGURATOR atualizado para a versão v1.3.0.
 
-• Os jogos de PS1 agora são instalados na partição exFAT junto com os jogos de PS2 e aplicativos.
-
-• Os jogos de PS1 armazenados em um compartilhamento de rede SMB agora podem ser iniciados pela Coleção de Jogos e pelo Navegador.
-
-• Foi adicionado o POPSLoader para navegar e iniciar jogos de PS1. Ele pode ser iniciado pelos menus ou segurando △ durante a inicialização.
-
-• Foi adicionada a integração do POPSLoader ao Instalador de Jogos, incluindo o download automático de artes.
-
-• O wLaunchELF-ISR foi substituído pelo wLaunchELF-R3Z, adicionando suporte para partições exFAT no disco interno. Agora ele pode ser iniciado segurando START durante a inicialização.
-
-• O OSDMenu Configurator foi substituído pelo R3CONFIGURATOR, adicionando suporte multilíngue.
+Outras alterações:
+• POPSLoader atualizado para a versão contínua mais recente.
+• Instalação mais fácil dos drivers ATA BDM Assault com o POPSLoader.
+• wLaunchELF_R3Z atualizado para a v4.75.
+• A configuração de idioma do wLaunchELF_R3Z e do POPSLoader agora é definida automaticamente.
+• A configuração dos botões do wLaunchELF_R3Z agora é definida automaticamente.
+• Adicionada uma tradução em português do Brasil do README do PSBBN Definitive Project.
+• Diversas correções de bugs e limpeza de código.

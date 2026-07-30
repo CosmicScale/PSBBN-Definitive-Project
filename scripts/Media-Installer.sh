@@ -275,7 +275,7 @@ error_msg() {
   [ -n "$error_4" ] && echo "$error_4"
   echo
   echo "${UI_TEXT[ERROR_TROUBLE]}"
-  echo "https://github.com/CosmicScale/PSBBN-Definitive-Project#troubleshooting"
+  echo "${UI_TEXT[TROUBLE_URL]}"
   echo
   read -n 1 -s -r -p "${UI_TEXT[EXIT_KEY]}" </dev/tty
   echo

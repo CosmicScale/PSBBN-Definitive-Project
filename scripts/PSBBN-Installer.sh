@@ -59,6 +59,7 @@ if [[ "$arch" = "x86_64" ]]; then
     PFS_FUSE="${HELPER_DIR}/PFS Fuse.elf"
     PFS_SHELL="${HELPER_DIR}/PFS Shell.elf"
     APA_FIXER="${HELPER_DIR}/PS2 APA Header Checksum Fixer.elf"
+    PSU_EXTRACT="${HELPER_DIR}/PSU Extractor.elf"
 elif [[ "$arch" = "aarch64" ]]; then
     # ARM64
     HDL_DUMP="${HELPER_DIR}/aarch64/HDL Dump.elf"
@@ -66,6 +67,7 @@ elif [[ "$arch" = "aarch64" ]]; then
     PFS_FUSE="${HELPER_DIR}/aarch64/PFS Fuse.elf"
     PFS_SHELL="${HELPER_DIR}/aarch64/PFS Shell.elf"
     APA_FIXER="${HELPER_DIR}/aarch64/PS2 APA Header Checksum Fixer.elf"
+    PSU_EXTRACT="${HELPER_DIR}/aarch64/PSU Extractor.elf"
 fi
 
 case "$1" in
@@ -313,7 +315,7 @@ error_msg() {
     [ -n "$error_4" ] && echo "$error_4"
     echo
     echo "${UI_TEXT[ERROR_TROUBLE]}"
-    echo "https://github.com/CosmicScale/PSBBN-Definitive-Project#troubleshooting"
+    echo "${UI_TEXT[TROUBLE_URL]}"
     echo
     read -n 1 -s -r -p "${UI_TEXT[MENU_RETURN]}" </dev/tty
     echo
@@ -1056,12 +1058,12 @@ if [ "$OS" = "PSBBN" ]; then
 
     if [ "$MODE" = "update" ]; then
         echo "Current PSBBN Definitive Patch version: $psbbn_version" >> "${LOG_FILE}"
-        echo "${UI_TEXT[VERSION_CURRENT]} $psbbn_version"
+        echo "${UI_TEXT[VERSION_CURRENT_PSBBN]} $psbbn_version"
     
         if [ "$(printf '%s\n' "$LATEST_VERSION" "$psbbn_version" | sort -V | tail -n1)" = "$psbbn_version" ]; then
             echo
             echo "You already have the latest PSBBN Definitive Patch installed." >> "${LOG_FILE}"
-            echo "${UI_TEXT[VERSION_UPTODATE_PSBBN]}"
+            echo "[✓] ${UI_TEXT[VERSION_UPTODATE_PSBBN]}"
             PSBBN_UPDATE="no"
         fi
     fi
@@ -1084,7 +1086,7 @@ if [ "$OS" = "PSBBN" ]; then
     if [ "$(printf '%s\n' "$LATEST_LANG" "$LANG_VER" | sort -V | tail -n1)" = "$LANG_VER" ]; then
         echo
         echo "You already have the latest language pack installed." >> "${LOG_FILE}"
-        echo "${UI_TEXT[VERSION_UPTODATE_LANG]}"
+        echo "[✓] ${UI_TEXT[VERSION_UPTODATE_LANG]}"
         LANG_UPDATE="no"
     fi
 
@@ -1100,7 +1102,7 @@ if [ "$OS" = "PSBBN" ]; then
         echo 
         if [ "$(printf '%s\n' "$LATEST_CHAN" "$CHAN_VER" | sort -V | tail -n1)" = "$CHAN_VER" ]; then
             echo "You already have the latest game channels installed." | tee -a "${LOG_FILE}"
-            echo "${UI_TEXT[VERSION_CURRENT_CHAN]}"
+            echo "[✓] ${UI_TEXT[VERSION_CURRENT_CHAN]}"
             CHAN_UPDATE="no"
         else
             CHAN_UPDATE="yes"
@@ -1125,7 +1127,7 @@ echo "${UI_TEXT[VERSION_CURRENT_OSD]} $osdmenu_version"
 if [ "$(printf '%s\n' "$LATEST_OSD" "$osdmenu_version" | sort -V | tail -n1)" = "$osdmenu_version" ]; then
     echo
     echo "You already have the latest OSDMenu system software installed." >> "${LOG_FILE}"
-    echo "${UI_TEXT[VERSION_UPTODATE_OSD]}"
+    echo "[✓] ${UI_TEXT[VERSION_UPTODATE_OSD]}"
     OSD_UPDATE="no"
 fi
 
@@ -1161,7 +1163,7 @@ if [ "$PSBBN_UPDATE" != "no" ] || [ "$MODE" != "update" ]; then
     echo
     center_text "${UI_TEXT[CHANGELOG_1]}"
     echo "$text"
-    center_text "https://github.com/CosmicScale/PSBBN-Definitive-Project/tree/main#changelog"
+    center_text "${UI_TEXT[CHANGE_URL]}"
     echo "$text"
     echo
     echo "=============================================================================================================="
@@ -1488,6 +1490,7 @@ if [ ! -f "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" ]; then
         }
         cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" <<EOL
 boot_auto = \$PSBBN
+boot_auto_arg1 = -dev9=NICHDD
 boot_cross = \$HOSDSYS
 boot_circle = \$PSBBN
 boot_circle_arg1 = --kernel
@@ -1513,6 +1516,7 @@ EOL
     else
         cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" <<EOL
 boot_auto = \$PSBBN
+boot_auto_arg1 = -dev9=NICHDD
 boot_cross = \$HOSDSYS
 boot_circle = 
 boot_square =
@@ -1534,7 +1538,11 @@ EOL
         fi
     fi
 else
-    echo "OSDMBR.CNF already exists — skipping." >> "${LOG_FILE}"
+    echo "OSDMBR.CNF already exists." >> "${LOG_FILE}"
+    sed -i '/^boot_auto_arg/d;' "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" 2>> "${LOG_FILE}"
+    if grep -q '^boot_auto = \$PSBBN$' "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF"; then
+        echo "boot_auto_arg1 = -dev9=NICHDD" >> "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF"
+    fi
 fi
 
 # Check if OSDMENU.CNF exists
@@ -1543,7 +1551,6 @@ if [ ! -f "${STORAGE_DIR}/__sysconf/osdmenu/OSDMENU.CNF" ]; then
     cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMENU.CNF" <<'EOL'
 boot_auto = $HOSDSYS
 OSDSYS_video_mode = AUTO
-OSDSYS_Inner_Browser = 0
 OSDSYS_selected_color = 0x10,0x80,0xE0,0x80
 OSDSYS_unselected_color = 0x33,0x33,0x33,0x80
 OSDSYS_scroll_menu = 1
@@ -1561,7 +1568,6 @@ OSDSYS_menu_top_delimiter =
 OSDSYS_menu_bottom_delimiter =
 OSDSYS_num_displayed_items = 5
 OSDSYS_Skip_Disc = 0
-OSDSYS_Skip_Logo = 0
 cdrom_skip_ps2logo = 0
 cdrom_disable_gameid = 0
 cdrom_use_dkwdrv = 0
@@ -1575,7 +1581,8 @@ EOL
         error_msg "${UI_TEXT[ERROR_OSDMENU_CNF]}"
     fi
 else
-    echo "OSDMENU.CNF already exists — skipping." >> "${LOG_FILE}"
+    echo "OSDMENU.CNF already exists." >> "${LOG_FILE}"
+    sed -i '/^OSDSYS_Inner_Browser/d; /^OSDSYS_Skip_Logo/d;' "${STORAGE_DIR}/__sysconf/osdmenu/OSDMENU.CNF" 2>> "${LOG_FILE}"
 fi
 
 if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ] && version_le "${psbbn_version:-0}" "4.0.0"; then
@@ -1667,15 +1674,18 @@ fi
 
 UNMOUNT_ALL
 
+COMMANDS="device ${DEVICE}\n"
+COMMANDS+="rmpart PP.SYS_OSDMENU-CONFIGURATOR\n"
+
 if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ] && version_le "${psbbn_version:-0}" "4.0.0"; then
-    COMMANDS="device ${DEVICE}\n"
     COMMANDS+="rmpart PP.LAUNCHDISC\n"
     COMMANDS+="rmpart PP.HDDOSD\n"
     COMMANDS+="rmpart PP.LAUNCHELF\n"
     COMMANDS+="rmpart PP.BBNAVIGATOR\n"
-    COMMANDS+="exit"
-    echo -e "$COMMANDS" | sudo "${PFS_SHELL}" >> "${LOG_FILE}" 2>&1
 fi
+
+COMMANDS+="exit"
+echo -e "$COMMANDS" | sudo "${PFS_SHELL}" >> "${LOG_FILE}" 2>&1
 
 clean_up
 
@@ -1748,7 +1758,8 @@ if [ "$MODE" = "update" ]; then
     rm -rf "${OPL}/APPS/HDDOSD" 2>> "${LOG_FILE}"
     rm -rf "${OPL}/APPS/LAUNCHELF" 2>> "${LOG_FILE}"
     rm -rf "${OPL}/APPS/BBNAVIGATOR" 2>> "${LOG_FILE}"
-    rm -f "${TOOLKIT_PATH}/games/APPS/"{Launch-Disc.elf,HDD-OSD.elf,PSBBN.ELF}
+    rm -rf "${OPL}/APPS/SYS_OSDMENU-CONFIGURATOR" 2>> "${LOG_FILE}"
+    rm -f "${TOOLKIT_PATH}/games/APPS/"{Launch-Disc.elf,HDD-OSD.elf,PSBBN.ELF,SYS_OSDMENU-CONFIGURATOR.psu} 2>> "${LOG_FILE}"
 
     FILE="${TOOLKIT_PATH}/games/APPS/BOOT.ELF"
     TARGET_MD5="20a5b2c1ffb86e742fb5705b5d9d7370"
@@ -1768,6 +1779,15 @@ if [ "$MODE" = "update" ]; then
     else
         echo "File not found: $FILE" >> "${LOG_FILE}"
     fi
+
+    cd "${OPL}/APPS/" 2>>"${LOG_FILE}" || {
+        echo "[X] Error: Failed to change directory: $OPL/APPS." >> "${LOG_FILE}"
+        error_msg "Error" "${UI_TEXT[ERROR_CD]} $OPL/APPS."
+    }
+
+    echo "Extracting SYS_R3CONFIGURATOR.psu..." >> "${LOG_FILE}"
+    "${PSU_EXTRACT}" "${TOOLKIT_PATH}/games/APPS/SYS_R3CONFIGURATOR.psu" -f >> "${LOG_FILE}" 2>&1
+    cd "$TOOLKIT_PATH"
 fi
 
 if [ "$MODE" = "install" ]; then
@@ -1863,10 +1883,8 @@ if [ "$MODE" = "install" ]; then
     echo "[✓] ${UI_TEXT[PSBBN_SUCCESS]}"
 else
     UPDATE_SPLASH
-    if [ "$OS" = "PSBBN" ]; then
-        echo "[✓] PS2 System Software Successfully Updated" >> "${LOG_FILE}"
-        center_title "${UI_TEXT[UPDATE_SUCCESS_1]}"
-    fi
+    echo "[✓] PS2 System Software Successfully Updated" >> "${LOG_FILE}"
+    center_title "${UI_TEXT[UPDATE_SUCCESS_1]}"
     echo
     if [ "$PSBBN_UPDATE" != "no" ]; then
         echo "  ${UI_TEXT[UPDATE_SUCCESS_2]} $LATEST_VERSION" | tee -a "${LOG_FILE}"

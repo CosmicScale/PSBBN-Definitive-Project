@@ -1,15 +1,19 @@
-• Added full localization for English, Japanese, French, Spanish, German, Italian, and Brazilian Portuguese. Language is detected automatically, with English as the fallback. (Windows users must update to the latest PSBBN Launcher.)
+Game Selector:
+• Manage all your games and applications with Game Selector v2.
+• Select which titles appear in the Game Collection and Browser.
+• Customise the order in which categories appear, giving you full control over how your library is organised.
 
-• Added a Game Selector, allowing you to choose which games appear in the Game Collection and Browser.
+OSDMenu:
+• OSDMenu MBR and HOSDMenu updated to v1.3.0.
+• Reduced PSBBN boot time.
+• Added support for additional gamepad launch keys. All keys are now supported except L3 and R3.
+• R3CONFIGURATOR updated to v1.3.0.
 
-• PS1 games are now installed to the exFAT partition alongside your PS2 games and apps.
-
-• PS1 games stored on an SMB network share can now be launched from the Game Collection and Browser.
-
-• Added POPSLoader for browsing and launching PS1 games. It can be started from the menus or by holding △ during boot.
-
-• Added POPSLoader integration to the Game Installer, including automatic artwork downloads.
-
-• Replaced wLaunchELF-ISR with wLaunchELF-R3Z, adding support for internal drive exFAT partitions. It can now be started by holding START during boot.
-
-• Replaced OSDMenu Configurator with R3CONFIGURATOR, adding multilingual support.
+Other Changes:
+• POPSLoader updated to latest rolling release.
+• Easier ATA BDM Assault Driver Installation with POPSLoader.
+• wLaunchELF_R3Z updated to v4.75.
+• Language setting for wLaunchELF_R3Z and POPSLoader are now automatically set.
+• Button configuration setting for wLaunchELF_R3Z is now automatically set.
+• Added a Brazilian Portuguese translation of the PSBBN Definitive Project README.
+• Various bug fixes and code clean-up.

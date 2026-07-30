@@ -61,6 +61,29 @@ Both installation options offer:
 
 # Changelog
 
+**July 29, 2026 - Game Selector v2, OSDMenu 1.3.0 and more!**
+<p></p>
+
+**[Game Selector:](#game-selector)**
+- Manage all your games and applications with [Game Selector](#game-selector) v2.
+- Select which titles appear in the [Game Collection](#game-collection) and [Browser](#hosdmenu).
+- Customise the order in which categories appear, such as PS2 Games, PS1 Games, Launchers, and Applications, giving you full control over how your library is organised.
+
+**OSDMenu:**
+- [OSDMenu MBR](#osdmenu-mbr) and [HOSDMenu](#hosdmenu) updated to [v1.3.0](#https://github.com/pcm720/OSDMenu/releases/tag/v1.3.0).
+- Reduced [PSBBN](#psbbn) boot time.
+- Added support for additional [gamepad launch keys](#boot-options). All keys are now supported except `L3` and `R3`.
+- [R3CONFIGURATOR](#r3configurator) updated to [v1.3.0](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.0).
+
+**Other Changes:**
+- [POPSLoader](#popsloader) updated to latest rolling release
+- Easier [ATA BDM Assault Driver Installation](#installing-ata-bdm-assault) with [POPSLoader](#popsloader)
+- [wLaunchELF_R3Z](#wlaunchelf-r3z) updated to [v4.75](#https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/v4.75)
+- Language setting for [wLaunchELF_R3Z](#wlaunchelf-r3z) and [POPSLoader](#popsloader) are now automatically set.
+- [Button configuration](#reassign-cross-and-circle-buttons) setting for [wLaunchELF_R3Z](#wlaunchelf-r3z) is now automatically set.
+- Added a Brazilian Portuguese translation of the [PSBBN Definitive Project README](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README-PT-BR.md).
+- Various bug fixes and code clean-up.
+
 **July 02, 2026 - Enhanced Localization, Game Selector, PS1 on exFAT, POPSLoader, wLaunchELF-R3Z, and R3CONFIGURATOR**
 <p></p>
 
@@ -831,15 +854,23 @@ Additionally, any new games or apps found in the selected folder on your PC will
 
 Selecting **Add Additional Games and Apps** downloads metadata and artwork for all newly added content.
 
-Games and apps can be deleted manually from the exFAT filesystem on the PS2 drive. Selecting **Add Additional Games and Apps** will also remove any deleted titles from the [Game Collection](#game-collection) and [HOSDMenu](#hosdmenu).
+Games and apps can be deleted manually from the exFAT filesystem on the PS2 drive. Selecting **Add Additional Games and Apps** will also remove any deleted titles from the [Game Collection](#game-collection) and [Browser](#hosdmenu).
 
 ### Game Selector
-When running the Game Installer, you will be presented with a list of all installed games, allowing you to select which games to display in the [Game Collection](#game-collection) and [Browser](#hosdmenu). If you have a large collection, limiting the number of games displayed can improve your browsing experience. 
+When running the Game Installer, you will be presented with a list of all installed games and applications, allowing you to choose which titles appear in the [Game Collection](#game-collection) and [Browser](#hosdmenu). If you have a large collection, limiting the number of titles displayed can improve your browsing experience.
 
-Up to 800 titles can be displayed in the [Game Collection](#game-collection) and [Browser](#hosdmenu). All PS2 games will remain available in your chosen game launcher [(OPL](#open-ps2-loader-opl) or [NHDDL)](#nhddl), and all PS1 games will remain available in [POPSLoader](#popsloader).
+Up to 800 titles can be displayed in the [Game Collection](#game-collection) and [Browser](#hosdmenu). All PS2 games will remain available in your chosen game launcher ([OPL](#open-ps2-loader-opl) or [NHDDL](#nhddl)), and all PS1 games will remain available in [POPSLoader](#popsloader).
+
+You can also customise the order in which categories appear, such as PS2 Games, PS1 Games, Launchers, and Applications, giving you full control over how your library is organised.
 
 ### Installing ATA BDM Assault
-To play PS1 games, you must install the **ATA BDM Assault drivers** on a PS2 Memory Card. Download both `usbd.irx` and `usbhdfsd.irx` from the [ATA Assault releases page](https://github.com/saildot4k/ATA-Assault/releases/tag/latest), then copy them to `mc?:/POPSTARTER` on your PS2 Memory Card.
+To launch PS1 games from the [Game Collection](#game-collection) or [Browser](#hosdmenu), you must first install the **ATA BDM Assault drivers** onto a PS2 Memory Card.
+
+1. Insert a PS2 Memory Card into your PS2 console.
+2. Launch [POPSLoader](#popsloader).
+3. Launch any PS1 game.
+
+The required drivers will be installed automatically to the PS2 Memory Card.
 
 ### Launching PS1 Games from SMB
 PS1 games in the `.VCD` format stored on an SMB network share can be launched from the [Game Collection](#game-collection) and [Browser](#hosdmenu). Before running the Game Installer:
@@ -1281,7 +1312,7 @@ Please include all relevant log files:
 - [POPStarter](https://www.psx-place.com/resources/popstarter.683/) by [KrHACKen](https://www.psx-place.com/members/krhacken.98/)
 - [POPSLoader](https://github.com/NathanNeurotic/POPSLoader) by [NathanNeurotic (Ripto)](https://github.com/NathanNeurotic)
 - [HugoPocked POPStarter fixes](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/) by [HugoPocked](https://ko-fi.com/hugopocked)
-- [ATA Assault](#https://github.com/saildot4k/ATA-Assault) by [R3Z3N](https://github.com/saildot4k)
+- [ATA BDM Assault](https://github.com/saildot4k/ATA-Assault) by [R3Z3N](https://github.com/saildot4k)
 - [wLaunchELF_R3Z](https://github.com/saildot4k/wLaunchELF_R3Z) by [R3Z3N](https://github.com/saildot4k)
 - [R3CONFIGURATOR](https://github.com/saildot4k/R3CONFIGURATOR) by [R3Z3N](https://github.com/saildot4k)
 - PS2 cover art from the [OPL Manager Art DB backups](https://oplmanager.com/site/index.php?backups)

@@ -1,15 +1,19 @@
-• Teljes lokalizáció hozzáadva angol, japán, francia, spanyol, német, olasz és brazil portugál nyelven. A nyelv automatikusan felismerésre kerül, az angol az alapértelmezett. (Windows felhasználóknak frissíteniük kell a PSBBN Launcher legújabb verziójára.)
+Játékválasztó:
+• Kezeld az összes játékodat és alkalmazásodat a Játékválasztó v2 segítségével.
+• Válaszd ki, mely címek jelenjenek meg a Játékgyűjteményben és a Browserben.
+• Szabd testre a kategóriák megjelenési sorrendjét, így teljes irányítást kapsz a könyvtárad rendszerezése felett.
 
-• Hozzáadva egy Játékválasztó, amely lehetővé teszi, hogy kiválaszd, mely játékok jelenjenek meg a Játékgyűjteményben és a Böngészőben.
+OSDMenu:
+• Az OSDMenu MBR és a HOSDMenu frissítve lett a v1.3.0 verzióra.
+• Csökkentettük a PSBBN indítási idejét.
+• További kontrollergombok állíthatók be játékindító gombként. Mostantól az L3 és R3 kivételével minden gomb támogatott.
+• Az R3CONFIGURATOR frissítve lett a v1.3.0 verzióra.
 
-• A PS1 játékok mostantól az exFAT partícióra települnek a PS2 játékok és alkalmazások mellé.
-
-• Az SMB hálózati megosztáson tárolt PS1 játékok mostantól elindíthatók a Játékgyűjteményből és a Böngészőből.
-
-• Hozzáadva a POPSLoader a PS1 játékok böngészéséhez és indításához. Elindítható a menükből vagy a △ gomb nyomva tartásával indításkor.
-
-• POPSLoader integráció hozzáadva a Játéktelepítőhöz, beleértve az automatikus borítóletöltést.
-
-• A wLaunchELF-ISR lecserélve wLaunchELF-R3Z-re, amely támogatja a belső meghajtó exFAT partícióit. Indításkor a START gomb nyomva tartásával indítható.
-
-• Az OSDMenu Configurator lecserélve R3CONFIGURATOR-ra, többnyelvű támogatással.
+Egyéb változások:
+• A POPSLoader frissítve lett a legújabb rolling release verzióra.
+• Egyszerűbb ATA BDM Assault illesztőprogram-telepítés a POPSLoader segítségével.
+• A wLaunchELF_R3Z frissítve lett a 4.75-ös verzióra.
+• • A wLaunchELF_R3Z és a POPSLoader nyelvi beállításai mostantól automatikusan beállításra kerülnek.
+• A wLaunchELF_R3Z gombkiosztási beállításai mostantól automatikusan beállításra kerülnek.
+• Hozzáadva a PSBBN Definitive Project README fájljának brazil portugál fordítása.
+• Különféle hibajavítások és kódtisztítások.

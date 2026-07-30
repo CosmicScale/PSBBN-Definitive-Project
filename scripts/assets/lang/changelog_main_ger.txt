@@ -1,15 +1,19 @@
-• Vollständige Lokalisierung für Englisch, Japanisch, Französisch, Spanisch, Deutsch, Italienisch und brasilianisches Portugiesisch hinzugefügt. Die Sprache wird automatisch erkannt, mit Englisch als Standard. (Windows-Nutzer müssen auf die neueste Version des PSBBN Launchers aktualisieren.)
+Spieleauswahl:
+• Verwalten Sie alle Ihre Spiele und Anwendungen mit Spieleauswahl v2.
+• Legen Sie fest, welche Titel in der Spielesammlung und im Browser angezeigt werden.
+• Passen Sie die Reihenfolge der Kategorien individuell an und behalten Sie die volle Kontrolle über die Organisation Ihrer Bibliothek.
 
-• Ein Spielauswähler wurde hinzugefügt, mit dem festgelegt werden kann, welche Spiele in der Spielesammlung und im Browser angezeigt werden.
+OSDMenu:
+• OSDMenu MBR und HOSDMenu wurden auf Version v1.3.0 aktualisiert.
+• PSBBN-Startzeit reduziert.
+• Unterstützung für zusätzliche Starttasten auf dem Gamepad hinzugefügt. Nun werden alle Tasten außer L3 und R3 unterstützt.
+• R3CONFIGURATOR wurde auf Version v1.3.0 aktualisiert.
 
-• PS1-Spiele werden jetzt auf der exFAT-Partition zusammen mit Ihren PS2-Spielen und Anwendungen installiert.
-
-• Auf einer SMB-Netzwerkfreigabe gespeicherte PS1-Spiele können jetzt über die Spielesammlung und den Browser gestartet werden.
-
-• POPSLoader für das Durchsuchen und Starten von PS1-Spielen hinzugefügt. Er kann über die Menüs oder durch Halten von △ beim Start ausgeführt werden.
-
-• POPSLoader-Integration im Game Installer hinzugefügt, einschließlich automatischer Cover-Downloads.
-
-• wLaunchELF-ISR wurde durch wLaunchELF-R3Z ersetzt und unterstützt nun exFAT-Partitionen auf dem internen Laufwerk. Es kann nun durch Halten von START beim Start ausgeführt werden.
-
-• OSDMenu Configurator wurde durch R3CONFIGURATOR ersetzt und bietet nun mehrsprachige Unterstützung.
+Weitere Änderungen:
+• POPSLoader auf die neueste Rolling-Release-Version aktualisiert.
+• Einfachere Installation der ATA BDM Assault-Treiber mit POPSLoader.
+• wLaunchELF_R3Z auf Version 4.75 aktualisiert.
+• • Die Spracheinstellungen für wLaunchELF_R3Z und POPSLoader werden nun automatisch festgelegt.
+• Die Tastenbelegung für wLaunchELF_R3Z wird nun automatisch festgelegt.
+• Eine brasilianisch-portugiesische Übersetzung der README-Datei des PSBBN Definitive Project hinzugefügt.
+• Verschiedene Fehlerbehebungen und Code-Bereinigungen.

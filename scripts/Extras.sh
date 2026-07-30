@@ -260,7 +260,7 @@ error_msg() {
   [ -n "$error_4" ] && echo "$error_4"
   echo
   echo "${UI_TEXT[ERROR_TROUBLE]}"
-  echo "https://github.com/CosmicScale/PSBBN-Definitive-Project#troubleshooting"
+  echo "${UI_TEXT[TROUBLE_URL]}"
   echo
   read -n 1 -s -r -p "${UI_TEXT[EXIT_KEY]}" </dev/tty
   echo
@@ -1006,10 +1006,12 @@ option_two() {
         BUTTON="X"
         OPL_ENTER="1"
         R3CONFIG_ENTER="0"
+        WLE_ENTER="1"
     else
         BUTTON="O"
         OPL_ENTER="0"
         R3CONFIG_ENTER="1"
+        WLE_ENTER="0"
     fi
 
     if grep -q '^ENTER =' "$OPL/version.txt" 2>> "${LOG_FILE}"; then
@@ -1047,15 +1049,33 @@ option_two() {
     if [[ -d "${OPL}/APPS/SYS_R3CONFIGURATOR" ]]; then
         if grep -q '^swap_select_btn =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
         sed -i "s/^swap_button[[:space:]]*=.*/swap_buttons = $R3CONFIG_ENTER/" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-            echo "[X] Error: Failed to update button config in r3configurator.cnf." >> "${LOG_FILE}"
+            echo "[X] Error: Failed to update button config in ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
             UNMOUNT_OPL
             return 1
         }
         else
             echo "swap_buttons = $R3CONFIG_ENTER" >> "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-                echo "[X] Error: Failed to add button config to r3configurator.cnf." >> "${LOG_FILE}"
+                echo "[X] Error: Failed to add button config to ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
                 error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
+                UNMOUNT_OPL
+                return 1
+            }
+        fi
+    fi
+
+    if [[ -d "${OPL}/APPS/APP_WLE-R3Z" ]]; then
+        if grep -q '^GUI_Swap_Keys =' "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" 2>> "${LOG_FILE}"; then
+        sed -i "s/^GUI_Swap_Keys[[:space:]]*=.*/GUI_Swap_Keys = $WLE_ENTER/" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
+            echo "[X] Error: Failed to update button config in ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
+            UNMOUNT_OPL
+            return 1
+        }
+        else
+            echo "GUI_Swap_Keys = $WLE_ENTER" >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
+                echo "[X] Error: Failed to add button config to ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
                 UNMOUNT_OPL
                 return 1
             }
@@ -1200,6 +1220,7 @@ option_three() {
                 lang="eng"
                 OPL_LANG="English (internal)"
                 R3CONFIG_LANG="en"
+                WLE_LANG="english"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_2]}"
                 break
                 ;;
@@ -1207,6 +1228,7 @@ option_three() {
                 lang="jpn"
                 OPL_LANG="japanese"
                 R3CONFIG_LANG="en"
+                WLE_LANG="english"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_3]}"
                 break
                 ;;
@@ -1214,6 +1236,7 @@ option_three() {
                 lang="fre"
                 OPL_LANG="French"
                 R3CONFIG_LANG="fr"
+                WLE_LANG="french"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_4]}"
                 break
                 ;;
@@ -1221,6 +1244,7 @@ option_three() {
                 lang="ger"
                 OPL_LANG="German"
                 R3CONFIG_LANG="en"
+                WLE_LANG="german"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_5]}"
                 break
                 ;;
@@ -1228,6 +1252,7 @@ option_three() {
                 lang="hun"
                 OPL_LANG="Hungarian"
                 R3CONFIG_LANG="en"
+                WLE_LANG="hungarian"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_6]}"
                 break
                 ;;
@@ -1235,6 +1260,7 @@ option_three() {
                 lang="ita"
                 OPL_LANG="Italian"
                 R3CONFIG_LANG="en"
+                WLE_LANG="italian"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_7]}"
                 break
                 ;;
@@ -1242,6 +1268,7 @@ option_three() {
                 lang="por"
                 OPL_LANG="Portuguese_BR"
                 R3CONFIG_LANG="pt"
+                WLE_LANG="brazilian"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_8]}"
                 break
                 ;;
@@ -1249,6 +1276,7 @@ option_three() {
                 lang="spa"
                 OPL_LANG="Spanish"
                 R3CONFIG_LANG="es"
+                WLE_LANG="spanish"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_9]}"
                 break
                 ;;
@@ -1288,14 +1316,14 @@ option_three() {
 
     if grep -q '^^language_text=' "${OPL}/conf_opl.cfg" 2>> "${LOG_FILE}"; then
     sed -i "s/^language_text=.*/language_text=$OPL_LANG/" "${OPL}/conf_opl.cfg" || {
-        echo "[X] Error: Failed to update button config in conf_opl.cfg." >> "${LOG_FILE}"
+        echo "[X] Error: Failed to update button config in ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
         UNMOUNT_OPL
         return 1
     }
     else
         echo "language_text=$OPL_LANG" >> "${OPL}/conf_opl.cfg" || {
-            echo "[X] Error: Failed to add button config to conf_opl.cfg." >> "${LOG_FILE}"
+            echo "[X] Error: Failed to add button config to ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
             UNMOUNT_OPL
             return 1
@@ -1303,17 +1331,35 @@ option_three() {
     fi
 
     if [[ -d "${OPL}/APPS/SYS_R3CONFIGURATOR" ]]; then
-        if grep -q '^swap_select_btn =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
+        if grep -q '^default_language =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
         sed -i "s/^default_language[[:space:]]*=.*/default_language = $R3CONFIG_LANG/" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-            echo "[X] Error: Failed to update button config in r3configurator.cnf." >> "${LOG_FILE}"
+            echo "[X] Error: Failed to update button config in ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
             UNMOUNT_OPL
             return 1
         }
         else
             echo "default_language = $R3CONFIG_LANG" >> "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-                echo "[X] Error: Failed to add button config to r3configurator.cnf." >> "${LOG_FILE}"
+                echo "[X] Error: Failed to add button config to ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
                 error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
+                UNMOUNT_OPL
+                return 1
+            }
+        fi
+    fi
+
+    if [[ -d "${OPL}/APPS/APP_WLE-R3Z" ]]; then
+        if grep -q '^language =' "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" 2>> "${LOG_FILE}"; then
+        sed -i "s/^language[[:space:]]*=.*/language = $WLE_LANG/" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
+            echo "[X] Error: Failed to update button config in ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
+            UNMOUNT_OPL
+            return 1
+        }
+        else
+            echo "language = $WLE_LANG" >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
+                echo "[X] Error: Failed to add button config to ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
                 UNMOUNT_OPL
                 return 1
             }

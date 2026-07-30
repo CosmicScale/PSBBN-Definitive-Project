@@ -1,15 +1,19 @@
-• Localisation complète ajoutée pour l’anglais, le japonais, le français, l’espagnol, l’allemand, l’italien et le portugais brésilien. La langue est détectée automatiquement, avec l’anglais comme langue par défaut. (Les utilisateurs Windows doivent mettre à jour vers la dernière version du PSBBN Launcher.)
+Sélecteur de jeux :
+• Gérez tous vos jeux et applications avec Sélecteur de jeux v2.
+• Choisissez quels titres apparaissent dans la Bibliothèque de Jeux et le Navigateur.
+• Personnalisez l’ordre d’affichage des catégories afin de garder un contrôle total sur l’organisation de votre bibliothèque.
 
-• Ajout d’un sélecteur de jeux, permettant de choisir les jeux affichés dans la collection de jeux et le navigateur.
+OSDMenu :
+• OSDMenu MBR et HOSDMenu ont été mis à jour vers la version v1.3.0.
+• Temps de démarrage de PSBBN réduit.
+• Ajout de la prise en charge de touches de lancement supplémentaires pour les manettes. Toutes les touches sont désormais prises en charge, à l’exception de L3 et R3.
+• R3CONFIGURATOR a été mis à jour vers la version v1.3.0.
 
-• Les jeux PS1 sont désormais installés sur la partition exFAT aux côtés de vos jeux PS2 et de vos applications.
-
-• Les jeux PS1 stockés sur un partage réseau SMB peuvent désormais être lancés depuis la Collection de jeux et le Navigateur.
-
-• Ajout de POPSLoader pour parcourir et lancer des jeux PS1. Il peut être lancé depuis les menus ou en maintenant △ au démarrage.
-
-• Intégration de POPSLoader ajoutée au Game Installer, avec téléchargement automatique des jaquettes.
-
-• wLaunchELF-ISR a été remplacé par wLaunchELF-R3Z, ajoutant la prise en charge des partitions exFAT sur le disque interne. Il peut désormais être lancé en maintenant START au démarrage.
-
-• OSDMenu Configurator a été remplacé par R3CONFIGURATOR, avec prise en charge multilingue.
+Autres changements :
+• POPSLoader mis à jour vers la dernière version rolling release.
+• Installation simplifiée des pilotes ATA BDM Assault avec POPSLoader.
+• wLaunchELF_R3Z mis à jour vers la version 4.75.
+• Les paramètres de langue de wLaunchELF_R3Z et de POPSLoader sont désormais configurés automatiquement.
+• Les paramètres de configuration des boutons de wLaunchELF_R3Z sont désormais configurés automatiquement.
+• Ajout d’une traduction en portugais brésilien du README de PSBBN Definitive Project.
+• Divers correctifs et travaux de nettoyage du code.
