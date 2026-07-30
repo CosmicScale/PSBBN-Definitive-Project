@@ -64,6 +64,8 @@ Both installation options offer:
 **July 29, 2026 - Game Selector v2, OSDMenu 1.3.0 and more!**
 <p></p>
 
+[![PSBBN Update: Game Selector v2, OSDMenu 1.3.0 & more!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
+
 **[Game Selector:](#game-selector)**
 - Manage all your games and applications with [Game Selector](#game-selector) v2.
 - Select which titles appear in the [Game Collection](#game-collection) and [Browser](#hosdmenu).
@@ -84,7 +86,8 @@ Both installation options offer:
 - Added a Brazilian Portuguese translation of the [PSBBN Definitive Project README](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README-PT-BR.md).
 - Various bug fixes and code clean-up.
 
-**July 02, 2026 - Enhanced Localization, Game Selector, PS1 on exFAT, POPSLoader, wLaunchELF-R3Z, and R3CONFIGURATOR**
+<details>
+<summary><b>July 02, 2026 - Enhanced Localization, Game Selector, PS1 on exFAT, POPSLoader, wLaunchELF-R3Z, and R3CONFIGURATOR</summary></b>
 <p></p>
 
 [![Enhanced Localization, Game Selector, PS1 on exFAT, POPSLoader & more!](https://github.com/user-attachments/assets/c1828dbf-e1ba-4c67-8ae0-ccff79f4a524)](https://youtu.be/Bqf8XCfa0QM)  
@@ -130,6 +133,7 @@ Both installation options offer:
 - Correctly handle duplicate game IDs even when files are in different folders.
 - Fixed incorrect truncation of Japanese game titles in the [Browser](#hosdmenu).
 - The mounting of `__linux.9` is now skipped for non-Japanese installs, allowing the support of smaller drives.
+</details>
 
 <details>
 <summary><b>April 16, 2026 - Improved PS1 Compatibility, PS2 VMCs, OPL Update & More!</summary></b> 
