@@ -13,7 +13,7 @@ O PSBBN é um software oficial da Sony para o PlayStation 2, lançado exclusivam
 - Assistir a vídeos no Canal de Filmes
 - Transferência de fotos de uma câmera digital e visualização delas no Canal de Fotos
 
-O **PSBBN Definitive Project** (anteriormente PSBBN Definitive English Patch) começou em 2023 como um patch de idioma inglês para o PSBBN, mas expandiu-se continuamente bem além de seu escopo original. Este projeto agora visa fornecer a configuração definitiva para a unidade interna do PlayStation 2.
+O **PSBBN Definitive Project** (anteriormente PSBBN Definitive English Patch) começou em 2023 como um patch de idioma Inglês para o PSBBN, mas expandiu-se continuamente bem além de seu escopo original. Este projeto agora visa fornecer a configuração definitiva para a unidade interna do PlayStation 2.
 
 Você pode saber mais sobre o software PSBBN original na [Wikipedia](https://en.wikipedia.org/wiki/PlayStation_Broadband_Navigator) e acompanhar o desenvolvimento deste projeto no meu [canal do YouTube](https://www.youtube.com/@CosmicScaleFactor).
 
@@ -37,7 +37,7 @@ Ambas as opções de instalação oferecem:
 - Sistema de arquivos exFAT usado para armazenamento e gerenciamento fácil de jogos e aplicativos homebrew
 - Sistema de arquivos PFS usado para o software de sistema e suporte a legado
 - [HOSDMenu](#hosdmenu) — uma versão modificada do software HDD-OSD da Sony que oferece muitas vantagens sobre o FreeHDBoot
-- Visualizar, navegar e iniciar os jogos e aplicativos diretamente do [Navegador](#hosdmenu), representados por [ícones 3D](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
+- Visualizar, navegar e iniciar os jogos e aplicativos diretamente da [Rotina de pesquisa](#hosdmenu), representados por [ícones 3D](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
 - Suporte a [ID do Jogo](#id-do-jogo) para o **Pixel FX Retro GEM**, **MemCard Pro** e **SD2PSX** — funciona com jogos e aplicativos instalados, bem como discos de jogos físicos
 - Suporte ao [MechaPwn](#executar-discos-de-jogos-de-ps1-e-ps2) com correção automática do logotipo do PS2, permitindo que jogos importados e discos de backup sejam iniciados. Também ajusta o modo de vídeo do driver do PlayStation para discos de jogos de PS1 importados
 - Inclui os aplicativos [wLaunchELF-R3Z](#wlaunchelf-r3z), [R3CONFIGURATOR](#r3configurator) e [POPSLoader](#popsloader), com a escolha do [OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl) para o iniciador de jogos
@@ -59,12 +59,10 @@ Ambas as opções de instalação oferecem:
 - [Canal de Internet](#canal-de-internet) que oferece acesso a espelhos (mirrors) dos canais de jogos online originais de várias produtoras, permitindo que você baixe trailers de jogos, capturas de tela e jogue jogos retrô clássicos
 - [Extras opcionais](#extras-opcionais), como a instalação do [PS2 Linux](#install-ps2-linux)
 
-# Histórico de Alterações
+# Registro de Alterações
 
 **29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!**
 <p></p>
-
-[![PSBBN Update: Game Selector v2, OSDMenu 1.3.0 & more!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
 
 **[Seletor de jogos:](#saindo-dos-jogos)**
 - Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
@@ -93,11 +91,11 @@ Outras alterações:
 [![Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader e Mais!](https://github.com/user-attachments/assets/c1828dbf-e1ba-4c67-8ae0-ccff79f4a524)](https://youtu.be/Bqf8XCfa0QM)  
 
 **Novos Recursos:**
-- Um histórico de alterações agora é exibido antes do [Menu Principal](#menu-principal) sempre que uma nova atualização é lançada.
-- Os scripts do **PSBBN Definitive Project** foram totalmente localizados para inglês, japonês, francês, espanhol, alemão, italiano e português do Brasil. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o inglês como padrão caso não esteja disponível. Usuários de **Windows** precisarão atualizar para a versão mais recente do **[PSBBN Launcher for Windows](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)** para que este recurso funcione.
-- O [Instalador de Jogos](#instalar-jogos-e-aplicativos) agora conta com um [Seletor de Jogos](#seletor-de-jogos), permitindo selecionar quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Se você tiver uma coleção grande, limitar o número de jogos exibidos pode melhorar sua experiência de navegação.
+- Um registro de alterações agora é exibido antes do [Menu Principal](#menu-principal) sempre que uma nova atualização é lançada.
+- Os scripts do **PSBBN Definitive Project** foram totalmente localizados para Inglês, Japonês, Francês, Espanhol, Alemão, Italiano e Português do Brasil. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o Inglês como padrão caso não esteja disponível. Usuários de **Windows** precisarão atualizar para a versão mais recente do **[PSBBN Launcher for Windows](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)** para que este recurso funcione.
+- O [Instalador de Jogos](#instalar-jogos-e-aplicativos) agora conta com um [Seletor de Jogos](#seletor-de-jogos), permitindo selecionar quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Se você tiver uma coleção grande, limitar o número de jogos exibidos pode melhorar sua experiência de navegação.
 - Os jogos de PS1 agora são instalados na partição exFAT junto com os jogos e aplicativos de PS2, removendo as limitações de espaço causadas pelo APA. Jogos instalados anteriormente permanecerão na partição `POPS` e ainda estarão funcionais. Para jogar jogos de PS1 a partir da partição exFAT, você **DEVE** instalar os [drivers do ATA BDM Assault](#installing-ata-bdm-assault) em um Memory Card de PS2.
-- Jogos de PS1 armazenados em um [compartilhamento de rede SMB](#iniciando-jogos-de-ps1-via-smb) agora podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu). Coloque um arquivo `POPSTARTER.ELF` renomeado com o prefixo `SB.` na pasta `POPS` e, em seguida, execute o [Instalador de Jogos](#instalar-jogos-e-aplicativos).
+- Jogos de PS1 armazenados em um [compartilhamento de rede SMB](#iniciando-jogos-de-ps1-via-smb) agora podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Coloque um arquivo `POPSTARTER.ELF` renomeado com o prefixo `SB.` na pasta `POPS` e, em seguida, execute o [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 - O aplicativo [POPSLoader](#popsloader) foi adicionado. Isso permite que você navegue e carregue facilmente jogos de PS1. O [POPSLoader](#popsloader) pode ser iniciado a partir da [Coleção de Jogos](#coleção-de-jogos) ou do Menu Navigator, no navegador ou menu de sistema do [HOSDMenu](#hosdmenu), ou segurando o botão [△](#opções-de-inicialização) na inicialização.
 - A integração com o [POPSLoader](#popsloader) foi adicionada ao [Instalador de Jogos](#instalar-jogos-e-aplicativos); a arte do jogo é baixada automaticamente para todos os jogos de PS1.
 - O **wLaunchELF-ISR** foi substituído pelo [wLaunchELF-R3Z](#wlaunchelf-r3z), adicionando suporte para o gerenciamento de arquivos na partição exFAT da unidade interna. Ele agora pode ser iniciado na inicialização segurando o botão [START](#opções-de-inicialização).
@@ -106,12 +104,12 @@ Outras alterações:
 **Aprimoramentos:**
 - [Instalador do PSBBN e HOSDMenu](#instalar-psbbn-e-hosdmenu) e [Instalador apenas do HOSDMenu](#instalar-apenas-o-hosdmenu):
   - Não cria mais uma partição `POPS`, permitindo partições de Música e Conteúdos maiores ou uma partição exFAT maior.
-  - A seleção de idioma foi removida. Agora ele é instalado automaticamente no mesmo idioma do sistema operacional, assumindo o inglês como padrão caso esse idioma não esteja disponível.
+  - A seleção de idioma foi removida. Agora ele é instalado automaticamente no mesmo idioma do sistema operacional, assumindo o Inglês como padrão caso esse idioma não esteja disponível.
 - [Instalador apenas do HOSDMenu](#instalar-apenas-o-hosdmenu):
   - Permite reservar espaço para futuras partições APA. Até 50% da capacidade da unidade (máximo de 2 TB) pode ser reservado.
 - [Instalador de Jogos](#instalar-jogos-e-aplicativos):
   - O idioma e a configuração dos botões agora são definidos automaticamente no [OPL](#open-ps2-loader-opl) e no [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação.
-  - Os jogos de PS2 agora são exibidos primeiro na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu), seguidos pelos jogos de PS1 e aplicativos homebrew.
+  - Os jogos de PS2 agora são exibidos primeiro na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu), seguidos pelos jogos de PS1 e aplicativos homebrew.
   - O feedback visual do [Instalador de Jogos](#instalar-jogos-e-aplicativos) foi simplificado e agora inclui barras de progresso.
   - Agora você tem a opção de desativar as [VMCs de PS2](#memory-cards-virtuais) caso elas tenham sido ativadas anteriormente.
   - O espaço disponível agora é exibido em MB, GB ou TB, dependendo do tamanho.
@@ -131,8 +129,8 @@ Outras alterações:
 - Exibe um aviso se um arquivo `.bin` estiver ausente ao converter para `.iso`. Ignora a conversão de `.VCD` se o arquivo `.bin` estiver ausente.
 - Verificações aprimoradas para a criação bem-sucedida das listas de jogos.
 - Lida corretamente com IDs de jogos duplicados, mesmo quando os arquivos estão em pastas diferentes.
-- Corrigido o truncamento incorreto de títulos de jogos japoneses no [Navegador](#hosdmenu).
-- A montagem de `__linux.9` agora é ignorada para instalações não japonesas, permitindo o suporte a unidades menores.
+- Corrigido o truncamento incorreto de títulos de jogos japoneses na [Rotina de pesquisa](#hosdmenu).
+- A montagem de `__linux.9` agora é ignorada para instalações não Japonesas, permitindo o suporte a unidades menores.
 </details>
 
 <details>
@@ -148,7 +146,7 @@ Outras alterações:
 
 **[Instalador de Jogos](#instalar-jogos-e-aplicativos):**
 - Atribui o iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)) ao botão □, permitindo que ele seja iniciado rapidamente na inicialização do console
-- Cria um arquivo de configuração do **[OPL](#open-ps2-loader-opl)** na sua unidade. O BDM HDD, Aplicativos e artes agora são ativados automaticamente
+- Cria um arquivo de configuração do **[OPL](#open-ps2-loader-opl)** na unidade. O BDM HDD, Aplicativos e artes agora são ativados automaticamente
 - Jogos no formato `ZSO` agora têm o "Modo de Compatibilidade 1" ativado automaticamente em suas configurações individuais do **[OPL](#open-ps2-loader-opl)**
 - Múltiplos jogos que compartilham o mesmo Title ID agora podem ser instalados, permitindo a instalação de uma variedade de modificações (mods)
 - Jogos de PS1 agora apresentam uma nova borda no estilo PSN na **[Coleção de Jogos](#coleção-de-jogos)** do PSBBN, tornando mais fácil distinguir entre jogos de PS1 e PS2
@@ -178,17 +176,17 @@ Outras alterações:
 - O Canal de Jogos foi renomeado para **[Canal de Internet](#canal-de-internet)**, refletindo o seu foco online
 - Novos canais online adicionados: CANAL BANDAI, So-Net e BIGLOBE
 - Baixe novos trailers de jogos em maior qualidade, com imagens de miniatura
-- O suporte ao idioma francês agora está disponível para o PSBBN
+- O suporte ao idioma Francês agora está disponível para o PSBBN
 </details>
 
 <details>
-<summary><b>05 de março de 2026 - Instaladores de Filmes e Fotos, OSDMenu Configurator e mais!</summary></b> 
+<summary><b>05 de março de 2026 - Instaladores de Filmes e Fotos, OSDMenu Configurator e Mais!</summary></b> 
 <p></p>
 
 [![Instaladores de Filmes, Fotos, OSDMenu Configurator e Mais!](https://github.com/user-attachments/assets/f0fae1ee-bf04-4aea-88a6-89e030926282)](https://youtu.be/_jKzzsClgOY)
 
 **Mais Idiomas:**
-- Além do inglês, japonês e alemão, o PSBBN agora está disponível em italiano, português do Brasil e espanhol
+- Além do Inglês, Japonês e Alemão, o PSBBN agora está disponível em Italiano, Português do Brasil e Espanhol
 
 **[Atualizar Software de Sistema do PS2:](#atualizar-software-do-sistema-do-ps2)**
 - Substitui a opção **Update PSBBN Software**. Esta nova opção atualiza o software de sistema tanto do **[PSBBN](#psbbn)** quanto do **[OSDMenu](#hosdmenu)**
@@ -207,7 +205,7 @@ Outras alterações:
 - As imagens poderão então ser visualizadas no **[Canal de Fotos](#canal-de-fotos)** do PSBBN
 
 **[OSDMenu 1.2.0:](#osdmenu-mbr)**
-- Tanto o **[OSDMenu MBR](#osdmenu-mbr)** quanto o **[HOSDMenu](#hosdmenu)** foram atualizados para a versão 1.2.0. O histórico de alterações pode ser encontrado **[aqui](https://github.com/pcm720/OSDMenu/releases)**
+- Tanto o **[OSDMenu MBR](#osdmenu-mbr)** quanto o **[HOSDMenu](#hosdmenu)** foram atualizados para a versão 1.2.0. O registro de alterações pode ser encontrado **[aqui](https://github.com/pcm720/OSDMenu/releases)**
 - O aplicativo **OSDMenu Configurator** foi adicionado. Ele permite que você personalize o console PS2 modificando as configurações do **[OSDMenu MBR](#osdmenu-mbr)** e do **[HOSDMenu](#hosdmenu)**
 - O **OSDMenu Configurator** será instalado na próxima vez que você selecionar **[Instalar Jogos e Aplicativos](#instalar-jogos-e-aplicativos)** a partir do **[Menu Principal](#menu-principal)** do PSBBN Definitive Project. Ele pode ser iniciado a partir da **[Coleção de Jogos](#coleção-de-jogos)** ou do **[HOSDMenu](#hosdmenu)**
 
@@ -217,7 +215,7 @@ Outras alterações:
 - Os usuários que possuem apenas o **[HOSDMenu](#hosdmenu)** agora podem alterar o idioma da instalação no **[Menu de Extras Opcionais](#extras-opcionais)**
 
 **[Alterar Configurações de Tela:](#alterar-configurações-de-tela)**
-- Anteriormente travado no **[PSBBN](#psbbn)**, agora você pode alterar as configurações de tela do sistema no menu **[Menu de Extras Opcionais](#extras-opcionais)** para 4:3, Cheia ou 16:9
+- Anteriormente travado no **[PSBBN](#psbbn)**, agora você pode alterar as configurações de tela do sistema no menu **[Menu de Extras Opcionais](#extras-opcionais)** para 4:3, Completo ou 16:9
 - **Note:** Essa configuração é utilizada por alguns jogos e pelo **[HOSDMenu](#hosdmenu)**. Ela não altera a proporção do próprio **[PSBBN](#psbbn)**
 
 **[Limpar Cache de Artes e Ícones:](#limpar-cache-de-arte-e-icones)**
@@ -251,55 +249,55 @@ Outras alterações:
 
 [![PSBBN Definitive Project: Novo Nome e Suporte Multilíngue](https://github.com/user-attachments/assets/32bb93f2-c009-4b82-ba62-67933ff30e83)](https://www.youtube.com/watch?v=dvCt_ExHwro)
 
-O PSBBN Definitive English Patch começou sua trajetória em 2023 como um patch de idioma inglês para o PSBBN, e este trabalho expandiu-se continuamente bem além de seu escopo original. Daqui para frente, ele será coletivamente chamado de **PSBBN Definitive Project**.
+O PSBBN Definitive English Patch começou sua trajetória em 2023 como um patch de idioma Inglês para o PSBBN, e este trabalho expandiu-se continuamente bem além de seu escopo original. Daqui para frente, ele será coletivamente chamado de **PSBBN Definitive Project**.
 
-O PSBBN agora está disponível em inglês, alemão, italiano e no japonês original, com a tradução em francês chegando em breve. Você poderá escolher o idioma ao instalar o PSBBN. O idioma também pode ser alterado posteriormente no menu **[Menu de Extras](#extras-opcionais)**.
+O PSBBN agora está disponível em Inglês, Alemão, Italiano e no Japonês original, com a tradução em Francês chegando em breve. Você poderá escolher o idioma ao instalar o PSBBN. O idioma também pode ser alterado posteriormente no menu **[Menu de Extras](#extras-opcionais)**.
 
-Quando o idioma está definido como japonês, os títulos dos jogos da região japonesa são exibidos em japonês e classificados na ordem 'gojūon' (五十音) tanto na **[Coleção de Jogos](#coleção-de-jogos)** quanto no **[Navegador do HOSDMenu](#hosdmenu)**. Além disso, os canais online japoneses originais também estão acessíveis a partir do **[Canal de Internet](#canal-de-internet)**.
+Quando o idioma está definido como Japonês, os títulos dos jogos da região Japonesa são exibidos em Japonês e classificados na ordem 'gojūon' (五十音) tanto na **[Coleção de Jogos](#coleção-de-jogos)** quanto no **[Navegador do HOSDMenu](#hosdmenu)**. Além disso, os canais online japoneses originais também estão acessíveis a partir do **[Canal de Internet](#canal-de-internet)**.
 
 **Notas completas de lançamento**  
 
 - **NOVO!** Tradução do PSBBN para o alemão feita por [Argo707](https://github.com/Argo707)  
-- Tradução para o inglês aprimorada  
-- Canais online japoneses originais restaurados
+- Tradução para o Inglês aprimorada  
+- Canais online Japoneses originais restaurados
 
 **[Instalador do PSBBN:](#instalar-psbbn-e-hosdmenu)**
 - Adicionada a opção de selecionar um idioma ao instalar o PSBBN
-- Selecionar o japonês também instalará os **[canais online](#canal-de-internet)** japoneses originais
+- Selecionar o Japonês também instalará os **[canais online](#canal-de-internet)** japoneses originais
 
 **[Atualizar Software do PSBBN:](#atualizar-software-do-sistema-do-ps2)**
 - Agora atualiza o software de sistema do PSBBN e o pacote de idiomas para a versão mais recente
-- Quando o idioma está definido como japonês, os canais online também são atualizados
+- Quando o idioma está definido como Japonês, os canais online também são atualizados
 
 **[Extras Opcionais:](#extras-opcionais)**
 - Adicionada a opção de alterar o idioma do PSBBN no menu **[Extras Opcionais](#extras-opcionais)**
 
 **[Instalador de Jogos:](#instalar-jogos-e-aplicativos)**
-- Quando o idioma estiver definido como japonês, os títulos dos jogos da região japonesa serão exibidos em japonês e classificados na ordem 'gojūon' (五十音)
+- Quando o idioma estiver definido como Japonês, os títulos dos jogos da região Japonesa serão exibidos em Japonês e classificados na ordem 'gojūon' (五十音)
 - A mensagem IGR do POPS é instalada correspondendo ao idioma selecionado
 - Os manuais dos jogos de PS1 são instalados correspondendo ao idioma selecionado
 
 **`TitlesDB_PS1.csv` e `TitlesDB_PS2.csv`:**  
-- Adicionados títulos de jogos japoneses para todos os jogos da região japonesa
+- Adicionados títulos de jogos japoneses para todos os jogos da região Japonesa
 
 **`list-builder.py`:**
-- Atualizado para lidar com títulos de jogos em japonês
+- Atualizado para lidar com títulos de jogos em Japonês
 
 **PSBBN Definitive Patch atualizado para a versão v4.1.0**
-- Atualizado o link para o novo Canal Konami em instalações não japonesas
+- Atualizado o link para o novo Canal Konami em instalações não Japonesas
 - Modificado o arquivo `fstab` para montar a partição `channels`
 
 **Geral**:  
-- O idioma do sistema agora é definido para o idioma selecionado do PSBBN e não é mais resetado para o inglês ou japonês ao iniciar o PSBBN
+- O idioma do sistema agora é definido para o idioma selecionado do PSBBN e não é mais resetado para o Inglês ou Japonês ao iniciar o PSBBN
 - Adicionados `libicu-dev` e `pkg-config` às dependências
-- Mensagem IGR em inglês do POPS aprimorada
+- Mensagem IGR em Inglês do POPS aprimorada
 - Adicionado um aviso para impedir que os scripts internos sejam executados diretamente
 - Adicionada uma verificação de validação de instalação para abortar instalações não suportadas
 - O **[NHDDL](#nhddl)** foi atualizado para a versão 1.2.1
 </details>
 
 <details>
-<summary><b>14 de novembro de 2025 - PSBBN Definitive Patch v4.0 - OSDMenu, adaptadores de HDD de terceiros e mais!</b></summary>
+<summary><b>14 de novembro de 2025 - PSBBN Definitive Patch v4.0 - OSDMenu, adaptadores de HDD de terceiros e Mais!</b></summary>
 <p></p>
 
 [![PSBBN Definitive Patch v4.0 - OSDMenu, adaptadores de HDD de terceiros e Mais!](https://github.com/user-attachments/assets/1a3f2d69-6bec-4fe4-aa27-c367f5d98f98)](https://www.youtube.com/watch?v=fT368C90Trc)
@@ -391,7 +389,7 @@ Aplica correções no **HDD-OSD** e introduz diversas melhorias:
 - Adicionado suporte para sistemas ARM64. Testado em um Raspberry Pi executando a última versão do Raspberry Pi OS
 - `BOOT.ELF` substituído pela versão do [wLaunchELF_ISR](#wlaunchelf_isr) v4.43x_isr-bb13043, compatível com o [SAS](#save-application-system-sas)
 - Removido o arquivo `PS1VModeNeg.elf`
-- Altera a configuração de localidade (locale) de `en_US.UTF-8` para `C.UTF-8` (alguns sistemas não possuíam o `en_US.UTF-8`), garantindo que a saída do script e os logs permaneçam em inglês e evitando falhas relacionadas
+- Altera a configuração de localidade (locale) de `en_US.UTF-8` para `C.UTF-8` (alguns sistemas não possuíam o `en_US.UTF-8`), garantindo que a saída do script e os logs permaneçam em Inglês e evitando falhas relacionadas
 - Melhoria no manuseio de montagem e desmontagem de partições APA
 - Correções de bugs
 - Adicionadas licenças de software
@@ -437,7 +435,7 @@ Um agradecimento especial ao Yornn por todo o seu trabalho nesse recurso.
 - Extrai o ID do Jogo diretamente dos arquivos ZSO ao descompactar apenas uma parte da imagem do disco; não é mais necessário descompactar totalmente os arquivos ZSO nem renomeá-los, melhorando significativamente o tempo de processamento
 
 **[Extras:](#extras-opcionais)**
-- O PS2 Linux agora é uma instalação opcional. Você pode definir um tamanho personalizado para a sua partição home. O PS2 Linux também pode ser reinstalado caso você enfrente problemas
+- O PS2 Linux agora é uma instalação opcional. Você pode definir um tamanho personalizado para a partição home. O PS2 Linux também pode ser reinstalado caso você enfrente problemas
 - Altere as funções dos botões Cruz e Círculo no controle. Escolha entre o layout padrão (Cruz = Confirmar, Círculo = Voltar) ou o layout alternativo (Círculo = Confirmar, Cruz = Voltar)
 
 **HDD-OSD (Browser 2.0):**
@@ -460,7 +458,7 @@ O patch v2.11 pode ser instalado executando o [script do Instalador do PSBBN](#i
 - Segurança de Inicialização Corrigida. A verificação de segurança do CRC no boot ELF do PSBBN foi burlada, permitindo o carregamento de kernels customizados.
 - Os botões × e ○ foram trocados: × agora é Enter, e ○ agora é Voltar.
 - Adicionado suporte para o controle remoto de DVD do PlayStation 2. Os botões `PLAY`, `PAUSE`, `STOP`, `PREV`, `NEXT`, `SCAN` e `DISPLAY` agora podem ser usados durante a reprodução de músicas e filmes nos canais de [Música](#canal-de-música) e [Filmes](#canal-de-filmes). O botão `ENTER` também pode ser utilizado na navegação dos menus.
-- O **Guia do PlayStation BB** foi atualizado para refletir a troca de botões e a realocação da [Coleção de Jogos](#coleção-de-jogos). Uma nova seção foi adicionada abordando os Canais Online. Diversas melhorias na tradução para o inglês.
+- O **Guia do PlayStation BB** foi atualizado para refletir a troca de botões e a realocação da [Coleção de Jogos](#coleção-de-jogos). Uma nova seção foi adicionada abordando os Canais Online. Diversas melhorias na tradução para o Inglês.
 - Melhora o processo de atualização. O uso de um pen drive e teclado USB não será necessário para futuras atualizações.
 
 **`02-PSBBN-Installer.sh`:**
@@ -480,7 +478,7 @@ O patch v2.11 pode ser instalado executando o [script do Instalador do PSBBN](#i
 
 **Neutrino Atualizado para a Versão 1.7.0**
 
-- O histórico de alterações completo do Neutrino pode ser encontrado [aqui](https://github.com/rickgaiser/neutrino/releases/tag/v1.7.0)
+- O registro de alterações completo do Neutrino pode ser encontrado [aqui](https://github.com/rickgaiser/neutrino/releases/tag/v1.7.0)
 
 **Open PS2 Loader Atualizado para a versão v1.2.0 Beta-2210-6b300b0**
 - Adiciona suporte a Grupos VMC e correções de bugs.
@@ -510,11 +508,11 @@ O patch v2.11 pode ser instalado executando o [script do Instalador do PSBBN](#i
 - Reduzido o atraso antes que os pressionamentos de botão sejam registrados ao inicializar o Linux  
 - A partição do PS2 Linux agora usa o sistema `ext2` em vez do `reiserfs`   
 - Removidas as Configurações de Provedor de Internet (ISP) do Menu Principal  
-- O atalho para o Open PS2 Loader foi removido do Menu Navigator (o usuário agora pode adicionar manualmente um atalho para o iniciador de jogos de sua escolha)
+- O atalho para o Open PS2 Loader foi removido do Menu Navigator (o usuário agora pode adicionar manualmente um atalho para o iniciador de jogos de sua preferência)
 - Atalhos modificados para o [LaunchELF](https://github.com/ps2homebrew/wLaunchELF) e para o [Launch Disc](#launch-disc)
 - Atualizada a página 'Sobre o PlayStation BB Navigator'  
 - Ativado o acesso via telnet ao PSBBN para fins de desenvolvimento  
-- Correções na tradução para o inglês  
+- Correções na tradução para o Inglês  
 
 **`02-PSBBN-Installer.sh`:**
 
@@ -663,7 +661,7 @@ O patch v2.11 pode ser instalado executando o [script do Instalador do PSBBN](#i
 </details>  
 
 # Guia de Instalação
-O **PSBBN Definitive Project** foi totalmente localizado para inglês, japonês, francês, espanhol, alemão, italiano e português do Brasil. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o inglês como padrão caso não esteja disponível.
+O **PSBBN Definitive Project** foi totalmente localizado para Inglês, Japonês, Francês, Espanhol, alemão, Italiano e Português do Brasil. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o Inglês como padrão caso não esteja disponível.
 
 ## Requisitos
 Para a melhor experiência, recomenda-se um modelo PS2 Fat (séries SCPH-30000 a SCPH-55000).
@@ -712,7 +710,7 @@ A maneira recomendada de instalar o **PSBBN Definitive Project** no Windows é u
 [![PSBBN Launcher for Windows: Instalação e Configuração Fácil](https://github.com/user-attachments/assets/981e4abc-10b0-49d2-8d52-3e19ea80650b)](https://www.youtube.com/watch?v=O5ZvJoW4oNw)
 
 **Ativando a Virtualização:**  
-Pode ser necessário ativar o Modo SVM (para CPUs AMD) ou VT-x (para CPUs Intel) nas configurações da sua BIOS, caso ainda não esteja habilitado. Instruções de como fazer isso podem ser encontradas [aqui](https://www.elevenforum.com/t/enable-or-disable-cpu-virtualization-in-uefi-bios-firmware-settings-on-windows-pc.4928/).
+Pode ser necessário ativar o Modo SVM (para CPUs AMD) ou VT-x (para CPUs Intel) nas configurações da BIOS, caso ainda não esteja ativado. Instruções de como fazer isso podem ser encontradas [aqui](https://www.elevenforum.com/t/enable-or-disable-cpu-virtualization-in-uefi-bios-firmware-settings-on-windows-pc.4928/).
 
 Baixe o **PSBBN Launcher for Windows [aqui](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)**.
 
@@ -764,7 +762,7 @@ Instala jogos de PS1 e PS2, além de aplicativos homebrew.
     2. [Instalar Filmes](#instalar-filmes)
     3. [Instalar Fotos](#instalar-fotos)
     4. [Definir Local de Mídia](#definir-local-de-mídia)
-    5. [Inicializar Partição de Música](#inicializar-partição-de-mísica)
+    5. [Inicializar Partição de Música](#inicializar-partição-de-música)
 
 6. [Extras Opcionais](#extras-opcionais)  
     1. [Instalar PS2 Linux](#instalar-ps2-linux)
@@ -778,8 +776,8 @@ Esta opção instala tanto o [PSBBN](#psbbn) quanto o [HOSDMenu](#hosdmenu). É 
 - Formata a unidade para uma instalação limpa
 - Baixa o software de sistema mais recente do [PSBBN](#psbbn) e o pacote de idiomas do [archive.org](https://archive.org/)
 - Instala o [PSBBN](#psbbn), [OSDMenu MBR](#osdmenu-mbr) e [HOSDMenu](#hosdmenu)
-- Define o idioma da interface para corresponder ao do sistema operacional (assume o inglês como padrão caso não esteja disponível)
-- Se o idioma estiver definido como japonês, baixa e instala os [Canais Online](#canal-de-internet) a partir do [archive.org](https://archive.org/)
+- Define o idioma da interface para corresponder ao do sistema operacional (assume o Inglês como padrão caso não esteja disponível)
+- Se o idioma estiver definido como Japonês, baixa e instala os [Canais Online](#canal-de-internet) a partir do [archive.org](https://archive.org/)
 - Solicita que você particione a unidade
 
 Você tem **114 GB** disponíveis para partições APA. Será solicitado que você selecione um tamanho para as seguintes partições:
@@ -794,7 +792,7 @@ Uma partição exFAT é então criada usando o espaço restante do disco (até 2
 Esta opção instala o [HOSDMenu](#hosdmenu) sem o [PSBBN](#psbbn) e é compatível com adaptadores de HDD de terceiros. O instalador executa as seguintes ações:
 - Formata a unidade para uma instalação limpa
 - Instala o [OSDMenu MBR](#osdmenu-mbr) e o [HOSDMenu](#hosdmenu)
-- Define o idioma da interface para corresponder ao do sistema operacional (assume o inglês como padrão caso não esteja disponível)
+- Define o idioma da interface para corresponder ao do sistema operacional (assume o Inglês como padrão caso não esteja disponível)
 - Solicita que você particione a unidade
 
 Você pode, opcionalmente, reservar espaço na unidade para uso futuro. Este espaço é deixado não alocado e pode ser usado posteriormente para partições APA. Até 50% da capacidade da unidade (máximo de 2 TB) pode ser reservado.
@@ -806,7 +804,7 @@ Selecionar esta opção verifica online as versões mais recentes do **Software 
 
 ## Instalar Jogos e Aplicativos
 O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e PS2, bem como de aplicativos homebrew:
-- Detecta automaticamente a sua unidade de PS2
+- Detecta automaticamente a unidade do PS2
 - Para usuários de Linux, permite definir um caminho personalizado no PC para armazenar jogos e aplicativos antes da instalação
 - Oferece a escolha entre o [Open PS2 Loader (OPL)](#open-ps2-loader-opl) ou o [NHDDL](#nhddl) para o iniciador de jogos
 - Atribui o iniciador de jogos escolhido, o [POPSLoader](#popsloader) e o [wLaunchELF-R3Z](#wlaunchelf-r3z) ao [botão de inicialização](#opções-de-inicialização)
@@ -815,7 +813,7 @@ O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e
 - Oferece a opção de aplicar uma correção HDTV para jogos de PS1, útil para usuários com uma TV que não suporta 240p
 - Oferece a opção de [sincronizar](#sincronizar-todos-os-jogos-e-aplicativos) os jogos e aplicativos no PC com a unidade do PS2, ou de [adicionar](#adicionar-jogos-e-aplicativos-adicionais) jogos e aplicativos adicionais
 - Converte automaticamente jogos de PS2 no formato `BIN/CUE` para `ISO` quando colocados na pasta `CD` do PC, e jogos de PS1 no formato `BIN/CUE` para `VCD` quando colocados na pasta `POPS` do PC
-- Permite que você selecione quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu)
+- Permite que você selecione quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu)
 - Para jogos no formato `ZSO`, o "Modo de Compatibilidade 1" é automaticamente ativado em suas configurações individuais do [OPL](#open-ps2-loader-opl)
 - Cria [Memory Cards Virtuais (VMCs)](#memory-cards-virtuais) para todos os jogos de PS1, com a opção de ativar VMCs para todos os jogos de PS2. Também cria [Grupos VMC](#memory-cards-virtuais) para jogos que podem interagir com os dados de salvamento de outros jogos
 - Configura jogos de PS1 de vários discos para permitir a troca de discos
@@ -824,14 +822,14 @@ O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e
   - Baixa artes para a [Coleção de Jogos](#coleção-de-jogos) do PSBBN a partir do [PSBBN Art Database](https://github.com/CosmicScale/psbbn-art-database) ou do IGN se não encontradas no banco de dados
   - Contribui automaticamente com as artes de jogos baixadas do IGN e relata artes ausentes para o [PSBBN Art Database](https://github.com/CosmicScale/psbbn-art-database)
   - Baixa a arte da capa de jogos de PS2 e PS1 do [banco de dados de artes do OPL Manager](https://oplmanager.com/site/?backups) para exibição no [OPL](#open-ps2-loader-opl), [NHDDL](#nhddl) e [POPSLoader](#popsloader)
-  - Baixa ícones para o [Navegador](#hosdmenu) a partir do [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Se os ícones não estiverem disponíveis, mas houver imagens de um jogo no [Banco de Dados de Artes do OPL Manager](https://oplmanager.com/site/?backups), ícones 3D serão gerados automaticamente
+  - Baixa os ícones para a [Rotina de pesquisa](#hosdmenu) a partir do [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Se os ícones não estiverem disponíveis, mas houver imagens de um jogo no [Banco de Dados de Artes do OPL Manager](https://oplmanager.com/site/?backups), ícones 3D serão gerados automaticamente
   - Contribui automaticamente com ícones do HDD-OSD e relata ícones ausentes para o [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database)
 - Atualiza atalhos para aplicativos homebrew no [Menu Navigator do PSBBN](#coleção-de-jogos) e no menu **OSDSYS** do [HOSDMenu](#hosdmenu)
-- Cria **partições iniciadoras** que permitem que jogos e aplicativos selecionados instalados na sua unidade, junto com jogos de PS1 armazenados em um compartilhamento de rede SMB, sejam iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu)
-- Habilita o BDM HDD, Apps e artes no arquivo de configuração do [OPL](#open-ps2-loader-opl)
+- Cria **partições iniciadoras** que permitem que jogos e aplicativos selecionados instalados na unidade, junto com jogos de PS1 armazenados em um compartilhamento de rede SMB, sejam iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu)
+- Ativa o BDM HDD, Apps e artes no arquivo de configuração do [OPL](#open-ps2-loader-opl)
 - Define o idioma e a [configuração dos botões](#reatribuir-os-botoes-x-e-o) nos arquivos de configuração do [OPL](#open-ps2-loader-opl) e do [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação
 
-**NOTA:** Para usar arquivos `ZSO`, você deve selecionar o [OPL](#open-ps2-loader-opl) como iniciador de jogos. Ao usar o [NHDDL](#nhddl), quaisquer arquivos `ZSO` na pasta de jogos do PC ou na unidade de PS2 são descompactados em arquivos `ISO`.
+**NOTA:** Para usar arquivos `ZSO`, você deve selecionar o [OPL](#open-ps2-loader-opl) como iniciador de jogos. Ao usar o [NHDDL](#nhddl), quaisquer arquivos `ZSO` na pasta de jogos do PC ou na unidade do ps2 são descompactados em arquivos `ISO`.
 
 ### Sincronizar Todos os Jogos e Aplicativos
 Esta opção atualiza o conteúdo do armazenamento do PS2 para corresponder ao conteúdo da pasta selecionada no PC. Quaisquer novos jogos ou aplicativos são copiados, e os que foram removidos do PC são excluídos do console.
@@ -858,7 +856,7 @@ Além disso, quaisquer novos jogos ou aplicativos encontrados na pasta seleciona
 
 Selecionar **Adicionar Jogos e Aplicativos Adicionais** baixa metadados e artes para todo o conteúdo recém-adicionado.
 
-Jogos e aplicativos podem ser excluídos manualmente do sistema de arquivos exFAT da unidade do PS2. Selecionar **Add Additional Games and Apps** também removerá quaisquer títulos excluídos da [Coleção de Jogos](#coleção-de-jogos) e do [HOSDMenu](#hosdmenu).
+Jogos e aplicativos podem ser excluídos manualmente do sistema de arquivos exFAT da unidade do PS2. Selecionar **Adicionar Jogos e Aplicativos Adicionais** também removerá quaisquer títulos excluídos da [Coleção de Jogos](#coleção-de-jogos) e do [HOSDMenu](#hosdmenu).
 
 ### Seletor de Jogos
 Ao executar o Instalador de Jogos, será apresentada uma lista de todos os títulos instalados, permitindo que você selecione quais títulos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Se você tiver uma grande coleção, limitar o número de títulos exibidos pode melhorar sua experiência de navegação.
@@ -877,7 +875,7 @@ Para iniciar jogos de PS1 pela Coleção de Jogos ou pela Rotina de pesquisa, vo
 Os drivers necessários serão instalados automaticamente no PS2 Memory Card.
 
 ### Iniciando Jogos de PS1 via SMB
-Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu). Antes de executar o Instalador de Jogos:
+Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Antes de executar o Instalador de Jogos:
 1. Instale os jogos de PS1 e os arquivos de suporte necessários no dispositivo externo. Instruções podem ser encontradas [aqui](https://nathanneurotic.github.io/POPSTARTERINFO/smb-network.html)
 2. Coloque os arquivos `POPSTARTER.ELF` renomeados com o prefixo `SB.` na pasta `POPS`, seja no PC ou diretamente na unidade do PS2.
 
@@ -892,10 +890,10 @@ Selecione **Install Media** no menu principal e você verá as seguintes opçõe
 2. [Instalar Filmes](#instalar-filmes)
 3. [Instalar Fotos](#instalar-fotos)
 4. [Definir Local de Mídia](#definir-local-de-mídia)
-5. [Inicializar Partição de Música](#inicializar-partição-de-mísica)
+5. [Inicializar Partição de Música](#inicializar-partição-de-música)
 
 ### Instalar Música
-Instale músicas para reprodução no [Canal de Música](#canal-de-música) do PSBBN. Para usar o Instalador de Música, você deve estar executando o **PSBBN Definitive Patch na versão 3.00 ou superior**. Se você atualizou de uma versão anterior, deve [Inicializar a Partição de Música](#inicializar-partição-de-mísica) primeiro.
+Instale músicas para reprodução no [Canal de Música](#canal-de-música) do PSBBN. Para usar o Instalador de Música, você deve estar executando o **PSBBN Definitive Patch na versão 3.00 ou superior**. Se você atualizou de uma versão anterior, deve [Inicializar a Partição de Música](#inicializar-partição-de-música) primeiro.
 
 Os formatos suportados são `.mp3`, `.m4a`, `.flac` e `.ogg`. Os metadados de cada arquivo devem incluir o título do álbum e o número da faixa. Coloque os arquivos de música na pasta padrão `music` no PC, ou escolha um local personalizado usando **[Definir Local de Mídia](#definir-local-de-mídia)** e coloque os arquivos na subpasta `music`.
 
@@ -912,7 +910,7 @@ Instale imagens para visualização no [Canal de Fotos](#canal-de-fotos) do PSBB
 Os formatos suportados incluem `JPG`, `PNG`, `TIF`, `GIF`, `BMP` e outros formatos comuns. Coloque os arquivos de imagem na pasta padrão `photo` do PC, ou escolha um local personalizado usando o **[Definir Local de Mídia](#definir-local-de-mídia)** e coloque os arquivos na subpasta `photo`.
 
 ### Definir Local de Mídia
-Configure um local personalizado para a sua pasta `media`. Músicas devem ser colocadas em uma subpasta `music`, vídeos em uma subpasta `movie`, e imagens em uma subpasta `photo`.
+Configure um local personalizado para a pasta `media`. Músicas devem ser colocadas em uma subpasta `music`, vídeos em uma subpasta `movie`, e imagens em uma subpasta `photo`.
 
 ### Inicializar Partição de Música
 Esta opção apaga todos os dados de música e reseta o banco de dados utilizado pelo [Canal de Música](#canal-de-música) do PSBBN. Use esta opção caso tenha atualizado a partir de uma versão do **PSBBN Definitive Patch** anterior à 3.0 e queira usar o [Instalador de Música](#instalar-música). Você também pode usar esta opção caso tenha problemas com o [Canal de Música](#canal-de-música).
@@ -936,7 +934,7 @@ Para usar este recurso, você deve:
 - Ter instalado o PSBBN Definitive Project versão 4.0.0 ou superior.
 
 Ao reinstalar o PS2 Linux:
-- Se o Linux já veio pré-instalado com a sua versão do PSBBN Definitive Project, todos os dados do PS2 Linux serão apagados, incluindo o seu diretório home.
+- Se o Linux já veio pré-instalado com a versão do PSBBN Definitive Project, todos os dados do PS2 Linux serão excluídos, incluindo o seu diretório home.
 - Se você instalou ou reinstalou o Linux utilizando a opção **Instalar PS2 Linux**, apenas os arquivos do sistema serão reinstalados — os seus arquivos pessoais no diretório home não serão afetados.
 
 Ao instalar o PS2 Linux pela primeira vez, ou ao reinstalar uma versão que veio pré-instalada com o PSBBN Definitive Project, você deverá escolher o tamanho do diretório home. O diretório home é onde ficam armazenados os seus arquivos pessoais e aplicativos.
@@ -954,11 +952,11 @@ Esta opção permite que você inverta as funções dos botões × e ○ no cont
 **NOTA: Este recurso se aplica apenas ao [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl) e [R3CONFIGURATOR](#r3configurator). Ele não altera o layout dos botões na janela de **in-game reset** do [POPS](#popstarter) ao sair de um jogo de PS1, nem no [HOSDMenu](#hosdmenu).**  
 
 ### Mudar Idioma
-Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema do PSBBN. Selecione entre inglês, alemão, italiano, português do Brasil, espanhol, francês e o japonês original. Mais idiomas serão adicionados em futuras atualizações. Para usuários em japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
+Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema do PSBBN. Selecione entre Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para usuários em Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
 
 Tanto para usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma da mensagem de **in-game reset** (IGR) do [POPS](#popstarter), do [OPL](#open-ps2-loader-opl), do [R3CONFIGURATOR](#r3configurator) e as preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 
-Após alterar o idioma, é recomendável executar novamente o [Instalador de Jogos](#instalar-jogos-e-aplicativos) e selecionar *Adicionar Jogos e Aplicativos Adicionais* para atualizar os títulos dos jogos para o idioma selecionado (apenas para inglês e japonês). Para usuários do [PSBBN](#psbbn), isso também atualizará os manuais dos jogos de PlayStation.
+Após alterar o idioma, é recomendável executar novamente o [Instalador de Jogos](#instalar-jogos-e-aplicativos) e selecionar *Adicionar Jogos e Aplicativos Adicionais* para atualizar os títulos dos jogos para o idioma selecionado (apenas para Inglês e Japonês). Para usuários do [PSBBN](#psbbn), isso também atualizará os manuais dos jogos de PlayStation.
 
 ### Alterar Configurações de Tela
 **NOTA: Este recurso é exclusivo do PSBBN.**  
@@ -967,7 +965,7 @@ O [PSBBN](#psbbn) normalmente trava as configurações de tela do sistema em **4
 Essa configuração é utilizada por alguns jogos e pelo [HOSDMenu](#hosdmenu). Ela não altera a proporção do próprio [PSBBN](#psbbn).
 
 ### Limpar Cache de Artes e Ícones
-Esta opção remove todas as artes e ícones de jogos que estão armazenados localmente no PC. Na próxima vez que você executar o Instalador de Jogos, ele examinará a sua coleção de jogos e, em seguida, fará o download e aplicará novas cópias das artes e ícones necessários.  
+Esta opção remove todas as artes e ícones de jogos que estão armazenados localmente no PC. Na próxima vez que você executar o Instalador de Jogos, ele examinará a coleção de jogos e, em seguida, fará o download e aplicará novas cópias das artes e ícones necessários.  
 
 Você pode querer limpar o cache se os jogos exibirem artes incorretas ou de baixa qualidade, já que artes atualizadas podem estar disponíveis.
 
@@ -990,8 +988,8 @@ Você pode segurar determinados botões do controle enquanto liga o console PS2 
 O PlayStation Broadband Navigator (também conhecido como BB Navigator e PSBBN) é um sistema operacional oficial do PlayStation 2 lançado exclusivamente no Japão. Ele possui canais para [jogos](#coleção-de-jogos), [música](#canal-de-música), [filmes](#canal-de-filmes), [fotos](#canal-de-fotos) e [serviços de internet](#canal-de-internet).
 
 O **Definitive Patch** aprimora e expande suas funcionalidades, oferecendo:
-- Uma tradução completa do software BB Navigator japonês original (versão 0.32) — Todos os binários, arquivos XML, texturas e imagens foram traduzidos[*](#problemas-conhecidos)
-- Disponibilidade em inglês, alemão, italiano, português do Brasil, espanhol, francês e no japonês original
+- Uma tradução completa do software BB Navigator Japonês original (versão 0.32) — Todos os binários, arquivos XML, texturas e imagens foram traduzidos[*](#problemas-conhecidos)
+- Disponibilidade em Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês e no Japonês original
 - Suporte para consoles PS2 de todas as regiões; o software original era restrito a consoles japoneses
 - [OSDMenu MBR](#osdmenu-mbr) — um substituto homebrew para o programa MBR original da Sony, com inúmeras melhorias em relação à implementação original
 - Um `osdboot.elf` corrigido (patched) para contornar a verificação de segurança CRC, permitindo o uso de kernels personalizados
@@ -1001,10 +999,10 @@ O **Definitive Patch** aprimora e expande suas funcionalidades, oferecendo:
 - Um link direto para a [Coleção de Jogos](#coleção-de-jogos) no **Menu Principal** (Top Menu) para acesso rápido
 - Verificações de autorização DNAS burladas para permitir o acesso aos [canais online](#canal-de-internet)
 - [Canais online](#canal-de-internet) da Sony, Hudson, EA, Konami, Capcom, Namco, KOEI, Bandai, So-Net e BIGLOBE
-- [Canais online](#canal-de-internet) japoneses originais em japonês nas instalações japonesas e em inglês em todas as outras instalações
+- [Canais online](#canal-de-internet) japoneses originais em Japonês nas instalações japonesas e em Inglês em todas as outras instalações
 - O recurso **Audio Player** foi readicionado ao [Canal de Música](#canal-de-música) a partir de uma versão anterior do PSBBN, permitindo compatibilidade com gravadores MiniDisc NetMD[*](#problemas-conhecidos)
 - Manuais e páginas de solução de problemas sobre o recurso **Audio Player** foram readicionados ao guia do usuário
-- Teclado virtual QWERTY japonês substituído por um teclado virtual em inglês (EUA)[*](#problemas-conhecidos)
+- Teclado virtual QWERTY Japonês substituído por um teclado virtual em Inglês (EUA)[*](#problemas-conhecidos)
 - Uma opção para trocar as funções dos botões × e ○
 - Uma opção para alterar as configurações de tela (normalmente travada em 4:3), com modos selecionáveis: 4:3, Cheia e 16:9.
 - Suporte para o controle remoto de DVD do PlayStation 2[*](#problemas-conhecidos)
@@ -1016,7 +1014,7 @@ Você pode encontrar a **Coleção de Jogos** no **Menu Principal** (Top Menu) d
 - Quando instalados pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos), todos os aplicativos e [jogos selecionados](#seletor-de-jogos) serão exibidos na coleção em uma interface estilo 'cover flow'.
 - Os itens são agrupados em jogos de PS2, jogos de PS1 e aplicativos homebrew.
 - Jogos de PS2 e PS1 são classificados em ordem alfabética e organizados por franquia (série), com os jogos de uma mesma série ordenados por data de lançamento.
-- Quando o idioma está definido como japonês, os títulos de jogos da região japonesa são exibidos em japonês e classificados na ordem 'gojūon' (五十音).
+- Quando o idioma está definido como Japonês, os títulos de jogos da região Japonesa são exibidos em Japonês e classificados na ordem 'gojūon' (五十音).
 - Os aplicativos homebrew são classificados em ordem alfabética, enquanto os [aplicativos SAS](#save-application-system-sas) são divididos em subgrupos com base no tipo de aplicativo (sistema, jogo, emulador, etc.).  
 - Você pode visualizar um manual para jogos de PS1 que lista as teclas de atalho suportadas. Para acessar o manual, pressione **△** sobre um jogo de PS1 destacado e selecione *Manual*.
 - Você pode definir atalhos para até quatro itens pressionando **△** sobre um jogo destacado e selecionando *Adicionar ao Menu Navigator*. Você pode acessar rapidamente os atalhos pressionando **SELECT**.
@@ -1033,7 +1031,7 @@ O **Canal de Filmes** permite que você reproduza filmes armazenados na unidade 
 O Canal de Fotos permite que você visualize fotos armazenadas na unidade interna do PS2 ou em um dispositivo USB formatado em FAT (pendrive, câmera digital, etc.). Fotos podem ser importadas de dispositivos USB e instaladas usando o [Instalador de Fotos](#instalar-fotos). Você pode criar álbuns e playlists com as suas fotos. Você também pode baixar artes de jogos e capturas de tela a partir dos [Canais Online](#canal-de-internet).
 
 ### Canal de Internet
-No **Canal de Internet**, você pode acessar arquivos de canais online de várias produtoras, exatamente como apareciam no início dos anos 2000. Os canais foram traduzidos para o inglês (trabalho em andamento). Se você tiver uma instalação japonesa do PSBBN, terá acesso às versões originais em japonês. Para visualizar esses canais online, o sistema PlayStation 2 deve estar conectado à internet. No **Canal de Internet** você pode:
+No **Canal de Internet**, você pode acessar arquivos de canais online de várias produtoras, exatamente como apareciam no início dos anos 2000. Os canais foram traduzidos para o Inglês (trabalho em andamento). Se você tiver uma instalação japonesa do PSBBN, terá acesso às versões originais em Japonês. Para visualizar esses canais online, o sistema PlayStation 2 deve estar conectado à internet. No **Canal de Internet** você pode:
 - Explorar os canais online de várias produtoras de jogos, incluindo Sony, Hudson, EA, Konami, Capcom, Namco, KOEI e Bandai.
 - Baixar trailers de *Metal Gear Solid 3: Subsistence*, *Bomberman Online* e mais. Os trailers podem ser baixados a partir do **Canal Konami**, **BANDAI Entertainment World** e do **CANAL HUDSON**. Os trailers baixados são salvos em um álbum no [Canal de Filmes](#canal-de-filmes).
 - Baixar artes e capturas de tela do canal **PlayStation® Now!**. As imagens baixadas são salvas em um álbum no [Canal de Fotos](#canal-de-fotos).
@@ -1045,7 +1043,7 @@ O **HDD-OSD** é um software oficial da Sony que expande o menu de sistema do Pl
 - Iniciar aplicativos homebrew diretamente do menu personalizado do **OSDSYS**
 - Iniciar [aplicativos compatíveis com o SAS](#save-application-system-sas) a partir de Memory Cards e da unidade interna no **Browser 2.0**
 - Suporte para inicializar aplicativos a partir de MMCE, MX4SIO, UDPBD, dispositivos iLink e HDDs formatados em APA e exFAT
-- [Iniciar Discos de Jogos de PS1 e PS2](#iniciando-discos-de-jogos-de-ps1-e-ps2) com suporte a ID do Jogo, MechaPwn e PS1VmodeNeg integrado
+- Iniciar [Discos de Jogos de PS1 e PS2](#iniciando-discos-de-jogos-de-ps1-e-ps2) com suporte a ID do Jogo, MechaPwn e PS1VmodeNeg integrado
 - GSM integrado para jogos em disco e aplicativos
 - Suporte a resoluções de 1080i e 480p
 - E mais — veja o [repositório no GitHub](https://github.com/pcm720/OSDMenu) para detalhes completos
@@ -1058,10 +1056,10 @@ Quando instalado através do [Instalador de Jogos](#instalar-jogos-e-aplicativos
 - Os [aplicativos compatíveis com o SAS](#save-application-system-sas) baixados na [PS2 Homebrew Store](https://ps2homebrewstore.com/) também aparecerão no **Navegador** representados por ícones exclusivos.
 
 ## Open PS2 Loader (OPL)
-O [Open PS2 Loader (OPL)](https://github.com/ps2homebrew/Open-PS2-Loader) é um carregador de jogos e aplicativos 100% de código aberto para o PS2. Todos os jogos de PS2 instalados serão exibidos no OPL. Se você selecionar o OPL como o iniciador de jogos ao [instalar jogos e aplicativos](#instalar-jogos-e-aplicativos), as configurações por jogo (per-game settings) atribuídas no OPL serão refletidas ao iniciar os jogos a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu).
+O [Open PS2 Loader (OPL)](https://github.com/ps2homebrew/Open-PS2-Loader) é um carregador de jogos e aplicativos 100% de código aberto para o PS2. Todos os jogos de PS2 instalados serão exibidos no OPL. Se você selecionar o OPL como o iniciador de jogos ao [instalar jogos e aplicativos](#instalar-jogos-e-aplicativos), as configurações por jogo (per-game settings) atribuídas no OPL serão refletidas ao iniciar os jogos a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu).
 
 ## NHDDL
-O [NHDDL](https://github.com/pcm720/nhddl) é um iniciador para o [Neutrino](https://github.com/rickgaiser/neutrino), um emulador de dispositivo de PS2 pequeno, rápido e modular. Todos os jogos de PS2 instalados serão exibidos no NHDDL. Se você selecionar o NHDDL como o iniciador de jogos ao [instalar jogos e aplicativos](#instalar-jogos-e-aplicativos), as configurações por jogo (per-game settings) atribuídas no NHDDL serão refletidas ao iniciar os jogos a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu).
+O [NHDDL](https://github.com/pcm720/nhddl) é um iniciador para o [Neutrino](https://github.com/rickgaiser/neutrino), um emulador de dispositivo de PS2 pequeno, rápido e modular. Todos os jogos de PS2 instalados serão exibidos no NHDDL. Se você selecionar o NHDDL como o iniciador de jogos ao [instalar jogos e aplicativos](#instalar-jogos-e-aplicativos), as configurações por jogo (per-game settings) atribuídas no NHDDL serão refletidas ao iniciar os jogos a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu).
 
 ## POPSLoader
 O [POPSLoader](https://github.com/NathanNeurotic/POPSLoader) é um iniciador gráfico desenvolvido para facilitar a navegação e a inicialização de jogos de PS1 (usando o [POPStarter](#popstarter)) a partir de vários dispositivos de armazenamento. Todos os jogos de PS1 instalados serão exibidos no **POPSLoader**.
@@ -1076,12 +1074,12 @@ Combinações de botões de atalho são suportadas para a troca de discos e vár
 | Atalho                 | Função                                |
 |------------------------|---------------------------------------|
 | SELECT + START + L1    | Sair do jogo                          |
-| SELECT + L2 + R2 + ✕   | Reiniciar software                    |
+| SELECT + L2 + R2 + ✕  | Reiniciar software                    |
 | SELECT + L1 + R2 	     | Ativar mapeamento de textura suave    |
 | SELECT + L2 + R1       | Desativar mapeamento de textura suave |
 | SELECT + R1 + R2       | Ativar scanlines                      |
 | SELECT + L1 + L2       | Desativar scanlines                   |
-| SELECT + L2 + R2 + △   | Abrir tampa de CD do PlayStation      |
+| SELECT + L2 + R2 + △  | Abrir tampa de CD do PlayStation      |
 | SELECT + L2 + R2 + ↑   | Inserir disco 1                       |
 | SELECT + L2 + R2 + →   | Inserir disco 2                       |
 | SELECT + L2 + R2 + ↓   | Inserir disco 3                       |
@@ -1109,7 +1107,7 @@ Um **POPStarter VMC** é criado para cada jogo de PS1 e, ao executar o [Instalad
 Tanto os jogos de PS1 quanto os de PS2 suportam **Grupos VMC**, permitindo que determinados jogos compartilhem um VMC e acessem dados salvos criados por outros títulos. Por exemplo, o Psycho Mantis de *Metal Gear Solid* pode comentar sobre outros jogos da Konami que você jogou, e os créditos de *Gran Turismo 3* podem ser transferidos para o *Gran Turismo 4*.
 
 ## ID do Jogo
-O recurso ID do Jogo no **Retro GEM**, **MemCard Pro 2** e **SD2PSX** é totalmente suportado ao iniciar jogos e aplicativos homebrew a partir da [Coleção de Jogos](#coleção-de-jogos) e do [Navegador](#hosdmenu), bem como de discos físicos de jogos de PS1 e PS2.
+O recurso ID do Jogo no **Retro GEM**, **MemCard Pro 2** e **SD2PSX** é totalmente suportado ao iniciar jogos e aplicativos homebrew a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu), bem como de discos físicos de jogos de PS1 e PS2.
 
 O **Retro GEM** é uma modificação de saída HDMI digital-para-digital para diversos consoles. O **Retro GEM ID do Jogo** permite a troca automática de perfis de exibição com base em cada jogo. Você pode saber mais sobre o **Retro GEM** no [site da Pixel FX](https://www.pixelfx.co/hdmi-retro-gem).
 
@@ -1124,7 +1122,7 @@ O [MechaPwn](https://github.com/MechaResearch/MechaPwn) também é totalmente su
 Uma variação (fork) do [wLaunchELF](https://github.com/ps2homebrew/wLaunchELF) criada por [R3Z3N](https://github.com/saildot4k) que inclui vários recursos avançados. Notavelmente, ele permite que você gerencie arquivos na partição exFAT da unidade interna, uma capacidade não disponível em outras forks do wLaunchELF. Mais informações estão disponíveis [aqui](https://github.com/saildot4k/wLaunchELF_R3Z).
 
 ## R3CONFIGURATOR
-Um aplicativo com interface gráfica (GUI) para editar o [OSDMenu](osdmenu-mbr) e outros arquivos de configuração (config). Ele permite modificar opções de inicialização (como atribuir um aplicativo a um botão para inicialização rápida), definir os modos de exibição do [HOSDMenu](#hosdmenu), ativar ou desativar o menu personalizado **OSDSYS** do [HOSDMenu](#hosdmenu), e muito mais.
+Um aplicativo com interface gráfica (GUI) para editar o [OSDMenu](osdmenu-mbr) e outros arquivos de configuração. Ele permite modificar opções de inicialização (como atribuir um aplicativo a um botão para inicialização rápida), definir os modos de exibição do [HOSDMenu](#hosdmenu), ativar ou desativar o menu personalizado **OSDSYS** do [HOSDMenu](#hosdmenu), e muito mais.
 
 Você pode encontrar todos os detalhes na [página do R3CONFIGURATOR no GitHub](https://github.com/saildot4k/R3CONFIGURATOR).
 
@@ -1144,12 +1142,12 @@ O **APA-Jail**, criado e desenvolvido por [Berion](https://www.psx-place.com/res
 
 O [OSDMenu MBR](#osdmenu-mbr) reside em uma partição APA especial. Quando um item é selecionado na [Coleção de Jogos](#coleção-de-jogos), o [OSDMenu MBR](#osdmenu-mbr) carrega os jogos e os aplicativos homebrew a partir da partição exFAT. Jogos de PS1 são executados via [POPStarter](#popstarter) e os de PS2 via [OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl).
 
-**Aviso: Criar manualmente novas partições APA na sua unidade de PS2 excedendo o espaço alocado para o sistema APA corromperá a unidade.**
+**Aviso: Criar manualmente novas partições APA na unidade do ps2 excedendo o espaço alocado para o sistema APA corromperá a unidade.**
 
 ## Consoles Antigos (SCPH-10000–18000) e Slim (SCPH-700xx)
 O **PSBBN Definitive Project** pode ser instalado nos modelos PS2 Slim **SCPH-700xx** usando um [IDE Resurrector](https://gusse.in/shop/ps2-modding-parts/ide-resurrector-origami-v0-7-flex-cable-for-ps2-slim-spch700xx/) ou mod de hardware semelhante. A instalação em um cartão SD não é suportada no Windows. Para garantir a compatibilidade com o PSBBN, é obrigatório utilizar um adaptador SATA, como o [iFlash-Sata v10](https://www.iflash.xyz/store/iflash-sata-v10/).
 
-Você também deve baixar os [Drivers de HDD Externo](https://israpps.github.io/FreeMcBoot-Installer/test/8_Downloads.html). Extraia os arquivos e coloque `hddload.irx`, `dev9.irx` e `atad.irx` na pasta de sistema correspondente à sua região dentro de um **Memory Card oficial de PS2 da Sony**:
+Você também deve baixar os [Drivers de HDD Externo](https://israpps.github.io/FreeMcBoot-Installer/test/8_Downloads.html). Extraia os arquivos e coloque `hddload.irx`, `dev9.irx` e `atad.irx` na pasta de sistema correspondente à região dentro de um **Memory Card oficial de PS2 da Sony**:
 
 | Região   | Nome da Pasta |
 |----------|-------------- |
@@ -1227,9 +1225,9 @@ Para problemas com jogos de PS2, se você selecionou o [OPL](#open-ps2-loader-op
 
 Se todos os jogos de PS1 ou PS2 falharem ao iniciar, siga as etapas abaixo:
 
-Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação estão disponíveis [aqui](#instalando-o-ata-bdm-assault).
+Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação e o link de download podem ser encontrados [aqui](#instalando-o-ata-bdm-assault).
 
-Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-jogos) ou do [Navegador](#hosdmenu), tente o seguinte:
+Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-jogos) ou da [Rotina de pesquisa](#hosdmenu), tente o seguinte:
 1. Se o console possui um [Mod Chip](#problemas-conhecidos), desative-o.
 2. Se estiver tendo problemas para iniciar jogos de PS2, remova todos os Memory Cards de PS2 do console e tente novamente. Se isso resolver o problema, exclua quaisquer arquivos de salvamento com o nome `Your System Configuration` dos memory cards, pois dados de configuração corrompidos podem impedir que os jogos iniciem.
 3. Verifique se os conectores do console e do Adaptador de Rede/HDD estão limpos, isentos de poeira e sem detritos.
@@ -1238,7 +1236,7 @@ Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-j
 
 Se ainda assim os jogos não iniciarem, tente carregar os jogos de PS2 usando o [OPL](#open-ps2-loader-opl) ou o [NHDDL](#nhddl), e os jogos de PS1 usando o [POPSLoader](#popsloader).
 
-Se o OPL travar/congelar na inicialização, exclua quaisquer arquivos de configuração do OPL que existam nos Memory Cards do PS2 ou em dispositivos USB conectados. Você também pode segurar o botão `START` enquanto o OPL inicia para ignorar a leitura do arquivo de configuração (config).
+Se o OPL travar/congelar na inicialização, exclua quaisquer arquivos de configuração do OPL que existam nos Memory Cards do PS2 ou em dispositivos USB conectados. Você também pode segurar o botão `START` enquanto o OPL inicia para ignorar a leitura do arquivo de configuração.
 
 Para exibir a lista de jogos no OPL, ajuste as seguintes configurações:
 1. Configurações > Modo de Início no HDD: DESLIGADO
@@ -1268,9 +1266,9 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 # Problemas Conhecidos
 - O PSBBN travará no logotipo "PlayStation 2" ao iniciar se um adaptador de HDD não oficial de terceiros for usado. **Um Adaptador de Rede oficial da Sony é obrigatório**.
 - O PSBBN travará ao iniciar jogos ou aplicativos se um modchip estiver ativo. Para usar o PSBBN, os modchips devem ser desativados.  
-- Há casos no feega em que algum texto em japonês não pôde ser traduzido pelo fato de estar inserido diretamente (hard-coded) em um arquivo criptografado. O software Atok não foi traduzido.  
+- Há casos no feega em que algum texto em Japonês não pôde ser traduzido pelo fato de estar inserido diretamente (hard-coded) em um arquivo criptografado. O software Atok não foi traduzido.  
 - O suporte para MiniDisc parou de funcionar a partir da versão 2.10 do patch e superiores. Espero corrigir isso em uma futura atualização.  
-- O teclado virtual padrão do PSBBN está configurado para japonês. No entanto, um teclado virtual em inglês (EUA) foi adicionado, embora você precise pressionar o botão `SELECT` várias vezes para alternar para ele. Há um bug onde a barra de espaço não funciona no teclado virtual em inglês, mas você pode inserir um espaço pressionando o botão **△** no controle como alternativa.  
+- O teclado virtual padrão do PSBBN está configurado para Japonês. No entanto, um teclado virtual em Inglês (EUA) foi adicionado, embora você precise pressionar o botão `SELECT` várias vezes para alternar para ele. Há um bug onde a barra de espaço não funciona no teclado virtual em Inglês, mas você pode inserir um espaço pressionando o botão **△** no controle como alternativa.  
 - No PSBBN, a inversão das funções dos botões × e ○ só é suportada em controles DualShock 2.
 - No PSBBN, os botões de mídia do Controle Remoto de DVD do PS2 só são suportados em consoles SCPH-5000x com receptor IR (infravermelho) embutido. O controle remoto pode se comportar de forma errática se não houver um controle conectado na Porta 1.
 - As músicas instaladas com o Instalador de Música só podem ser reproduzidas se forem gravadas nos primeiros 3 GB da partição de música. Músicas extraídas de CDs de áudio no [Canal de Música](#canal-de-música) não são afetadas e podem usar a capacidade total da partição.
@@ -1321,7 +1319,7 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 - [R3CONFIGURATOR](https://github.com/saildot4k/R3CONFIGURATOR) de [R3Z3N](https://github.com/saildot4k)
 - Artes de capa de PS2 retiradas dos [backups do Banco de Artes do OPL Manager](https://oplmanager.com/site/index.php?backups)
 - Artes de aplicativos retiradas do [OPL B-APPS Cover Pack](https://www.psx-place.com/resources/opl-b-apps-cover-pack.1440/) e [OPL Discs & Boxes Pack](https://www.psx-place.com/resources/opl-discs-boxes-pack.1439/) como cortesia de [Berion](https://www.psx-place.com/resources/authors/berion.1431/)
-- Canais online hospedados e traduzidos para o inglês por vitas155 no [psbbn.ru](https://psbbn.ru/), com exceção do PlayStation Now! e do Canal Konami, traduzidos para o inglês por [CosmicScale](https://github.com/CosmicScale)
+- Canais online hospedados e traduzidos para o Inglês por vitas155 no [psbbn.ru](https://psbbn.ru/), com exceção do PlayStation Now! e do Canal Konami, traduzidos para o Inglês por [CosmicScale](https://github.com/CosmicScale)
 
 **Bibliotecas e Binários de Terceiros:**  
 - `vmlinux` **Kernel do BB Navigator (Linux 2.4.17)** – Código fonte disponível [aqui](https://github.com/CosmicScale/PSBBN-Definitive-Patch-Kernel)
