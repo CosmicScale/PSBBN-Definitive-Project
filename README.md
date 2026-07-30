@@ -1227,7 +1227,7 @@ For issues with PS2 games, if you selected [OPL](#open-ps2-loader-opl) as your g
 
 If all PS1 or PS2 games fail to launch, follow the steps below:
 
-If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions and a download link can be found [here](#installing-ata-bdm-assault).
+If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](#installing-ata-bdm-assault).
 
 If games fail to launch from the [Game Collection](#game-collection) or [Browser](#hosdmenu), try the following:
 1. If you have a [mod chip](#known-issues), disable it

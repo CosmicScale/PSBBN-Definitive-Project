@@ -76,7 +76,7 @@ body:
 
         If all PS1 or PS2 games fail to launch, follow the steps below:
 
-        If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions and a download link can be found [here](https://github.com/CosmicScale/PSBBN-Definitive-Project#installing-ata-bdm-assault).
+        If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](https://github.com/CosmicScale/PSBBN-Definitive-Project#installing-ata-bdm-assault).
 
         If games fail to launch from the Game Collection or Browser, try the following:
         1. If you have a mod chip, disable it

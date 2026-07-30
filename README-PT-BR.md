@@ -1227,7 +1227,7 @@ Para problemas com jogos de PS2, se você selecionou o [OPL](#open-ps2-loader-op
 
 Se todos os jogos de PS1 ou PS2 falharem ao iniciar, siga as etapas abaixo:
 
-Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação e o link de download podem ser encontrados [aqui](#instalando-o-ata-bdm-assault).
+Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação estão disponíveis [aqui](#instalando-o-ata-bdm-assault).
 
 Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-jogos) ou do [Navegador](#hosdmenu), tente o seguinte:
 1. Se o console possui um [Mod Chip](#problemas-conhecidos), desative-o.
