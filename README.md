@@ -1223,11 +1223,11 @@ If your console boots to the regular OSD, freezes, or displays an error, you sho
 ## Games Not Working
 Some games may fail to launch or exhibit compatibility issues. First, make sure your game image is a verified good dump. Check the MD5 or SHA-1 checksum of your `ISO` or `BIN` file and confirm that it matches the corresponding entry on [redump.org](http://redump.org).
 
+If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](#installing-ata-bdm-assault).
+
 For issues with PS2 games, if you selected [OPL](#open-ps2-loader-opl) as your game launcher, you can check for existing issues or report a new one [here](https://github.com/ps2homebrew/Open-PS2-Loader/issues). If you selected [NHDDL](#nhddl), you can do so [here](https://github.com/rickgaiser/neutrino/issues).
 
 If all PS1 or PS2 games fail to launch, follow the steps below:
-
-If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](#installing-ata-bdm-assault).
 
 If games fail to launch from the [Game Collection](#game-collection) or [Browser](#hosdmenu), try the following:
 1. If you have a [mod chip](#known-issues), disable it

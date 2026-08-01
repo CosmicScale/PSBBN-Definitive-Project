@@ -1223,11 +1223,11 @@ Se o console inicializar na tela clássica do PS2 (OSD regular), travar/congelar
 ## Jogos Não Funcionam
 Alguns jogos podem falhar ao executar ou apresentar problemas de compatibilidade. Primeiro, certifique-se de que a imagem do jogo é um "dump" (cópia) verificado e válido. Verifique o checksum MD5 ou SHA-1 do arquivo `ISO` ou `BIN` e confirme se ele corresponde à respectiva entrada no [redump.org](http://redump.org).
 
+Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação estão disponíveis [aqui](#instalando-o-ata-bdm-assault).
+
 Para problemas com jogos de PS2, se você selecionou o [OPL](#open-ps2-loader-opl) como launcher de jogos, você pode verificar os problemas existentes ou relatar um novo [aqui](https://github.com/ps2homebrew/Open-PS2-Loader/issues). Se você selecionou o [NHDDL](#nhddl), você pode fazer isso [aqui](https://github.com/rickgaiser/neutrino/issues).
 
 Se todos os jogos de PS1 ou PS2 falharem ao iniciar, siga as etapas abaixo:
-
-Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação e o link de download podem ser encontrados [aqui](#instalando-o-ata-bdm-assault).
 
 Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-jogos) ou da [Rotina de pesquisa](#hosdmenu), tente o seguinte:
 1. Se o console possui um [Mod Chip](#problemas-conhecidos), desative-o.
