@@ -751,7 +751,7 @@ OPL_SIZE_CKECK() {
         available_mb=$((opl_freespace - 128))
         cd_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.iso' --include='[^.]*.ISO' --include='[^.]*.zso' --include='[^.]*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
         dvd_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.iso' --include='[^.]*.ISO' --include='[^.]*.zso' --include='[^.]*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
-        pops_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/{POPS}/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
+        pops_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
         needed_mb=$((cd_size + dvd_size + pops_size))
     fi
 
@@ -3552,7 +3552,7 @@ case "$lang" in
         ;;
     ger)
         OPL_LANG="German"
-        R3CONFIG_LANG="en"
+        R3CONFIG_LANG="de"
         WLE_LANG="german"
         ;;
     ita)
