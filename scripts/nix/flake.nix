@@ -15,70 +15,76 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        psbbn = pkgs.writeScriptBin "psbbn" ''
-          #!${pkgs.bash}/bin/bash
-          ${builtins.concatStringsSep "\n" (
-            builtins.tail (pkgs.lib.splitString "\n" (builtins.readFile ../../PSBBN-Definitive-Patch.sh))
-          )}
-        '';
-
         pkgs = import nixpkgs { inherit system; };
+
         pythonEnv = pkgs.python3.withPackages (
           ps: with ps; [
             lz4
             natsort
             mutagen
             tqdm
-            PyICU
+            pyicu
             pykakasi
             pillow
-            Unidecode
+            unidecode
             textual
             wcwidth
           ]
         );
+
+        runtimeDeps = with pkgs; [
+          pythonEnv
+          axel
+          imagemagick
+          unixtools.xxd
+          bc
+          rsync
+          curl
+          zip
+          unzip
+          wget
+          exfatprogs
+          ffmpeg
+          parted
+          fuse2
+          bchunk
+          e2fsprogs
+          ffmpegthumbnailer
+          unrar-free
+          lvm2
+          dosfstools
+          util-linux
+        ];
+
+        psbbn = pkgs.writeShellApplication {
+          name = "psbbn";
+          runtimeInputs = runtimeDeps;
+          # Preserve the script's own error-handling; don't impose set -euo pipefail.
+          bashOptions = [ ];
+          # The upstream script isn't shellcheck-clean and contains non-ASCII
+          # output, which trips writeShellApplication's default check phase.
+          checkPhase = "";
+          text = builtins.readFile ../../PSBBN-Definitive-Patch.sh;
+        };
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            stdenv.cc
-            icu
-            bash
-            pythonEnv
-            axel
-            imagemagick
-            unixtools.xxd
-            bc
-            rsync
-            curl
-            zip
-            unzip
-            wget
-            exfatprogs
-            ffmpeg
-            parted
-            fuse2
-            bchunk
-            e2fsprogs
-            pkg-config
-            patchelf
-            ffmpegthumbnailer
-            pkgsi686Linux.glibc
-            unrar-free
-            lvm2
-            dosfstools
-            util-linux
-            psbbn
-          ];
+          buildInputs =
+            runtimeDeps
+            ++ (with pkgs; [
+              stdenv.cc
+              icu
+              bash
+              pkg-config
+              patchelf
+              psbbn
+            ]);
 
           shellHook = ''
             ${pkgs.patchelf}/bin/patchelf --set-rpath "${pkgs.fuse2.out}/lib" "./scripts/helper/PFS Fuse.elf"
 
-            # patch ps2str to use 32-bit glibc from Nix
-            ${pkgs.patchelf}/bin/patchelf --set-interpreter ${pkgs.pkgsi686Linux.glibc}/lib/ld-linux.so.2 ./scripts/helper/ps2str
-
-            mkdir -p scripts/venv/
-            ln -sfn ${pythonEnv}/* ./scripts/venv/
+            rm -rf scripts/venv
+            ln -s ${pythonEnv} scripts/venv
 
             echo -e "\033[1;32m==============================================================\033[0m"
             echo -e "\033[1;36m                PSBBN Definitive Project                      \033[0m"
