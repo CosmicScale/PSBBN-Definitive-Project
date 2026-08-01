@@ -61,15 +61,15 @@ Ambas as opções de instalação oferecem:
 
 # Registro de Alterações
 
-**29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!**
+**29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!**
 <p></p>
 
-[![Seletor de Jogos v2, OSDMenu 1.3.0 e muito mais!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
+[![Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
 
-**[Seletor de jogos:](#saindo-dos-jogos)**
-- Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
+**[Seletor de Jogos:](#saindo-dos-jogos)**
+- Gerencie todos os seus jogos e aplicativos com o Seletor de Jogos v2.
 - Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
-- Personalize a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da sua biblioteca.
+- Personalize a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da biblioteca.
 
 **OSDMenu:**
 - [OSDMenu MBR](#osdmenu-mbr) e [HOSDMenu](#hosdmenu) atualizados para a versão [v1.3.0](#https://github.com/pcm720/OSDMenu/releases/tag/v1.3.0).
@@ -83,7 +83,7 @@ Outras alterações:
 - [wLaunchELF_R3Z](#wlaunchelf-r3z) atualizado para a v4.75.
 - A configuração de idioma do [wLaunchELF_R3Z](#wlaunchelf-r3z) e do [POPSLoader](#popsloader) agora é definida automaticamente.
 - O idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) para o [wLaunchELF_R3Z](#wlaunchelf-r3z) agora são definidos automaticamente
-- Adicionada uma tradução em português do Brasil do README do PSBBN Definitive Project.
+- Adicionada a tradução em Português do Brasil do README do PSBBN Definitive Project.
 - Diversas correções de bugs e limpeza de código.
 
 <details>
@@ -98,7 +98,7 @@ Outras alterações:
 - O [Instalador de Jogos](#instalar-jogos-e-aplicativos) agora conta com um [Seletor de Jogos](#seletor-de-jogos), permitindo selecionar quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Se você tiver uma coleção grande, limitar o número de jogos exibidos pode melhorar sua experiência de navegação.
 - Os jogos de PS1 agora são instalados na partição exFAT junto com os jogos e aplicativos de PS2, removendo as limitações de espaço causadas pelo APA. Jogos instalados anteriormente permanecerão na partição `POPS` e ainda estarão funcionais. Para jogar jogos de PS1 a partir da partição exFAT, você **DEVE** instalar os [drivers do ATA BDM Assault](#installing-ata-bdm-assault) em um Memory Card de PS2.
 - Jogos de PS1 armazenados em um [compartilhamento de rede SMB](#iniciando-jogos-de-ps1-via-smb) agora podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Coloque um arquivo `POPSTARTER.ELF` renomeado com o prefixo `SB.` na pasta `POPS` e, em seguida, execute o [Instalador de Jogos](#instalar-jogos-e-aplicativos).
-- O aplicativo [POPSLoader](#popsloader) foi adicionado. Isso permite que você navegue e carregue facilmente jogos de PS1. O [POPSLoader](#popsloader) pode ser iniciado a partir da [Coleção de Jogos](#coleção-de-jogos) ou do Menu Navigator, no navegador ou menu de sistema do [HOSDMenu](#hosdmenu), ou segurando o botão [△](#opções-de-inicialização) na inicialização.
+- O aplicativo [POPSLoader](#popsloader) foi adicionado. Ele permite navegar e carregar jogos de PS1 facilmente. O [POPSLoader](#popsloader) pode ser iniciado pela [Coleção de Jogos](#game-collection), Menu Navigator, Rotina de pesquisa do [HOSDMenu](#hosdmenu), menu do sistema ou segurando [△](#boot-options) durante a inicialização.
 - A integração com o [POPSLoader](#popsloader) foi adicionada ao [Instalador de Jogos](#instalar-jogos-e-aplicativos); a arte do jogo é baixada automaticamente para todos os jogos de PS1.
 - O **wLaunchELF-ISR** foi substituído pelo [wLaunchELF-R3Z](#wlaunchelf-r3z), adicionando suporte para o gerenciamento de arquivos na partição exFAT da unidade interna. Ele agora pode ser iniciado na inicialização segurando o botão [START](#opções-de-inicialização).
 - O **OSDMenu Configurator** foi substituído pelo [R3CONFIGURATOR](#r3configurator), adicionando suporte multilíngue.
@@ -255,7 +255,7 @@ O PSBBN Definitive English Patch começou sua trajetória em 2023 como um patch 
 
 O PSBBN agora está disponível em Inglês, Alemão, Italiano e no Japonês original, com a tradução em Francês chegando em breve. Você poderá escolher o idioma ao instalar o PSBBN. O idioma também pode ser alterado posteriormente no menu **[Menu de Extras](#extras-opcionais)**.
 
-Quando o idioma está definido como Japonês, os títulos dos jogos da região Japonesa são exibidos em Japonês e classificados na ordem 'gojūon' (五十音) tanto na **[Coleção de Jogos](#coleção-de-jogos)** quanto no **[Navegador do HOSDMenu](#hosdmenu)**. Além disso, os canais online japoneses originais também estão acessíveis a partir do **[Canal de Internet](#canal-de-internet)**.
+Quando o idioma está definido como Japonês, os títulos dos jogos da região Japonesa são exibidos em Japonês e classificados na ordem 'gojūon' (五十音) tanto na **[Coleção de Jogos](#coleção-de-jogos)** quanto na **[Rotina de pesquisa do HOSDMenu](#hosdmenu)**. Além disso, os canais online japoneses originais também estão acessíveis a partir do **[Canal de Internet](#canal-de-internet)**.
 
 **Notas completas de lançamento**  
 
@@ -829,7 +829,7 @@ O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e
 - Atualiza atalhos para aplicativos homebrew no [Menu Navigator do PSBBN](#coleção-de-jogos) e no menu **OSDSYS** do [HOSDMenu](#hosdmenu)
 - Cria **partições iniciadoras** que permitem que jogos e aplicativos selecionados instalados na unidade, junto com jogos de PS1 armazenados em um compartilhamento de rede SMB, sejam iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu)
 - Ativa o BDM HDD, Apps e artes no arquivo de configuração do [OPL](#open-ps2-loader-opl)
-- Define o idioma e a [configuração dos botões](#reatribuir-os-botoes-x-e-o) nos arquivos de configuração do [OPL](#open-ps2-loader-opl) e do [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação
+- Define o idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) nos arquivos de configuração do [OPL](#open-ps2-loader-opl) e do [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação
 
 **NOTA:** Para usar arquivos `ZSO`, você deve selecionar o [OPL](#open-ps2-loader-opl) como iniciador de jogos. Ao usar o [NHDDL](#nhddl), quaisquer arquivos `ZSO` na pasta de jogos do PC ou na unidade do ps2 são descompactados em arquivos `ISO`.
 
@@ -861,20 +861,20 @@ Selecionar **Adicionar Jogos e Aplicativos Adicionais** baixa metadados e artes 
 Jogos e aplicativos podem ser excluídos manualmente do sistema de arquivos exFAT da unidade do PS2. Selecionar **Adicionar Jogos e Aplicativos Adicionais** também removerá quaisquer títulos excluídos da [Coleção de Jogos](#coleção-de-jogos) e do [HOSDMenu](#hosdmenu).
 
 ### Seletor de Jogos
-Ao executar o Instalador de Jogos, será apresentada uma lista de todos os títulos instalados, permitindo que você selecione quais títulos exibir na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Se você tiver uma grande coleção, limitar o número de títulos exibidos pode melhorar sua experiência de navegação.
+Ao executar o Instalador de Jogos, será apresentada uma lista de todos os títulos instalados, permitindo que você selecione quais títulos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Se você tiver uma grande coleção, limitar o número de títulos exibidos pode melhorar sua experiência de navegação.
 
-Até 800 títulos podem ser exibidos na [Coleção de Jogos](#coleção-de-jogos) e no [Navegador](#hosdmenu). Todos os jogos de PS2 permanecerão disponíveis no iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)), e todos os jogos de PS1 permanecerão disponíveis no [POPSLoader](#popsloader).
+Até 800 títulos podem ser exibidos na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Todos os jogos de PS2 permanecerão disponíveis no iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)), e todos os jogos de PS1 permanecerão disponíveis no [POPSLoader](#popsloader).
 
-Você também pode personalizar a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da sua biblioteca.
+Você também pode personalizar a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da biblioteca.
 
 ### Instalando o ATA BDM Assault
-Para iniciar jogos de PS1 pela Coleção de Jogos ou pela Rotina de pesquisa, você deve primeiro instalar os drivers ATA BDM Assault em um PS2 Memory Card.
+Para iniciar jogos de PS1 pela **Coleção de Jogos** ou pela **Rotina de pesquisa**, você deve primeiro instalar os drivers ATA BDM Assault em um Memory Card de PS2.
 
-1. Insira um PS2 Memory Card no seu console PS2.
+1. Insira um Memory Card no console PS2.
 2. Inicie o POPSLoader.
 3. Inicie qualquer jogo de PS1.
 
-Os drivers necessários serão instalados automaticamente no PS2 Memory Card.
+Os drivers necessários serão instalados automaticamente no Memory Card de PS2.
 
 ### Iniciando Jogos de PS1 via SMB
 Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Antes de executar o Instalador de Jogos:
@@ -967,7 +967,7 @@ O [PSBBN](#psbbn) normalmente trava as configurações de tela do sistema em **4
 Essa configuração é utilizada por alguns jogos e pelo [HOSDMenu](#hosdmenu). Ela não altera a proporção do próprio [PSBBN](#psbbn).
 
 ### Limpar Cache de Artes e Ícones
-Esta opção remove todas as artes e ícones de jogos que estão armazenados localmente no PC. Na próxima vez que você executar o Instalador de Jogos, ele examinará a coleção de jogos e, em seguida, fará o download e aplicará novas cópias das artes e ícones necessários.  
+Esta opção remove todas as artes e ícones de jogos armazenados localmente no PC. Na próxima vez que você executar o Instalador de Jogos, ele examinará a Coleção de Jogos, fará o download e aplicará novas cópias das artes e dos ícones necessários.
 
 Você pode querer limpar o cache se os jogos exibirem artes incorretas ou de baixa qualidade, já que artes atualizadas podem estar disponíveis.
 
