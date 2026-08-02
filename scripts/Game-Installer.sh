@@ -3539,41 +3539,49 @@ case "$lang" in
         OPL_LANG="japanese"
         R3CONFIG_LANG="en"
         WLE_LANG="english"
+        PLOAD_LANG="EN"
         ;;
     fre)
         OPL_LANG="French"
         R3CONFIG_LANG="fr"
         WLE_LANG="french"
+        PLOAD_LANG="FR"
         ;;
     spa)
         OPL_LANG="Spanish"
         R3CONFIG_LANG="es"
         WLE_LANG="spanish"
+        PLOAD_LANG="ES"
         ;;
     ger)
         OPL_LANG="German"
         R3CONFIG_LANG="de"
         WLE_LANG="german"
+        PLOAD_LANG="DE"
         ;;
     ita)
         OPL_LANG="Italian"
         R3CONFIG_LANG="en"
         WLE_LANG="italian"
+        PLOAD_LANG="IT"
         ;;
     por)
         OPL_LANG="Portuguese_BR"
         R3CONFIG_LANG="pt"
         WLE_LANG="brazilian"
+        PLOAD_LANG="PT"
         ;;
     hun)
         OPL_LANG="Hungarian"
         R3CONFIG_LANG="en"
         WLE_LANG="hungarian"
+        PLOAD_LANG="HU"
        ;;
     *)
         OPL_LANG="English (internal)"
         R3CONFIG_LANG="en"
         WLE_LANG="english"
+        PLOAD_LANG="EN"
         ;;
 esac
 
@@ -3653,6 +3661,19 @@ if [[ -d "${OPL}/APPS/APP_WLE-R3Z" ]]; then
     cat >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" <<EOL
 language = $WLE_LANG
 GUI_Swap_Keys = $WLE_ENTER
+EOL
+fi
+
+echo "POPSLoader Language: $PLOAD_LANG" >> "${LOG_FILE}"
+if [[ -d "${OPL}/POPS" ]]; then
+    if [[ -f "${OPL}/POPS/.pldrs" ]]; then
+        sed -i \
+        -e '/^LANGUAGE=/d' \
+        "${OPL}/POPS/.pldrs"
+    fi
+
+    cat >> "${OPL}/POPS/.pldrs" <<EOL
+LANGUAGE=$PLOAD_LANG
 EOL
 fi
 

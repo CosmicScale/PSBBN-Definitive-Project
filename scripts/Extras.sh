@@ -1221,6 +1221,7 @@ option_three() {
                 OPL_LANG="English (internal)"
                 R3CONFIG_LANG="en"
                 WLE_LANG="english"
+                PLOAD_LANG="EN"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_2]}"
                 break
                 ;;
@@ -1229,6 +1230,7 @@ option_three() {
                 OPL_LANG="japanese"
                 R3CONFIG_LANG="en"
                 WLE_LANG="english"
+                PLOAD_LANG="EN"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_3]}"
                 break
                 ;;
@@ -1237,14 +1239,16 @@ option_three() {
                 OPL_LANG="French"
                 R3CONFIG_LANG="fr"
                 WLE_LANG="french"
+                PLOAD_LANG="FR"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_4]}"
                 break
                 ;;
             4)
                 lang="ger"
                 OPL_LANG="German"
-                R3CONFIG_LANG="en"
+                R3CONFIG_LANG="de"
                 WLE_LANG="german"
+                PLOAD_LANG="DE"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_5]}"
                 break
                 ;;
@@ -1253,6 +1257,7 @@ option_three() {
                 OPL_LANG="Hungarian"
                 R3CONFIG_LANG="en"
                 WLE_LANG="hungarian"
+                PLOAD_LANG="HU"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_6]}"
                 break
                 ;;
@@ -1261,6 +1266,7 @@ option_three() {
                 OPL_LANG="Italian"
                 R3CONFIG_LANG="en"
                 WLE_LANG="italian"
+                PLOAD_LANG="IT"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_7]}"
                 break
                 ;;
@@ -1269,6 +1275,7 @@ option_three() {
                 OPL_LANG="Portuguese_BR"
                 R3CONFIG_LANG="pt"
                 WLE_LANG="brazilian"
+                PLOAD_LANG="PT"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_8]}"
                 break
                 ;;
@@ -1277,6 +1284,7 @@ option_three() {
                 OPL_LANG="Spanish"
                 R3CONFIG_LANG="es"
                 WLE_LANG="spanish"
+                PLOAD_LANG="ES"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_9]}"
                 break
                 ;;
@@ -1316,14 +1324,14 @@ option_three() {
 
     if grep -q '^^language_text=' "${OPL}/conf_opl.cfg" 2>> "${LOG_FILE}"; then
     sed -i "s/^language_text=.*/language_text=$OPL_LANG/" "${OPL}/conf_opl.cfg" || {
-        echo "[X] Error: Failed to update button config in ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
+        echo "[X] Error: Failed to update language config in ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
         UNMOUNT_OPL
         return 1
     }
     else
         echo "language_text=$OPL_LANG" >> "${OPL}/conf_opl.cfg" || {
-            echo "[X] Error: Failed to add button config to ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
+            echo "[X] Error: Failed to add language config to ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
             UNMOUNT_OPL
             return 1
@@ -1333,14 +1341,14 @@ option_three() {
     if [[ -d "${OPL}/APPS/SYS_R3CONFIGURATOR" ]]; then
         if grep -q '^default_language =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
         sed -i "s/^default_language[[:space:]]*=.*/default_language = $R3CONFIG_LANG/" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-            echo "[X] Error: Failed to update button config in ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
+            echo "[X] Error: Failed to update language config in ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
             UNMOUNT_OPL
             return 1
         }
         else
             echo "default_language = $R3CONFIG_LANG" >> "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
-                echo "[X] Error: Failed to add button config to ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
+                echo "[X] Error: Failed to add language config to ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
                 error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
                 UNMOUNT_OPL
                 return 1
@@ -1351,15 +1359,33 @@ option_three() {
     if [[ -d "${OPL}/APPS/APP_WLE-R3Z" ]]; then
         if grep -q '^language =' "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" 2>> "${LOG_FILE}"; then
         sed -i "s/^language[[:space:]]*=.*/language = $WLE_LANG/" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
-            echo "[X] Error: Failed to update button config in ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+            echo "[X] Error: Failed to update language config in ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
             UNMOUNT_OPL
             return 1
         }
         else
             echo "language = $WLE_LANG" >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" || {
-                echo "[X] Error: Failed to add button config to ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
+                echo "[X] Error: Failed to add language config to ${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" >> "${LOG_FILE}"
                 error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
+                UNMOUNT_OPL
+                return 1
+            }
+        fi
+    fi
+
+    if [[ -d "${OPL}/POPS" ]]; then
+        if grep -q '^LANGUAGE=' "${OPL}/POPS/.pldrs" 2>> "${LOG_FILE}"; then
+        sed -i "s/^LANGUAGE=.*/LANGUAGE=$PLOAD_LANG/" "${OPL}/POPS/.pldrs" || {
+            echo "[X] Error: Failed to update language config in ${OPL}/POPS/.pldrs" >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/POPS/.pldrs"
+            UNMOUNT_OPL
+            return 1
+        }
+        else
+            echo "LANGUAGE=$PLOAD_LANG" >> "${OPL}/POPS/.pldrs" || {
+                echo "[X] Error: Failed to add language config to ${OPL}/POPS/.pldrs" >> "${LOG_FILE}"
+                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/POPS/.pldrs"
                 UNMOUNT_OPL
                 return 1
             }
