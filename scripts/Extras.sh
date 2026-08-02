@@ -694,7 +694,7 @@ downoad_latest_file() {
     if [[ -f "${ASSETS_DIR}/${LATEST_FILE}" && ! -f "${ASSETS_DIR}/${LATEST_FILE}.st" ]]; then
         echo | tee -a "${LOG_FILE}"
         echo "${LATEST_FILE} already exists. Skipping download." >> "${LOG_FILE}"
-        echo "${UI_TEXT[DOWNLOAD_LATEST_FILE_1]}"
+        echo "${LATEST_FILE} ${UI_TEXT[DOWNLOAD_LATEST_FILE_1]}"
     else
         # Check for and delete older files
         for file in "${ASSETS_DIR}"/$prefix*.tar.gz; do
