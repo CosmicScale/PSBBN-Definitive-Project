@@ -1,5 +1,5 @@
 Seletor de jogos:
-• Gerencie todos os seus jogos e aplicativos com o Seletor de jogos v2.
+• Gerencie todos os seus jogos e aplicativos com o Seletor de Jogos v2.
 • Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
 • Personalize a ordem em que as categorias aparecem, tendo controle total sobre a organização da sua biblioteca.
 
@@ -15,5 +15,5 @@ Outras alterações:
 • wLaunchELF_R3Z atualizado para a v4.75.
 • A configuração de idioma do wLaunchELF_R3Z e do POPSLoader agora é definida automaticamente.
 • A configuração dos botões do wLaunchELF_R3Z agora é definida automaticamente.
-• Adicionada uma tradução em português do Brasil do README do PSBBN Definitive Project.
+• Adicionada a tradução em Português do Brasil do README do PSBBN Definitive Project.
 • Diversas correções de bugs e limpeza de código.
