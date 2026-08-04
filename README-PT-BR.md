@@ -951,12 +951,12 @@ Ao instalar o PS2 Linux pela primeira vez, ou ao reinstalar uma versão que veio
 ### Reatribuir Botões Cruz e Círculo
 Esta opção permite que você inverta as funções dos botões × e ○ no controle. Você pode escolher entre o layout padrão (× = confirmar, ○ = voltar) ou o layout alternativo (○ = confirmar, × = voltar), dependendo da sua preferência.  
 
-**NOTA: Este recurso se aplica apenas ao [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl) e [R3CONFIGURATOR](#r3configurator). Ele não altera o layout dos botões na janela de **in-game reset** do [POPS](#popstarter) ao sair de um jogo de PS1, nem no [HOSDMenu](#hosdmenu).**  
+**NOTA: Este recurso se aplica apenas ao [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), e [R3CONFIGURATOR](#r3configurator). Ele não altera o layout dos botões na janela de **in-game reset** do [POPS](#popstarter) ao sair de um jogo de PS1, nem no [HOSDMenu](#hosdmenu).**  
 
 ### Mudar Idioma
 Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema do PSBBN. Selecione entre Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para usuários em Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
 
-Tanto para usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma da mensagem de **in-game reset** (IGR) do [POPS](#popstarter), do [OPL](#open-ps2-loader-opl), do [R3CONFIGURATOR](#r3configurator) e as preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
+Tanto para os usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma do [OPL](#open-ps2-loader-opl), do [wLaunchELF-R3Z](#wlaunchelf-r3z), do [R3CONFIGURATOR](#r3configurator) e da mensagem de in-game reset (IGR) do [POPS](#popstarter), além das preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 
 Após alterar o idioma, é recomendável executar novamente o [Instalador de Jogos](#instalar-jogos-e-aplicativos) e selecionar *Adicionar Jogos e Aplicativos Adicionais* para atualizar os títulos dos jogos para o idioma selecionado (apenas para Inglês e Japonês). Para usuários do [PSBBN](#psbbn), isso também atualizará os manuais dos jogos de PlayStation.
 
