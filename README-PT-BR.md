@@ -954,7 +954,7 @@ Esta opção permite que você inverta as funções dos botões × e ○ no cont
 **NOTA: Este recurso se aplica apenas ao [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), e [R3CONFIGURATOR](#r3configurator). Ele não altera o layout dos botões na janela de **in-game reset** do [POPS](#popstarter) ao sair de um jogo de PS1, nem no [HOSDMenu](#hosdmenu).**  
 
 ### Mudar Idioma
-Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema do PSBBN. Selecione entre Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para usuários em Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
+Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema. Selecione entre Inglês, Alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para os usuários do idioma Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
 
 Tanto para os usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma do [OPL](#open-ps2-loader-opl), do [wLaunchELF-R3Z](#wlaunchelf-r3z), do [R3CONFIGURATOR](#r3configurator) e da mensagem de in-game reset (IGR) do [POPS](#popstarter), além das preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 
