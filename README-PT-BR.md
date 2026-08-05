@@ -217,8 +217,8 @@ Outras alterações:
 - Os usuários que possuem apenas o **[HOSDMenu](#hosdmenu)** agora podem alterar o idioma da instalação no **[Menu de Extras Opcionais](#extras-opcionais)**
 
 **[Alterar Configurações de Tela:](#alterar-configurações-de-tela)**
-- Anteriormente travado no **[PSBBN](#psbbn)**, agora você pode alterar as configurações de tela do sistema no menu **[Menu de Extras Opcionais](#extras-opcionais)** para 4:3, Completo ou 16:9
-- **Note:** Essa configuração é utilizada por alguns jogos e pelo **[HOSDMenu](#hosdmenu)**. Ela não altera a proporção do próprio **[PSBBN](#psbbn)**
+- Anteriormente bloqueadas no **[PSBBN](#psbbn)**, agora é possível alterar as configurações de tela do sistema no **[Menu de Extras Opcionais](#extras-opcionais)** para 4:3, Completo ou 16:9.
+- **Nota:** Esta configuração é usada por alguns jogos e pelo **[HOSDMenu](#hosdmenu)**. Ela não altera a proporção de tela do próprio **[PSBBN](#psbbn)**.
 
 **[Limpar Cache de Artes e Ícones:](#limpar-cache-de-arte-e-icones)**
 - No menu **[Menu de Extras Opcionais](#extras-opcionais)**, você agora tem a opção de limpar todas as artes e ícones baixados anteriormente que estão armazenados localmente no PC
@@ -956,13 +956,13 @@ Esta opção permite que você inverta as funções dos botões × e ○ no cont
 ### Mudar Idioma
 Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema. Selecione entre Inglês, Alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para os usuários do idioma Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
 
-Tanto para os usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma do [OPL](#open-ps2-loader-opl), do [wLaunchELF-R3Z](#wlaunchelf-r3z), do [R3CONFIGURATOR](#r3configurator) e da mensagem de in-game reset (IGR) do [POPS](#popstarter), além das preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
+Tanto para os usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma do [OPL](#open-ps2-loader-opl), do [wLaunchELF-R3Z](#wlaunchelf-r3z), do [R3CONFIGURATOR](#r3configurator), do [POPSLoader](#popsloader) e da mensagem de in-game reset (IGR) do [POPS](#popstarter), além das preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 
 Após alterar o idioma, é recomendável executar novamente o [Instalador de Jogos](#instalar-jogos-e-aplicativos) e selecionar *Adicionar Jogos e Aplicativos Adicionais* para atualizar os títulos dos jogos para o idioma selecionado (apenas para Inglês e Japonês). Para usuários do [PSBBN](#psbbn), isso também atualizará os manuais dos jogos de PlayStation.
 
 ### Alterar Configurações de Tela
 **NOTA: Este recurso é exclusivo do PSBBN.**  
-O [PSBBN](#psbbn) normalmente trava as configurações de tela do sistema em **4:3**. Esta opção permite alterar essa configuração. Você pode escolher entre **4:3**, **Cheia** e **16:9**.
+O [PSBBN](#psbbn) normalmente bloqueia as configurações de tela do sistema em **4:3**. Esta opção permite alterar a configuração de tela. É possível escolher entre **4:3**, **Completo** e **16:9**.
 
 Essa configuração é utilizada por alguns jogos e pelo [HOSDMenu](#hosdmenu). Ela não altera a proporção do próprio [PSBBN](#psbbn).
 
@@ -1006,7 +1006,7 @@ O **Definitive Patch** aprimora e expande suas funcionalidades, oferecendo:
 - Manuais e páginas de solução de problemas sobre o recurso **Audio Player** foram readicionados ao guia do usuário
 - Teclado virtual QWERTY Japonês substituído por um teclado virtual em Inglês (EUA)[*](#problemas-conhecidos)
 - Uma opção para trocar as funções dos botões × e ○
-- Uma opção para alterar as configurações de tela (normalmente travada em 4:3), com modos selecionáveis: 4:3, Cheia e 16:9.
+- Uma opção para alterar as configurações de tela (normalmente bloqueadas em 4:3), com modos selecionáveis: 4:3, Completo e 16:9.
 - Suporte para o controle remoto de DVD do PlayStation 2[*](#problemas-conhecidos)
 
 Para ver os detalhes completos de todos os recursos e um guia completo do usuário, consulte o **Guia do PlayStation BB**, acessível pelo **Menu Principal**.

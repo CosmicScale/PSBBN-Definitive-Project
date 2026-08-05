@@ -956,7 +956,7 @@ This option lets you swap the functions of the × and ○ buttons on your contro
 ### Change Language
 When [PSBBN](#psbbn) is installed, this option changes the system language of PSBBN. Select from English, German, Italian, Brazilian Portuguese, Spanish, French, and the original Japanese. More languages will be added with future updates. For Japanese users, it also downloads and installs the Japanese versions of the [Online Channels](#internet-channel).
 
-For both [PSBBN](#psbbn) and [HOSDMenu](#hosdmenu) users, this option also changes the language for [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), [R3CONFIGURATOR](#r3configurator), and the [POPS](#popstarter) in-game reset (IGR) message, as well as the language preference used by the [Game Installer](#install-games-and-apps).
+For both [PSBBN](#psbbn) and [HOSDMenu](#hosdmenu) users, this option also changes the language for [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), [R3CONFIGURATOR](#r3configurator), [POPSLoader](#popsloader), and the [POPS](#popstarter) in-game reset (IGR) message, as well as the language preference used by the [Game Installer](#install-games-and-apps).
 
 After changing the language, it is recommended to rerun the [Game Installer](#install-games-and-apps) and select *Add Additional Games and Apps* to update game titles to your selected language (English and Japanese only). For [PSBBN](#psbbn) users, this will also update the PlayStation game manuals.
 
