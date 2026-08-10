@@ -1377,10 +1377,18 @@ create_system_cnf() {
 }
 
 APP_ART() {
-    local title_id="${title_id//[^A-Za-z0-9_-]/}"
-    local title_id="${title_id:0:12}"
-    local title_id="${title_id%-}"
-    local title_id="${title_id^^}"
+
+    local APP_ID
+    local png_file
+    local pp_name="$1"
+    local title_id="$2"
+    local elf="$3"
+    local title="$4"
+
+    title_id="${title_id//[^A-Za-z0-9_-]/}"
+    title_id="${title_id:0:12}"
+    title_id="${title_id%-}"
+    title_id="${title_id^^}"
 
     case "$title_id" in
     OPL*|OPNPS2LD*)
@@ -2884,7 +2892,12 @@ if [ "$APP_COUNT" -gt 0 ]; then
     for dir in "${SOURCE_DIR}"/*/; do
         [[ -d "$dir" ]] || continue
 
-        if find "$dir/" -maxdepth 1 -type f -iname "*.elf" | grep -q .; then
+        if find "$dir/" -maxdepth 1 -type f -iname "*.elf" | grep -q . \
+            && [ -r "$dir/title.cfg" ]; then
+
+            title=""
+            elf=""
+            publisher=""
             folder_name=$(basename "$dir")
             pp_name=$(echo "$folder_name" | sed 's/[^A-Za-z0-9_-]//g' | tr 'a-z' 'A-Z')
             title_id="${pp_name:0:12}"
@@ -2903,6 +2916,11 @@ if [ "$APP_COUNT" -gt 0 ]; then
                     Developer) publisher="$value" ;;
                 esac
             done < "$dir/title.cfg"
+
+            if [ -z "$title" ] || [ -z "$elf" ]; then
+                echo "$title_id,$title,$elf,$dir/title.cfg,Failed to read title.cfg" >> "${MISSING_APP_ART}"
+                continue
+            fi
 
             mkdir -p "${SCRIPTS_DIR}/tmp/${pp_name}" || {
                 echo "[X] Error: Failed to create folder: $pp_name" >> "${LOG_FILE}"
@@ -2963,7 +2981,7 @@ EOL
             info_sys_filename="${SCRIPTS_DIR}/tmp/${pp_name}/info.sys"
             create_info_sys "$title" "$title_id" "$publisher"
 
-            APP_ART
+            APP_ART "$pp_name" "$title_id" "$elf" "$title"
 
             i=$((i + 1))
             show_progress "$i" "$APP_COUNT"
