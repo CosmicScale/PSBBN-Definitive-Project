@@ -1,4 +1,4 @@
-• O PSBBN Definitive Project agora está totalmente localizado em húngaro. Você pode alterar o idioma da sua instalação do PSBBN no menu Extras opcionais.
+• O PSBBN Definitive Project agora está totalmente localizado em Húngaro. Você pode alterar o idioma da sua instalação do PSBBN no menu Extras opcionais.
 
 • Todos os pacotes de idiomas foram atualizados com correções e traduções aprimoradas.
 
