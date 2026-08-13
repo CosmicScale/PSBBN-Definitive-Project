@@ -1,19 +1,5 @@
-Játékválasztó:
-• Kezeld az összes játékodat és alkalmazásodat a Játékválasztó v2 segítségével.
-• Válaszd ki, mely címek jelenjenek meg a Játékgyűjteményben és a Browserben.
-• Szabd testre a kategóriák megjelenési sorrendjét, így teljes irányítást kapsz a könyvtárad rendszerezése felett.
+• A PSBBN Definitive Project most már teljes egészében magyar nyelvre van lokalizálva. A PSBBN telepítésének nyelvét az Opcionális extrák menüben módosíthatja.
 
-OSDMenu:
-• Az OSDMenu MBR és a HOSDMenu frissítve lett a v1.3.0 verzióra.
-• Csökkentettük a PSBBN indítási idejét.
-• További kontrollergombok állíthatók be játékindító gombként. Mostantól az L3 és R3 kivételével minden gomb támogatott.
-• Az R3CONFIGURATOR frissítve lett a v1.3.0 verzióra.
+• Minden nyelvi csomag frissítve lett javításokkal és továbbfejlesztett fordításokkal.
 
-Egyéb változások:
-• A POPSLoader frissítve lett a legújabb rolling release verzióra.
-• Egyszerűbb ATA BDM Assault illesztőprogram-telepítés a POPSLoader segítségével.
-• A wLaunchELF_R3Z frissítve lett a 4.75-ös verzióra.
-• • A wLaunchELF_R3Z és a POPSLoader nyelvi beállításai mostantól automatikusan beállításra kerülnek.
-• A wLaunchELF_R3Z gombkiosztási beállításai mostantól automatikusan beállításra kerülnek.
-• Hozzáadva a PSBBN Definitive Project README fájljának brazil portugál fordítása.
-• Különféle hibajavítások és kódtisztítások.
+• Az R3CONFIGURATOR az 1.3.1-es verzióra, a wLaunchELF_R3Z pedig a 4.76-os verzióra lett frissítve. A frissítésükhöz válassza a "Játékok és alkalmazások telepítése" lehetőséget a főmenüben.

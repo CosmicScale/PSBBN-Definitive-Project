@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<MANUAL version="1.0">
+
+	<IMG id="bg" src="./bg.png" />
+
+	<MENUGROUP id="TOP">
+		<TITLE id="TOP-TITLE" label="PlayStation Játék Kézikönyv" />
+		<ITEM id="M00" label="Gyorsbillentyűk"	page="PIC0000" />
+		<ITEM id="M01" label="Lemezek Cseréje"	page="PIC0001" />
+		</MENUGROUP>
+
+	<PAGEGROUP>
+		<PAGE id="PIC0000" src="./1.png" retitem="M00" retgroup="TOP" />
+		<PAGE id="PIC0001" src="./2.png" retitem="M01" retgroup="TOP" />
+	</PAGEGROUP>	
+</MANUAL>

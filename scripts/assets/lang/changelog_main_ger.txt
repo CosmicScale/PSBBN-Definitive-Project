@@ -1,19 +1,5 @@
-Spieleauswahl:
-• Verwalten Sie alle Ihre Spiele und Anwendungen mit Spieleauswahl v2.
-• Legen Sie fest, welche Titel in der Spielesammlung und im Browser angezeigt werden.
-• Passen Sie die Reihenfolge der Kategorien individuell an und behalten Sie die volle Kontrolle über die Organisation Ihrer Bibliothek.
+• Das PSBBN Definitive Project ist jetzt vollständig ins Ungarische lokalisiert. Sie können die Sprache Ihrer PSBBN-Installation im Menü Optionale Extras ändern.
 
-OSDMenu:
-• OSDMenu MBR und HOSDMenu wurden auf Version v1.3.0 aktualisiert.
-• PSBBN-Startzeit reduziert.
-• Unterstützung für zusätzliche Starttasten auf dem Gamepad hinzugefügt. Nun werden alle Tasten außer L3 und R3 unterstützt.
-• R3CONFIGURATOR wurde auf Version v1.3.0 aktualisiert.
+• Alle Sprachpakete wurden mit Korrekturen und verbesserten Übersetzungen aktualisiert.
 
-Weitere Änderungen:
-• POPSLoader auf die neueste Rolling-Release-Version aktualisiert.
-• Einfachere Installation der ATA BDM Assault-Treiber mit POPSLoader.
-• wLaunchELF_R3Z auf Version 4.75 aktualisiert.
-• • Die Spracheinstellungen für wLaunchELF_R3Z und POPSLoader werden nun automatisch festgelegt.
-• Die Tastenbelegung für wLaunchELF_R3Z wird nun automatisch festgelegt.
-• Eine brasilianisch-portugiesische Übersetzung der README-Datei des PSBBN Definitive Project hinzugefügt.
-• Verschiedene Fehlerbehebungen und Code-Bereinigungen.
+• R3CONFIGURATOR wurde auf v1.3.1 aktualisiert, und wLaunchELF_R3Z wurde auf v4.76 aktualisiert. Um sie zu aktualisieren, wählen Sie "Spiele und Apps installieren" im Hauptmenü.

@@ -126,9 +126,9 @@ case "$SYS_LANG" in
     pt*|po*)
         LANG_FILE="por"
         ;;
-    #hu*)
-    #    LANG_FILE="hun"
-    #   ;;
+    hu*)
+        LANG_FILE="hun"
+       ;;
     *)
         LANG_FILE="eng"
         ;;
@@ -972,11 +972,11 @@ if [ -f "${ASSETS_DIR}/lang/changelog_main_$LANG_FILE.txt" ]; then
     echo "$text"
     center_text "${UI_TEXT[CHANGE_URL]}"
     echo "$text"
-    echo
-    center_text "${UI_TEXT[CHANGELOG_2]}"
-    echo "$text"
-    center_text "https://youtu.be/UEsqDorgbew"
-    echo "$text"
+    # echo
+    # center_text "${UI_TEXT[CHANGELOG_2]}"
+    # echo "$text"
+    # center_text "https://youtu.be/UEsqDorgbew"
+    #echo "$text"
     echo
     echo "=============================================================================================================="
     echo

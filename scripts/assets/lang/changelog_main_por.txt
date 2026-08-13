@@ -1,19 +1,5 @@
-Seletor de jogos:
-• Gerencie todos os seus jogos e aplicativos com o Seletor de Jogos v2.
-• Escolha quais títulos aparecem na Coleção de Jogos e na Rotina de pesquisa.
-• Personalize a ordem em que as categorias aparecem, tendo controle total sobre a organização da sua biblioteca.
+• O PSBBN Definitive Project agora está totalmente localizado em húngaro. Você pode alterar o idioma da sua instalação do PSBBN no menu Extras opcionais.
 
-OSDMenu:
-• OSDMenu MBR e HOSDMenu atualizados para a versão v1.3.0.
-• Tempo de inicialização do PSBBN reduzido.
-• Adicionado suporte para botões adicionais de inicialização pelo controle. Agora todas as teclas são suportadas, exceto L3 e R3.
-• R3CONFIGURATOR atualizado para a versão v1.3.0.
+• Todos os pacotes de idiomas foram atualizados com correções e traduções aprimoradas.
 
-Outras alterações:
-• POPSLoader atualizado para a versão contínua mais recente.
-• Instalação mais fácil dos drivers ATA BDM Assault com o POPSLoader.
-• wLaunchELF_R3Z atualizado para a v4.75.
-• A configuração de idioma do wLaunchELF_R3Z e do POPSLoader agora é definida automaticamente.
-• A configuração dos botões do wLaunchELF_R3Z agora é definida automaticamente.
-• Adicionada a tradução em Português do Brasil do README do PSBBN Definitive Project.
-• Diversas correções de bugs e limpeza de código.
+• O R3CONFIGURATOR foi atualizado para a v1.3.1, e o wLaunchELF_R3Z foi atualizado para a v4.76. Para atualizá-los, selecione "Instalar jogos e aplicativos" no menu principal.

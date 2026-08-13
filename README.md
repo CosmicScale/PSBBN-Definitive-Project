@@ -13,7 +13,7 @@ PSBBN is official Sony software for the PlayStation 2, released exclusively in J
 - Watching videos in the Movie Channel
 - Transferring photos from a digital camera and viewing them in the Photo Channel
 
-The **PSBBN Definitive Project** (formerly the PSBBN Definitive English Patch) began in 2023 as an English-language patch for PSBBN, but steadily expanded well beyond its original scope. This project now aims to provide the ultimate setup for the PlayStation 2's internal drive.
+The **PSBBN Definitive Project** (formerly the PSBBN Definitive English Patch) began in 2023 as an English-language patch for PSBBN, but steadily expanded well beyond its original scope. This project now supports multiple languages and aims to provide the ultimate setup for the PlayStation 2's internal drive.
 
 You can find out more about the original PSBBN software on [Wikipedia](https://en.wikipedia.org/wiki/PlayStation_Broadband_Navigator) and follow the development of this project on my [YouTube channel](https://www.youtube.com/@CosmicScaleFactor).
 
@@ -60,6 +60,12 @@ Both installation options offer:
 - [Optional extras](#optional-extras) such as installing [PS2 Linux](#install-ps2-linux)
 
 # Changelog
+
+**August 13, 2026 - Hungarian localisation, language packs, R3CONFIGURATOR & wLaunchELF_R3Z updates**
+
+- The PSBBN Definitive Project has now been fully localised into Hungarian. You can change the language of your PSBBN installation from the Optional Extras menu.
+- All language packs have been updated with corrections and improved translations.
+- R3CONFIGURATOR has been updated to [v1.3.1](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.1), and wLaunchELF_R3Z has been updated to [v4.76](https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/v4.76). To update them, select “Install Games and Apps” from the main menu.
 
 **July 29, 2026 - Game Selector v2, OSDMenu 1.3.0 and more!**
 <p></p>
@@ -663,7 +669,7 @@ Patch v2.11 can be installed by running the [PSBBN Installer script](#install-ps
 </details>  
 
 # Installation Guide
-The **PSBBN Definitive Project** has been fully localised into English, Japanese, French, Spanish, German, Italian, and Brazilian Portuguese. Your operating system's language is detected automatically, and the project runs in that language, defaulting to English if it is not available.
+The **PSBBN Definitive Project** has been fully localised into English, Japanese, French, Spanish, German, Italian, Brazilian Portuguese, and Hungarian. Your operating system's language is detected automatically, and the project runs in that language, defaulting to English if it is not available.
 
 ## Requirements
 For the best experience, a PS2 Fat model (SCPH-30000 to SCPH-55000 series) is recommended.
@@ -954,7 +960,7 @@ This option lets you swap the functions of the × and ○ buttons on your contro
 **NOTE: This feature only applies to [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), and [R3CONFIGURATOR](#r3configurator). It does not swap the button layout for the [POPS](#popstarter) in-game reset dialog when exiting a PS1 game, or [HOSDMenu](#hosdmenu).**  
 
 ### Change Language
-When [PSBBN](#psbbn) is installed, this option changes the system language of PSBBN. Select from English, German, Italian, Brazilian Portuguese, Spanish, French, and the original Japanese. More languages will be added with future updates. For Japanese users, it also downloads and installs the Japanese versions of the [Online Channels](#internet-channel).
+When [PSBBN](#psbbn) is installed, this option changes the system language of PSBBN. Select from English, German, Italian, Brazilian Portuguese, Spanish, French, Hungarian, and the original Japanese. More languages will be added with future updates. For Japanese users, it also downloads and installs the Japanese versions of the [Online Channels](#internet-channel).
 
 For both [PSBBN](#psbbn) and [HOSDMenu](#hosdmenu) users, this option also changes the language for [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), [R3CONFIGURATOR](#r3configurator), [POPSLoader](#popsloader), and the [POPS](#popstarter) in-game reset (IGR) message, as well as the language preference used by the [Game Installer](#install-games-and-apps).
 
@@ -991,7 +997,7 @@ PlayStation Broadband Navigator (also referred to as BB Navigator and PSBBN) is 
 
 The **Definitive Patch** enhances and extends its functionality, offering:
 - A full translation of the stock Japanese BB Navigator software version 0.32 — All binaries, XML files, textures, and pictures have been translated[*](#known-issues)
-- Available in English, German, Italian, Brazilian Portuguese, Spanish, French, and the original Japanese
+- Available in English, German, Italian, Brazilian Portuguese, Spanish, French, Hungarian, and the original Japanese
 - Support for PS2 consoles from all regions; the original software was restricted to Japanese consoles
 - [OSDMenu MBR](#osdmenu-mbr) — a homebrew replacement for Sony’s original MBR program with numerous improvements over the original implementation
 - A patched `osdboot.elf` to bypass the CRC security check, allowing the use of custom kernels
@@ -1299,6 +1305,7 @@ Please include all relevant log files:
   - Brazilian Portuguese — [Emerson Teles (Emertels)](https://github.com/Emertels)
   - Spanish — [Ignacio Trillo (Nacheras)](https://github.com/Nacheras) & [ViZoRRetrogames](https://github.com/ViZoRRetrogames)
   - French — [Bistroww](https://github.com/Bistroww) & [iSlickick](https://github.com/iSlickick)
+  - Hungarian — [BeLANzO666](https://github.com/BeLANzO666)
 
 **The PSBBN Definitive Project uses the following PS2 homebrew tools and applications:**
 - [PSBBN Art Database](https://github.com/CosmicScale/psbbn-art-database) created and maintained by [CosmicScale](https://github.com/CosmicScale)

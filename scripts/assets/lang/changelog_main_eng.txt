@@ -1,19 +1,5 @@
-Game Selector:
-• Manage all your games and applications with Game Selector v2.
-• Select which titles appear in the Game Collection and Browser.
-• Customise the order in which categories appear, giving you full control over how your library is organised.
+• The PSBBN Definitive Project has now been fully localised into Hungarian. You can change the language of your PSBBN installation from the Optional Extras menu.
 
-OSDMenu:
-• OSDMenu MBR and HOSDMenu updated to v1.3.0.
-• Reduced PSBBN boot time.
-• Added support for additional gamepad launch keys. All keys are now supported except L3 and R3.
-• R3CONFIGURATOR updated to v1.3.0.
+• All language packs have been updated with corrections and improved translations.
 
-Other Changes:
-• POPSLoader updated to latest rolling release.
-• Easier ATA BDM Assault Driver Installation with POPSLoader.
-• wLaunchELF_R3Z updated to v4.75.
-• Language setting for wLaunchELF_R3Z and POPSLoader are now automatically set.
-• Button configuration setting for wLaunchELF_R3Z is now automatically set.
-• Added a Brazilian Portuguese translation of the PSBBN Definitive Project README.
-• Various bug fixes and code clean-up.
+• R3CONFIGURATOR has been updated to v1.3.1, and wLaunchELF_R3Z has been updated to v4.76. To update them, select “Install Games and Apps” from the main menu.

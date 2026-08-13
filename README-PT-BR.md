@@ -13,7 +13,7 @@ O PSBBN é um software oficial da Sony para o PlayStation 2, lançado exclusivam
 - Assistir a vídeos no Canal de Filmes
 - Transferência de fotos de uma câmera digital e visualização delas no Canal de Fotos
 
-O **PSBBN Definitive Project** (anteriormente PSBBN Definitive English Patch) começou em 2023 como um patch de idioma Inglês para o PSBBN, mas expandiu-se continuamente bem além de seu escopo original. Este projeto agora visa fornecer a configuração definitiva para a unidade interna do PlayStation 2.
+O **PSBBN Definitive Project** (anteriormente PSBBN Definitive English Patch) começou em 2023 como um patch de idioma Inglês para o PSBBN, mas expandiu-se continuamente bem além de seu escopo original. Este projeto agora oferece suporte a vários idiomas e tem como objetivo fornecer a configuração definitiva para a unidade interna do PlayStation 2.
 
 Você pode saber mais sobre o software PSBBN original na [Wikipedia](https://en.wikipedia.org/wiki/PlayStation_Broadband_Navigator) e acompanhar o desenvolvimento deste projeto no meu [canal do YouTube](https://www.youtube.com/@CosmicScaleFactor).
 
@@ -60,6 +60,12 @@ Ambas as opções de instalação oferecem:
 - [Extras opcionais](#extras-opcionais), como a instalação do [PS2 Linux](#install-ps2-linux)
 
 # Registro de Alterações
+
+**13 de agosto de 2026 - Localização em húngaro, pacotes de idiomas e atualizações do R3CONFIGURATOR e wLaunchELF_R3Z**
+
+- O PSBBN Definitive Project agora está totalmente localizado em húngaro. Você pode alterar o idioma da sua instalação do PSBBN no menu Extras opcionais.
+- Todos os pacotes de idiomas foram atualizados com correções e traduções aprimoradas.
+- O R3CONFIGURATOR foi atualizado para a [v1.3.1](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.1), e o wLaunchELF_R3Z foi atualizado para a [v4.76](https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/v4.76). Para atualizá-los, selecione “Instalar jogos e aplicativos” no menu principal.
 
 **29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!**
 <p></p>
@@ -663,7 +669,7 @@ O patch v2.11 pode ser instalado executando o [script do Instalador do PSBBN](#i
 </details>  
 
 # Guia de Instalação
-O **PSBBN Definitive Project** foi totalmente localizado para Inglês, Japonês, Francês, Espanhol, alemão, Italiano e Português do Brasil. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o Inglês como padrão caso não esteja disponível.
+O **PSBBN Definitive Project** foi totalmente localizado para Inglês, Japonês, Francês, Espanhol, alemão, Italiano, Português do Brasil e Húngaro. O idioma do sistema operacional é detectado automaticamente, e o projeto é executado nesse idioma, assumindo o Inglês como padrão caso não esteja disponível.
 
 ## Requisitos
 Para a melhor experiência, recomenda-se um modelo PS2 Fat (séries SCPH-30000 a SCPH-55000).
@@ -954,7 +960,7 @@ Esta opção permite que você inverta as funções dos botões × e ○ no cont
 **NOTA: Este recurso se aplica apenas ao [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), e [R3CONFIGURATOR](#r3configurator). Ele não altera o layout dos botões na janela de **in-game reset** do [POPS](#popstarter) ao sair de um jogo de PS1, nem no [HOSDMenu](#hosdmenu).**  
 
 ### Mudar Idioma
-Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema. Selecione entre Inglês, Alemão, Italiano, Português do Brasil, Espanhol, Francês e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para os usuários do idioma Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
+Quando o [PSBBN](#psbbn) está instalado, esta opção altera o idioma do sistema. Selecione entre Inglês, Alemão, Italiano, Português do Brasil, Espanhol, Francês, Húngaro e o Japonês original. Mais idiomas serão adicionados em futuras atualizações. Para os usuários do idioma Japonês, a ferramenta também baixa e instala as versões japonesas dos [Canais Online](#canal-de-internet).
 
 Tanto para os usuários do [PSBBN](#psbbn) quanto do [HOSDMenu](#hosdmenu), esta opção também altera o idioma do [OPL](#open-ps2-loader-opl), do [wLaunchELF-R3Z](#wlaunchelf-r3z), do [R3CONFIGURATOR](#r3configurator), do [POPSLoader](#popsloader) e da mensagem de in-game reset (IGR) do [POPS](#popstarter), além das preferências de idioma usadas pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos).
 
@@ -991,7 +997,7 @@ O PlayStation Broadband Navigator (também conhecido como BB Navigator e PSBBN) 
 
 O **Definitive Patch** aprimora e expande suas funcionalidades, oferecendo:
 - Uma tradução completa do software BB Navigator Japonês original (versão 0.32) — Todos os binários, arquivos XML, texturas e imagens foram traduzidos[*](#problemas-conhecidos)
-- Disponibilidade em Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês e no Japonês original
+- Disponibilidade em Inglês, alemão, Italiano, Português do Brasil, Espanhol, Francês, Húngaro e no Japonês original
 - Suporte para consoles PS2 de todas as regiões; o software original era restrito a consoles japoneses
 - [OSDMenu MBR](#osdmenu-mbr) — um substituto homebrew para o programa MBR original da Sony, com inúmeras melhorias em relação à implementação original
 - Um `osdboot.elf` corrigido (patched) para contornar a verificação de segurança CRC, permitindo o uso de kernels personalizados
@@ -1299,6 +1305,7 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
   - Português do Brasil — [Emerson Teles (Emertels)](https://github.com/Emertels)
   - Espanhol — [Ignacio Trillo (Nacheras)](https://github.com/Nacheras) & [ViZoRRetrogames](https://github.com/ViZoRRetrogames)
   - Francês — [Bistroww](https://github.com/Bistroww) & [iSlickick](https://github.com/iSlickick)
+  - Húngaro — [BeLANzO666](https://github.com/BeLANzO666)
 
 **O PSBBN Definitive Project usa as seguintes ferramentas e aplicativos homebrew de PS2:**
 - [PSBBN Art Database](https://github.com/CosmicScale/psbbn-art-database) criado e mantido por [CosmicScale](https://github.com/CosmicScale)
