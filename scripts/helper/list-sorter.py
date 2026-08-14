@@ -162,7 +162,11 @@ def sort_games_list(games_list_path):
             "wrc 3: the official game of the fia world rally championship": "wrc 3",
             "wrc 4: the official game of the fia world rally championship": "wrc 4",
             "wrc: rally evolved": "wrc 5",
-            "wrc avec sébastien loeb édition 2005": "wrc 5"
+            "wrc avec sébastien loeb édition 2005": "wrc 5",
+            "silent line: armored core": "armored core 3",
+            "unlimited saga": "saga 1",
+            "romancing saga": "saga 2",
+            "romancing saga: minstrel song": "saga 2"
 
         }
 
