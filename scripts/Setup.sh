@@ -144,14 +144,14 @@ elif [ -x "$(command -v emerge)" ]; then
     fi
     # Check if device-mapper is in the user's kernel
     # First, see if it's built in
-    if grep -q "device-mapper" /proc/devices 2>/dev/null && ! lsmod 2>/dev/null | grep -q "^dm_mod"; then
+    if grep -q "device-mapper" /proc/devices 2>/dev/null && ! lsmod 2>/dev/null | grep -q "^dm_mod"; then :
     # If it's not built in, see if it's configured as a module
     elif modprobe -n dm_mod &>/dev/null || lsmod 2>/dev/null | grep -q "^dm_mod"; then
         # If it's a module, check if it's loaded
-        if grep -q "device-mapper" /proc/devices 2>/dev/null || lsmod 2>/dev/null | grep -q "^dm_mod"; then
+        if grep -q "device-mapper" /proc/devices 2>/dev/null || lsmod 2>/dev/null | grep -q "^dm_mod"; then :
         else
         # If it's not loaded, attempt to load it
-        if sudo modprobe dm_mod 2>/dev/null; then
+        if sudo modprobe dm_mod 2>/dev/null; then :
         else
         echo "Error: Failed to load the 'dm_mod' kernel module." >&2
         exit 1
