@@ -473,7 +473,7 @@ POPS_PATCH_DL() {
         wget -qO- 'https://www.mediafire.com/file/rznkr05pci45w5p/Hugopocked_POPStarter_Fixes_%25282023-08-11%2529.rar/file' \
         | grep -o 'https://download[^"]*Hugopocked+POPStarter+Fixes+%282023-08-11%29.rar' | head -n1)"
 
-    unrar-free x "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" "$ASSETS_DIR"
+    bsdtar -xf "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" -C "$ASSETS_DIR"
 }
 
 CREATE_PS1_VMC() {
