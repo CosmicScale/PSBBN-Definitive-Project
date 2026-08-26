@@ -130,7 +130,7 @@ elif [ -x "$(command -v dnf)" ]; then
         i386="glibc.i686"
     fi
     sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm 2>&1 | tee -a "${LOG_FILE}"
-    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl wget ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer bsdtar device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl wget ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer libarchive bsdtar device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Arch-based system, do this instead
 elif [ -x "$(command -v pacman)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
