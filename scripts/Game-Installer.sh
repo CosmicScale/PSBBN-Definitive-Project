@@ -920,7 +920,7 @@ install_pops() {
             if [[ -f "${ASSETS_DIR}/POPS-binaries-main.zip" && ! -f "${ASSETS_DIR}/POPS-binaries-main.zip.st" ]]; then
                 echo | tee -a "${LOG_FILE}"
                 echo "POPS-binaries-main.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     echo "[!] Warning: Failed to extract POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_1]}"
                 fi
@@ -932,7 +932,7 @@ install_pops() {
                     echo "[!] Warning: Failed to download POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "Failed to download POPS binaries."
                 fi
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_2]}"
                 fi
             fi
@@ -3943,9 +3943,9 @@ cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
 
 cd "${ICONS_DIR}/ico/tmp/"
 rm *.png >/dev/null 2>&1
-zip -r "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
 cd "${ARTWORK_DIR}/tmp/" 
-zip -r "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
 
 if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
     echo "Contributing to the PSBBN art & HDD-OSD databases..." >> "${LOG_FILE}"
