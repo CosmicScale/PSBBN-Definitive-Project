@@ -691,7 +691,7 @@ For the best experience, a PS2 Fat model (SCPH-30000 to SCPH-55000 series) is re
 The **PSBBN Definitive Project** requires an x86-64 or ARM64 PC for installation. Connect the HDD or SSD to the PC via SATA or a USB adapter.
 
 ## Installing on Linux
-64-bit Debian-based distributions using `apt`, Arch-based distributions using `pacman`, and Fedora-based[*](#troubleshooting) distributions using `dnf` are supported. Nix-based systems are also supported via flakes. Recommended distributions are Linux Mint, Debian, and for Raspberry Pi, Raspberry Pi OS.
+64-bit Debian-based distributions using `apt`, Arch-based distributions using `pacman`, Fedora-based[*](#troubleshooting) distributions using `dnf`, and Gentoo-based distributions using `emerge` are supported. Nix-based systems are also supported via flakes. Recommended distributions are Linux Mint, Debian, and for Raspberry Pi, Raspberry Pi OS.
 
 **The PSBBN Definitive Project is a rolling release. To get automatic updates and the latest bug fixes, you must install the scripts using `git clone`.**
 
