@@ -540,7 +540,7 @@ check_dep(){
     check_cmd bchunk
     check_cmd pkg-config
     check_cmd ffmpegthumbnailer
-    check_cmd unrar-free
+    check_cmd bsdtar
     check_cmd dmsetup
 
     if ! pkg-config --exists icu-i18n 2>/dev/null; then
