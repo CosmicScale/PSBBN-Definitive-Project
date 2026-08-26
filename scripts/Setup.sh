@@ -123,20 +123,47 @@ if [ -x "$(command -v apt-get)" ]; then
         sudo dpkg --add-architecture i386
         i386="libc6:i386"
     fi
-    sudo apt-get -q update && sudo apt-get install -y axel imagemagick xxd python3 python3-venv python3-pip bc rsync curl zip unzip wget ffmpeg lvm2 libfuse2 dosfstools e2fsprogs libc-bin exfatprogs exfat-fuse util-linux fdisk parted bchunk build-essential libicu-dev pkg-config ffmpegthumbnailer binfmt-support unrar-free dmsetup $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo apt-get -q update && sudo apt-get install -y axel imagemagick xxd python3 python3-venv python3-pip bc rsync curl wget ffmpeg lvm2 libfuse2 dosfstools e2fsprogs libc-bin exfatprogs exfat-fuse util-linux fdisk parted bchunk build-essential libicu-dev pkg-config ffmpegthumbnailer binfmt-support libarchive-tools dmsetup $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Fedora-based system, do this instead
 elif [ -x "$(command -v dnf)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
         i386="glibc.i686"
     fi
     sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm 2>&1 | tee -a "${LOG_FILE}"
-    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl zip unzip wget ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer unrar-free device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl wget ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer bsdtar device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Arch-based system, do this instead
 elif [ -x "$(command -v pacman)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
         i386="lib32-glibc"
     fi
-    sudo pacman -S --needed --noconfirm axel imagemagick xxd python pyenv python-pip bc rsync curl zip unzip wget ffmpeg lvm2 fuse2 dosfstools e2fsprogs glibc exfatprogs util-linux parted bchunk base-devel icu pkgconf ffmpegthumbnailer unrar-free device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo pacman -S --needed --noconfirm axel imagemagick xxd python pyenv python-pip bc rsync curl wget ffmpeg lvm2 fuse2 dosfstools e2fsprogs glibc exfatprogs util-linux parted bchunk base-devel icu pkgconf ffmpegthumbnailer libarchive device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+# Or if user is on Gentoo-based system, do this instead
+elif [ -x "$(command -v emerge)" ]; then
+    if [[ "$arch" = "x86_64" ]]; then
+        i386="glibc"
+    fi
+    # Check if device-mapper is in the user's kernel
+    # First, see if it's built in
+    if grep -q "device-mapper" /proc/devices 2>/dev/null && ! lsmod 2>/dev/null | grep -q "^dm_mod"; then
+    # If it's not built in, see if it's configured as a module
+    elif modprobe -n dm_mod &>/dev/null || lsmod 2>/dev/null | grep -q "^dm_mod"; then
+        # If it's a module, check if it's loaded
+        if grep -q "device-mapper" /proc/devices 2>/dev/null || lsmod 2>/dev/null | grep -q "^dm_mod"; then
+        else
+        # If it's not loaded, attempt to load it
+        if sudo modprobe dm_mod 2>/dev/null; then
+        else
+        echo "Error: Failed to load the 'dm_mod' kernel module." >&2
+        exit 1
+        fi
+    fi
+    else
+    # If it's not present at all, halt and throw this error message
+    echo "Error: device-mapper (CONFIG_BLK_DEV_DM) is missing from your kernel." >&2
+    echo "Please rebuild your kernel with CONFIG_BLK_DEV_DM=y or CONFIG_BLK_DEV_DM=m before running this installer." >&2
+        exit 1
+    fi
+    sudo USE='lvm' emerge --ask net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl net-misc/wget media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
 elif [ -n "$IN_NIX_SHELL" ]; then
     echo Running in Nix environment - packages should be provided by flake and setup should not be run. >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_NIX]}"
