@@ -171,11 +171,25 @@ media-video/ffmpeg opus
 EOF
 # Swap deprecated exfat-utils with exfatprogs if present
     if portageq has_version / sys-fs/exfat-utils &>/dev/null; then
-        echo "Removing deprecated sys-fs/exfat-utils to prevent package blocks..."
-        sudo emerge --deselect sys-fs/exfat-utils &>/dev/null
-        sudo emerge --unmerge --quiet sys-fs/exfat-utils
+        while true; do
+        read -p "You have deprecated exfat-utils installed. It must be removed for this program to function. Do you want to remove it now and replace it with exfatprogs? (y/n): " yn
+        case $yn in
+            [Yy]* )
+                sudo emerge --deselect sys-fs/exfat-utils &>/dev/null
+                sudo emerge --unmerge --quiet sys-fs/exfat-utils
+                break
+                ;;
+            [Nn]* )
+                echo "Please remove sys-fs/exfat-utils manually before running this script again."
+                exit 0
+                ;;
+            * )
+                echo "Invalid input! Please enter y or n."
+                ;;
+            esac
+        done
     fi
-    sudo emerge --sync && sudo USE='lvm' emerge --noreplace --quiet --quiet-fail --autounmask=y --autounmask-continue=y --autounmask-write=y -- net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl net-misc/wget media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse:0 sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo emerge --sync && sudo USE='lvm' emerge --noreplace --quiet --quiet-fail --autounmask=y --autounmask-continue=y --autounmask-write=y net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl net-misc/wget media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse:0 sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
 elif [ -n "$IN_NIX_SHELL" ]; then
     echo Running in Nix environment - packages should be provided by flake and setup should not be run. >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_NIX]}"
