@@ -123,20 +123,20 @@ if [ -x "$(command -v apt-get)" ]; then
         sudo dpkg --add-architecture i386
         i386="libc6:i386"
     fi
-    sudo apt-get -q update && sudo apt-get install -y axel imagemagick xxd python3 python3-venv python3-pip bc rsync curl wget ffmpeg lvm2 libfuse2 dosfstools e2fsprogs libc-bin exfatprogs exfat-fuse util-linux fdisk parted bchunk build-essential libicu-dev pkg-config ffmpegthumbnailer binfmt-support libarchive-tools dmsetup $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo apt-get -q update && sudo apt-get install -y axel imagemagick xxd python3 python3-venv python3-pip bc rsync curl ffmpeg lvm2 libfuse2 dosfstools e2fsprogs libc-bin exfatprogs exfat-fuse util-linux fdisk parted bchunk build-essential libicu-dev pkg-config ffmpegthumbnailer binfmt-support libarchive-tools dmsetup $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Fedora-based system, do this instead
 elif [ -x "$(command -v dnf)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
         i386="glibc.i686"
     fi
     sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm 2>&1 | tee -a "${LOG_FILE}"
-    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl wget ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer libarchive bsdtar device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo dnf install -y gcc-c++ axel ImageMagick xxd python3 python3-devel python3-pip bc rsync curl ffmpeg lvm2 fuse-libs dosfstools e2fsprogs glibc-common exfatprogs fuse-exfat util-linux parted bchunk libicu-devel pkgconf ffmpegthumbnailer libarchive bsdtar device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Arch-based system, do this instead
 elif [ -x "$(command -v pacman)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
         i386="lib32-glibc"
     fi
-    sudo pacman -S --needed --noconfirm axel imagemagick xxd python pyenv python-pip bc rsync curl wget ffmpeg lvm2 fuse2 dosfstools e2fsprogs glibc exfatprogs util-linux parted bchunk base-devel icu pkgconf ffmpegthumbnailer libarchive device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo pacman -S --needed --noconfirm axel imagemagick xxd python pyenv python-pip bc rsync curl ffmpeg lvm2 fuse2 dosfstools e2fsprogs glibc exfatprogs util-linux parted bchunk base-devel icu pkgconf ffmpegthumbnailer libarchive device-mapper $i386 2>&1 | tee -a "${LOG_FILE}"
 # Or if user is on Gentoo-based system, do this instead
 elif [ -x "$(command -v emerge)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
@@ -186,7 +186,7 @@ EOF
             esac
         done
     fi
-    sudo emerge --sync && sudo USE='lvm' emerge --update --quiet --quiet-fail --changed-use --ask net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl net-misc/wget media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse:0 sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
+    sudo emerge --sync && sudo USE='lvm' emerge --update --quiet --quiet-fail --changed-use --ask net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse:0 sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
 elif [ -n "$IN_NIX_SHELL" ]; then
     echo Running in Nix environment - packages should be provided by flake and setup should not be run. >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_NIX]}"
