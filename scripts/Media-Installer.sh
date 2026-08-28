@@ -587,7 +587,7 @@ download_ps2str() {
     else
         echo "Downloading ps2str..." >> "${LOG_FILE}"
         echo "${UI_TEXT[DOWNLOAD_REQUIRED]}"
-        wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/ps2str_v1.08_2001.zip" https://archive.org/download/ps2str_v1.08_2001/ps2str_v1.08_2001.zip
+        curl -s -m 10 --retry 3 -o "${ASSETS_DIR}/ps2str_v1.08_2001.zip" https://archive.org/download/ps2str_v1.08_2001/ps2str_v1.08_2001.zip
         echo
         if [[ -s "${ASSETS_DIR}/ps2str_v1.08_2001.zip" ]]; then
             bsdtar -xf "${ASSETS_DIR}/ps2str_v1.08_2001.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
