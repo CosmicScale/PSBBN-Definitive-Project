@@ -526,7 +526,6 @@ check_dep(){
     check_cmd bc
     check_cmd rsync
     check_cmd curl
-    check_cmd wget
     check_cmd ffmpeg
     check_cmd lvm
     check_cmd timeout
@@ -914,7 +913,7 @@ else
     if [[ -n "$psbbn_version" || -n $osdmenu_version || -n "$LANG_VER" || -n "$CHAN_VER" ]]; then
 
         HTML_FILE=$(mktemp)
-        timeout 20 wget -O "$HTML_FILE" "$URL" -o - >> "$LOG_FILE" 2>&1
+        timeout 20 curl -sSL -o "$HTML_FILE" "$URL" >> "$LOG_FILE" 2>&1
 
         if [[ -n "$psbbn_version" ]]; then
             get_latest_file "psbbn-definitive-patch" "PSBBN Definitive Patch"
