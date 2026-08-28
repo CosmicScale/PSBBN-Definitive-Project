@@ -40,7 +40,6 @@
           bc
           rsync
           curl
-          wget
           exfatprogs
           ffmpeg
           parted
