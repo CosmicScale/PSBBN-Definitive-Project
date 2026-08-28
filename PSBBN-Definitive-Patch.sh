@@ -913,7 +913,7 @@ else
     if [[ -n "$psbbn_version" || -n $osdmenu_version || -n "$LANG_VER" || -n "$CHAN_VER" ]]; then
 
         HTML_FILE=$(mktemp)
-        timeout 20 curl -sSL -o "$HTML_FILE" "$URL" >> "$LOG_FILE" 2>&1
+        curl -sSL -m 20 -o "$HTML_FILE" "$URL" >> "$LOG_FILE" 2>&1
 
         if [[ -n "$psbbn_version" ]]; then
             get_latest_file "psbbn-definitive-patch" "PSBBN Definitive Patch"
