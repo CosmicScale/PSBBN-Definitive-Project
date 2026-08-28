@@ -1049,10 +1049,10 @@ fi
 if [ "$OS" = "PSBBN" ]; then
     # Download the HTML of the page
     HTML_FILE=$(mktemp)
-    timeout 20 wget -O "$HTML_FILE" "$URL" -o - >> "$LOG_FILE" 2>&1 &
-    WGET_PID=$!
+    curl -sSL -m 20 -o "$HTML_FILE" "$URL" >> "$LOG_FILE" 2>&1 &
+    CURL_PID=$!
 
-    spinner $WGET_PID "${UI_TEXT[VERSION_CHECK_PSBBN]}"
+    spinner $CURL_PID "${UI_TEXT[VERSION_CHECK_PSBBN]}"
 
     get_latest_file "psbbn-definitive-patch" "PSBBN Definitive Patch"
 
