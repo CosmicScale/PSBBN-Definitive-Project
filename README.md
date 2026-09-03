@@ -1153,7 +1153,7 @@ The full readme can be found [here](https://github.com/pcm720/OSDMenu/blob/main/
 **Warning: Manually creating new APA partitions on your PS2 drive and exceeding the allocated space for APA will corrupt the drive.**
 
 ## Early (SCPH-10000–18000) and Slim (SCPH-700xx) Consoles
-The **PSBBN Definitive Project** can be installed on PS2 Slim **SCPH-700xx** models with an [IDE Resurrector](https://gusse.in/shop/ps2-modding-parts/ide-resurrector-origami-v0-7-flex-cable-for-ps2-slim-spch700xx/) or similar hardware mod. Installing to an SD card is not supported on Windows. For PSBBN compatibility, an SATA adapter must be used, such as the [iFlash-Sata v10](https://www.iflash.xyz/store/iflash-sata-v10/).
+The **PSBBN Definitive Project** can be installed on PS2 Slim **SCPH-700xx** models with an [IDE Resurrector](https://gusse.in/shop/ps2-modding-parts/ide-resurrector-origami-v0-7-flex-cable-for-ps2-slim-spch700xx/) or similar hardware mod. Installing to an SD card is not supported on Windows. For PSBBN compatibility, a SATA adapter must be used, such as the [iFlash-Sata v10](https://www.iflash.xyz/store/iflash-sata-v10/).
 
 You must also download the [External HDD Drivers](https://israpps.github.io/FreeMcBoot-Installer/test/8_Downloads.html). Extract the files and place `hddload.irx`, `dev9.irx`, and `atad.irx` in the appropriate system folder for your region on an **official Sony PS2 Memory Card**:
 
