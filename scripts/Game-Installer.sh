@@ -469,11 +469,8 @@ process_psu_files() {
 }
 
 POPS_PATCH_DL() {
-    wget -O "$ASSETS_DIR/Hugopocked_POPStarter_Fixes.rar" "$(
-        wget -qO- 'https://www.mediafire.com/file/rznkr05pci45w5p/Hugopocked_POPStarter_Fixes_%25282023-08-11%2529.rar/file' \
-        | grep -o 'https://download[^"]*Hugopocked+POPStarter+Fixes+%282023-08-11%29.rar' | head -n1)"
-
-    unrar-free x "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" "$ASSETS_DIR"
+    curl -sSL -o "$ASSETS_DIR/Hugopocked_POPStarter_Fixes.rar" "$(curl -sL 'https://www.mediafire.com/file/rznkr05pci45w5p/Hugopocked_POPStarter_Fixes_%25282023-08-11%2529.rar/file' | grep -oE 'https://download[^\"]+' | head -n1)"
+    bsdtar -xf "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" -C "$ASSETS_DIR"
 }
 
 CREATE_PS1_VMC() {
@@ -920,7 +917,7 @@ install_pops() {
             if [[ -f "${ASSETS_DIR}/POPS-binaries-main.zip" && ! -f "${ASSETS_DIR}/POPS-binaries-main.zip.st" ]]; then
                 echo | tee -a "${LOG_FILE}"
                 echo "POPS-binaries-main.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     echo "[!] Warning: Failed to extract POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_1]}"
                 fi
@@ -932,7 +929,7 @@ install_pops() {
                     echo "[!] Warning: Failed to download POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "Failed to download POPS binaries."
                 fi
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_2]}"
                 fi
             fi
@@ -1431,7 +1428,7 @@ APP_ART() {
         echo "Created: ${SCRIPTS_DIR}/tmp/${pp_name}/jkt_001.png"  >> "${LOG_FILE}"
     elif [ ! -s "$png_file" ]; then
         echo "Artwork not found locally for $APP_ID. Attempting to download from the PSBBN art database..." >> "${LOG_FILE}"
-        wget --quiet --timeout=10 --tries=3 --output-document="$png_file" \
+        curl -s -m 10 --retry 3 -o "$png_file" \
         "https://raw.githubusercontent.com/CosmicScale/psbbn-art-database/main/apps/${APP_ID}.png"
         
         if [[ -s "$png_file" ]]; then
@@ -1706,15 +1703,15 @@ create_game_assets() {
                 if [[ -f "$png_file" ]]; then
                     echo "Artwork for $game_id already exists. Skipping download." >> "${LOG_FILE}"
                 else
-                    # Attempt to download artwork using wget
+                    # Attempt to download artwork using curl
                     echo -n "Artwork not found locally. Attempting to download from the PSBBN art database..." >> "${LOG_FILE}"
                     echo >> "${LOG_FILE}"
-                    wget --quiet --timeout=10 --tries=3 --output-document="$png_file" \
+                    curl s -m 10 --retry 3 -o "$png_file" \
                     "https://raw.githubusercontent.com/CosmicScale/psbbn-art-database/main/art/${game_id}.png"
                     if [[ -s "$png_file" ]]; then
                         echo "[✓] Successfully downloaded artwork for $game_id" >> "${LOG_FILE}"
                     else
-                        # If wget fails, run the art downloader
+                        # If curl fails, run the art downloader
                         [[ -f "$png_file" ]] && rm -f "$png_file"
                         echo "Trying IGN for $game_id" >> "${LOG_FILE}"
                         "${HELPER_DIR}/art_downloader.py" "$game_id" 2>&1 >> "${LOG_FILE}"
@@ -1782,14 +1779,14 @@ create_game_assets() {
             ico_file="${ICONS_DIR}/ico/$game_id.ico"
             
             if [[ ! -s "$ico_file" ]]; then
-                # Attempt to download icon using wget
+                # Attempt to download icon using curl
                 echo -n "Icon not found locally for $game_id. Attempting to download from the HDD-OSD icon database..." >> "${LOG_FILE}"
-                wget --quiet --timeout=10 --tries=3 --output-document="$ico_file" \
+                curl -s -m 10 --retry 3 -o "$ico_file" \
                 "https://raw.githubusercontent.com/CosmicScale/HDD-OSD-Icon-Database/main/ico/${game_id}.ico"
                 if [[ -s "$ico_file" ]]; then
                     echo "[✓] Successfully downloaded icon for ${game_id}." >> "${LOG_FILE}"
                 else
-                    # If wget fails, run the art downloader
+                    # If curl fails, run the art downloader
                     [[ -f "$ico_file" ]] && rm -f "$ico_file"
 
                     png_file_cov="${TOOLKIT_PATH}/icons/ico/tmp/${game_id}_COV.png"
@@ -1803,18 +1800,18 @@ create_game_assets() {
                     fi
 
                     if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
-                        wget --quiet --timeout=10 --tries=3 --output-document="${png_file_cov}" \
+                        curl -s -m 10 --retry 3 -o "${png_file_cov}" \
                         "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV.png"
                         if [[ -s "$png_file_cov" ]]; then
-                            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cov2" \
+                            curl -s -m 10 --retry 3 -o "$png_file_cov2" \
                             "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV2.png"
-                            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_lab" \
+                            curl -s -m 10 --retry 3 -o "$png_file_lab" \
                             "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_LAB.png"
                         fi
                     elif [[ -s "$png_file_cov"  ]]; then
-                        wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cov2" \
+                        curl -s -m 10 --retry 3 -o "$png_file_cov2" \
                         "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_COV2.png"
-                        wget --quiet --timeout=10 --tries=3 --output-document="$png_file_lab" \
+                        curl -s -m 10 --retry 3 -o "$png_file_lab" \
                         "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_LAB.png"
                     fi
 
@@ -3012,11 +3009,11 @@ if [ -f "${PS2_LIST}" ]; then
         if [[ -f "$png_file_cover" ]]; then
             echo "OPL Artwork for $game_id already exists. Skipping download." >> "${LOG_FILE}"
         else
-            # Attempt to download artwork using wget
+            # Attempt to download artwork using curl
             echo "OPL Artwork not found locally for $game_id. Attempting to download from archive.org..." >> "${LOG_FILE}"
-            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cover" \
+            curl -s -m 10 --retry 3 -o "$png_file_cover" \
             "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_COV.png"
-            #wget --quiet --timeout=10 --tries=3 --output-document="$png_file_disc" \
+            #curl -s -m 10 --retry 3 -o "$png_file_disc" \
             #"https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_ICO.png"
 
             missing_files=()
@@ -3069,9 +3066,9 @@ if [ -f "${ATA_POPS_LIST}" ]; then
         if [[ -f "$png_file_cover" ]]; then
             echo "POPSLoader Artwork for $filename already exists. Skipping download." >> "${LOG_FILE}"
         else
-            # Attempt to download artwork using wget
+            # Attempt to download artwork using curl
             echo "POPSLoader Artwork not found locally for $filename. Attempting to download from archive.org..." >> "${LOG_FILE}"
-            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cover" \
+            curl -s -m 10 --retry 3 -o "$png_file_cover" \
             "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV.png"
 
             missing_files=()
@@ -3943,9 +3940,9 @@ cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
 
 cd "${ICONS_DIR}/ico/tmp/"
 rm *.png >/dev/null 2>&1
-zip -r "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
 cd "${ARTWORK_DIR}/tmp/" 
-zip -r "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
 
 if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
     echo "Contributing to the PSBBN art & HDD-OSD databases..." >> "${LOG_FILE}"

@@ -367,14 +367,14 @@ download_files() {
         # Check if extras.zip exists
         if [[ -f "${ASSETS_DIR}/extras.zip" && ! -f "${ASSETS_DIR}/extras.zip.st" ]]; then
             echo "extras.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-            unzip -o "${ASSETS_DIR}/extras.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+            bsdtar -xf "${ASSETS_DIR}/extras.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
         else
             echo "Downloading..." >> "${LOG_FILE}"
             echo -n "${UI_TEXT[DOWNLOAD_LATEST_FILE_2]}..."
-            wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/extras.zip" https://archive.org/download/psbbn-definitive-english-patch-v2/extras.zip
+            curl -s -m 10 --retry 3 -o "${ASSETS_DIR}/extras.zip" https://archive.org/download/psbbn-definitive-english-patch-v2/extras.zip
             echo
             if [[ -s "${ASSETS_DIR}/extras.zip" ]]; then
-                unzip -o "${ASSETS_DIR}/extras.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+                bsdtar -xf "${ASSETS_DIR}/extras.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
             else
                 rm "${ASSETS_DIR}/extras.zip"
                 echo "[X] Error: Download failed for HDD-OSD." >> "${LOG_FILE}" 2>&1

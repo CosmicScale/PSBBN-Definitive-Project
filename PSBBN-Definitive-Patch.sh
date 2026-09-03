@@ -526,9 +526,6 @@ check_dep(){
     check_cmd bc
     check_cmd rsync
     check_cmd curl
-    check_cmd zip
-    check_cmd unzip
-    check_cmd wget
     check_cmd ffmpeg
     check_cmd lvm
     check_cmd timeout
@@ -540,7 +537,7 @@ check_dep(){
     check_cmd bchunk
     check_cmd pkg-config
     check_cmd ffmpegthumbnailer
-    check_cmd unrar-free
+    check_cmd bsdtar
     check_cmd dmsetup
 
     if ! pkg-config --exists icu-i18n 2>/dev/null; then
@@ -916,7 +913,7 @@ else
     if [[ -n "$psbbn_version" || -n $osdmenu_version || -n "$LANG_VER" || -n "$CHAN_VER" ]]; then
 
         HTML_FILE=$(mktemp)
-        timeout 20 wget -O "$HTML_FILE" "$URL" -o - >> "$LOG_FILE" 2>&1
+        curl -sSL -m 20 -o "$HTML_FILE" "$URL" >> "$LOG_FILE" 2>&1
 
         if [[ -n "$psbbn_version" ]]; then
             get_latest_file "psbbn-definitive-patch" "PSBBN Definitive Patch"
