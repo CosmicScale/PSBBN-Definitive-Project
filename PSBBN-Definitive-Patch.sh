@@ -526,8 +526,6 @@ check_dep(){
     check_cmd bc
     check_cmd rsync
     check_cmd curl
-    check_cmd zip
-    check_cmd unzip
     check_cmd wget
     check_cmd ffmpeg
     check_cmd lvm
@@ -540,7 +538,7 @@ check_dep(){
     check_cmd bchunk
     check_cmd pkg-config
     check_cmd ffmpegthumbnailer
-    check_cmd unrar-free
+    check_cmd bsdtar
     check_cmd dmsetup
 
     if ! pkg-config --exists icu-i18n 2>/dev/null; then

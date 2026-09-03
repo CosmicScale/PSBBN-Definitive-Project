@@ -583,14 +583,14 @@ download_ps2str() {
     if [[ -f "${ASSETS_DIR}/ps2str_v1.08_2001.zip" ]]; then
       echo "Found ${ASSETS_DIR}/ps2str_v1.08_2001.zip..." >> "${LOG_FILE}"
         echo "${UI_TEXT[GET_LATEST_FILE_1]} ${ASSETS_DIR}/ps2str_v1.08_2001.zip..."
-        unzip -o "${ASSETS_DIR}/ps2str_v1.08_2001.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+        bsdtar -xf "${ASSETS_DIR}/ps2str_v1.08_2001.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
     else
         echo "Downloading ps2str..." >> "${LOG_FILE}"
         echo "${UI_TEXT[DOWNLOAD_REQUIRED]}"
         wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/ps2str_v1.08_2001.zip" https://archive.org/download/ps2str_v1.08_2001/ps2str_v1.08_2001.zip
         echo
         if [[ -s "${ASSETS_DIR}/ps2str_v1.08_2001.zip" ]]; then
-            unzip -o "${ASSETS_DIR}/ps2str_v1.08_2001.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+            bsdtar -xf "${ASSETS_DIR}/ps2str_v1.08_2001.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
         fi
     fi
 }
