@@ -153,7 +153,6 @@ elif [ -x "$(command -v emerge)" ]; then
         echo "Error: Failed to load the 'dm_mod' kernel module." >&2
         exit 1
         fi
-    fi
     else
     # If it's not present at all, halt and throw this error message
     echo "Error: device-mapper (CONFIG_BLK_DEV_DM) is missing from your kernel." >&2
