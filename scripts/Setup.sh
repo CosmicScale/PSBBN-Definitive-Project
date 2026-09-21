@@ -163,7 +163,7 @@ fi
         echo "Failed to activate the Python virtual environment." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_2]}"
     }
-    pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth >> "${LOG_FILE}" || {
+    pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth pycryptodome >> "${LOG_FILE}" || {
         echo "Failed to install Python dependencies." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_3]}"
     }

@@ -779,6 +779,9 @@ Installs PS1 and PS2 games, plus homebrew apps.
     4. [Change Screen Settings](#change-screen-settings)
     5. [Clear Art & Icon Cache](#clear-art--icon-cache)
 
+7. [Install PlayOnline](#install-playonline)  
+Installs the PlayOnline Viewer and its games from your own disc images
+
 ## Install PSBBN and HOSDMenu
 This option installs both [PSBBN](#psbbn) and [HOSDMenu](#hosdmenu). An official Sony Network Adapter is required[*](#known-issues). The installer performs the following actions:
 - Formats the drive for a clean installation
@@ -976,6 +979,60 @@ This setting is used by some games and [HOSDMenu](#hosdmenu). It does not change
 This option removes all game artwork and icons that are stored locally on your PC. When you next run the game installer, it will scan your game collection, then download and apply fresh copies of the required artwork and icons.  
 
 You might want to clear the cache if games display incorrect or low-quality artwork, as updated artwork may now be available.
+
+## Install PlayOnline
+**NOTE: This feature is new and should be considered experimental. See [PlayOnline Status](#playonline-status) below.**
+
+PlayOnline was Square Enix's online service for the PS2 and the home of *Final Fantasy XI*. The **Install PlayOnline** option installs the PlayOnline Viewer and its games to the PS2 drive from your own disc images, alongside everything else PSBBN or HOSDMenu has installed. The games then appear in the [Game Collection](#game-collection) and in [HOSDMenu](#hosdmenu) like any other HDD title.
+
+Unlike other PS2 games, PlayOnline titles cannot be launched from OPL or NHDDL. Each disc carries an installer rather than a game that runs from the disc, and the installed files are normally tied to an official Sony HDD. This option performs the installation on your PC instead, and makes the result work on any drive supported by the PSBBN Definitive Project.
+
+### PlayOnline Requirements
+- A drive with [PSBBN](#install-psbbn-and-hosdmenu) or [HOSDMenu](#install-hosdmenu-only) already installed
+- Free space in the PS2 partition area of the drive. A full install of every title needs roughly 18 GB (*Final Fantasy XI* takes 8 GB, *Front Mission Online* and *Dirge of Cerberus* 4 GB each). The Viewer, *Tetra Master* and *JongHoLow* together fit in under 2 GB
+- Your own disc images, placed in the `POL` folder inside your `games` folder. `.iso`, `.img`, `.bin` and `.chd` files are supported. A `.chd` file is extracted once, next to the original, which needs free space for the full-size image
+- A community-run PlayOnline server to connect to. Square Enix's PS2 service has closed, so the games cannot go online without one
+
+The following discs are recognised:
+
+| Disc | Region | Supplies |
+|---|---|---|
+| PlayOnline Viewer & Tetra Master (`SLPS-20200`) | Japan | Viewer, *Tetra Master*, *JongHoLow* |
+| PlayOnline Viewer and Tetra Master (`SCUS-97269`) | USA | Viewer, *Tetra Master* |
+| Final Fantasy XI: Vana'diel Collection 2008 (`SLUS-21704`) | USA | Viewer, *Tetra Master*, *Final Fantasy XI* |
+| Dirge of Cerberus: Final Fantasy VII (`SLPM-66271`) | Japan | Viewer, *Tetra Master*, *JongHoLow*, *Dirge of Cerberus* online mode |
+| Front Mission Online (`SLPM-65981`) | Japan | *Front Mission Online* |
+
+When more than one disc supplies the same title, the newest build is used. *Vana'diel Collection 2008* is the recommended source for the US Viewer, and the *Dirge of Cerberus* disc is the recommended source for the Japanese one.
+
+### Installing PlayOnline
+1. Copy your disc images to the `games/POL` folder
+2. Select **Install PlayOnline** from the main menu
+3. Choose which PlayOnline Viewer the drive should have, US or Japanese. A drive has one Viewer. The US Viewer can launch the US titles and the Japan-only titles. The Japanese Viewer launches the Japanese titles only
+4. Choose the titles to install. The Viewer is always installed, because it is what launches the games
+5. Review the list of partitions that will be created, and confirm
+
+Nothing already on the drive is modified. A title that is already installed is skipped, so your saves and any updates are kept. If you run the option again you will be offered the chance to refresh installed titles from your discs.
+
+**Notes:**
+- When the US Viewer is chosen, the Japan-only titles are given English names: *JongHoLow* (雀鳳楼), *FRONT MISSION ONLINE* and *Dirge of Cerberus -FFVII-*
+- A file named `playonline.hddid` is created in `games/POL`. **Keep this file.** It holds the drive identity that the PlayOnline install on this drive depends on
+- *Final Fantasy XI* is a large install of more than 26,000 files and takes a long time to write
+- Before the installer adds the `__net` partition that PlayOnline requires, the partition table sectors it changes are backed up to the `logs/playonline-backups` folder
+
+### Connecting to a server
+**IMPORTANT: Do not let a console with PlayOnline installed reach Square Enix's own servers.** Their PS2 patch servers still respond, and the update they deliver is the 2015 end-of-service patch, which disables the Viewer. Before launching the Viewer for the first time, set your console's DNS server, or your router's, to the one provided by the community server you intend to use, so that the PlayOnline host names resolve to that server.
+
+As a safeguard, the installer sets the Viewer's update server to `play.openlobby.fyi`, the [PrettyOpenLobby](https://github.com/PrettyOpenLobby) community server, so that an installed Viewer never asks Square Enix's servers for updates. To use a different server, set the `POL_PATCH_HOST` environment variable to its host name before running the script.
+
+In the Viewer's network settings, create a connection as you would for any PS2 online game. How accounts are created depends on the server you use.
+
+### PlayOnline Status
+The installer has been tested on a real console with a third-party SSD, using the US Viewer from *Vana'diel Collection 2008*. The Viewer starts from the [Game Collection](#game-collection) and from [HOSDMenu](#hosdmenu), updates and logs in, and every title installs. The Japanese Viewer has been tested under the PCSX2 emulator only.
+
+Whether a game can be played online, and how far, depends on the server you connect to and not on the installer. Check your server's own documentation for the state of each game.
+
+Technical documentation can be found in [scripts/helper/playonline/DESIGN.md](scripts/helper/playonline/DESIGN.md).
 
 # User Guide
 

@@ -1,0 +1,56 @@
+name: PlayOnline installer
+
+# The PlayOnline installer's own checks. None of them needs a drive, a disc
+# image or anything of Square Enix's.
+
+on:
+  push:
+    paths:
+      - 'scripts/helper/playonline/**'
+      - 'scripts/PlayOnline-Installer.sh'
+      - '.github/workflows/playonline.yml'
+  pull_request:
+    paths:
+      - 'scripts/helper/playonline/**'
+      - 'scripts/PlayOnline-Installer.sh'
+      - '.github/workflows/playonline.yml'
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install what the crypto modules need
+        run: pip install pycryptodome
+
+      - name: Shell syntax
+        run: bash -n scripts/PlayOnline-Installer.sh
+
+      - name: Every UI string the step prints is defined
+        run: |
+          python3 - <<'PY'
+          import io, re, sys
+          sh = io.open("scripts/PlayOnline-Installer.sh", encoding="utf-8").read()
+          used = sorted(set(re.findall(r"UI_TEXT\[([A-Z0-9_]+)\]", sh)))
+          have = set(re.findall(r"^([A-Z0-9_]+)=",
+                                io.open("scripts/assets/lang/eng.txt",
+                                        encoding="utf-8-sig").read(), re.M))
+          missing = [k for k in used if k not in have]
+          print("%d keys used, %d missing" % (len(used), len(missing)))
+          for k in missing:
+              print("  missing:", k)
+          sys.exit(1 if missing else 0)
+          PY
+
+      - name: Nothing of Sony's or Square Enix's is committed
+        working-directory: scripts/helper
+        run: python3 -m playonline.shipcheck
+
+      - name: Selftest
+        working-directory: scripts/helper
+        run: python3 -m playonline.selftest
