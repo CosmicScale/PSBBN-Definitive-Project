@@ -582,12 +582,21 @@ function main {
 
   # the line above is a shell || chain: when the update path fails, the clone
   # fallback fails too because the folder is already there, and the toolkit would
-  # then be run from whatever stale tree is in ~. Confirm the branch before that.
+  # then be run from whatever stale tree is in ~.
+  #
+  # Checking the branch name alone is not enough. Once a clone is on $gitBranch
+  # it stays on it, so a checkout that fails on a later run leaves the name
+  # matching while the tree sits on an older commit, and the run silently uses
+  # code that was meant to be replaced. Compare the commit as well.
   $repoBranch = (wsl -d $wslLabel --cd "~/PSBBN-Definitive-Project" -- git rev-parse --abbrev-ref HEAD) -join ""
-  if ($repoBranch.Trim() -ne $gitBranch) {
+  $repoHead   = (wsl -d $wslLabel --cd "~/PSBBN-Definitive-Project" -- git rev-parse HEAD) -join ""
+  $repoWant   = (wsl -d $wslLabel --cd "~/PSBBN-Definitive-Project" -- git rev-parse origin/$gitBranch) -join ""
+  if ($repoBranch.Trim() -ne $gitBranch -or $repoHead.Trim() -eq "" -or $repoHead.Trim() -ne $repoWant.Trim()) {
     Write-Host "
-    Could not put ~/PSBBN-Definitive-Project on branch '$gitBranch'.
-    It is on '$repoBranch'.
+    Could not put ~/PSBBN-Definitive-Project on the latest '$gitBranch'.
+    branch: '$repoBranch'
+    commit: '$repoHead'
+    wanted: '$repoWant'
     Delete it inside WSL and run this script again:
       wsl -d $wslLabel -- rm -rf ~/PSBBN-Definitive-Project
     " -ForegroundColor Red
