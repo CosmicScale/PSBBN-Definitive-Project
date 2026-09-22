@@ -208,6 +208,8 @@ troubleshooting, and the README mentions only `POL_PATCH_HOST`.
 | `POL_ROUTE_MODE=plaintext` or `transcrypt` | the module mode, when the Viewer is already on the drive and its mode cannot be read |
 | `POL_NO_ROUTE=1` | installs titles in disc form; they will not start |
 | `POL_HDDID=file` | where the HDD ID file is kept |
+| `POL_CONSOLE=us` or `jp` | answers the console region question, which picks the loader. This is the console's MagicGate zone, not the Viewer's region |
+| `POL_LOADER=file` | a loader KELF to use instead of the shipped one, such as a `VERBOSE=1` build |
 | `POL_RESYNC=1` or `0` | answers the refresh question on a second run |
 
 ## Checks

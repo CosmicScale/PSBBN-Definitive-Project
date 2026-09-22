@@ -513,3 +513,4 @@ POL_CHD_TOOL=chdman (mame-tools) wird installiert, um .chd-Images zu lesen...
 POL_CHD_EXTRACT=.chd-Images werden entpackt. Das geschieht nur einmal und kann einige Minuten dauern:
 POL_CHD_FAILED=Ein .chd-Image konnte nicht entpackt werden und wird übersprungen. Entpacke es mit chdman oder verwende ein .iso- oder .bin-Image.
 POL_REPORT_WRITTEN=Ein Bericht, den Sie senden können, wurde geschrieben nach
+POL_SELECT_CONSOLE=Aus welcher Region stammt die PS2-Konsole für dieses Laufwerk, US oder japanisch? [U/j]

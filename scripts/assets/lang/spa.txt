@@ -514,3 +514,4 @@ POL_CHD_TOOL=Instalando chdman (mame-tools) para leer imágenes .chd...
 POL_CHD_EXTRACT=Extrayendo las imágenes .chd. Se hace una sola vez y puede tardar unos minutos:
 POL_CHD_FAILED=No se pudo extraer una imagen .chd y se omitirá. Extráela con chdman o usa una imagen .iso o .bin.
 POL_REPORT_WRITTEN=Se ha guardado un informe que puedes enviar en
+POL_SELECT_CONSOLE=¿De qué región es la consola PS2 en la que se usará esta unidad, US o japonesa? [U/j]

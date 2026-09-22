@@ -513,3 +513,4 @@ POL_CHD_TOOL=.chdイメージを読み込むためにchdman (mame-tools) をイ�
 POL_CHD_EXTRACT=.chdイメージを展開しています。この処理は一度だけ行われ、数分かかることがあります:
 POL_CHD_FAILED=.chdイメージを展開できなかったため、スキップします。chdmanで展開するか、.isoまたは.binイメージを使用してください。
 POL_REPORT_WRITTEN=送信できるレポートを次の場所に書き出しました:
+POL_SELECT_CONSOLE=このドライブを使うPS2本体は、US版と日本版のどちらですか? [U/j]

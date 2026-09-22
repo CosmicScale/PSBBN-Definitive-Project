@@ -184,6 +184,8 @@ write_report() {
         echo "discs:   ${DISC_DIR}"
         echo "drive:   ${DEVICE:-none chosen}"
         echo "region:  ${REGION:-not reached}"
+        echo "console: ${CONSOLE_REGION:-not asked}"
+        echo "loader:  ${LOADER_KELF:-none}"
         echo "keyed:   $([[ "${ROUTE_READY:-0}" -eq 1 ]] && echo "yes" || echo "no - the titles will not start")"
         echo "mode:    ${ROUTE_MODE:-none}"
         echo
@@ -441,7 +443,34 @@ ROUTE_READY=0
 ROUTE_MISSING=()
 HDDID_FILE="${POL_HDDID:-${DISC_DIR}/playonline.hddid}"
 DERIVE_ELF="${WORK_DIR}/derivation.elf"
-LOADER_KELF="${SCRIPTS_DIR}/assets/playonline/polbbnexec.kelf"
+# The loader is a signed KELF, and a KELF carries the MagicGate zone of the
+# disc it was signed from: Square Enix's US dnasload.elf is AppType 0x0B in
+# zone 0x2, the Japanese one AppType 0x01 in zone 0x1. A console opens a KELF
+# only for its own zone, and it checks before any of this runs, so a loader
+# from the wrong zone drops straight back to the browser with nothing drawn.
+# polkelf cannot widen a zone, so there is one signed loader per console
+# region.
+#
+# This is the console's region, not the disc's. They are independent: a
+# Japanese console runs the US Viewer perfectly well, and it needs the
+# Japanese loader to do it. REGION above is the Viewer's and decides the
+# titles; this decides which loader can open at all.
+CONSOLE_REGION="${POL_CONSOLE:-}"
+if [[ -z "${CONSOLE_REGION}" ]]; then
+    printf "%s " "${UI_TEXT[POL_SELECT_CONSOLE]}"
+    read -r answer </dev/tty
+    case "$answer" in
+        [Jj]*) CONSOLE_REGION=jp ;;
+        *)     CONSOLE_REGION=us ;;
+    esac
+fi
+LOADER_KELF="${POL_LOADER:-${SCRIPTS_DIR}/assets/playonline/polbbnexec-${CONSOLE_REGION}.kelf}"
+# The toolkit shipped a single loader before it shipped one per region, and
+# that file is the Japanese-zoned build. A US console has no fallback on
+# purpose: using the Japanese one would install a Viewer that cannot start.
+if [[ -z "${POL_LOADER}" && ! -f "${LOADER_KELF}" && "${CONSOLE_REGION}" == "jp" ]]; then
+    LOADER_KELF="${SCRIPTS_DIR}/assets/playonline/polbbnexec.kelf"
+fi
 # Every title on a drive has to be in the same mode as the Viewer partition:
 # a plaintext Viewer opens plain title modules and a keyed one opens keyed
 # ones. The mode is read off the Viewer as it is prepared. When the Viewer is
