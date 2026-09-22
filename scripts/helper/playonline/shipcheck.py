@@ -59,7 +59,13 @@ ADDED = [
 LOADER_BINARY = "polbbnexec.kelf"
 # The same loader, unsigned, for the emulator image tool: PCSX2 has no
 # MagicGate keys and can only run the plain ELF. It gets the same checks.
-LOADER_BINARIES = (LOADER_BINARY, "polbbnexec.elf")
+#
+# A KELF opens only on its own MagicGate zone, so the same payload is signed
+# once per console region and shipped as polbbnexec-<region>.kelf. The content
+# of every one of them is byte-identical to polbbnexec.elf; only the 32-byte
+# header, which the signing template lends, differs.
+LOADER_BINARIES = (LOADER_BINARY, "polbbnexec.elf",
+                   "polbbnexec-us.kelf", "polbbnexec-jp.kelf")
 
 # `out` holds loader-src/build.sh's build products and is listed in
 # .gitignore.
