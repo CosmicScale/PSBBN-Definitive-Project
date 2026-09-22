@@ -249,6 +249,19 @@ while IFS='|' read -r key disc part need status ver build; do
 done < <(pol sources --plain "${DISC_DIR}" 2>>"${LOG_FILE}" | tr -d '\r')
 
 if [[ ${#ORDER[@]} -eq 0 ]]; then
+    # `pol sources` collects the reason a disc was rejected and then drops it,
+    # so on its own this error cannot tell an unrecognised disc from an empty
+    # folder from a disc that was never read. `pol discs` prints one line per
+    # image, including why each one was skipped. When it prints nothing at all
+    # the folder held no file with a disc image extension, and the listing is
+    # what says so.
+    echo "${UI_TEXT[POL_DISCS_FOUND]} ${DISC_DIR}"
+    disc_report=$(pol discs "${DISC_DIR}" 2>&1)
+    if [[ -n "${disc_report}" ]]; then
+        printf '%s\n' "${disc_report}" | tee -a "${LOG_FILE}" | sed 's/^/  /'
+    else
+        ls -la "${DISC_DIR}" 2>&1 | tee -a "${LOG_FILE}" | sed 's/^/  /'
+    fi
     error_msg "${UI_TEXT[POL_NOTHING_TO_DO]}"
 fi
 
