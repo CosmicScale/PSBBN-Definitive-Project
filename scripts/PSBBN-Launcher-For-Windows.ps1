@@ -23,8 +23,10 @@ $oplVolumeName = "OPL"
 # a list of subfolders to be created in the main folder if missing
 $defaultFolders = @('DVD', 'CD', 'POPS', 'APPS', 'music', 'movie', 'photo')
 
-# the specific git branch to be checked out
-$gitBranch = "main"
+# the git repository and branch the toolkit is cloned from. The PlayOnline
+# build lives on a fork; upstream's main has no option 7.
+$gitRepo = "https://github.com/PSChuze/PSBBN-Definitive-Project.git"
+$gitBranch = "playonline"
 
 # the console size that is set at the start of the script
 $consoleWidth = 110
@@ -560,19 +562,37 @@ function main {
     `&`& `( `
       mv ./PSBBN-Definitive-English-Patch ./PSBBN-Definitive-Project `
       `&`& cd PSBBN-Definitive-Project/ `
-      `&`& git remote set-url origin https://github.com/CosmicScale/PSBBN-Definitive-Project.git `
+      `&`& git remote set-url origin $gitRepo `
     `)
 
-  # clone the PSBBN repo into ~, or pull if it's already there
+  # clone the PSBBN repo into ~, or move an existing clone onto $gitRepo/$gitBranch.
+  # An existing clone was made by an earlier version of this script and still has
+  # upstream as its origin, so the remote is repointed before the fetch; without
+  # that the fetch asks upstream for a branch it does not have. checkout -B forces
+  # the branch to what was just fetched, which also covers a clone sitting on main.
   Write-Host
   wsl -d $wslLabel --cd "~" -- [ -d PSBBN-Definitive-Project/.git ] `
     `&`& `( `
       cd PSBBN-Definitive-Project/ `
+      `&`& git remote set-url origin $gitRepo `
       `&`& git fetch origin $gitBranch `
-      `&`& git checkout $gitBranch `
-      `&`& git pull --ff-only `
+      `&`& git checkout -B $gitBranch origin/$gitBranch `
     `) `
-    `|`| git clone -b $gitBranch https://github.com/CosmicScale/PSBBN-Definitive-Project.git
+    `|`| git clone -b $gitBranch $gitRepo
+
+  # the line above is a shell || chain: when the update path fails, the clone
+  # fallback fails too because the folder is already there, and the toolkit would
+  # then be run from whatever stale tree is in ~. Confirm the branch before that.
+  $repoBranch = (wsl -d $wslLabel --cd "~/PSBBN-Definitive-Project" -- git rev-parse --abbrev-ref HEAD) -join ""
+  if ($repoBranch.Trim() -ne $gitBranch) {
+    Write-Host "
+    Could not put ~/PSBBN-Definitive-Project on branch '$gitBranch'.
+    It is on '$repoBranch'.
+    Delete it inside WSL and run this script again:
+      wsl -d $wslLabel -- rm -rf ~/PSBBN-Definitive-Project
+    " -ForegroundColor Red
+    Exit
+  }
 
   if (-Not ($isWslInstalled)) {
     Write-Host "------- Linux magic finishes ---------`n"
