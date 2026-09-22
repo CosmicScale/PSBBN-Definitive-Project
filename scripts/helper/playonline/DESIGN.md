@@ -183,6 +183,36 @@ Vana'diel Collection 2008 pairs a 2004 boot module with 2007 data whose
 copied from the disc's own `ROM/0/1.DAT`.
 
 
+## The boot trace
+
+A console that stops owns the screen, and the power cycle that follows clears
+IOP RAM, so the only record that survives is one on the disk. The installer
+writes `/trace.bin` into the Viewer partition, blank but for the magic in
+`loader-src/poltrace.h`, and reads it back on every later run into the report
+it leaves in the POL folder. `poltrace.py` is the reader.
+
+The magic is the safety catch. A diagnostic loader reads the sector before its
+first write and refuses unless the magic is already there, so a wrong location
+costs one harmless read on a user's real drive and nothing else. Exactly one
+sector is ever written, always the same one.
+
+The PC side is finished and does nothing harmful on a loader that has no trace
+in it: the record stays blank and the report says so, which is itself an answer
+when a title returns to the browser having drawn nothing.
+
+What the loader still needs, which is one build:
+
+* take the trace sector from a fillable payload slot rather than the
+  compile-time `-DTRACE_LBA`, since the sector differs per drive and the
+  installer already fills slots (the boot ELF, the IOPRP image, the HDD ID)
+  the same way;
+* the installer then writes the LBA of `/trace.bin` into that slot when it
+  prepares the Viewer, the way it writes the HDD ID.
+
+Until then `build.sh` builds with `TRACE_LBA=0`, which disables the channel
+completely, and `POL_LOADER` is the way to put a diagnostic build on a drive
+without replacing the shipped one.
+
 ## The Viewer's registry
 
 The Viewer decides whether a title is installed from `pub/all/install.inf`,

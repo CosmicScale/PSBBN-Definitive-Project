@@ -196,7 +196,16 @@ write_report() {
                 && { polroot inspect "${DEVICE}" 2>&1
                      echo
                      echo "--- __net ---"
-                     polsudo netpart "${DEVICE}" --verify 2>&1; } \
+                     polsudo netpart "${DEVICE}" --verify 2>&1
+                     # What the console recorded while it booted, if the
+                     # loader on it writes a trace. A blank record is itself
+                     # an answer: the boot never reached the trace.
+                     if [[ -n "${VIEWER_KEY}" && -n "${TITLE_PART[${VIEWER_KEY}]:-}" ]]; then
+                         echo
+                         echo "--- boot trace ---"
+                         polsudo poltrace "${DEVICE}" \
+                             --partition "${TITLE_PART[${VIEWER_KEY}]}" 2>&1
+                     fi; } \
                 || echo "(skipped: needs a password this late in the run)"
             echo
         fi
@@ -754,6 +763,20 @@ for k in "${ORDER[@]}"; do
     # driver lays a volume out across them. playonline.pfsput writes the
     # command list, and build --populated then writes what pfsshell does
     # not: the header password and the browser entry.
+    # One 512-byte sector in the Viewer partition for the console to record
+    # how far it got. A console that stops owns the screen and a power cycle
+    # clears IOP RAM, so the disk is the only thing that survives; this file
+    # is where it lands, and the installer reads it back on every later run
+    # into the report. Blank but for its magic, which is what lets the loader
+    # arm: it reads the sector first and will not write without it, so a wrong
+    # location costs one harmless read. See poltrace.py and loader-src/poltrace.h.
+    if [[ "$k" == viewer-* ]]; then
+        polmod poltrace --partition "$part" --blank "${WORK_DIR}/$k/trace.bin" \
+            "$DEVICE" >> "${LOG_FILE}" 2>&1 \
+            || echo "[!] could not stage trace.bin; the boot trace will be absent." \
+                   >> "${LOG_FILE}"
+    fi
+
     echo "${UI_TEXT[POL_DOING_WRITE]} $k"
     rm -rf "${WORK_DIR}/$k-extras" "${WORK_DIR}/$k-pfsshell.txt"
     mkdir -p "${WORK_DIR}/$k-extras"
