@@ -61,8 +61,16 @@ shift
 
 if [[ -n "$1" ]] && [[ "$1" == /* ]]; then
     path_arg="$1"
-    [[ -d "${path_arg}/POL" ]] && DISC_DIR="${path_arg}/POL"
-    [[ -n "${POL_DISC_DIR}" ]] && DISC_DIR="${POL_DISC_DIR}"
+    # The Game Installer takes the path the launcher passes as the games folder
+    # itself and puts its subfolders under it, so POL belongs under it too.
+    #
+    # Accepting it only when it already existed meant a user whose POL folder
+    # was anywhere else silently fell back to <toolkit>/games/POL, which on a
+    # Windows install is inside the WSL filesystem and not somewhere they can
+    # reach from Explorer. They were then told no usable discs were found while
+    # their disc sat in the folder they had picked. Name the folder under the
+    # path instead, so the "put your discs in" message points somewhere real.
+    DISC_DIR="${path_arg}/POL"
 fi
 [[ -n "${POL_DISC_DIR}" ]] && DISC_DIR="${POL_DISC_DIR}"
 
