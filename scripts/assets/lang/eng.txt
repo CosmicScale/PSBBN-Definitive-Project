@@ -514,3 +514,6 @@ POL_CHD_EXTRACT=Extracting .chd images. This is done once and can take a few min
 POL_CHD_FAILED=A .chd image could not be extracted and will be skipped. Extract it with chdman, or use an .iso or .bin image.
 POL_REPORT_WRITTEN=A report you can send was written to
 POL_SELECT_CONSOLE=Which region is the PS2 console this drive will be used in, US or Japanese? [U/j]
+POL_SKIP_NOROOM=Not enough free space, skipping:
+POL_SKIPPED_NOROOM=Not installed, for lack of space:
+POL_SKIPPED_RETRY=Free space in the PS2 partition area and run this option again to add them.

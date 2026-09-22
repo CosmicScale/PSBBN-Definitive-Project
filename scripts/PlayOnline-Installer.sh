@@ -186,6 +186,7 @@ write_report() {
         echo "region:  ${REGION:-not reached}"
         echo "console: ${CONSOLE_REGION:-not asked}"
         echo "loader:  ${LOADER_KELF:-none}"
+        echo "skipped: ${SKIPPED[*]:-none}"
         echo "keyed:   $([[ "${ROUTE_READY:-0}" -eq 1 ]] && echo "yes" || echo "no - the titles will not start")"
         echo "mode:    ${ROUTE_MODE:-none}"
         echo
@@ -580,6 +581,10 @@ polsudo netpart "$DEVICE" --write \
     --backup "${WORK_DIR}/apa-before-net-$(date +%Y%m%d-%H%M%S).json" \
     >> "${LOG_FILE}" 2>&1 || error_msg "${UI_TEXT[POL_ERROR_NET]}"
 
+# Titles that did not fit. They are named again at the end, because a message
+# printed before a long write has scrolled away by the time the run finishes.
+SKIPPED=()
+
 # A Japanese install keeps every browser title as Square Enix wrote it.
 title_args=()
 [[ "${REGION}" == "jp" ]] && title_args=(--original-titles)
@@ -720,9 +725,25 @@ for k in "${ORDER[@]}"; do
     size=$(polroot size --src "${WORK_DIR}/$k" --title "$k" --drive "$DEVICE" --plain \
            2>>"${LOG_FILE}" | tr -d '\r')
     if [[ -z "$size" ]]; then
+        # The verbose run goes to the log: it names the staged size and every
+        # free entry it considered.
         polroot size --src "${WORK_DIR}/$k" --title "$k" --drive "$DEVICE" \
             >> "${LOG_FILE}" 2>&1
-        error_msg "${UI_TEXT[POL_ERROR_NOROOM]} $k"
+        # One title that does not fit is not a reason to abandon the others.
+        # Stopping here used to leave the run short of installinf and retitle,
+        # so a drive that had taken the Viewer perfectly well was left without
+        # the registry that tells the Viewer anything is installed. Skip it,
+        # say so, and carry on to the steps after the loop.
+        #
+        # The Viewer is the exception: it is what launches everything else, so
+        # there is nothing worth finishing without it.
+        if [[ "$k" == "$VIEWER_KEY" ]]; then
+            error_msg "${UI_TEXT[POL_ERROR_NOROOM]} $k"
+        fi
+        echo "  ${UI_TEXT[POL_SKIP_NOROOM]} $k"
+        SKIPPED+=("$k")
+        rm -rf "${WORK_DIR}/$k"
+        continue
     fi
     echo "  ${UI_TEXT[POL_SIZED]} ${size}M"
     make_partition "$part" "$size"
@@ -783,6 +804,11 @@ fi
 echo
 center_text "${UI_TEXT[POL_DONE]}"
 echo
+if [[ ${#SKIPPED[@]} -gt 0 ]]; then
+    center_text "${UI_TEXT[POL_SKIPPED_NOROOM]} ${SKIPPED[*]}"
+    center_text "${UI_TEXT[POL_SKIPPED_RETRY]}"
+    echo
+fi
 if [[ $ROUTE_READY -eq 1 ]]; then
     center_text "${UI_TEXT[POL_DONE_KEYED]} ${HDDID_FILE}"
     [[ -n "${ROUTE_MODE}" ]] && center_text "${UI_TEXT[POL_ROUTE_MODE_SET]} ${ROUTE_MODE}"

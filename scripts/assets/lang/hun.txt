@@ -514,3 +514,6 @@ POL_CHD_EXTRACT=A .chd képfájlok kibontása. Ez csak egyszer történik meg, �
 POL_CHD_FAILED=Egy .chd képfájlt nem sikerült kibontani, ezért kimarad. Bontsd ki a chdman programmal, vagy használj .iso vagy .bin képfájlt.
 POL_REPORT_WRITTEN=Egy elküldhető jelentés ide készült:
 POL_SELECT_CONSOLE=Melyik régióból való a PS2 konzol, amelyben a meghajtót használni fogod, US vagy japán? [U/j]
+POL_SKIP_NOROOM=Nincs elég szabad hely, kihagyva:
+POL_SKIPPED_NOROOM=Helyhiány miatt nem lett telepítve:
+POL_SKIPPED_RETRY=Szabadíts fel helyet a PS2 partíciós területen, majd futtasd újra ezt a lehetőséget.

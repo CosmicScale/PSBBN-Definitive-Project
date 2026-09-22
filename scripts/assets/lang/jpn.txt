@@ -514,3 +514,6 @@ POL_CHD_EXTRACT=.chdイメージを展開しています。この処理は一度
 POL_CHD_FAILED=.chdイメージを展開できなかったため、スキップします。chdmanで展開するか、.isoまたは.binイメージを使用してください。
 POL_REPORT_WRITTEN=送信できるレポートを次の場所に書き出しました:
 POL_SELECT_CONSOLE=このドライブを使うPS2本体は、US版と日本版のどちらですか? [U/j]
+POL_SKIP_NOROOM=空き容量が足りないため、スキップします:
+POL_SKIPPED_NOROOM=容量不足のため未インストール:
+POL_SKIPPED_RETRY=PS2パーティション領域に空きを作り、この項目をもう一度実行してください。
