@@ -104,6 +104,11 @@ error_msg() {
     echo
     center_text "$1"
     echo
+    # Write the report before the pause, so its location is on screen while the
+    # user is still looking at the error. The EXIT trap would run after this
+    # keypress, by which point the window is usually cleared.
+    REPORT_RC=1
+    write_report
     read -n 1 -s -r -p "${UI_TEXT[EXIT_KEY]}" </dev/tty
     echo
     exit 1
@@ -117,6 +122,8 @@ route_failed() {
     center_text "${UI_TEXT[POL_ERROR_ROUTE]} $1"
     center_text "${UI_TEXT[POL_ROUTE_RETRY]}"
     echo
+    REPORT_RC=1
+    write_report
     read -n 1 -s -r -p "${UI_TEXT[EXIT_KEY]}" </dev/tty
     echo
     exit 1
@@ -148,6 +155,54 @@ polsudo() { local m="$1"; shift; sudo -E env PYTHONPATH="${HELPER_DIR}" "${POL_P
 # The package CLI as root, for the sizing step, which reads the drive's free
 # space off the device.
 polroot() { sudo -E env PYTHONPATH="${HELPER_DIR}" "${POL_PY}" -m playonline "$@"; }
+
+# A report the user can read without a terminal.
+#
+# The log lives under the toolkit, which on a Windows install is inside the WSL
+# filesystem and not somewhere most people can reach. The POL folder is the one
+# they put their discs in, so on those installs it is a folder already open in
+# Explorer. Write the report there, on every exit including the error paths,
+# because a run that failed is the one that needs sending.
+#
+# Anything that is not a disc image is ignored by the folder scan and skipped by
+# route derive-elf, so leaving a .txt here is safe.
+REPORT_FILE="${DISC_DIR}/playonline-report.txt"
+REPORT_DONE=0
+write_report() {
+    local rc=$?
+    # error_msg calls this before its keypress and sets REPORT_RC, so the path
+    # is on screen while the error still is. The trap then finds it done.
+    [[ -n "${REPORT_RC}" ]] && rc="${REPORT_RC}"
+    [[ ${REPORT_DONE} -eq 1 ]] && return 0
+    REPORT_DONE=1
+    [[ -d "${DISC_DIR}" ]] || return 0
+    {
+        echo "PlayOnline installer report"
+        echo "date:    $(date)"
+        echo "result:  $([[ $rc -eq 0 ]] && echo "finished" || echo "stopped early (exit $rc)")"
+        echo "toolkit: $(git -C "${TOOLKIT_PATH}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+        echo "discs:   ${DISC_DIR}"
+        echo "drive:   ${DEVICE:-none chosen}"
+        echo "region:  ${REGION:-not reached}"
+        echo "keyed:   $([[ "${ROUTE_READY:-0}" -eq 1 ]] && echo "yes" || echo "no - the titles will not start")"
+        echo "mode:    ${ROUTE_MODE:-none}"
+        echo
+        if [[ -n "${DEVICE}" ]]; then
+            echo "--- drive ---"
+            timeout 120 sudo -n true 2>/dev/null \
+                && { polroot inspect "${DEVICE}" 2>&1
+                     echo
+                     echo "--- __net ---"
+                     polsudo netpart "${DEVICE}" --verify 2>&1; } \
+                || echo "(skipped: needs a password this late in the run)"
+            echo
+        fi
+        echo "--- log ---"
+        cat "${LOG_FILE}" 2>/dev/null
+    } > "${REPORT_FILE}" 2>&1
+    printf '\n%s %s\n' "${UI_TEXT[POL_REPORT_WRITTEN]}" "${REPORT_FILE}"
+}
+trap write_report EXIT
 
 activate_python() {
     [ -n "$IN_NIX_SHELL" ] && return

@@ -512,3 +512,4 @@ POL_SELECT_VIEWER_REQUIRED=A PlayOnline Viewer minden címmel együtt települ, 
 POL_CHD_TOOL=A chdman (mame-tools) telepítése a .chd képfájlok olvasásához...
 POL_CHD_EXTRACT=A .chd képfájlok kibontása. Ez csak egyszer történik meg, és néhány percig tarthat:
 POL_CHD_FAILED=Egy .chd képfájlt nem sikerült kibontani, ezért kimarad. Bontsd ki a chdman programmal, vagy használj .iso vagy .bin képfájlt.
+POL_REPORT_WRITTEN=Egy elküldhető jelentés ide készült:

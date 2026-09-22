@@ -1019,6 +1019,7 @@ Nothing already on the drive is modified. A title that is already installed is s
 - A file named `playonline.hddid` is created in `games/POL`. **Keep this file.** It holds the drive identity that the PlayOnline install on this drive depends on
 - *Final Fantasy XI* is a large install of more than 26,000 files and takes a long time to write
 - Before the installer adds the `__net` partition that PlayOnline requires, the partition table sectors it changes are backed up to the `logs/playonline-backups` folder
+- A file named `playonline-report.txt` is written to `games/POL` every time the option is run, including when it stops early. It holds the run's log, the drive's partition layout and a summary of what was installed. It is the easiest thing to attach when reporting a problem, and it sits next to your disc images rather than inside the toolkit
 
 ### Connecting to a server
 **IMPORTANT: Do not let a console with PlayOnline installed reach Square Enix's own servers.** Their PS2 patch servers still respond, and the update they deliver is the 2015 end-of-service patch, which disables the Viewer. Before launching the Viewer for the first time, set your console's DNS server, or your router's, to the one provided by the community server you intend to use, so that the PlayOnline host names resolve to that server.

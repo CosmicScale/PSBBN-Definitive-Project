@@ -512,3 +512,4 @@ POL_SELECT_VIEWER_REQUIRED=Le PlayOnline Viewer est installé avec n'importe que
 POL_CHD_TOOL=Installation de chdman (mame-tools) pour lire les images .chd...
 POL_CHD_EXTRACT=Extraction des images .chd. Cette opération n'est faite qu'une fois et peut prendre quelques minutes :
 POL_CHD_FAILED=Une image .chd n'a pas pu être extraite et sera ignorée. Extrayez-la avec chdman, ou utilisez une image .iso ou .bin.
+POL_REPORT_WRITTEN=Un rapport que vous pouvez envoyer a été écrit dans
