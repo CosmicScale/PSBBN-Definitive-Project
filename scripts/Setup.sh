@@ -155,7 +155,12 @@ fi
 
 # Python virtual environment setup
 (
-    python3 -m venv scripts/venv >> "${LOG_FILE}" 2>&1 || {
+    # --clear rebuilds an existing environment. Without it a venv left broken by
+    # an earlier run is reused as-is: python3 -m venv reports success, activate
+    # never validates anything, and the first real use fails with
+    # "venv/bin/pip: cannot execute: required file not found", which is the
+    # venv's own python3 missing from the shebang rather than a missing pip.
+    python3 -m venv --clear scripts/venv >> "${LOG_FILE}" 2>&1 || {
         echo "Failed to create Python virtual environment." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_1]}"
     }
@@ -171,6 +176,13 @@ fi
 ) &
 PID=$!
 spinner $PID "${UI_TEXT[SETUP_PYTHON]}"
+
+# The block above runs in a background subshell, so the error_msg calls inside it
+# exit that subshell and not this script. Without this the run reports the real
+# failure and then prints "Setup completed successfully!" straight over the top of
+# it. spinner polls with kill -0 and never reaps the child, so the exit status is
+# still here to collect; the subshell has already printed the reason.
+wait "$PID" || exit 1
 
 echo
 echo "[✓] Setup completed successfully!" >> "${LOG_FILE}"
