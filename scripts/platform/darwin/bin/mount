@@ -1,0 +1,13 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+args=()
+for arg in "$@"; do
+    args+=("$(psbbn_rewrite_device "$arg")")
+done
+real="${PSBBN_REAL_MOUNT:-/sbin/mount}"
+exec "$real" "${args[@]}"

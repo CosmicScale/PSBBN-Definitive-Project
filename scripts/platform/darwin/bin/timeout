@@ -1,0 +1,27 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+for candidate in \
+    /opt/homebrew/opt/coreutils/libexec/gnubin/timeout \
+    /usr/local/opt/coreutils/libexec/gnubin/timeout \
+    /opt/homebrew/bin/timeout
+do
+    if [[ -x "$candidate" && "$candidate" != "$0" ]]; then
+        exec "$candidate" "$@"
+    fi
+done
+duration="${1:-0}"
+shift || exit 1
+"$@" &
+pid=$!
+(
+    sleep "$duration"
+    kill "$pid" 2>/dev/null
+) &
+waiter=$!
+wait "$pid"
+status=$?
+kill "$waiter" 2>/dev/null
+wait "$waiter" 2>/dev/null
+exit "$status"

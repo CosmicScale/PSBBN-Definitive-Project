@@ -1,0 +1,25 @@
+#!/bin/bash
+# List mount points the way `findmnt -nr -o TARGET` does, so cleanup can see
+# live PFS mounts before it deletes the storage directory.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+if [[ -n "${PSBBN_MOUNT_FILE:-}" ]]; then
+    if [[ ! -r "$PSBBN_MOUNT_FILE" ]]; then
+        echo "findmnt: cannot read $PSBBN_MOUNT_FILE" >&2
+        exit 1
+    fi
+    text=$(cat "$PSBBN_MOUNT_FILE")
+else
+    if ! text=$(mount 2>/dev/null); then
+        echo "findmnt: mount failed" >&2
+        exit 1
+    fi
+fi
+printf '%s\n' "$text" | /opt/homebrew/bin/python3 -c '
+import re, sys
+for line in sys.stdin:
+    match = re.search(r" on (.*) \([^)]*\)\s*$", line.rstrip("\n"))
+    if match:
+        print(match.group(1))
+'

@@ -26,6 +26,14 @@ if [ -z "$BASH_VERSION" ]; then
     exit 1
 fi
 
+# macOS /bin/bash is 3.2 and stops on ${var,,} and declare -A.
+# This block is valid on bash 3.2. It runs before those lines.
+# Linux uname -s is not Darwin, so this does not run there.
+if [[ "$(uname -s)" == Darwin && -z "${PSBBN_DARWIN_ENTERED:-}" ]]; then
+    export PSBBN_DARWIN_ENTERED=1
+    exec "$(cd "$(dirname "$0")" && pwd)/scripts/platform/darwin/enter.sh" "$@"
+fi
+
 [[ -t 0 && -t 1 ]] || exit 1
 
 echo -e "\e[8;45;110t"

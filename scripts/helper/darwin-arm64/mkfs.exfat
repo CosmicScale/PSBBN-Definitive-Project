@@ -1,0 +1,51 @@
+#!/bin/bash
+# Map exfatprogs `mkfs.exfat -c 32K -L OPL` onto newfs_exfat.
+# The installer passes ${DEVICE}3, which is /dev/diskN concatenated with 3.
+# Real disks are refused until a format has been checked against a scratch device.
+here=$(cd "$(dirname "$0")/../../platform/darwin" && pwd)
+# shellcheck disable=SC1091
+. "$here/lib.sh"
+
+cluster=""
+label=""
+device=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c)
+            cluster="${2:-}"
+            shift 2
+            ;;
+        -L)
+            label="${2:-}"
+            shift 2
+            ;;
+        *)
+            device="$1"
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$device" ]]; then
+    /sbin/newfs_exfat 2>&1 || true
+    exit 1
+fi
+
+rewritten=$(psbbn_rewrite_device "$device")
+if psbbn_is_real_disk "$rewritten" && [[ "${PSBBN_ALLOW_DISK_FORMAT:-}" != 1 ]]; then
+    echo "mkfs.exfat: refusing $rewritten (from $device)" >&2
+    exit 2
+fi
+
+args=()
+if [[ "$cluster" == "32K" || "$cluster" == "32k" ]]; then
+    # -R makes -b apply to an existing ExFAT volume. Without it, newfs_exfat keeps the old cluster size.
+    args+=(-R -b 32768)
+fi
+if [[ -n "$label" ]]; then
+    args+=(-v "$label")
+fi
+args+=("$rewritten")
+
+newfs="${PSBBN_NEWFS_EXFAT:-/sbin/newfs_exfat}"
+exec "$newfs" "${args[@]}"

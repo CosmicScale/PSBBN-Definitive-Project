@@ -1,0 +1,52 @@
+#!/opt/homebrew/bin/python3
+"""Print exFAT volumes the way the installer parses blkid.
+
+The scripts keep the field before ':' and run sed 's/[0-9]*$//'.
+macOS nodes look like /dev/disk6s1. The sed shim turns that into /dev/disk6.
+FilesystemType=exfat is the filesystem. Partition Content Windows_NTFS is only
+the MBR type byte 0x07 and is not NTFS.
+"""
+import os
+import plistlib
+import subprocess
+import sys
+
+def load_plist(argv):
+    raw = subprocess.check_output(argv)
+    return plistlib.loads(raw)
+
+def main(argv):
+    want = None
+    if "-t" in argv:
+        i = argv.index("-t")
+        spec = argv[i + 1]
+        if spec.startswith("TYPE="):
+            want = spec.split("=", 1)[1]
+    diskutil = os.environ.get("PSBBN_DISKUTIL", "diskutil")
+    listing = load_plist([diskutil, "list", "-plist", "external", "physical"])
+    parts = {}
+    for disk in listing.get("AllDisksAndPartitions") or []:
+        for part in disk.get("Partitions") or []:
+            ident = part.get("DeviceIdentifier")
+            if ident:
+                parts[ident] = part
+    for ident in parts:
+        info = load_plist([diskutil, "info", "-plist", ident])
+        fstype = (info.get("FilesystemType") or "").lower()
+        if want and fstype != want.lower():
+            continue
+        if fstype != "exfat" and want is None:
+            continue
+        node = info.get("DeviceNode") or f"/dev/{ident}"
+        label = info.get("VolumeName") or ""
+        print(f'{node}: LABEL="{label}" TYPE="{fstype}"')
+    return 0
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--psbbn-shim-ok":
+        sys.exit(0)
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except subprocess.CalledProcessError as exc:
+        sys.stderr.write(f"blkid: diskutil failed: {exc}\n")
+        sys.exit(exc.returncode or 1)

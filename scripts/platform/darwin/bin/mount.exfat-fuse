@@ -1,0 +1,29 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+diskutil="${PSBBN_DISKUTIL:-diskutil}"
+src=""
+mnt=""
+prev=""
+for arg in "$@"; do
+    case "$prev" in
+        -o) prev="" ; continue ;;
+    esac
+    case "$arg" in
+        -o) prev="-o" ; continue ;;
+        -o*) continue ;;
+        *)
+            if [[ -z "$src" ]]; then
+                src="$arg"
+            else
+                mnt="$arg"
+            fi
+            ;;
+    esac
+done
+src=$(psbbn_rewrite_device "$src")
+exec "$diskutil" mount -mountPoint "$mnt" "$src"

@@ -1,0 +1,70 @@
+#!/opt/homebrew/bin/python3
+"""Write the three-partition APA-Jail MBR the installer pipes to sfdisk.
+
+Geometry is the util-linux default this script aims at: 512-byte sectors,
+first partition at LBA 2048. It has not been compared to a Linux sfdisk
+byte dump. Real /dev/disk and /dev/rdisk paths are refused.
+"""
+import os
+import struct
+import sys
+
+def refuse(path):
+    if path.startswith("/dev/disk") or path.startswith("/dev/rdisk"):
+        sys.stderr.write(f"sfdisk: refusing real disk {path}\n")
+        sys.exit(2)
+
+def parse(text, total):
+    start = 2048
+    entries = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split(",")
+        if len(parts) < 3:
+            sys.stderr.write(f"sfdisk: bad line: {line}\n")
+            sys.exit(1)
+        size = parts[1].strip()
+        typ = int(parts[2].strip(), 16)
+        if size == "":
+            count = total - start
+        else:
+            if not size.endswith("MiB"):
+                sys.stderr.write(f"sfdisk: size must be MiB or empty: {size}\n")
+                sys.exit(1)
+            count = int(size[:-3]) * 2048
+        if start + count > total:
+            sys.stderr.write("sfdisk: partitions do not fit in the image\n")
+            sys.exit(1)
+        entries.append((typ, start, count))
+        start += count
+    return entries
+
+def main(argv):
+    if len(argv) > 1 and argv[1] == "--psbbn-shim-ok":
+        return 0
+    if len(argv) != 2:
+        sys.stderr.write("usage: sfdisk DEVICE\n")
+        return 1
+    path = argv[1]
+    refuse(path)
+    if not os.path.isfile(path):
+        sys.stderr.write(f"sfdisk: not a regular file: {path}\n")
+        return 1
+    total = os.path.getsize(path) // 512
+    entries = parse(sys.stdin.read(), total)
+    blob = bytearray(512)
+    for i, (typ, start, count) in enumerate(entries[:4]):
+        off = 446 + i * 16
+        blob[off + 4] = typ
+        blob[off + 8:off + 12] = struct.pack("<I", start)
+        blob[off + 12:off + 16] = struct.pack("<I", count)
+    blob[510] = 0x55
+    blob[511] = 0xAA
+    with open(path, "r+b") as fh:
+        fh.write(blob)
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

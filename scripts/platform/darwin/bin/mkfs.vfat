@@ -1,0 +1,15 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+path="${@: -1}"
+path=$(psbbn_rewrite_device "$path")
+if psbbn_is_real_disk "$path"; then
+    echo "mkfs.vfat: refusing $path" >&2
+    exit 2
+fi
+echo "mkfs.vfat: formatting a file image is not implemented" >&2
+exit 2

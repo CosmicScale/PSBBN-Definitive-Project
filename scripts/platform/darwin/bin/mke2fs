@@ -1,0 +1,36 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+path="${@: -1}"
+rewritten=$(psbbn_rewrite_device "$path")
+if psbbn_is_real_disk "$rewritten" || psbbn_is_real_disk "$path"; then
+    echo "mke2fs: refusing $path" >&2
+    exit 2
+fi
+real=""
+for candidate in \
+    /opt/homebrew/opt/e2fsprogs/sbin/mke2fs \
+    /usr/local/opt/e2fsprogs/sbin/mke2fs
+do
+    if [[ -x "$candidate" ]]; then
+        real="$candidate"
+        break
+    fi
+done
+if [[ -z "$real" ]]; then
+    echo "mke2fs: e2fsprogs is not installed" >&2
+    exit 127
+fi
+args=()
+for arg in "$@"; do
+    if [[ "$arg" == "$path" ]]; then
+        args+=("$rewritten")
+    else
+        args+=("$arg")
+    fi
+done
+exec "$real" "${args[@]}"
