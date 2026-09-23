@@ -688,7 +688,7 @@ Para a melhor experiência, recomenda-se um modelo PS2 Fat (séries SCPH-30000 a
 - O [PSBBN](#psbbn) não suporta adaptadores de HDD de terceiros[*](#problemas-conhecidos). Adaptadores de terceiros são suportados apenas para a [instalação do HOSDMenu](#instalar-apenas-o-hosdmenu).
 - O [PSBBN](#psbbn) e o [HOSDMenu](#hosdmenu) são compatíveis com os modelos PS2 Slim SCPH-700xx usando um IDE Resurrector (ou mod de hardware equivalente), e com os primeiros modelos de PS2 (séries SCPH-10000 a SCPH-18000) com um case de HDD externo oficial. [Uma configuração adicional é necessária para ambas as configurações](#consoles-antigos-scph-1000018000-e-slim-scph-700xx).
 
-O **PSBBN Definitive Project** requer um PC x86-64 ou ARM64 para instalação. Conecte o HDD ou SSD ao PC via cabo SATA ou por meio de um adaptador USB.
+O **PSBBN Definitive Project** requer um PC x86-64 ou ARM64 para instalação. Macs com Apple silicon são suportados pelos passos de instalação no macOS abaixo. Conecte o HDD ou SSD ao computador via cabo SATA ou por meio de um adaptador USB.
 
 ## Instalando no Linux
 Distribuições de 64 bits baseadas em Debian usando `apt`, distribuições baseadas em Arch usando `pacman` e distribuições baseadas em Fedora[*](#solução-de-problemas) usando `dnf` são suportadas. Sistemas baseados em Nix também são suportados via flakes. As distribuições recomendadas são Linux Mint, Debian e, para Raspberry Pi, o Raspberry Pi OS.
@@ -710,6 +710,37 @@ Em seguida, acesse o diretório `PSBBN-Definitive-Project` e execute o script `P
 cd PSBBN-Definitive-Project
 ./PSBBN-Definitive-Patch.sh
 ```
+## Instalando no macOS
+Macs com Apple silicon executam o mesmo menu do `PSBBN-Definitive-Patch.sh`. Isso foi executado no macOS 27. Os binários auxiliares para Mac Intel não estão incluídos.
+
+O suporte a macOS está no branch `macos-native` de [rflpazini/PSBBN-Definitive-Project](https://github.com/rflpazini/PSBBN-Definitive-Project) até ser incorporado ao repositório original.
+
+Instale o [Homebrew](https://brew.sh) se ele ainda não estiver instalado. Se o `brew` pedir as Xcode Command Line Tools, instale-as e execute o `brew` de novo.
+
+```
+brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs pkg-config icu4c python@3 xz unar
+brew install --cask fuse-t
+```
+
+O `fuse-t` pede a senha de administrador. Confirme essa instalação. O menu usa o FUSE-T para montar partições PFS.
+
+Clone o branch de macOS e crie o ambiente Python que o script verifica:
+
+```
+git clone -b macos-native https://github.com/rflpazini/PSBBN-Definitive-Project.git
+cd PSBBN-Definitive-Project
+export PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
+"$(brew --prefix python@3)/bin/python3" -m venv scripts/venv
+./scripts/venv/bin/pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth
+./PSBBN-Definitive-Patch.sh
+```
+
+O script abre o mesmo [menu principal](#menu-principal) do Linux. Saia com `q` antes de desconectar a unidade e ejete-a pelo Finder.
+
+Conecte apenas a unidade do PS2. A lista de discos mostra unidades externas. O disco interno do Mac não aparece.
+
+A formatação de um disco real é recusada neste branch. `wipefs`, `sfdisk` e `mkfs.exfat` param em vez de gravar em `/dev/disk*`. O menu funciona. Uma instalação nova de [PSBBN e HOSDMenu](#instalar-psbbn-e-hosdmenu) ainda não apaga a unidade.
+
 ## Instalando no Windows
 A maneira recomendada de instalar o **PSBBN Definitive Project** no Windows é usando o **PSBBN Launcher for Windows**. O **PSBBN Launcher for Windows** é compatível com as edições Home do Windows 10 e 11; outras edições podem não ser compatíveis. Para uma experiência sem problemas, certifique-se de que o Windows esteja totalmente atualizado.
 
@@ -1199,6 +1230,10 @@ wsl --unregister PSBBN
 2. Baixe a versão mais recente do script `PSBBN-Launcher-For-Windows.ps1` [aqui](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
 3. Certifique-se de ter uma conexão de internet ativa. Se estiver usando uma VPN, tente desativá-la.
 4. Execute o script `PSBBN-Launcher-For-Windows.ps1` novamente.
+
+**Se você estiver usando o [macOS](#instalando-no-macos) e o script encerrar antes do menu:**
+
+O `/bin/bash` do macOS é antigo demais para este script. Instale o bash do Homebrew com `brew install bash` e execute `./PSBBN-Definitive-Patch.sh` de novo. Se a montagem das partições falhar, confirme que o FUSE-T foi instalado (`brew install --cask fuse-t`) e que o pedido de administrador foi aceito.
 
 **Se você estiver usando o [Linux](#instalando-no-linux) e encontrar problemas:**
 1. Exclua a pasta `PSBBN-Definitive-Project`.

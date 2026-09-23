@@ -688,7 +688,7 @@ For the best experience, a PS2 Fat model (SCPH-30000 to SCPH-55000 series) is re
 - [PSBBN](#psbbn) does not support third-party HDD adapters[*](#known-issues). Third-party adapters are only supported for [HOSDMenu installation](#install-hosdmenu-only).
 - [PSBBN](#psbbn) and [HOSDMenu](#hosdmenu) are both compatible with PS2 Slim SCPH-700xx models using an IDE Resurrector (or equivalent hardware mod), and early PS2 models (SCPH-10000 to SCPH-18000 series) with an official external HDD enclosure. [Additional setup is required for both configurations](#early-scph-1000018000-and-slim-scph-700xx-consoles).
 
-The **PSBBN Definitive Project** requires an x86-64 or ARM64 PC for installation. Connect the HDD or SSD to the PC via SATA or a USB adapter.
+The **PSBBN Definitive Project** requires an x86-64 or ARM64 PC for installation. Apple silicon Macs are supported from the macOS install steps below. Connect the HDD or SSD to the computer via SATA or a USB adapter.
 
 ## Installing on Linux
 64-bit Debian-based distributions using `apt`, Arch-based distributions using `pacman`, and Fedora-based[*](#troubleshooting) distributions using `dnf` are supported. Nix-based systems are also supported via flakes. Recommended distributions are Linux Mint, Debian, and for Raspberry Pi, Raspberry Pi OS.
@@ -710,6 +710,37 @@ You can then change to the `PSBBN-Definitive-Project` directory and run `PSBBN-D
 cd PSBBN-Definitive-Project
 ./PSBBN-Definitive-Patch.sh
 ```
+## Installing on macOS
+Apple silicon Macs run the same `PSBBN-Definitive-Patch.sh` menu. This was run on macOS 27. Intel Mac helper binaries are not included.
+
+macOS support is on the `macos-native` branch of [rflpazini/PSBBN-Definitive-Project](https://github.com/rflpazini/PSBBN-Definitive-Project) until it is merged upstream.
+
+Install [Homebrew](https://brew.sh) if it is not already installed. If `brew` asks for the Xcode Command Line Tools, install them and run `brew` again.
+
+```
+brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs pkg-config icu4c python@3 xz unar
+brew install --cask fuse-t
+```
+
+`fuse-t` asks for an administrator password. Approve that install. The menu uses it to mount PlayStation File System partitions.
+
+Clone the macOS branch and create the Python environment the script checks for:
+
+```
+git clone -b macos-native https://github.com/rflpazini/PSBBN-Definitive-Project.git
+cd PSBBN-Definitive-Project
+export PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
+"$(brew --prefix python@3)/bin/python3" -m venv scripts/venv
+./scripts/venv/bin/pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth
+./PSBBN-Definitive-Patch.sh
+```
+
+The script opens the same [main menu](#main-menu) as on Linux. Quit with `q` before you unplug the drive, then eject it from Finder.
+
+Plug in only the PS2 drive. The disk list shows external disks. The internal Mac disk is not listed.
+
+Formatting a real disk is refused in this branch. `wipefs`, `sfdisk`, and `mkfs.exfat` stop instead of writing `/dev/disk*`. The menu runs. A fresh [PSBBN and HOSDMenu](#install-psbbn-and-hosdmenu) install does not erase the drive yet.
+
 ## Installing on Windows
 The recommended way to install the **PSBBN Definitive Project** on Windows is by using the **PSBBN Launcher for Windows**. The **PSBBN Launcher for Windows** is compatible with Windows 10 and 11 Home editions; other editions may not be compatible. For a trouble-free experience, make sure Windows is fully up to date.
 
@@ -1199,6 +1230,10 @@ wsl --unregister PSBBN
 2. Download the latest version of the `PSBBN-Launcher-For-Windows.ps1` script [here](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
 3. Ensure you have an active internet connection. If you are using a VPN, try disabling it
 4. Run the `PSBBN-Launcher-For-Windows.ps1` script again
+
+**If you are using [macOS](#installing-on-macos) and the script exits before the menu:**
+
+`/bin/bash` on macOS is too old for this script. Install Homebrew bash with `brew install bash` and run `./PSBBN-Definitive-Patch.sh` again. If partition mounts fail, confirm FUSE-T installed (`brew install --cask fuse-t`) and that the administrator prompt was approved.
 
 **If you are using [Linux](#installing-on-linux) and experience issues:**
 1. Delete the `PSBBN-Definitive-Project` folder
