@@ -739,7 +739,7 @@ The script opens the same [main menu](#main-menu) as on Linux. Quit with `q` bef
 
 Plug in only the PS2 drive. The disk list shows external disks. The internal Mac disk is not listed.
 
-Formatting a real disk is refused in this branch. `wipefs`, `sfdisk`, and `mkfs.exfat` stop instead of writing `/dev/disk*`. The menu runs. A fresh [PSBBN and HOSDMenu](#install-psbbn-and-hosdmenu) install does not erase the drive yet.
+An external PS2 drive can be initialised. The internal Mac disk is refused. When macOS asks for an administrator password, that password is for writing the drive. Enter it once. Later commands reuse it.
 
 ## Installing on Windows
 The recommended way to install the **PSBBN Definitive Project** on Windows is by using the **PSBBN Launcher for Windows**. The **PSBBN Launcher for Windows** is compatible with Windows 10 and 11 Home editions; other editions may not be compatible. For a trouble-free experience, make sure Windows is fully up to date.

@@ -8,6 +8,8 @@ fi
 here=${0%/*}
 [[ "$here" == "$0" ]] && here=.
 here=$(cd "$here" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
 cmd="${1:-}"
 if [[ -z "$cmd" ]]; then
     echo "usage: sudo command" >&2
@@ -21,5 +23,7 @@ if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "sudo: $cmd: command not found" >&2
     exit 1
 fi
-real="${PSBBN_REAL_SUDO:-/usr/bin/sudo}"
-exec "$real" env PATH="$PATH" "$cmd" "$@"
+if [[ -n "${PSBBN_REAL_SUDO:-}" ]]; then
+    exec "$PSBBN_REAL_SUDO" env PATH="$PATH" "$cmd" "$@"
+fi
+platform_elevate env PATH="$PATH" "$cmd" "$@"

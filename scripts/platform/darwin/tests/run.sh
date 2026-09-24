@@ -149,7 +149,7 @@ print("mbr-ok")
 PY
 [[ $? -eq 0 ]] && ok sfdisk || bad sfdisk
 set +e
-"$bin/sfdisk" /dev/disk6 </dev/null >/dev/null 2>&1
+"$bin/sfdisk" /dev/disk0 </dev/null >/dev/null 2>&1
 rc=$?
 set -e
 [[ "$rc" -ne 0 ]] && ok sfdisk-refuse || bad sfdisk-refuse
@@ -157,10 +157,39 @@ set -e
 "$bin/partprobe" "$img" && ok partprobe || bad partprobe
 sectors=$("$bin/blockdev" --getsz "$img")
 [[ "$sectors" == 163840 ]] && ok blockdev || bad "blockdev $sectors"
+
+python3 - "$fix" << 'PY'
+import plistlib, sys
+d = sys.argv[1]
+def dump(path, obj):
+    with open(path, "wb") as fh:
+        plistlib.dump(obj, fh)
+dump(f"{d}/ext.plist", {"Internal": False, "Size": 160041885696, "TotalSize": 160041885696})
+dump(f"{d}/int.plist", {"Internal": True, "Size": 1000, "TotalSize": 1000})
+PY
+cat > "$fix/diskutil-kind" << EOF
+#!/bin/bash
+if [[ "\$1" == info && "\$3" == disk5 ]]; then cat "$fix/ext.plist"; exit 0; fi
+if [[ "\$1" == info && "\$3" == disk0 ]]; then cat "$fix/int.plist"; exit 0; fi
+exit 1
+EOF
+chmod +x "$fix/diskutil-kind"
+if PSBBN_DISKUTIL="$fix/diskutil-kind" "$bin/wipefs" -a /dev/disk5; then
+    ok wipefs-external
+else
+    bad wipefs-external
+fi
 set +e
-"$bin/mke2fs" /dev/disk6 >/dev/null 2>&1
+PSBBN_DISKUTIL="$fix/diskutil-kind" "$bin/wipefs" -a /dev/disk0 >/dev/null 2>&1
 rc=$?
-"$bin/mkfs.vfat" /dev/disk6 >/dev/null 2>&1
+set -e
+[[ "$rc" -eq 2 ]] && ok wipefs-internal || bad "wipefs-internal $rc"
+sectors=$(PSBBN_DISKUTIL="$fix/diskutil-kind" "$bin/blockdev" --getsz /dev/disk5)
+[[ "$sectors" == 312581808 ]] && ok blockdev-disk5 || bad "blockdev-disk5 $sectors"
+set +e
+PSBBN_DISKUTIL="$fix/diskutil-kind" "$bin/mke2fs" /dev/disk0 >/dev/null 2>&1
+rc=$?
+PSBBN_DISKUTIL="$fix/diskutil-kind" "$bin/mkfs.vfat" /dev/disk0 >/dev/null 2>&1
 rc2=$?
 set -e
 [[ "$rc" -ne 0 && "$rc2" -ne 0 ]] && ok mkfs-refuse || bad mkfs-refuse
@@ -260,5 +289,27 @@ for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipe
 done
 
 rm -rf "$stub" "$fix" "$state" "$img" "$repo" "$overlay" "$marker"
+linux_uname=$(mktemp -d)
+cat > "$linux_uname/uname" << 'EOF'
+#!/bin/bash
+if [[ "$1" == -s ]]; then echo Linux; else /usr/bin/uname "$@"; fi
+EOF
+chmod +x "$linux_uname/uname"
+linux_prefix=$(PATH="$linux_uname:$PATH" /opt/homebrew/bin/bash -c '. "'"$root/../load.sh"'"; platform_mapper_prefix disk5')
+[[ "$linux_prefix" == /dev/mapper/disk5- ]] && ok linux-mapper || bad "linux-mapper $linux_prefix"
+darwin_prefix=$(/opt/homebrew/bin/bash -c 'export PSBBN_MAPPER_DIR="'"$stub"'/maps"; . "'"$root/../load.sh"'"; platform_mapper_prefix disk5')
+[[ "$darwin_prefix" == "$stub/maps/disk5-" ]] && ok darwin-mapper || bad "darwin-mapper $darwin_prefix"
+
+slice=$(mktemp)
+dd if=/dev/zero of="$slice" bs=1048576 count=8 status=none 2>/dev/null || dd if=/dev/zero of="$slice" bs=1048576 count=8 >/dev/null
+slice_state=$(mktemp -d)
+printf '%s\n' "slice-__linux.1,,,rw,0 8192 linear $slice 2048" | PSBBN_DM_STATE="$slice_state" PSBBN_MAPPER_DIR="$stub/maps" "$bin/dmsetup" create --concise
+if PSBBN_MAPPER_DIR="$stub/maps" "$bin/mke2fs" -t ext2 -b 4096 -I 128 "$stub/maps/slice-__linux.1"; then
+    magic=$(python3 -c 'import os,struct,sys; p=sys.argv[1]; f=open(p,"rb"); f.seek(1024+56); print("%s %s" % (hex(struct.unpack("<H", f.read(2))[0]), os.path.getsize(p)))' "$stub/maps/slice-__linux.1")
+    [[ "$magic" == "0xef53 4194304" ]] && ok slice-ext2 || bad "slice-ext2 $magic"
+else
+    bad slice-ext2-mke2fs
+fi
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

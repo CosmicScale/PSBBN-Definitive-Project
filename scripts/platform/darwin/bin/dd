@@ -1,0 +1,33 @@
+#!/bin/bash
+# sudo dd is how the installer zeros a drive. This checks the disk before
+# /bin/dd runs. Linux calls /bin/dd directly because this file is not on PATH.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+args=()
+for arg in "$@"; do
+    case "$arg" in
+        of=*|if=*)
+            key=${arg%%=*}
+            val=$(psbbn_rewrite_device "${arg#*=}")
+            args+=("${key}=${val}")
+            ;;
+        *)
+            args+=("$(psbbn_rewrite_device "$arg")")
+            ;;
+    esac
+done
+needs_root=0
+for arg in "${args[@]}"; do
+    case "$arg" in
+        of=/dev/disk*|of=/dev/rdisk*) needs_root=1 ;;
+    esac
+done
+if [[ "$needs_root" -eq 1 ]]; then
+    platform_elevate /bin/dd "${args[@]}"
+else
+    /bin/dd "${args[@]}"
+fi

@@ -37,6 +37,7 @@ ICONS_DIR="${TOOLKIT_PATH}/icons"
 ARTWORK_DIR="${ICONS_DIR}/art"
 VMC_ICON_DIR="${ICONS_DIR}/ico/vmc"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 LANG_DIR="${ASSETS_DIR}/lang"
@@ -1507,7 +1508,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {

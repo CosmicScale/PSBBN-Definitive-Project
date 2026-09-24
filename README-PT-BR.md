@@ -739,7 +739,7 @@ O script abre o mesmo [menu principal](#menu-principal) do Linux. Saia com `q` a
 
 Conecte apenas a unidade do PS2. A lista de discos mostra unidades externas. O disco interno do Mac não aparece.
 
-A formatação de um disco real é recusada neste branch. `wipefs`, `sfdisk` e `mkfs.exfat` param em vez de gravar em `/dev/disk*`. O menu funciona. Uma instalação nova de [PSBBN e HOSDMenu](#instalar-psbbn-e-hosdmenu) ainda não apaga a unidade.
+Uma unidade externa do PS2 pode ser inicializada. O disco interno do Mac é recusado. Quando o macOS pedir a senha de administrador, essa senha é para gravar na unidade. Digite-a uma vez. Os comandos seguintes reutilizam essa autorização.
 
 ## Instalando no Windows
 A maneira recomendada de instalar o **PSBBN Definitive Project** no Windows é usando o **PSBBN Launcher for Windows**. O **PSBBN Launcher for Windows** é compatível com as edições Home do Windows 10 e 11; outras edições podem não ser compatíveis. Para uma experiência sem problemas, certifique-se de que o Windows esteja totalmente atualizado.

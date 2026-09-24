@@ -8,8 +8,16 @@ here=$(cd "$(dirname "$0")" && pwd)
 path="${@: -1}"
 path=$(psbbn_rewrite_device "$path")
 if psbbn_is_real_disk "$path"; then
-    echo "mkfs.vfat: refusing $path" >&2
+    if psbbn_disk_internal "$path"; then
+        echo "mkfs.vfat: refusing internal disk $path" >&2
+        exit 2
+    fi
+    echo "mkfs.vfat: refusing raw disk $path; format the slice file" >&2
     exit 2
 fi
-echo "mkfs.vfat: formatting a file image is not implemented" >&2
-exit 2
+if [[ ! -f "$path" && ! -f "${path}.meta" ]]; then
+    echo "mkfs.vfat: not a slice file: $path" >&2
+    exit 2
+fi
+# newfs_msdos writes the FAT on the slice file. The file is the slice.
+exec /sbin/newfs_msdos -F 32 "$path"

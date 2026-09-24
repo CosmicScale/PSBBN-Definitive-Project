@@ -5,6 +5,9 @@ if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
 fi
 state="${PSBBN_DM_STATE:-/tmp/psbbn-dm}"
 mkdir -p "$state"
+here=${0%/*}
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
 cmd="${1:-}"
 shift || true
 case "$cmd" in
@@ -32,6 +35,8 @@ case "$cmd" in
             exit 1
         fi
         rm -f "$state/$name"
+        dir=$(platform_mapper_dir)
+        rm -f "$dir/$name" "$dir/$name.meta"
         exit 0
         ;;
     create)
@@ -39,11 +44,36 @@ case "$cmd" in
             echo "dmsetup create: only --concise is implemented" >&2
             exit 1
         fi
+        dir=$(platform_mapper_dir)
         while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%;}"
             [[ -z "$line" ]] && continue
             name="${line%%,*}"
             printf '%s\n' "$line" > "$state/$name"
+            if ! /opt/homebrew/bin/python3 - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
+import os, sys
+node, meta_path, line = sys.argv[1], sys.argv[2], sys.argv[3]
+parts = line.split(",")
+tables = [p.strip() for p in parts[4:] if p.strip()]
+if len(tables) != 1:
+    sys.stderr.write("dmsetup: only one linear extent is supported, got %d\n" % len(tables))
+    sys.exit(1)
+logical, length, kind, device, start = tables[0].split()
+if kind != "linear":
+    sys.stderr.write("dmsetup: unsupported target %s\n" % kind)
+    sys.exit(1)
+sectors = int(length)
+nbytes = sectors * 512
+# The published path is the slice itself, not an empty stamp.
+fd = os.open(node, os.O_CREAT | os.O_RDWR, 0o644)
+os.ftruncate(fd, nbytes)
+os.close(fd)
+with open(meta_path, "w") as fh:
+    fh.write("device=%s\nstart=%s\nsectors=%s\n" % (device, start, sectors))
+PY
+            then
+                exit 1
+            fi
         done
         exit 0
         ;;

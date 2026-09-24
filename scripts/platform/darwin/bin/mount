@@ -9,5 +9,44 @@ args=()
 for arg in "$@"; do
     args+=("$(psbbn_rewrite_device "$arg")")
 done
+src=""
+mnt=""
+for arg in "${args[@]}"; do
+    case "$arg" in
+        -*) continue ;;
+        *)
+            if [[ -z "$src" ]]; then
+                src="$arg"
+            else
+                mnt="$arg"
+            fi
+            ;;
+    esac
+done
+if [[ -n "$src" && -f "${src}.meta" && -n "$mnt" ]]; then
+    device=""
+    start=""
+    sectors=""
+    # shellcheck disable=SC1091
+    . "${src}.meta"
+    fuse2fs=""
+    for candidate in \
+        /opt/homebrew/opt/e2fsprogs/sbin/fuse2fs \
+        /usr/local/opt/e2fsprogs/sbin/fuse2fs \
+        "$here/../../../helper/darwin-arm64/fuse2fs"
+    do
+        if [[ -x "$candidate" ]]; then
+            fuse2fs="$candidate"
+            break
+        fi
+    done
+    if [[ -z "$fuse2fs" ]]; then
+        echo "mount: APA slice $src needs fuse2fs, which is not installed" >&2
+        exit 1
+    fi
+    mkdir -p "$mnt"
+    offset=$((start * 512))
+    exec "$fuse2fs" -o "offset=${offset},rw,fakeroot" "$device" "$mnt"
+fi
 real="${PSBBN_REAL_MOUNT:-/sbin/mount}"
 exec "$real" "${args[@]}"

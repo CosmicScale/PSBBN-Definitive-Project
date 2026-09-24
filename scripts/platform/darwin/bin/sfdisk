@@ -1,18 +1,38 @@
 #!/opt/homebrew/bin/python3
 """Write the three-partition APA-Jail MBR the installer pipes to sfdisk.
 
-Geometry is the util-linux default this script aims at: 512-byte sectors,
-first partition at LBA 2048. It has not been compared to a Linux sfdisk
-byte dump. Real /dev/disk and /dev/rdisk paths are refused.
+Geometry follows the installer's sfdisk script: 512-byte sectors, first
+partition at LBA 2048. It has not been byte-compared with Linux sfdisk.
+Internal disks are refused. External disks are the PS2 drive.
 """
 import os
+import plistlib
 import struct
+import subprocess
 import sys
 
+def load_sh():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "load.sh")
+
+def lib_sh():
+    return os.path.join(os.path.dirname(__file__), "..", "lib.sh")
+
 def refuse(path):
-    if path.startswith("/dev/disk") or path.startswith("/dev/rdisk"):
-        sys.stderr.write(f"sfdisk: refusing real disk {path}\n")
+    if not (path.startswith("/dev/disk") or path.startswith("/dev/rdisk")):
+        return
+    probe = subprocess.run(
+        ["bash", "-c", '. "$1"; psbbn_disk_internal "$2"', "bash", lib_sh(), path],
+        capture_output=True,
+    )
+    # Return code 1 is the only external-disk answer. Anything else refuses.
+    if probe.returncode != 1:
+        sys.stderr.write(f"sfdisk: refusing {path}\n")
         sys.exit(2)
+
+def disk_sectors(path):
+    info = plistlib.loads(subprocess.check_output(["diskutil", "info", "-plist", path]))
+    size = int(info.get("TotalSize") or info.get("Size") or 0)
+    return size // 512
 
 def parse(text, total):
     start = 2048
@@ -49,10 +69,13 @@ def main(argv):
         return 1
     path = argv[1]
     refuse(path)
-    if not os.path.isfile(path):
+    if path.startswith("/dev/"):
+        total = disk_sectors(path)
+    elif os.path.isfile(path):
+        total = os.path.getsize(path) // 512
+    else:
         sys.stderr.write(f"sfdisk: not a regular file: {path}\n")
         return 1
-    total = os.path.getsize(path) // 512
     entries = parse(sys.stdin.read(), total)
     blob = bytearray(512)
     for i, (typ, start, count) in enumerate(entries[:4]):
@@ -62,6 +85,12 @@ def main(argv):
         blob[off + 12:off + 16] = struct.pack("<I", count)
     blob[510] = 0x55
     blob[511] = 0xAA
+    if path.startswith("/dev/"):
+        proc = subprocess.run(
+            ["bash", "-c", '. "$1"; platform_elevate dd of="$2" bs=512 count=1 conv=notrunc', "bash", load_sh(), path],
+            input=bytes(blob),
+        )
+        return proc.returncode
     with open(path, "r+b") as fh:
         fh.write(blob)
     return 0

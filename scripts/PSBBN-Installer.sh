@@ -42,6 +42,7 @@ fi
 # Set paths
 TOOLKIT_PATH="$(pwd)"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 LANG_DIR="${ASSETS_DIR}/lang"
@@ -547,7 +548,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {

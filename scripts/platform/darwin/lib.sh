@@ -25,6 +25,45 @@ psbbn_is_real_disk() {
     esac
 }
 
+# Return 0 when the node is internal or cannot be identified.
+# External disks return 1. Linux never calls this.
+psbbn_disk_internal() {
+    local node="$1"
+    case "$node" in
+        /dev/disk0|/dev/disk0s*|/dev/rdisk0|/dev/rdisk0s*) return 0 ;;
+    esac
+    local diskutil="${PSBBN_DISKUTIL:-diskutil}"
+    local py="/opt/homebrew/bin/python3"
+    [[ -x "$py" ]] || py="/usr/bin/python3"
+    "$py" - "$diskutil" "$node" << 'PY'
+import plistlib, subprocess, sys
+diskutil, node = sys.argv[1], sys.argv[2]
+ident = node[5:] if node.startswith("/dev/") else node
+try:
+    info = plistlib.loads(subprocess.check_output([diskutil, "info", "-plist", ident]))
+except Exception:
+    sys.exit(0)
+if "Internal" not in info or info.get("Internal"):
+    sys.exit(0)
+sys.exit(1)
+PY
+}
+
+psbbn_disk_bytes() {
+    local node="$1"
+    local diskutil="${PSBBN_DISKUTIL:-diskutil}"
+    local py="/opt/homebrew/bin/python3"
+    [[ -x "$py" ]] || py="/usr/bin/python3"
+    "$py" - "$diskutil" "$node" << 'PY'
+import plistlib, subprocess, sys
+diskutil, node = sys.argv[1], sys.argv[2]
+ident = node[5:] if node.startswith("/dev/") else node
+info = plistlib.loads(subprocess.check_output([diskutil, "info", "-plist", ident]))
+size = int(info.get("TotalSize") or info.get("Size") or 0)
+sys.stdout.write(str(size))
+PY
+}
+
 psbbn_gnu_sed() {
     if [[ -n "${PSBBN_REAL_SED:-}" ]]; then
         printf '%s\n' "$PSBBN_REAL_SED"
