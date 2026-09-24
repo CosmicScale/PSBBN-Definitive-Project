@@ -26,9 +26,8 @@ if [ -z "$BASH_VERSION" ]; then
     exit 1
 fi
 
-# macOS /bin/bash is 3.2 and stops on ${var,,} and declare -A.
-# This block is valid on bash 3.2. It runs before those lines.
-# Linux uname -s is not Darwin, so this does not run there.
+# macOS /bin/bash is 3.2 and stops on ${var,,} and declare -A, so this
+# block comes first and uses only bash 3.2 syntax.
 if [[ "$(uname -s)" == Darwin && -z "${PSBBN_DARWIN_ENTERED:-}" ]]; then
     export PSBBN_DARWIN_ENTERED=1
     exec "$(cd "$(dirname "$0")" && pwd)/scripts/platform/darwin/enter.sh" "$@"
@@ -572,11 +571,11 @@ check_dep(){
     echo >> "$LOG_FILE"
     echo "--- exFAT support ---" >> "$LOG_FILE"
 
-    if grep -qw exfat /proc/filesystems; then
+    if grep -qw exfat /proc/filesystems 2>/dev/null; then
         echo "[✓] Native kernel exFAT support detected." >> "$LOG_FILE"
     else
         sudo modprobe exfat 2>/dev/null
-        if grep -qw exfat /proc/filesystems; then
+        if grep -qw exfat /proc/filesystems 2>/dev/null; then
             echo "[✓] Native kernel exFAT support detected (after modprobe)." >> "$LOG_FILE"
         elif command -v mount.exfat-fuse &>/dev/null; then
             echo "[✓] FUSE-based exFAT support detected (mount.exfat-fuse)." >> "$LOG_FILE"
@@ -856,7 +855,7 @@ if [[ "$arch" != "x86_64" && "$arch" != "aarch64" ]]; then
 fi
 
 # Detect WSL
-if grep -qi microsoft /proc/version; then
+if grep -qi microsoft /proc/version 2>/dev/null; then
     # Detect distro
     if [ -f /etc/os-release ]; then
         . /etc/os-release

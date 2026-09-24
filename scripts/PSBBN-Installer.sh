@@ -47,6 +47,10 @@ ASSETS_DIR="${SCRIPTS_DIR}/assets"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 LANG_DIR="${ASSETS_DIR}/lang"
 STORAGE_DIR="${SCRIPTS_DIR}/storage"
+# macOS writes AppleDouble files when this path is under /var. /tmp does not.
+if [[ "$(uname -s)" == Darwin ]]; then
+    STORAGE_DIR="/tmp/psbbn-storage-${UID}"
+fi
 SYSCONF_XML="${SCRIPTS_DIR}/tmp/sysconf.xml"
 OPL="${SCRIPTS_DIR}/OPL"
 arch="$(uname -m)"
