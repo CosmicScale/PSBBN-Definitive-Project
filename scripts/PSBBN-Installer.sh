@@ -950,6 +950,10 @@ if [ "$MODE" = "install" ]; then
             lang="hun"
             LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_6]}"
             ;;
+        rus)
+            lang="rus"
+            LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_18]}"
+            ;;
         *)
             echo
             echo "Unsupported language. Defaulting to English." >> "${LOG_FILE}"
@@ -990,7 +994,7 @@ else
         fi
 
         lang=$(awk -F' *= *' '$1=="LANG"{print $2}' "${OPL}/version.txt")
-        if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" ]]; then
+        if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" && "$lang" != "rus" ]]; then
             lang="eng"
         fi
 
@@ -1019,6 +1023,9 @@ else
                 ;;
             hun)
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_6]}"
+                ;;
+            rus)
+                LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_18]}"
                 ;;
             *)
                 echo
@@ -1639,6 +1646,7 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
 
     if [[ "$SCREEN" == "full" ]]; then
         case "$lang" in
+            jpn) SIZE_NAME="フル" ;;
             eng) SIZE_NAME="Full" ;;
             fre) SIZE_NAME="Plein écran" ;;
             spa) SIZE_NAME="Pantalla Completa" ;;
@@ -1646,6 +1654,8 @@ if [ "$OS" = "PSBBN" ] && [ "$MODE" = "update" ]; then
             ita) SIZE_NAME="Schermo Intero" ;;
             dut) SIZE_NAME="Volledig" ;;
             por) SIZE_NAME="Completo" ;;
+            hun) SIZE_NAME="Teljes" ;;
+            rus) SIZE_NAME="Весь экран" ;;
         esac
     elif [[ "$SCREEN" == "16:9" ]]; then
             SIZE_NAME="16:9"

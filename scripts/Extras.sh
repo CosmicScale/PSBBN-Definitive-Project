@@ -721,7 +721,7 @@ downoad_latest_file() {
             echo "${UI_TEXT[DOWNLOAD_LATEST_FILE_3]} ${LATEST_FILE}"
         else
             echo "[X] Error: Download failed for ${LATEST_FILE}." "Please check your internet connection and try again." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_LATEST_FILE_1]} ${LATEST_FILE}." "${UI_TEXT[ERROR_LATEST_FILE_2]}"
+            error_msg "${UI_TEXT[ERROR_LATEST_FILE_1]} ${LATEST_FILE}." "${UI_TEXT[GET_LATEST_FILE_3]}"
             return 1
         fi
     fi
@@ -955,28 +955,25 @@ option_two() {
     SWAP_SPLASH
 
     clean_up
-    if [ "$OS" = "HOSD" ]; then
-        echo "[X] Error: PSBBN is not installed. Please install PSBBN to use this feature." >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[ERROR_OS_CHECK_2]}"
-        return 1
-    fi
 
     MOUNT_OPL   || return 1
     
-    psbbn_version=$(head -n 1 "$OPL/version.txt" 2>/dev/null)
-    
-    if [[ "$(printf '%s\n' "$psbbn_version" "2.10" | sort -V | head -n1)" != "2.10" ]]; then
-        # $psbbn_version < 2.10
-        echo "[X] Error: PSBBN Definitive Patch version $psbbn_version is lower than the required version of 3.00. To update, please select 'Install PSBBN' from the main menu and try again." >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[ERROR_VERSION_3]} $psbbn_version" "${UI_TEXT[ERROR_VERSION_4]} 3.00" " " "${UI_TEXT[ERROR_VERSION_5]}"
-        UNMOUNT_OPL
-        return 1
-    elif [[ "$(printf '%s\n' "$psbbn_version" "3.00" | sort -V | head -n1)" = "$psbbn_version" ]] \
-        && [[ "$psbbn_version" != "3.00" ]]; then
-        echo "[X] Error: PSBBN Definitive Patch version $psbbn_version is lower than the required version of 3.00. To update, please select Update PSBBN Software from the main menu and try again." >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[ERROR_VERSION_3]} $psbbn_version" "${UI_TEXT[ERROR_VERSION_4]} 3.00" " " "${UI_TEXT[ERROR_VERSION_6]}"
-        UNMOUNT_OPL
-        return 1
+    if [ "$OS" = "PSBBN" ]; then
+        psbbn_version=$(head -n 1 "$OPL/version.txt" 2>/dev/null)
+        
+        if [[ "$(printf '%s\n' "$psbbn_version" "2.10" | sort -V | head -n1)" != "2.10" ]]; then
+            # $psbbn_version < 2.10
+            echo "[X] Error: PSBBN Definitive Patch version $psbbn_version is lower than the required version of 3.00. To update, please select 'Install PSBBN' from the main menu and try again." >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_VERSION_3]} $psbbn_version" "${UI_TEXT[ERROR_VERSION_4]} 3.00" " " "${UI_TEXT[ERROR_VERSION_5]}"
+            UNMOUNT_OPL
+            return 1
+        elif [[ "$(printf '%s\n' "$psbbn_version" "3.00" | sort -V | head -n1)" = "$psbbn_version" ]] \
+            && [[ "$psbbn_version" != "3.00" ]]; then
+            echo "[X] Error: PSBBN Definitive Patch version $psbbn_version is lower than the required version of 3.00. To update, please select Update PSBBN Software from the main menu and try again." >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_VERSION_3]} $psbbn_version" "${UI_TEXT[ERROR_VERSION_4]} 3.00" " " "${UI_TEXT[ERROR_VERSION_6]}"
+            UNMOUNT_OPL
+            return 1
+        fi
     fi
 
     choice=""
@@ -1052,7 +1049,7 @@ option_two() {
     fi
 
     if [[ -d "${OPL}/APPS/SYS_R3CONFIGURATOR" ]]; then
-        if grep -q '^swap_select_btn =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
+        if grep -q '^swap_button =' "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" 2>> "${LOG_FILE}"; then
         sed -i "s/^swap_button[[:space:]]*=.*/swap_buttons = $R3CONFIG_ENTER/" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" || {
             echo "[X] Error: Failed to update button config in ${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
@@ -1088,6 +1085,17 @@ option_two() {
     fi
 
     UNMOUNT_OPL || return 1
+
+    if [ "$OS" = "HOSD" ]; then
+        SWAP_SPLASH
+        echo "[✓] Buttons Swapped Successfully" >> "${LOG_FILE}"
+        center_title "[✓] ${UI_TEXT[REASSIGN_BUTTONS_4]}"
+        echo
+        center_text "${UI_TEXT[CONTINUE]}"
+        echo
+        read -n 1 -s -r -p "$text" </dev/tty
+        return 0
+    fi
 
     LINUX_PARTITIONS=("__linux.4" )
     APA_PARTITIONS=("__system" )
@@ -1205,6 +1213,7 @@ option_three() {
             CHANGE_LANGUAGE_7
             CHANGE_LANGUAGE_8
             CHANGE_LANGUAGE_9
+            CHANGE_LANGUAGE_10
         )
         center_menu
         printf "%*s%s\n\n" "$((padding - 3))" "" "${UI_TEXT[CHANGE_LANGUAGE_1]}"
@@ -1215,7 +1224,8 @@ option_three() {
         printf "%*s%s\n\n" "$padding" "5) " "${UI_TEXT[CHANGE_LANGUAGE_6]}"
         printf "%*s%s\n\n" "$padding" "6) " "${UI_TEXT[CHANGE_LANGUAGE_7]}"
         printf "%*s%s\n\n" "$padding" "7) " "${UI_TEXT[CHANGE_LANGUAGE_8]}"
-        printf "%*s%s\n\n" "$padding" "8) " "${UI_TEXT[CHANGE_LANGUAGE_9]}"
+        printf "%*s%s\n\n" "$padding" "8) " "${UI_TEXT[CHANGE_LANGUAGE_18]}"
+        printf "%*s%s\n\n" "$padding" "9) " "${UI_TEXT[CHANGE_LANGUAGE_9]}"
         printf "%*s%s\n\n" "$padding" "b) " "${UI_TEXT[MENU_BACK]}"
         printf "%*s%s " "$((padding - 3))" "" "${UI_TEXT[MENU_PROMPT]}"
         read -rp "" choice
@@ -1285,6 +1295,15 @@ option_three() {
                 break
                 ;;
             8)
+                lang="rus"
+                OPL_LANG="Russian"
+                R3CONFIG_LANG="en"
+                WLE_LANG="english"
+                PLOAD_LANG="EN"
+                LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_18]}"
+                break
+                ;;
+            9)
                 lang="spa"
                 OPL_LANG="Spanish"
                 R3CONFIG_LANG="es"
@@ -1427,7 +1446,12 @@ option_three() {
             return 1
         }
 
-        LINUX_PARTITIONS=("__linux.1" "__linux.4" "__linux.5" "__linux.9" )
+        if [[ "$lang" == "jpn" ]]; then
+            LINUX_PARTITIONS=("__linux.1" "__linux.4" "__linux.5" "__linux.9" )
+        else
+            LINUX_PARTITIONS=("__linux.1" "__linux.4" "__linux.5" )
+        fi
+
         APA_PARTITIONS=("__system" "__sysconf" "__common")
 
         clean_up   && \
@@ -1445,20 +1469,9 @@ option_three() {
         }
 
         if [[ "$lang" == "jpn" ]]; then
-            cp -f "${ASSETS_DIR}/kernel/vmlinux_jpn" "${STORAGE_DIR}/__system/p2lboot/vmlinux" 2>> "${LOG_FILE}" || {
-                echo "[X] Error: Failed to copy kernel file." >> "$LOG_FILE"
-                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_5]}"
-                return 1
-            }
             sudo tar zxpf "${CHANNELS}" -C "${STORAGE_DIR}/" >> "${LOG_FILE}" 2>&1 || {
                 echo "[X] Error: Failed to install channels." >> "$LOG_FILE"
                 error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_4]}"
-                return 1
-            }
-        else
-            cp -f "${ASSETS_DIR}/kernel/vmlinux" "${STORAGE_DIR}/__system/p2lboot/vmlinux" 2>> "${LOG_FILE}" || {
-                echo "[X] Error: Failed to copy kernel file." >> "$LOG_FILE"
-                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_5]}"
                 return 1
             }
         fi
@@ -1492,19 +1505,19 @@ option_three() {
             if sudo cp -f "${ASSETS_DIR}/kernel/vmlinux_jpn" "${STORAGE_DIR}/__system/p2lboot/vmlinux" >> "${LOG_FILE}" 2>&1 \
                 && sudo cp -f "${ASSETS_DIR}/kernel/o.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_r.tm2" >> "${LOG_FILE}" 2>&1 \
                 && sudo cp -f "${ASSETS_DIR}/kernel/x.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_d.tm2" >> "${LOG_FILE}" 2>&1 ; then
-                echo "Enter button swapped to O" >> "${LOG_FILE}"
+                echo "Copied kernel and enter button set to O" >> "${LOG_FILE}"
             else
-                echo "[X] Error: Failed to swap enter button." >> "$LOG_FILE"
-
+                echo "[X] Error: Failed to copy kernel file." >> "$LOG_FILE"
+                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_5]}"
             fi
         elif [[ "$ENTER" == "X" ]] || { [[ -z "$ENTER" ]] && [[ "$lang" != "jpn" ]]; }; then
             if sudo cp -f "${ASSETS_DIR}/kernel/vmlinux" "${STORAGE_DIR}/__system/p2lboot/vmlinux" >> "${LOG_FILE}" 2>&1 \
                 && sudo cp -f "${ASSETS_DIR}/kernel/x.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_r.tm2" >> "${LOG_FILE}" 2>&1 \
                 && sudo cp -f "${ASSETS_DIR}/kernel/o.tm2" "${STORAGE_DIR}/__linux.4/bn/data/tex/btn_d.tm2" >> "${LOG_FILE}" 2>&1 ; then
-                echo "Enter button swapped to X" >> "${LOG_FILE}"
+                echo "Copied kernel and enter button set to X" >> "${LOG_FILE}"
             else
-                echo "Failed to swap enter button. See log for details." >> "$LOG_FILE"
-                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_7]}"
+                echo "[X] Error: Failed to copy kernel file." >> "$LOG_FILE"
+                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_5]}"
             fi
         fi
 
@@ -1519,6 +1532,7 @@ option_three() {
                 dut) SIZE_NAME="Volledig" ;;
                 por) SIZE_NAME="Completo" ;;
                 hun) SIZE_NAME="Teljes" ;;
+                rus) SIZE_NAME="Весь экран" ;;
             esac
         elif [[ "$SCREEN" == "16:9" ]]; then
             SIZE_NAME="16:9"
@@ -1641,6 +1655,7 @@ option_four() {
                     dut) SIZE_NAME="Volledig" ;;
                     por) SIZE_NAME="Completo" ;;
                     hun) SIZE_NAME="Teljes" ;;
+                    rus) SIZE_NAME="Весь экран" ;;
                 esac
                 break
                 ;;
@@ -1766,14 +1781,14 @@ option_five() {
     # === Delete files in ARTWORK_DIR ===
     if ! find "$ARTWORK_DIR" -maxdepth 1 -type f ! \( \
         -name "APP.png" -o \
-        -name "APP_WLE-R3Z.png" -o \
-        -name "HOSDMENU.png" -o \
+        -name "APP_WLER3Z.png" -o \
+        -name "SYS_OSDMENU.png" -o \
         -name "SYS_R3CONFIG.png" -o \
-        -name "NHDDL.png" -o \
-        -name "OPENPS2LOAD.png" -o \
+        -name "APP_NHDDL.png" -o \
+        -name "APP_OPL.png" -o \
         -name "ps1.png" -o \
         -name "ps2.png" -o \
-        -name "POPSLOADER.png" \
+        -name "PS1_POPSLOAD.png" \
     \) -delete; then
     echo "[X] Error: Some files could not be deleted in $ARTWORK_DIR" >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_CLEAR_CACHE]}"
@@ -1782,19 +1797,19 @@ option_five() {
 
     # === Delete files in ICO_DIR ===
     if ! find "$ICO_DIR" -maxdepth 1 -type f ! \( \
-        -name "app-del.ico" -o \
-        -name "app.ico" -o \
         -name "cd.ico" -o \
         -name "dvd.ico" -o \
-        -name "nhddl-del.ico" -o \
-        -name "nhddl.ico" -o \
-        -name "opl-del.ico" -o \
-        -name "opl.ico" -o \
         -name "ps1.ico" -o \
-        -name "psbbn-del.ico" -o \
-        -name "psbbn.ico" -o \
-        -name "popsloader.ico" -o \
-        -name "popsloader-del.ico" \
+        -name "APP_DEFAULT_DEL.ico" -o \
+        -name "APP_DEFAULT_LST.ico" -o \
+        -name "APP_NHDDL_DEL.ico" -o \
+        -name "APP_NHDDL_LST.ico" -o \
+        -name "APP_OPL_DEL.ico" -o \
+        -name "APP_OPL_LST.ico" -o \
+        -name "SYS_PSBBN_DEL.ico" -o \
+        -name "SYS_PSBBN_LST.ico" -o \
+        -name "PS1_POPSLOAD_LST.ico" -o \
+        -name "PS1_POPSLOAD_DEL.ico" \
     \) -delete; then
         echo "[X] Error: Some files could not be deleted in $ICO_DIR" >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_CLEAR_CACHE]}"

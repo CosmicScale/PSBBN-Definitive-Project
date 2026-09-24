@@ -543,6 +543,9 @@ case "$LANG_FILE" in
     hun)
         lang="hun"
         ;;
+    rus)
+        lang="rus"
+        ;;
     *)
         echo
         echo "Unsupported language. Defaulting to English." >> "${LOG_FILE}"
@@ -592,7 +595,7 @@ free_space=$((available / 1024))
 
 echo >> "${LOG_FILE}"
 
-# Prompt user for partition size for POPS, Music and Contents, validate input, and keep asking until valid input is provided
+# Prompt user to reserve space for future APA partitions
 while true; do
     SPLASH
     center_title "${UI_TEXT[PARTITION_DRIVE_1]}"
@@ -704,7 +707,6 @@ cp "${ASSETS_DIR}/extras"/{OSDSYS_A.XLF,FNTOSD,ICOIMAGE,JISUCS,SKBIMAGE,SNDIMAGE
 
 cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" <<'EOL'
 boot_auto = $HOSDSYS
-boot_auto_arg1 = -dev9=NICHDD
 boot_cross =
 boot_circle =
 boot_square =

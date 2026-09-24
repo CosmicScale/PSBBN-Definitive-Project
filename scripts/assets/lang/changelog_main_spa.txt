@@ -1,5 +1,15 @@
-• PSBBN Definitive Project ya está completamente localizado al húngaro. Puedes cambiar el idioma de tu instalación de PSBBN desde el menú Extras opcionales.
+• Se ha añadido una opción para comprimir archivos ISO de PS2 al instalar juegos. Active esta opción para ahorrar espacio y almacenar más juegos en su unidad.
 
-• Todos los paquetes de idiomas se han actualizado con correcciones y traducciones mejoradas.
+• Se ha añadido una opción para instalar parches panorámicos para juegos de PS2, habilitando compatibilidad real con formato 16:9 y un campo de visión más amplio en los juegos compatibles.
 
-• R3CONFIGURATOR se ha actualizado a la v1.3.1 y wLaunchELF_R3Z se ha actualizado a la v4.76. Para actualizarlos, selecciona "Instalar juegos y aplicaciones" en el menú principal.
+• Se ha mejorado el instalador de aplicaciones homebrew. La base de datos de aplicaciones se ha ampliado y ahora contiene información de más de 500 aplicaciones, incluyendo su título, desarrollador, ID de título y categoría.
+
+• El Selector de Juegos ahora divide las aplicaciones homebrew en las siguientes categorías: Emuladores, Juegos, Demoscene, Aplicaciones, Aplicaciones de PS1, Aplicaciones del Sistema, Herramientas de Diagnóstico, Aplicaciones de Depuración y Entornos de Ejecución. Puede reorganizar libremente las categorías según sus preferencias.
+
+• Se han añadido más de 500 iconos de navegador para aplicaciones a la Base de Datos de Iconos HDD-OSD. El instalador ahora descarga estos iconos para mostrarlos en el Navegador de HOSDMenu.
+
+• Las aplicaciones del Navegador ahora muestran la categoría a la que pertenecen.
+
+• R3CONFIGURATOR ahora está asignado a una tecla de arranque y puede iniciarse durante el arranque manteniendo pulsado el botón SELECT.
+
+• Los usuarios que utilicen únicamente HOSDMenu ahora pueden usar la opción «Reasignar los botones Cruz y Círculo» en el menú Extras Opcionales.

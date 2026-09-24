@@ -136,6 +136,9 @@ case "$SYS_LANG" in
     hu*)
         LANG_FILE="hun"
        ;;
+    #ru*)
+    #    LANG_FILE="rus"
+    #   ;;
     *)
         LANG_FILE="eng"
         ;;
@@ -424,12 +427,10 @@ check_required_files() {
         "${SCRIPTS_DIR}/Media-Installer.sh"
         "${HELPER_DIR}/art_downloader.py"
         "${HELPER_DIR}/binmerge.py"
-        "${HELPER_DIR}/icon_sys_to_txt.py"
         "${HELPER_DIR}/list-builder.py"
         "${HELPER_DIR}/list-sorter.py"
         "${HELPER_DIR}/music-installer.py"
         "${HELPER_DIR}/ps2iconmaker.sh"
-        "${HELPER_DIR}/txt_to_icon_sys.py"
         "${HELPER_DIR}/ziso.py"
         "${ASSETS_DIR}/database/AppDB.csv"
         "${ASSETS_DIR}/database/ArtDB.csv"
@@ -845,7 +846,7 @@ echo >> "${LOG_FILE}"
 echo "WSL: $wsl" >> "${LOG_FILE}"
 echo "Disk Serial: $serialnumber" >> "${LOG_FILE}"
 echo "Path: $path_arg" >> "${LOG_FILE}"
-echo "Language: $lang" >> "${LOG_FILE}"
+echo "Language: $LANG_FILE" >> "${LOG_FILE}"
 echo >> "${LOG_FILE}"
 
 if [[ "$arch" != "x86_64" && "$arch" != "aarch64" ]]; then
@@ -904,7 +905,7 @@ else
 
     lang=$(awk -F' *= *' '$1=="LANG"{print $2}' "${OPL}/version.txt")
 
-    if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" ]]; then
+    if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" && "$lang" != "rus" ]]; then
         lang="eng"
     fi
 
@@ -979,11 +980,11 @@ if [ -f "${ASSETS_DIR}/lang/changelog_main_$LANG_FILE.txt" ]; then
     echo "$text"
     center_text "${UI_TEXT[CHANGE_URL]}"
     echo "$text"
-    # echo
-    # center_text "${UI_TEXT[CHANGELOG_2]}"
-    # echo "$text"
-    # center_text "https://youtu.be/UEsqDorgbew"
-    #echo "$text"
+    echo
+    center_text "${UI_TEXT[CHANGELOG_2]}"
+    echo "$text"
+    center_text "https://youtu.be/ImmUr69x57Y"
+    echo "$text"
     echo
     echo "=============================================================================================================="
     echo
