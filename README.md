@@ -64,6 +64,9 @@ Both installation options offer:
 # Changelog
 
 **September 17, 2026 - Compressed Games, Widescreen Hacks, Improved Homebrew installer**
+<p></p>
+
+[![PSBBN Update: Game Compression, Widescreen Hacks, Improved Homebrew installer & more!](https://github.com/user-attachments/assets/4dfe26c8-7349-4f14-97d1-e88e616ea599)](https://youtu.be/ImmUr69x57Y)
 
 **New Features:**
 
