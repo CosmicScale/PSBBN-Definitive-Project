@@ -703,7 +703,6 @@ cp "${ASSETS_DIR}/extras"/{OSDSYS_A.XLF,FNTOSD,ICOIMAGE,JISUCS,SKBIMAGE,SNDIMAGE
 
 cat > "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" <<'EOL'
 boot_auto = $HOSDSYS
-boot_auto_arg1 = -dev9=NICHDD
 boot_cross =
 boot_circle =
 boot_square =
