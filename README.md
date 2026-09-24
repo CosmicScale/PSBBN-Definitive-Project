@@ -70,7 +70,7 @@ Both installation options offer:
 
 **New Features:**
 
-**[Game and App Installer](**#install-games-and-apps**):**
+**[Game and App Installer](#install-games-and-apps):**
 - Added an option to compress PS2 `ISO` files when installing games. Enable this option to save space and fit more games on your drive.
 - Added an option to install widescreen hacks for PS2 games, enabling true 16:9 widescreen support with a wider field of view in compatible games.
 - Improved the installer for homebrew apps. The application database has been expanded to contain details of over 500 applications, including their title, developer, title ID, and category.
@@ -79,7 +79,7 @@ Both installation options offer:
 - Applications in the [Browser](#hosdmenu) now display the category to which they belong.
 - [R3CONFIGURATOR](#r3configurator) is now assigned to a [boot key](#boot-options) and can be launched at boot by holding the *SELECT* button.
 
-**[Optional Extras](**#optional-extras**):**
+**[Optional Extras](#optional-extras):**
 - HOSDMenu-only users can now use the [Reassign Cross and Circle Buttons](#reassign-cross-and-circle-buttons) option in the [Optional Extras menu](#optional-extras). This swaps the functions of the × and ○ buttons in [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#wlaunchelf-r3z), and [R3CONFIGURATOR](#r3configurator).
 
 **Enhancements and Bug Fixes:**
