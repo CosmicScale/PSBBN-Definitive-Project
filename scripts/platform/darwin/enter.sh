@@ -55,8 +55,13 @@ if command -v brew >/dev/null 2>&1; then
 fi
 path="$path:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:$orig_path"
 export PATH="$path"
+# macOS creates AppleDouble files on copies. The PS2 partitions must not get them.
+export COPYFILE_DISABLE=1
 
 overlay="${TMPDIR:-/tmp}/psbbn-overlay-${UID}"
 build_overlay "$repo" "$overlay"
 cd "$overlay"
+# exec keeps this pid. da-veto refuses Disk Arbitration mounts of the
+# selected drive for as long as this process lives.
+export PSBBN_SESSION_PID=$$
 exec "$bash5" "$overlay/PSBBN-Definitive-Patch.sh" "$@"
