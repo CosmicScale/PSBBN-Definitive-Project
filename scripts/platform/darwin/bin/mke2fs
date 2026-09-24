@@ -1,8 +1,7 @@
 #!/bin/bash
-# Darwin strategy for mke2fs.
-# A mapper stamp with a .meta file is an APA slice: format that byte range
-# of the underlying disk with -E offset. A real external partition is passed
-# through. An internal disk is refused. Linux never uses this file.
+# A mapper stamp with a .meta file is an APA slice: the slice file itself is
+# formatted (never the disk with -E offset) and umount writes it back. A real
+# external partition is passed through. An internal disk is refused.
 if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
     exit 0
 fi
@@ -58,8 +57,7 @@ if [[ -f "${path}.meta" ]]; then
         echo "mke2fs: refusing internal disk $device" >&2
         exit 2
     fi
-    # Format the slice file. Do not run mke2fs -E offset on the whole disk.
-    "$real" "${args[@]}" "$path"
+    "$real" -F "${args[@]}" "$path"
     exit $?
 fi
 

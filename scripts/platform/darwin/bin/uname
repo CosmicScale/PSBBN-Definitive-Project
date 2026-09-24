@@ -1,5 +1,5 @@
 #!/bin/bash
-# uame -m on Apple silicon is arm64. The installer only accepts x86_64 and aarch64.
+# uname -m on Apple silicon is arm64. The installer only accepts x86_64 and aarch64.
 real="${PSBBN_UNAME:-/usr/bin/uname}"
 if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
     exit 0

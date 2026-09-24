@@ -1,20 +1,86 @@
 #!/bin/bash
+# A staged partition is written back: the directory goes into the slice
+# (debugfs, mtools or pfsshell), the slice goes onto the PS2 drive with dd.
+# A real macOS mount (the OPL exFAT volume) is handed to diskutil.
 if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
     exit 0
 fi
 here=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
-. "$here/../lib.sh"
+. "$here/../../load.sh"
 args=()
 for arg in "$@"; do
     case "$arg" in
-        -l|--lazy) continue ;;
+        -l|--lazy|-f|--force) continue ;;
         --) continue ;;
-        *) args+=("$(psbbn_rewrite_device "$arg")") ;;
+        *)
+            arg=$(psbbn_rewrite_device "$arg")
+            if [[ "$arg" != "/" ]]; then
+                arg=${arg%/}
+            fi
+            args+=("$arg")
+            ;;
     esac
 done
-real="${PSBBN_REAL_UMOUNT:-/sbin/umount}"
 if [[ ${#args[@]} -eq 0 ]]; then
     exit 0
 fi
-exec "$real" "${args[@]}"
+state=$(psbbn_mount_state_dir)
+for arg in "${args[@]}"; do
+    key=$(psbbn_mount_key "$arg")
+    if [[ ! -f "$state/$key" ]]; then
+        psbbn_strip_appledouble "$arg"
+        psbbn_diskutil_unmount "$arg" || exit $?
+        continue
+    fi
+    slice=$(cat "$state/$key")
+    kind=""
+    [[ -f "$state/$key.kind" ]] && kind=$(cat "$state/$key.kind")
+    manifest="$state/$key.manifest"
+    [[ -f "$manifest" ]] || manifest=""
+    case "$kind" in
+        ext2|vfat)
+            if [[ ! -f "$slice" ]]; then
+                session=""
+                [[ -f "$state/$key.session" ]] && session=$(cat "$state/$key.session")
+                if [[ -n "$session" && "$session" == "${PSBBN_SESSION_PID:-}" ]]; then
+                    echo "umount: $arg: slice $slice vanished during this run; nothing in $arg was written back" >&2
+                    exit 1
+                fi
+                # A record left by an earlier, failed run. Nothing can be
+                # written back; do not block every later run.
+                echo "umount: $arg: slice $slice is gone, dropping the stale record" >&2
+                psbbn_stage_forget "$arg"
+                continue
+            fi
+            if [[ "$kind" == ext2 ]]; then
+                psbbn_ext2_import "$arg" "$slice" "$manifest" || exit $?
+            else
+                psbbn_vfat_import "$arg" "$slice" || exit $?
+            fi
+            ;;
+        pfs)
+            part=""
+            [[ -f "$state/$key.part" ]] && part=$(cat "$state/$key.part")
+            psbbn_pfs_import "$arg" "$slice" "$part" "$manifest" || exit $?
+            ;;
+        *)
+            echo "umount: $arg: unknown stage kind '$kind'" >&2
+            exit 1
+            ;;
+    esac
+    if [[ -f "${slice}.meta" ]]; then
+        device=""
+        start=""
+        sectors=""
+        node=""
+        # shellcheck disable=SC1091
+        . "${slice}.meta"
+        psbbn_writeback_range "$device" "$start" "$sectors" "$slice" || exit $?
+        if [[ "$node" == 1 ]]; then
+            rm -f "${slice:?}" "${slice:?}.meta"
+        fi
+    fi
+    psbbn_stage_forget "$arg"
+done
+exit 0

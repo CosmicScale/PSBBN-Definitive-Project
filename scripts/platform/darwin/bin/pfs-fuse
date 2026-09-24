@@ -1,0 +1,72 @@
+#!/bin/bash
+# The installer starts PFS Fuse by path. A FUSE-T mount is what panicked
+# macOS 27, so the mount point is a normal folder filled with pfsshell get;
+# umount writes it back with pfsshell put. Runs as the user (the sudo shim
+# recognises the helper symlink); only pfsshell is elevated for a real disk.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+source=$0
+while [[ -L "$source" ]]; do
+    dir=$(cd "$(dirname "$source")" && pwd)
+    target=$(readlink "$source")
+    if [[ "$target" != /* ]]; then
+        source="$dir/$target"
+    else
+        source="$target"
+    fi
+done
+here=$(cd "$(dirname "$source")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+
+partition=""
+device=""
+mnt=""
+args=("$@")
+i=0
+n=${#args[@]}
+while [[ $i -lt $n ]]; do
+    a=${args[$i]}
+    case "$a" in
+        --partition=*)
+            partition=${a#--partition=}
+            ;;
+        --partition)
+            i=$((i + 1))
+            partition=${args[$i]:-}
+            ;;
+        -o)
+            i=$((i + 1))
+            ;;
+        -*)
+            printf '%s\n' "PFS Fuse: unsupported option $a" >&2
+            exit 1
+            ;;
+        *)
+            if [[ -z "$device" ]]; then
+                device=$a
+            else
+                mnt=$a
+            fi
+            ;;
+    esac
+    i=$((i + 1))
+done
+mnt=${mnt%/}
+if [[ -z "$partition" || -z "$device" || -z "$mnt" ]]; then
+    printf '%s\n' "PFS Fuse: usage: PFS Fuse -o allow_other --partition=NAME device mountpoint" >&2
+    exit 1
+fi
+if psbbn_is_real_disk "$device" && psbbn_disk_internal "$device"; then
+    printf '%s\n' "PFS Fuse: refusing internal disk $device" >&2
+    exit 2
+fi
+mkdir -p "$mnt"
+if ! psbbn_pfs_export "$device" "$partition" "$mnt"; then
+    printf '%s\n' "PFS Fuse: $mnt did not mount" >&2
+    exit 1
+fi
+psbbn_stage_save "$mnt" "$device" pfs "$partition"
+psbbn_manifest_write "$mnt" || exit 1
+exit 0

@@ -19,5 +19,11 @@ if [[ ! -f "$path" && ! -f "${path}.meta" ]]; then
     echo "mkfs.vfat: not a slice file: $path" >&2
     exit 2
 fi
-# newfs_msdos writes the FAT on the slice file. The file is the slice.
-exec /sbin/newfs_msdos -F 32 "$path"
+# newfs_msdos cannot ioctl a regular file. -s is the sector count.
+bytes=$(wc -c < "$path")
+sectors=$((bytes / 512))
+if (( sectors < 65536 )); then
+    echo "mkfs.vfat: $path is too small for FAT32 ($sectors sectors)" >&2
+    exit 1
+fi
+exec /sbin/newfs_msdos -F 32 -s "$sectors" "$path"

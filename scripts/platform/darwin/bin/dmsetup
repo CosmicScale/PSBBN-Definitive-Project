@@ -50,7 +50,7 @@ case "$cmd" in
             [[ -z "$line" ]] && continue
             name="${line%%,*}"
             printf '%s\n' "$line" > "$state/$name"
-            if ! /opt/homebrew/bin/python3 - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
+            if ! "$(psbbn_python)" - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
 import os, sys
 node, meta_path, line = sys.argv[1], sys.argv[2], sys.argv[3]
 parts = line.split(",")
