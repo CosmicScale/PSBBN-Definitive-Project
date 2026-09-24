@@ -1,0 +1,22 @@
+#!/bin/bash
+# The overlay presents the repository's files as symlinks. rsync skips
+# symlinks unless asked to follow them ("skipping non-regular file"), and
+# still exits 0, so the installer would report an app as updated while
+# nothing was copied. On Linux these sources are regular files, so follow
+# links here. Everything else goes to the real rsync.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+real=""
+IFS=: read -r -a dirs <<< "$PATH"
+for dir in "${dirs[@]}"; do
+    [[ -n "$dir" && "$dir" != "$here" && -x "$dir/rsync" ]] || continue
+    real="$dir/rsync"
+    break
+done
+if [[ -z "$real" ]]; then
+    echo "rsync: not installed (brew install rsync)" >&2
+    exit 127
+fi
+exec "$real" --copy-links "$@"
