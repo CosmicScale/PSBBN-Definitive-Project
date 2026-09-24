@@ -1,6 +1,7 @@
 #!/bin/bash
-# sudo dd is how the installer zeros a drive. This checks the disk before
-# /bin/dd runs. Linux calls /bin/dd directly because this file is not on PATH.
+# sudo dd is how the installer zeros a drive, reads the APA header back and
+# writes the checksum and bootstrap. Reads and writes of a disk node need
+# root. Linux calls /bin/dd directly because this file is not on PATH.
 if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
     exit 0
 fi
@@ -23,7 +24,26 @@ done
 needs_root=0
 for arg in "${args[@]}"; do
     case "$arg" in
-        of=/dev/disk*|of=/dev/rdisk*) needs_root=1 ;;
+        of=/dev/disk*|of=/dev/rdisk*|if=/dev/disk*|if=/dev/rdisk*)
+            if psbbn_disk_internal "${arg#*=}"; then
+                echo "dd: refusing internal disk ${arg#*=}" >&2
+                exit 2
+            fi
+            ;;
+    esac
+done
+for arg in "${args[@]}"; do
+    case "$arg" in
+        of=/dev/disk*|of=/dev/rdisk*)
+            needs_root=1
+            target=${arg#of=}
+            if ! psbbn_is_partition_node "$target"; then
+                psbbn_quiesce_disk "$target"
+            fi
+            ;;
+        if=/dev/disk*|if=/dev/rdisk*)
+            needs_root=1
+            ;;
     esac
 done
 if [[ "$needs_root" -eq 1 ]]; then
