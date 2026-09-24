@@ -539,6 +539,9 @@ case "$LANG_FILE" in
     hun)
         lang="hun"
         ;;
+    rus)
+        lang="rus"
+        ;;
     *)
         echo
         echo "Unsupported language. Defaulting to English." >> "${LOG_FILE}"
@@ -588,7 +591,7 @@ free_space=$((available / 1024))
 
 echo >> "${LOG_FILE}"
 
-# Prompt user for partition size for POPS, Music and Contents, validate input, and keep asking until valid input is provided
+# Prompt user to reserve space for future APA partitions
 while true; do
     SPLASH
     center_title "${UI_TEXT[PARTITION_DRIVE_1]}"

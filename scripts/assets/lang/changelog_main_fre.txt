@@ -1,5 +1,15 @@
-• Le PSBBN Definitive Project est désormais entièrement localisé en hongrois. Vous pouvez modifier la langue de votre installation de PSBBN depuis le menu Extras optionnels.
+• Ajout d’une option permettant de compresser les fichiers ISO PS2 lors de l’installation des jeux. Activez cette option pour économiser de l’espace et stocker davantage de jeux sur votre disque.
 
-• Tous les packs de langues ont été mis à jour avec des corrections et des traductions améliorées.
+• Ajout d’une option permettant d’installer des correctifs écran large pour les jeux PS2, offrant une véritable prise en charge du format 16:9 avec un champ de vision élargi dans les jeux compatibles.
 
-• R3CONFIGURATOR a été mis à jour vers la v1.3.1, et wLaunchELF_R3Z a été mis à jour vers la v4.76. Pour les mettre à jour, sélectionnez "Installer jeux et applications" dans le menu principal.
+• Amélioration de l’installateur des applications homebrew. La base de données des applications a été enrichie et contient désormais des informations sur plus de 500 applications, notamment leur titre, développeur, identifiant de titre et catégorie.
+
+• Le Sélecteur de Jeux répartit désormais les applications homebrew dans les catégories suivantes : Émulateurs, Jeux, Demoscene, Applications, Applications PS1, Applications système, Outils de diagnostic, Applications de débogage et Environnements d’exécution. Vous pouvez réorganiser librement les catégories selon vos préférences.
+
+• Plus de 500 icônes de navigateur pour les applications ont été ajoutées à la base de données d’icônes HDD-OSD. L’installateur télécharge désormais ces icônes afin qu’elles soient affichées dans le Navigateur de HOSDMenu.
+
+• Les applications affichées dans le Navigateur indiquent désormais la catégorie à laquelle elles appartiennent.
+
+• R3CONFIGURATOR est désormais associé à une touche de démarrage et peut être lancé au démarrage en maintenant le bouton SELECT enfoncé.
+
+• Les utilisateurs de HOSDMenu uniquement peuvent désormais utiliser l’option « Réaffecter les boutons Croix et Rond » dans le menu Extras optionnels.

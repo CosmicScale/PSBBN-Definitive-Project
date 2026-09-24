@@ -72,18 +72,22 @@ body:
         ## Games Not Working
         Some games may fail to launch or exhibit compatibility issues. First, make sure your game image is a verified good dump. Check the MD5 or SHA-1 checksum of your `ISO` or `BIN` file and confirm that it matches the corresponding entry on [redump.org](http://redump.org).
 
-        If you experience problems launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](https://github.com/CosmicScale/PSBBN-Definitive-Project#installing-ata-bdm-assault).
+        If you selected OPL as your game launcher, try disabling cheats:
+        1. Launch OPL, highlight the game you are having issues with in the games list, and press △
+        2. Select "Cheat Settings" and turn off "PS2RD Cheat Engine"
+        3. Save the changes and launch the game
         
-        For issues with PS2 games, if you selected OPL as your game launcher, you can check for existing issues or report a new one [here](https://github.com/ps2homebrew/Open-PS2-Loader/issues). If you selected NHDDL, you can do so [here](https://github.com/rickgaiser/neutrino/issues).
+        If you still experience problems with specific PS2 games, if you selected OPL as your game launcher, you can check for existing issues or report a new one [here](https://github.com/ps2homebrew/Open-PS2-Loader/issues). If you selected NHDDL, you can do so [here](https://github.com/rickgaiser/neutrino/issues).
 
         If all PS1 or PS2 games fail to launch, follow the steps below:
 
         If games fail to launch from the Game Collection or Browser, try the following:
         1. If you have a mod chip, disable it
-        2. If you're having trouble launching PS2 games, remove all PS2 Memory Cards from your console and try again. If this resolves the issue, delete any `Your System Configuration` save files from the memory cards, as corrupted configuration data can prevent games from launching.
-        3. Check that the connectors on the console and Network or HDD Adapter are clean and free of dust or debris
-        4. Ensure the Network or HDD adapter and drive are securely connected to the console
-        5. If using a SATA mod, make sure it has been installed correctly
+        2. If you're having issues launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](#https://github.com/CosmicScale/PSBBN-Definitive-Project#installing-ata-bdm-assault)
+        3. If you're having trouble launching PS2 games, remove all PS2 Memory Cards from your console and try again. If this resolves the issue, delete any `Your System Configuration` save files from the memory cards, as corrupted configuration data can prevent games from launching.
+        4. Check that the connectors on the console and Network or HDD Adapter are clean and free of dust or debris
+        5. Ensure the Network or HDD adapter and drive are securely connected to the console
+        6. If using a SATA mod, make sure it has been installed correctly
 
         If games still fail to launch, try loading PS2 games using OPL or NHDDL, and PS1 games using POPSLoader.
 

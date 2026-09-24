@@ -1,5 +1,15 @@
-• A PSBBN Definitive Project most már teljes egészében magyar nyelvre van lokalizálva. A PSBBN telepítésének nyelvét az Opcionális extrák menüben módosíthatja.
+• Új lehetőség került hozzáadásra a PS2 ISO fájlok tömörítésére játékok telepítésekor. Engedélyezze ezt a lehetőséget a tárhely megtakarításához és ahhoz, hogy több játék férjen el a meghajtón.
 
-• Minden nyelvi csomag frissítve lett javításokkal és továbbfejlesztett fordításokkal.
+• Új lehetőség került hozzáadásra a PS2-játékok szélesvásznú javításainak telepítésére, amely a kompatibilis játékokban valódi 16:9-es szélesvásznú támogatást és nagyobb látómezőt biztosít.
 
-• Az R3CONFIGURATOR az 1.3.1-es verzióra, a wLaunchELF_R3Z pedig a 4.76-os verzióra lett frissítve. A frissítésükhöz válassza a "Játékok és alkalmazások telepítése" lehetőséget a főmenüben.
+• Javult a homebrew alkalmazások telepítője. Az alkalmazásadatbázis kibővült, és már több mint 500 alkalmazás adatait tartalmazza, beleértve a nevüket, fejlesztőjüket, azonosítójukat és kategóriájukat.
+
+• A Játékválasztó mostantól a következő kategóriákba sorolja a homebrew alkalmazásokat: Emulátorok, Játékok, Demoscene, Alkalmazások, PS1 Alkalmazások, Rendszeralkalmazások, Diagnosztikai Eszközök, Hibakereső Alkalmazások és Futtatókörnyezetek. A kategóriák szabadon átrendezhetők az igényeinek megfelelően.
+
+• Több mint 500 alkalmazásikon került hozzáadásra a HDD-OSD Ikonadatbázishoz. A telepítő mostantól letölti ezeket az ikonokat, hogy megjelenjenek a HOSDMenu Böngészőjében.
+
+• A Böngészőben található alkalmazások mostantól megjelenítik a kategóriájukat.
+
+• A R3CONFIGURATOR mostantól egy indítógombhoz van hozzárendelve, és a SELECT gomb nyomva tartásával indítható rendszerindításkor.
+
+• A kizárólag HOSDMenu-t használó felhasználók mostantól használhatják a „Kereszt és Kör gombok felcserélése” opciót az Opcionális Extrák menüben.

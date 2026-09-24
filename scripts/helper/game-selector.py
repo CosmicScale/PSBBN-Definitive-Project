@@ -71,7 +71,7 @@ def fit_text(text: str, width: int) -> str:
 
 def parse(data, lang):
     ps1, ps2 = [], []
-    apps, launchers, smb = [], [], []
+    apps, launchers, smb, emu, gme, sys, dst, dbg, ps1app, rte, dem = [], [], [], [], [], [], [], [], [], [], []
 
     for line in data.splitlines():
         parts = line.split("|")
@@ -102,8 +102,24 @@ def parse(data, lang):
             ps1.append(item)
         elif media == "SMB":
             smb.append(item)
+        elif media == "EMU":
+            emu.append(item)
+        elif media == "GME":
+            gme.append(item)
+        elif media == "SYS":
+            sys.append(item)
+        elif media == "DST":
+            dst.append(item)
+        elif media == "DBG":
+            dbg.append(item)
+        elif media == "PS1":
+            ps1app.append(item)
+        elif media == "RTE":
+            rte.append(item)
+        elif media == "DEM":
+            dem.append(item)
 
-    return ps1, ps2, apps, launchers, smb
+    return ps1, ps2, apps, launchers, smb, emu, gme, sys, dst, dbg, ps1app, rte, dem
 
 def load_exclusions(path):
     excluded = set()
@@ -344,6 +360,14 @@ class GameSelector(App):
             self.apps,
             self.launchers,
             self.smb,
+            self.emu,
+            self.gme,
+            self.sys,
+            self.dst,
+            self.dbg,
+            self.ps1app,
+            self.rte,
+            self.dem,
         ) = parse(raw, self.lang)
 
         self.section_widgets = {}
@@ -353,7 +377,15 @@ class GameSelector(App):
             "ps1": (f"🎮 {self.tr('GAME_SELECTOR_8')}", self.ps1),
             "smb": (f"🔗 {self.tr('GAME_SELECTOR_9')}", self.smb),
             "launchers": (f"🚀 {self.tr('GAME_SELECTOR_10')}", self.launchers),
+            "ps1app": (f"🗃️  {self.tr('GAME_SELECTOR_13')}", self.ps1app),
+            "emu": (f"👾 {self.tr('GAME_SELECTOR_14')}", self.emu),
+            "gme": (f"🕹️  {self.tr('GAME_SELECTOR_15')}", self.gme),
+            "dem": (f"🌌 {self.tr('GAME_SELECTOR_16')}", self.dem),
             "apps": (f"🔧 {self.tr('GAME_SELECTOR_11')}", self.apps),
+            "sys": (f"⚙️  {self.tr('GAME_SELECTOR_17')}", self.sys),
+            "dst": (f"🔍 {self.tr('GAME_SELECTOR_18')}", self.dst),
+            "dbg": (f"🐞 {self.tr('GAME_SELECTOR_19')}", self.dbg),
+            "rte": (f"🏃 {self.tr('GAME_SELECTOR_20')}", self.rte),
         }
 
         # Use saved order if available

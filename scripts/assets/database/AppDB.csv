@@ -1,101 +1,557 @@
-PSBBN|BB Navigator
-BOOT|LaunchELF
-WLAUNCHELF|wLaunchELF
-OPNPS2LD|Open PS2 Loader
-OPL12O|Open PS2 Loader
-OPL093|Open PS2 Loader
-OPL0.8CHILDPROOF|OPL (Childproof)
-REBOOT|Reboot System
-POWEROFF|Shutdown System
-OFF|Shutdown System
-SYSTEMSHUTDOWN|Shutdown System
-APPPOWEROFF|Shutdown System
-OSDXMB|OSD-XMB
-NICKYPS2|Nicky Boum
-LBFN|LbFn
-HWCLBFN|LbFn HWC
-RABOOT|RetroArch
-PS1VMODENEG|PS1VModeNeg
-REGBA|ReGBA
-TEMPGBA|TempGBA
-XEBPLUS|Xtreme Elite Boot Plus
-XEBPLUSXMAS|Xtreme Elite Boot Plus
-PS2OGCARDTEST|Original Card Test
-MCA|Memory Card Annihilator
-MCA_|Memory Card Annihilator
-MEMCARDANNIHILATOR|Memory Card Annihilator
-MCAV20|Memory Card Annihilator
-SMS|Simple Media System
-HDDOSD|HDD-OSD
-HOSDMENU|HOSDMenu
-HDL|HD Loader
-HDL_V0.8C|HD Loader
-NEOCD|NeoCD/PS2
-UOPL|Unofficial Open PS2 Loader
-HDLSVR093|HDL Server
-HDLSERVER093|HDL Server
-GSM038|GSM
-GSM036X|GSM
-GSM023|GSM
-GSM2|GSM
-POPSLOADER|POPSLoader
-PS2HDDTESTER|HDD Tester
-3DPINBALLPLAYER|3D Pinball
-3DPINBALL|3D Pinball
-3DPINBALLPS2|3D Pinball
-APOLLO|Apollo Save Tool
-PGEN151|PGEN
-PGENCJABCDPATCH48BIT|PGEN
-PGENDATEL|PGEN Datel
-NHDDLSTANDA|NHDDL
-VTSPS2HBDL|HomeBrew DownLoader
-PSXLAUNCHER|PSX Launcher
-CLASSICUBEPS2|ClassiCube
-MECHAPWNPCK|MechaPwn
-R0004|SOCOM II Online R0004 Update
-JUMPBUMP|Jump 'n Bump
-CB10|Code Breaker
-CB92|Code Breaker
-ULAUNCHELF|uLaunchELF
-FLASHBCK|Flashback (REminiscence)
-DAVEGNUKEM|Dave Gnunkem
-SUPERTUX|SuperTux
-OPLNEUT|OPLNEUTRINO GUI
-GPSPKAI|gpSP kai
-PVCS13|PVCS
-NTPS2|NTPS2
-NTPS2UNC|NTPS2
-TGBDUALLIBRETROPS2|TGB Dual Libretro PS2
-MGBALIBRETROPS2|mGBA Libretro PS2
-GPSPLIBRETROPS2|gpSP Libretro PS2
-PS2ESDL0825OB|Playstation 2 External Storage Device Game Loader
-DNASH4X0R|DNAS H4x0r
-CDLOADER|CD Loader
-GAMESHARK2|Gameshark 2
-SNESEMU024S160906|SNES Station
-SNES026C|SNES Station
-ULEKHN|uLaunchELF
-ULE2TB|uLaunchELF
-DVDPLAYERPR|DVD Player
-CODBREAKER1|Code Breaker
-POWOFF|Shutdown System
-SNESEMU024S|SNES
-INFONESRE|InfoNES
-VECXFORPS2|VecX For PS2
-TGEMU|TGEmu
-PS2PSXEGUIP|PS2PSXe GUI Pack
-PS2PSXEN|PS2PSXe
-BEEBEM|BEEBeM
-SM64.US.F3DEX2E|Super Mario 64
-NEOPOP|NeoPop
-PS2TEMP|PS2 Temps
-OSWANPS2|Wonderstation
-ESRGUI|ESR GUI
-MFU|PS2 Memory Card Formatter
-TURBOGRAFX16|TurboGrafx-16
-KHSKIP|Kingdom Hearts (Skip Mod)
-SWAPMAGIC.38|Swap Magic 3 Plus
-SMDVD38|Swap Magic 3 Plus
-WOPNPS2LD|wOPL
-WLER3Z|wLaunchELF-R3Z
-RIPTOPL|RiptOPL
+REBOOT|Reboot PS2|SYS|SYS_REBOOT||RESTART.ELF
+REBOOTSYSTEM|Reboot PS2|SYS|SYS_REBOOT||REBOOTSYSTEM.ELF
+RESTART|Reboot PS2|SYS|SYS_REBOOT||RESTART.ELF
+POWEROFF|PowerOff PS2|SYS|SYS_POWEROFF||POWEROFF.ELF
+POWOFF|PowerOff PS2|SYS|SYS_POWEROFF||POWOFF.ELF
+OFF|PowerOff PS2|SYS|SYS_POWEROFF||OFF.ELF
+SHUTDOWN|PowerOff PS2|SYS|SYS_POWEROFF||SHUTDOWN.ELF
+SYSTEMSHUTDOWN|PowerOff PS2|SYS|SYS_POWEROFF||SYSTEMSHUTDOWN.ELF
+POWEROFF|PowerOff PS2|SYS|SYS_POWEROFF||POWEROFF.ELF
+NICKYPS2|Nicky Boum|GME|GME_NICKYBOU|cosmito|nickyPS2.elf
+LBFN|LbFn|APP|APP_LBFN|x.com/nika_towns|LbFn v0.70.19 WIP.elf
+HWCLBFN|LbFn (with updated libcdvd)|APP|APP_LBFNHWC|psx-place.com/members/hwnj.32001|HWCLBFN.ELF
+HWCLBFNUPDATEDLIBCDVD|LbFn (with updated libcdvd)|APP|APP_LBFNHWC|psx-place.com/members/hwnj.32001|HWC-LbFn-Updated-libcdvd.ELF
+RABOOT|RetroArch|EMU|EMU_RETROARC|retroarch.com|raboot.elf
+REGBA|ReGBA|EMU|EMU_REGBA|psx-place.com/tags/belek666|ReGBA.elf
+TEMPGBA|TempGBA|EMU|EMU_TEMPGBA|psx-place.com/tags/belek666|TempGBA.elf
+XEBPLUS|Xtreme Elite Boot+|APP|APP_XEBPLUS|Howling Wolf & Chelsea|XEBPLUS.ELF
+XEBPLUSXMAS|Xtreme Elite Boot+|APP|APP_XEBPLUS|Howling Wolf & Chelsea|XEBPLUS_XMAS.ELF
+PS2OGCARDTEST|Original Card Test|DST|DST_OGCARDTE|israpps.github.io|PS2_OG_CARD_TEST.ELF
+MEMCARDANNIHILATOR|Memory Card Annihilator|DST|DST_MCA|ffgriever-pl|Memory Card Annihilator.ELF
+MCA|Memory Card Annihilator|DST|DST_MCA|ffgriever-pl|mca_v20.elf
+HOSDMENU|OSDMenu|SYS|SYS_OSDMENU|pcm720|hosdmenu.elf
+HDL|HD Loader|APP|APP_HDLOADER|HDLoader|HDL_V0.8C.ELF
+HDDLOADER|HD Loader|APP|APP_HDLOADER|HDLoader|hddloader.elf
+NEOCD|NeoCD/PS2|EMU|EMU_NEOCD|github.com/obiot|neocd.elf
+UOPNPS2LD|Unofficial Open PS2 Loader|APP|APP_UOPL|github.com/KrahJohlito|UOPNPS2LD.ELF
+HDLSVR093|HDL Server|APP|APP_HDLSVR|ps2homebrew.github.io|HDL-SERVER-093.ELF
+3DPINBALLPLAYER|3D Pinball XP Player|GME|GME_3DPINBAL|Usagiru Release|3DPINBALL-PLAYER.ELF
+3DPINBALLPS2|3D Pinball XP Player|GME|GME_3DPINBAL|Usagiru Release|3dpinball-ps2.elf
+PGEN|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN v1.5.1s.elf
+PGEN151|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN151.ELF
+PGENCJABCDPATCH48BIT|PGEN|EMU|EMU_PGEN|Datel|PGENCJ_ABCD_PATCH_48BIT.ELF
+SEGAGENESIS|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|Sega Genesis.ELF
+PGENDATEL|PGen|EMU|EMU_PGEN|Datel|pgen_datel.elf
+PGENDATELU|PGen|EMU|EMU_PGEN|Datel|pgen_datel-u.elf
+VTSPS2HBDL|HomeBrew DownLoader|APP|APP_HBDL|github.com/VTSTech|VTSPS2-HBDL.elf
+VTSPS2CRC32|VTSPS2-CRC32|APP|APP_VTSPS2CR|github.com/VTSTech|VTSPS2-CRC32-packed.ELF
+PSXLAUNCHER|PSX Launcher|PS1|PS1_PSXLAUNC|vegito_93|PSXLAUNCHER.ELF
+CLASSICUBEPS2|ClassiCube|GME|GME_CLASSICU|classicube.net|ClassiCube-ps2.elf
+MECHAPWN|MechaPwn|DST|DST_MECHAPWN|github.com/MechaResearch|MechaPwn.elf
+R0004|SOCOM II Online R0004 Update|GME|GME_SOCOMII|psrewired.com|r0004v002.elf
+JUMPBUMP|Jump 'n Bump|GME|GME_JUMPBUMP|Gil Megidish|JUMPBUMP.ELF
+CBV10|Code Breaker|APP|APP_CODEBREA|Pelican Accessories|CBV.10.elf
+CB10|Code Breaker|APP|APP_CODEBREA|Pelican Accessories|CB10.elf
+CB92|Code Breaker|APP|APP_CODEBREA|Pelican Accessories|CB92.elf
+CODEBREAKER10|Code Breaker|APP|APP_CODEBREA|Pelican Accessories|CODEBREAKER10.ELF
+ULAUNCHELF|uLaunchELF|APP|APP_ULE|Eric Price (E P) & Ronald Andersson (dlanor)|uLaunchELF.elf
+ULAUNCHELF|uLaunchELF|APP|APP_ULE|Eric Price (E P) & Ronald Andersson (dlanor)|WorkingULE.ELF
+UNOFFICIALLAUNCHELF|uLaunchELF|APP|APP_ULE|Eric Price (E P) & Ronald Andersson (dlanor)|unofficial Launch ELF v4.40h.elf
+ULEKHN|uLaunchELF|APP|APP_ULE|krHACKen|ULEKHN.ELF
+ULE2TB|uLaunchELF|APP|APP_ULE|SP193|uLE - 2TB.elf
+FLASHBCK|Flashback (REminiscence)|GME|GME_FLASHBCK|gawd|FLASHBCK.ELF
+DAVEGNUKEM|Dave Gnunkem|GME|GME_DAVEGNUK|Drakonite|davegnukem.elf
+SUPERTUX|SuperTux|GME|GME_SUPERTUX|github.com/headshot2017|supertux.elf
+OPLNEUT|OPL Neutrino GUI|APP|APP_OPLNEUT|crt0|OPLNEUTV41.ELF
+GPSPKAI|gpSP kai|EMU|EMU_GPSPKAI||gpsp_kai.elf
+ATARI2600|PVCS Reloaded (Atari 2600)|EMU|EMU_PVCS|Bruno Freitas (bootsector)|Atari 2600.ELF
+PVCSRELOADED|PVCS Reloaded (Atari 2600)|EMU|EMU_PVCS|Bruno Freitas (bootsector)|PVCS Reloaded v0.3.elf
+PVCS13|PVCS (Atari 2600)|EMU|EMU_PVCS|Daniel Boris|PVCS13.ELF
+PVCS|PVCS (Atari 2600)|EMU|EMU_PVCS|Daniel Boris|PVCS v1.3.elf
+PS2ESDL|Playstation 2 External Storage Device Game Loader|APP|APP_PS2ESDL|sites.google.com/view/ysai187|PS2ESDL v0.825 OB.elf
+PS2ESDL0825OB|Playstation 2 External Storage Device Game Loader|APP|APP_PS2ESDL|sites.google.com/view/ysai187|PS2ESDL_0825_OB.elf
+PS2ESDL0821OB|Playstation 2 External Storage Device Game Loader|APP|APP_PS2ESDL|sites.google.com/view/ysai187|PS2ESDL_0821_OB.elf
+DNASH4X0R|DNAS H4x0r|DST|DST_DNASH4X0|PS2NFO.COM|DNAS H4x0r.elf
+GAMESHARK2|GameShark 2|APP|APP_GAMESHAR|GameShark|GAMESHARK2.ELF
+SNESSTATION|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|SNES-Station v0.2.4.elf
+SNESSTATIONMODHWC|SNES Station|EMU|EMU_SNESSTAT|Howling Wolf & Chelsea|SNES-Station-MOD-HWC.ELF
+SNESEMU024S160906|SNES Station|EMU|EMU_SNESSTAT|ffgriever & Hiryu|snes_emu_024S160906.elf
+SUPERNINTENDO|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|Super Nintendo.ELF
+SNES026C|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|SNES026C.ELF
+SNESEMU|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|snes_emu.elf
+SNESEMUHDD|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|snes_emu_hdd.elf
+SNESEMUHDD2|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|snes_emu_hdd2.elf
+SNESEMU024S|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|SNESEMU024S.ELF
+SNESTICLEREVIVE|SNESticle Revive|EMU|EMU_SNESREVI|github.com/ReyFxck|SNESticleRevive v1.0.5.elf
+SNESTICLE|SNESticle Aurora|EMU|EMU_SNESAURO|github.com/itsveenee|SNESticle.elf
+DVDPLAYERPR|DVD Player|APP|APP_DVDPLAYE||dvdplayer.elf
+INFONES|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES.elf
+INFONESRE|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES rev4.elf
+INFONESHD|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES-HD.elf
+VECXPS2|VecX|EMU|EMU_VECX|Jum|VECXPS2.ELF
+VECXFORPS2|VecX|EMU|EMU_VECX|Jum|VECXFORPS2.ELF
+TGEMU|TGEmu|EMU|EMU_TGEMU|Charles MacDonald|tgemu v0.1.elf
+PS2PSXE|PS2PSXe|PS1|PS1_PS2PSXE|ffgriever|ps2psxe.elf
+BEEBEM|BEEBeM|EMU|EMU_BEEBEM|RUNTiME|BEEBEM v1.0b3.elf
+MICROEMULATOR|BEEBeM|EMU|EMU_BEEBEM|RUNTiME|MicroEmulator.elf
+NEOPOP|NeoPop|EMU|EMU_NEOPOP|evilo|neopop.elf
+PS2TEMP|PS2Temps|DST|DST_PS2TEMPS|jolek and AKuHAK|PS2TEMP.ELF
+PS2TEMPS|PS2Temps|DST|DST_PS2TEMPS|jolek and AKuHAK|PS2TEMPS.ELF
+OSWANPS2|Wonder-Station|EMU|EMU_WONDERST|evilo|oswanps2.elf
+WONDERSTATION|Wonder-Station|EMU|EMU_WONDERST|evilo|Wonder-Station v0.1.elf
+ESRGUI|ESR GUI|APP|APP_ESR|ffgriever|ESR_GUI.elf
+ESRLAUNCHER|ESR Launcher|APP|APP_ESRLAUNC|Howling Wolf & Chelsea|ESR-LAUNCHER.ELF
+ESR|ESR|APP|APP_ESR||ESR.ELF
+MFU|PS2 Memory Card Formatter|DST|DST_MFU|1UP & Based_Skid|MFU-Packed.elf
+MASSMCFORMATTER|PS2 Memory Card Formatter|DST|DST_MFU|1UP & Based_Skid|MassMCFormatter.elf
+MCFORMATTER|PS2 Memory Card Formatter|DST|DST_MFU|1UP & Based_Skid|mcFormatter.elf
+TURBOGRAFX16|TurboGrafx-16|EMU|EMU_TURBOGRA|KaylaKaze|TurboGrafx 16.ELF
+KHSKIP|Kingdom Hearts (Skip Mod)|GME|GME_KHSKIP|github.com/fniq5|khskip.elf
+SWAPMAGIC38|Swap Magic 3 Plus|APP|APP_SWAPMAGI|Datel|SWAPMAGIC38.ELF
+SMDVD38|Swap Magic 3 Plus|APP|APP_SWAPMAGI|Datel|SMDVD38.ELF
+WOPNPS2LD|Double Unofficial Open PS2 Loader|APP|APP_WOPL|ps2homebrew.github.io|WOPNPS2LD.ELF 
+RIPTOPL|RiptOPL|APP|APP_RIPTOPL|github.com/NathanNeurotic|RIPTOPL.ELF
+RIPTOPLRA|RiptOPL|APP|APP_RIPTOPL|github.com/NathanNeurotic|RIPTOPL-RA.ELF
+APOLLO|Apollo Save Tool|APP|APP_APOLLO|github.com/bucanero|APOLLO.ELF
+ARGON|Argon XMB Media Player|APP|APP_ARGON|sourceforge.net/u/argonps2/profile/|ARGON.ELF
+CHEATDEVICEFORWARDER|Cheat Device PS2BBL Forwarder|APP|APP_CHEATDEV|israpps.github.io|CHEATDEVICE-FORWARDER.ELF
+CHEATDEVICE|Cheat Device|APP|APP_CHEATDEV|israpps.github.io|CHEATDEVICE.ELF
+CHEATHDD|Cheat Device|APP|APP_CHEATDEV|israpps.github.io|CHEATHDD.ELF
+GSM|Graphic Synthesizer Mode (GSM)|APP|APP_GSM|github.com/doctorxyz|GSM.ELF
+NHDDL|NHDDL|APP|APP_NHDDL|pcm720|nhddl.elf
+OSDXMB|OSD-XMB|APP|APP_OSDXMB|HiroTex|OSDXMB.ELF
+PSBBNFORWARDER|PSBBN Forwarder|APP|APP_PSBBNFOR|pcm720|PSBBN-FORWARDER.ELF
+SMS|Simple Media System|APP|APP_SMS|ps2homebrew|SMS.ELF
+SMSVERSION29|Simple Media System|APP|APP_SMS|ps2homebrew|SMS Version 2.9 (Rev.4).elf
+SIMPLEMEDIASYSTEM|Simple Media System|APP|APP_SMS|github.com/NathanNeurotic|Simple-Media-System.elf
+OPL08CHILDPROOF|Open PS2 Loader (CHILDPROOF)|APP|APP_OPL|Ifcaro & jimmikaelkael|OPL 0.8- ChildPROOF.ELF
+OPNPS2LD|Open PS2 Loader|APP|APP_OPL|ps2homebrew.github.io|OPNPS2LD.ELF
+WLER3Z|wLaunchELF_R3Z|APP|APP_WLER3Z|R3Z3N, pcm720, El Isra|WLE-R3Z.ELF
+WLAUNCHELF|wLaunchELF|APP|APP_WLE|ps2homebrew.github.io|WLAUNCHELF.ELF
+WLEISR|wLaunchELF_isr|APP|APP_WLEISR|israpps.github.io|WLE-ISR.ELF
+UNOFFICIALLAUNCHELFKHN|wLaunchELF KHn|APP|APP_WLEVCD|krHACKen|unofficial Launch ELF kHn (2020-08-10).elf
+DOUBLEUNOFFICIALLAUNCHELF|wLaunchELF|APP|APP_WLEVCD|krHACKen|double unofficial Launch ELF
+DOUBLEUNOFFICIALLAUNCHELFKHN|wLaunchELF KHn|APP|APP_WLEVCD|krHACKen|double unofficial Launch ELF kHn (2020-08-10) (packed).elf
+FMCBD|Free McBoot|SYS|SYS_FMCB|Jimmikaelkael and Neme|FMCBD.ELF
+FMCBINSTALLER|FreeMcBoot Installer|SYS|SYS_FMCB|github.com/israpps|FMCBInstaller.elf
+FMCBCFG|FMCB Configurator|SYS|SYS_FMCBCFG|suloku|FMCB-CFG.ELF
+NTPS2|NTPS2|SYS|SYS_NTPS2|ShyavanS|NTPS2.ELF
+NTPS2UNC|NTPS2|SYS|SYS_NTPS2|ShyavanS|NTPS2-UNC.ELF
+OSDMENU|OSDMenu|SYS|SYS_OSDMENU|pcm720|osdmenu.elf
+R3CONFIGURATOR|R3CONFIGURATOR|SYS|SYS_R3CONFIG|pcm720, R3Z3N|r3configurator.elf
+PS2LINKHILOAD|PS2 LINK High Loading|DBG|DBG_PS2LINK|github.com/ps2dev/|PS2LINK-HILOAD.ELF
+PS2LINK|PS2LINK|DBG|DBG_PS2LINK|github.com/ps2dev/|PS2LINK.ELF
+PS2LINKEXTIRX|PS2LINK External IRXs|DBG|DBG_PS2LINK|github.com/ps2dev/|PS2LINK-EXTIRX.ELF
+HDDTESTER|HDD Tester|DST|DST_HDDTESTE|GrimBrew|HDDTESTER.ELF
+PS2HDDTESTER|HDD Tester|DST|DST_HDDTESTE|GrimBrew|PS2HDDTESTER.ELF
+LENSCHANGER|LensChanger|DST|DST_LENSCHAN|DamproSoft|LENSCHANGER.ELF
+LCHGINST|LensChanger|DST|DST_LENSCHAN|DamproSoft|LCHGINST.ELF
+LENSCHNG|LensChanger|DST|DST_LENSCHAN|DamproSoft|LENSCHNG.ELF
+MECHACONCRASHTESTER|Mechacon Crash Tester|DST|DST_MECHCRSH|israpps.github.io|MECHACON-CRASH-TESTER.ELF
+OGCARDTEST|Original Card Test|DST|DST_OGCARDTE|israpps.github.io|OG-CARD-TEST.ELF
+PADTEST|PS2 Controller Tester|DST|DST_PADTEST|jbit|PADTEST.ELF
+PADTESTPS2|PS2 Controller Tester|DST|DST_PADTEST|jbit|PADTESTPS2.ELF
+PS2PADTEST|PS2 Controller Tester|DST|DST_PADTEST|jbit|PS2PADTEST.ELF
+PS2RDRAMTEST|PS2 RDRAM Test|DST|DST_PS2RDRAM|krat0s|PS2_RDRAMTest.ELF
+PS2IDENT|PS2Ident|DST|DST_PS2IDENT|SP193 AkuHAK, Maximus32|PS2IDENT.ELF
+PS2IDENTNP|PS2Ident|DST|DST_PS2IDENT|SP193 AkuHAK, Maximus32|PS2Ident_np.elf
+ROMVERCHK|ROM Version Checker|DST|DST_ROMVERCH|slimpuggamer|ROMVERCHK.ELF
+X2P|Xbox2Playstation (X2P)|EMU|EMU_X2P|github.com/koraxial|X2P.ELF
+PICODRIVE|PicoDrive|EMU|EMU_PICODRIV|github.com/irixxxx|PICODRIVE.ELF
+HERMES|Hermes|GME|GME_HERMES|retroguru.com|HERMES.ELF
+SM64|Super Mario 64|GME|GME_SM64|github.com/fgsfdsfgs/sm64-port|SM64.ELF
+MARIO64|Super Mario 64|GME|GME_SM64|github.com/fgsfdsfgs/sm64-port|mario64.elf
+DKWDRV|DKWDRV|PS1|PS1_DKWDRV|github.com/DKWDRV|DKWDRV.ELF
+POPSLOADER|POPSLoader|PS1|PS1_POPSLOAD|israpps.github.io/|POPSLOADER.ELF
+KERNELLDR3|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|KERNELLDR3.ELF
+KERNELLOADER|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|Kernel Loader v3.0.elf
+KLOADER30|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|kloader3.0.elf
+PS2LAUNCHER|PS2 Launcher|APP|APP_PS2LAUNC|github.com/Irfanlesnar|PS2-Launcher-v3.1.0.ELF
+PS2LAUNCHER400|PS2 Launcher|APP|APP_PS2LAUNC|github.com/Irfanlesnar|PS2-Launcher-4.0.0.ELF
+NETFS|smbLaunchELF|APP|APP_NETFS|github.com/sahlberg|NETFS.ELF
+USBADVN|USB Advance|APP|APP_USBADVN||USBADVN.ELF
+USBADVANCE|USB Advance|APP|APP_USBADVN||USB_ADVANCE.ELF
+USBAWAR|USB Advance|APP|APP_USBADVN||USBA_WAR.ELF
+USBHDDADVANCED|USB Advance|APP|APP_USBADVN||USB_HDD_ADVANCED.ELF
+2048LIBRETROPS2|2048|EMU|EMU_2048|retroarch.com|2048_libretro_ps2.elf
+81LIBRETROPS2|ZX81 (EightyOne)|EMU|EMU_81|retroarch.com|81_libretro_ps2.elf
+ANARCHLIBRETROPS2|Anarch|EMU|EMU_ANARCH|retroarch.com|anarch_libretro_ps2.elf
+ARDENSLIBRETROPS2|Ardens|EMU|EMU_ARDENS|retroarch.com|ardens_libretro_ps2.elf
+ARDUOUSLIBRETROPS2|Arduous|EMU|EMU_ARDUOUS|retroarch.com|arduous_libretro_ps2.elf
+ATARI800LIBRETROPS2|Atari800|EMU|EMU_ATARI800|retroarch.com|atari800_libretro_ps2.elf
+BKLIBRETROPS2|BK|EMU|EMU_BKLIBRET|retroarch.com|bk_libretro_ps2.elf
+BLUEMSXLIBRETROPS2|blueMSX|EMU|EMU_BLUEMSX|retroarch.com|bluemsx_libretro_ps2.elf
+DICELIBRETROPS2|DICE|EMU|EMU_DICE|retroarch.com|dice_libretro_ps2.elf
+DOUBLECHERRYGBLIBRETROPS2|DoubleCherryGB|EMU|EMU_DOUBLECH|retroarch.com|DoubleCherryGB_libretro_ps2.elf
+ECWOLFLIBRETROPS2|Wolfenstein 3D (ECWolf)|EMU|EMU_ECWOLF|retroarch.com|ecwolf_libretro_ps2.elf
+FCEUMMLIBRETROPS2|FCEUmm|EMU|EMU_FCEUMM|retroarch.com|fceumm_libretro_ps2.elf
+FMSXLIBRETROPS2|fMSX|EMU|EMU_FMSX|retroarch.com|fmsx_libretro_ps2.elf
+FREECHAFLIBRETROPS2|FreeChaF|EMU|EMU_FREECHAF|retroarch.com|freechaf_libretro_ps2.elf
+FREEINTVLIBRETROPS2|FreeIntv|EMU|EMU_FREEINTV|retroarch.com|freeintv_libretro_ps2.elf
+GAM4980LIBRETROPS2|GAM-4980|EMU|EMU_GAM4980|retroarch.com|gam4980_libretro_ps2.elf
+GAMBATTELIBRETROPS2|Gambatte|EMU|EMU_GAMBATTE|retroarch.com|gambatte_libretro_ps2.elf
+GEARBOYLIBRETROPS2|Gearboy|EMU|EMU_GEARBOY|retroarch.com|gearboy_libretro_ps2.elf
+GEARCOLECOLIBRETROPS2|Gearcoleco|EMU|EMU_GEARCOLE|retroarch.com|gearcoleco_libretro_ps2.elf
+GEARSYSTEMLIBRETROPS2|Gearsystem|EMU|EMU_GEARSYST|retroarch.com|gearsystem_libretro_ps2.elf
+GMELIBRETROPS2|Game Music Emu|EMU|EMU_GME|retroarch.com|gme_libretro_ps2.elf
+GONGLIBRETROPS2|Gong|EMU|EMU_GONG|retroarch.com|gong_libretro_ps2.elf
+GPSPLIBRETROPS2|gPSP|EMU|EMU_GPSP|retroarch.com|gpsp_libretro_ps2.elf
+HANDYLIBRETROPS2|Handy|EMU|EMU_HANDY|retroarch.com|handy_libretro_ps2.elf
+JAXELIBRETROPS2|JAXE|EMU|EMU_JAXE|retroarch.com|jaxe_libretro_ps2.elf
+JUMPNBUMPLIBRETROPS2|Jump 'n Bump|GME|GME_JUMPBUMP|retroarch.com|jumpnbump_libretro_ps2.elf
+LOWRESNXLIBRETROPS2|LowRes NX|EMU|EMU_LOWRESNX|retroarch.com|lowresnx_libretro_ps2.elf
+LUTROLIBRETROPS2|Lutro|EMU|EMU_LUTRO|retroarch.com|lutro_libretro_ps2.elf
+MEDNAFENLYNXLIBRETROPS2|Beetle Lynx|EMU|EMU_LYNX|retroarch.com|mednafen_lynx_libretro_ps2.elf
+MEDNAFENWSWANLIBRETROPS2|Beetle WonderSwan|EMU|EMU_WONDERSW|retroarch.com|mednafen_wswan_libretro_ps2.elf
+MGBALIBRETROPS2|mGBA|EMU|EMU_MGBA|retroarch.com|mgba_libretro_ps2.elf
+MINIVMACLIBRETROPS2|Mini vMac|EMU|EMU_MINIVMAC|retroarch.com|minivmac_libretro_ps2.elf
+MRBOOMLIBRETROPS2|Mr.Boom|EMU|EMU_MRBOOM|retroarch.com|mrboom_libretro_ps2.elf
+MULIBRETROPS2|Mu|EMU|EMU_MU|retroarch.com|mu_libretro_ps2.elf
+NEOCDLIBRETROPS2|NeoCD|EMU|EMU_NEOCD|retroarch.com|neocd_libretro_ps2.elf
+NUMEROLIBRETROPS2|Numero|EMU|EMU_NUMERO|retroarch.com|numero_libretro_ps2.elf
+NXENGINELIBRETROPS2|NX Engine|EMU|EMU_NXENGINE|retroarch.com|nxengine_libretro_ps2.elf
+O2EMLIBRETROPS2|O2EM|EMU|EMU_O2EM|retroarch.com|o2em_libretro_ps2.elf
+PICODRIVELIBRETROPS2|PicoDrive|EMU|EMU_PICODRIV|retroarch.com|picodrive_libretro_ps2.elf
+POCKETCDGLIBRETROPS2|PocketCDG|EMU|EMU_POCKETCD|retroarch.com|pocketcdg_libretro_ps2.elf
+PRBOOMLIBRETROPS2|PrBoom|EMU|EMU_PRBOOM|retroarch.com|prboom_libretro_ps2.elf
+QUASI88LIBRETROPS2|QUASI88|EMU|EMU_QUASI88|retroarch.com|quasi88_libretro_ps2.elf
+QUICKNESLIBRETROPS2|QuickNES|EMU|EMU_QUICKNES|retroarch.com|quicknes_libretro_ps2.elf
+RACELIBRETROPS2|RACE|EMU|EMU_RACE|retroarch.com|race_libretro_ps2.elf
+RETRO8LIBRETROPS2|Retro8|EMU|EMU_RETRO8|retroarch.com|retro8_libretro_ps2.elf
+SMSPLUSLIBRETROPS2|SMS Plus GX|EMU|EMU_SMSPLUS|retroarch.com|smsplus_libretro_ps2.elf
+SNES9X2002LIBRETROPS2|Snes9x 2002|EMU|EMU_SNES9X|retroarch.com|snes9x2002_libretro_ps2.elf
+SQUIRRELJMELIBRETROPS2|SquirrelJME|EMU|EMU_SQUIRREL|retroarch.com|squirreljme_libretro_ps2.elf
+STELLA2014LIBRETROPS2|Stella 2014|EMU|EMU_STELLA20|retroarch.com|stella2014_libretro_ps2.elf
+TAMALIBRETROLIBRETROPS2|Bandai - Tamagotchi P1 (TamaLIBretro)|EMU|EMU_TAMALIBR|retroarch.com|tamalibretro_libretro_ps2.elf
+TGBDUALLIBRETROPS2|TGB Dual|EMU|EMU_TGBDUAL|retroarch.com|tgbdual_libretro_ps2.elf
+THEODORELIBRETROPS2|Theodore (Thomson TO8/TO9)|EMU|EMU_THEODORE|retroarch.com|theodore_libretro_ps2.elf
+UW8LIBRETROPS2|UW8|EMU|EMU_UW8|retroarch.com|uw8_libretro_ps2.elf
+UZEMLIBRETROPS2|Uzebox (Uzem)|EMU|EMU_UZEM|retroarch.com|uzem_libretro_ps2.elf
+VAPORSPECLIBRETROPS2|VaporSpec|EMU|EMU_VAPORSPE|retroarch.com|vaporspec_libretro_ps2.elf
+WASM4LIBRETROPS2|WebAssembly (WASM-4)|EMU|EMU_WASM4|retroarch.com|wasm4_libretro_ps2.elf
+X1LIBRETROPS2|X Millennium / X1|EMU|EMU_X1|retroarch.com|x1_libretro_ps2.elf
+TYRIAN|Tyrian|GME|GME_TYRIAN|Andres ruiz|TYRIAN.elf
+TEAPOT|Teapot|DEM|DEM_TEAPOT|github.com/ps2dev|teapot.elf
+SPACE|Space Invaders|GME|GME_SPACEINV|Makeshift Development|space.elf
+SPACEINVADERSFORPS2|Space Invaders|GME|GME_SPACEINV|Makeshift Development|Space Invaders for PS2 v1.0.elf
+PS2INVADERS|Space Invaders|GME|GME_SPACEINV|Makeshift Development|ps2invaders.elf
+SOFTDE|SoftDev2 Installer|APP|APP_SOFTDEV2|github.com/parrado|SoftDev2Installer.elf
+SLAVEOFTHEVU|Slave of the VU|DEM|DEM_SLAVEOFT|Jar|slave_of_the_vu.elf
+SIOCOMMUNICATIONSTESTER|SIO Communications Tester|DST|DST_SIOCOMMU||SIO Communications Tester v1.0.elf
+ROCKBOT|Rockbot|GME|GME_ROCKBOT|protomank|rockbot.elf
+ROCKBOTPS2|Rockbot|GME|GME_ROCKBOT|protomank|Rockbot PS2 v1.1.1.elf
+RELEVEN|R-Eleven|DEM|DEM_RELEVEN|NoRecess|R-ELEVEN.elf
+ELEVEN|R-Eleven|DEM|DEM_RELEVEN|NoRecess|ELEVEN.ELF
+RADSHELL|RadShell|APP|APP_RADSHELL|radad|radshell.elf
+RADSHELLMOD|RadShell|APP|APP_RADSHELL|radad|radshellmod.elf
+RADMENU|RadMenu|APP|APP_RADMENU|radad|RadMenu.elf
+QUAKE|Quake|GME|GME_QUAKE|nicp067,Nicolas Plourde,belek666 |quake.elf
+QUAKEPS2|Quake|GME|GME_QUAKE|nicp067|QUAKE PS2 v1.09.elf
+QUAKEVGA|Quake (VGA)|GME|GME_QUAKE|belek666|quake-vga.elf
+QUAKENTSC|Quake (NTSC)|GME|GME_QUAKE|belek666|quake-ntsc.elf
+PS2QUAKEMOD|Quake|GME|GME_QUAKE|Nicolas Plourde|PS2 Quake Mod (VGA) v0.3.elf
+PUKKP2L|Pukklink|APP|APP_PUKKLINK||PUKK_P2L.ELF
+PUKKLINK|Pukklink|APP|APP_PUKKLINK||Pukklink v1.0b.elf
+PS2SPLASH|PS2 Splash|APP|APP_PS2SPLAS|github.com/parrado|PS2SPLASH v1.0.elf
+PS2SHELL|PS2 Shell|APP|APP_PS2SHELL|weltall|PS2Shell v0.0.3.elf
+PS2ROOM|PS2Room|DEM|DEM_PS2ROOM|No Recess|PS2Room.elf
+PS2REALITYMEDIAPLAYERPRO|PS2 Reality Mediaplayer PRO|APP|APP_PS2REALI|PS2Reality(Hermes, Mavy & Bigboss)|PS2 Reality Mediaplayer Pro.elf
+RMPPRO|PS2 Reality Mediaplayer PRO|APP|APP_PS2REALI|PS2Reality(Hermes, Mavy & Bigboss)|RMP_PRO.ELF
+PS2REALITY|PS2 Reality Mediaplayer PRO|APP|APP_PS2REALI|PS2Reality(Hermes, Mavy & Bigboss)|PS2REALITY_PRO.ELF
+RACE|PS2-Racer|GME|GME_RACER|jbit|race.elf
+RACER|PS2-Racer|GME|GME_RACER|jbit|racer.elf
+PS2RACER|PS2-Racer|GME|GME_RACER|jbit|PS2-Racer.elf
+PATIENCE|PS2 Patience|GME|GME_PATIENCE|TyRaNiD|patience.elf
+PS2PATIENCE|PS2 Patience|GME|GME_PATIENCE|TyRaNiD|PS2 Patience.elf
+PS2OS|PS2OS|APP|APP_PS2OS|PS2World.it Team|PS2OS.ELF
+PLAYSTATION2MP3PLAYERSE|PlayStation 2 MP3 Player SE|APP|APP_PS2MP3|weltall(stefy2)|PlayStation 2 MP3 Player SE v1.3.elf
+PLAYSTATION2MP3PLAYER|PlayStation 2 MP3 Player|APP|APP_PS2MP3|Ryan Kegel|PlayStation 2 MP3 Player.elf
+PS2LUAPLAYER|PS2 Lua Player|APP|APP_PS2LUAPL|ps2homebrew.github.io|PS2 LUA Player v0.20 R3.elf
+PS2IRC|PS2irc|APP|APP_PS2IRC|ubergeek42|ps2-irc.elf
+INTROLDR|PS2 Intro Loader|APP|APP_INTROLDR|github.com/dekkit|INTROLDR.ELF
+PS2INTROLOADER|PS2 Intro Loader|APP|APP_INTROLDR|github.com/dekkit|PS2 Intro Loader v1.0.elf
+PS2EJECT|PS2 Eject|SYS|SYS_PS2EJECT|github.com/VTSTech|PS2Eject.ELF
+PS2DOSBOX|DOSBox|EMU|EMU_DOSBOX|belek666|PS2DOSBox.elf
+FUNTUNAFORKINSTALLER|FunTuna-Fork Installer|SYS|SYS_FUNTUNA|israpps.github.io|FunTuna-Fork_Installer.ELF
+WAVES|Waves|DEM|DEM_WAVES|Tyranid|waves.elf
+GPS2|gpSP|EMU|EMU_GPSP|belek666|GPS2.elf
+IGR|Return to Boot Card|SYS|SYS_IGR|github.com/JonathanDotCel|IGR.ELF
+FCEU|FCEUmm|EMU|EMU_FCEU|ps2homebrew.github.io|fceu.elf
+FCEUHWC|FCEU|EMU|EMU_FCEU|Howling Wolf & Chelsea|FCEU-HWC.ELF
+TUROS|Turos|DEM|DEM_TUROS|Nippy|turos.elf
+TRAVEL|Travel|DEM|DEM_TRAVEL|Nippy|TRAVEL.ELF
+TORUS|Torus|DEM|DEM_TORUS|Lukasz|torus.elf
+TINYFIREPAL|tinyFire (PAL)|DEM|DEM_TINYFIRE|wiRe|tinyFire_pal.elf
+TINYFIRENTSC|tinyFire (NTSC)|DEM|DEM_TINYFIRE|wiRe|tinyFire_ntsc.elf
+TEXTURE|Texture|DEM|DEM_TEXTURE|github.com/ps2dev|texture.elf
+TESTMODE|rom0:TESTMODE Launcher|DST|DST_TESTMODE|github.com/VTSTech|testmode.ELF
+TESTMODELAUNCHER|rom0:TESTMODE Launcher|DST|DST_TESTMODE|github.com/VTSTech|TESTMODE Launcher v0.2.elf
+VTSPS2TESTMODE|rom0:TESTMODE Launcher|DST|DST_TESTMODE|github.com/VTSTech|VTSPS2-TESTMODE-packed.ELF
+TESTLAUNCHERBM|Test Launcher BM|DST|DST_TESTLAUN||TestLauncher BM v2.elf
+TESL|TES-L|APP|APP_TESL|yi|TES-L v0.001.elf
+TERRAIN|Terrain|DEM|DEM_TERRAIN|wiRe / Napalm|TERRAIN.ELF
+TCCMONKEY|Just da Monkey|DEM|DEM_TCCMONKE|djhuevo|tcc_monkey.elf
+T0MB0LA|Sparks & Supershapes|DEM|DEM_SPARKSSU|t0mb0la|t0mb0la.elf
+STENCH|Stench|DEM|DEM_STENCH|Tyranid|stench.elf
+STATIKPREV|Statik|DEM|DEM_STATIK|blackdroid|statik-prev.elf
+SPACEFIGHTER|Spacefighter|DEM|DEM_SPACEFIG|Gabriel T. DelaRosa|spacefighter.elf
+SMW|Super Mario War|GME|GME_SMW|github.com/obiot|smw.elf
+SUPERMARIOWAR|Super Mario War|GME|GME_SMW|github.com/obiot|Super_Mario_War.elf
+SUPERMARIOWAR20060223|Super Mario War|GME|GME_SMW|github.com/obiot|Super Mario War 2006-02-23.elf
+RZRTTC2564K|64k|DEM|DEM_64K|Raizor|rzr_ttc25_64k.elf
+RIPPER3NAVIGATOR|Ripper 3 Navigator (Infinity Manager hack)|APP|APP_RIPPER3N||Ripper 3 Navigator (Infinity Manager hack).elf
+RIPPER2NAVIGATOR|Ripper 2 Navigator (Infinity Manager hack)|APP|APP_RIPPER2N||Ripper 2 Navigator (Infinity Manager hack).elf
+RDBUIF|Retail DeBugging Startup Card UIF|DBG|DBG_RDB||RDB-UIF v0.9.5
+RDB|Retail DeBugging Startup Card|DBG|DBG_RDB||RDB v0.9.5.elf
+PS2SX|PS2SX|PS1|PS1_PS2SX|HWNJ|PS2SX v1.3.elf
+HWCPSX2SX|PS2SX|PS1|PS1_PS2SX|HWNJ|hwc-psx2sx.elf
+PS2CODINGISGOODFORYOU|PS2 Coding Is Good For You|DEM|DEM_PS2CODIN|MJJ Prod|PS2 Coding Is Good For You.elf
+UNTITLED|Untitled|DEM|DEM_UNTITLED|ps2reality.net|UNTITLED.elf
+YEAR2003|Year2003|DEM|DEM_YEAR2003|No Recess|YEAR2003.ELF
+PS2EVOL|Evolution|DEM|DEM_EVOLUTIO|No Recess/CONDENSE|PS2EVOL.ELF
+EVOLUTION|Evolution|DEM|DEM_EVOLUTIO|No Recess/CONDENSE|Evolution.elf
+VUHARNESS|PS2vuharness|DEM|DEM_VUHARNES|Adresd|vuharness.elf
+SNES9X|Snes9x|EMU|EMU_SNES9X||packed_snes9x.elf
+PS2CAM|EyeToy Driver|APP|APP_PS2CAM||ps2cam.elf
+POORDEMO|The Poor Demo|DEM|DEM_POORDEMO|KaL{Ir}|poordemo.elf
+PLAYWAV|Play WAV|DEM|DEM_PLAYWAV|github.com/ps2dev|playwav.elf
+PANG20060112|PANG|GME|GME_PANG|evilo|Pang 2006-01-12.elf
+PANG|PANG|GME|GME_PANG|evilo|pang.elf
+PADXSAMPLE|Padx Sample|DEM|DEM_PADXSAMP|github.com/ps2dev|padx_sample.elf
+PADS|Pads|DEM|DEM_PADS|github.com/ps2dev|pads.elf
+PADEXAMPLE|Pad Example|DEM|DEM_PADEXAMP|github.com/ps2dev|pad_example.elf
+OGGVORBISPLAYERBETA01|OGG Vorbis Player|APP|APP_OGGVORBI|CarelessWhisper|OGG Vorbis Player beta 01.elf
+NPORT|nPort|DBG|DBG_NPORT||nPort.elf
+NJAM|Njam|GME|GEM_NJAM|Andres ruiz|njam.elf
+NIM|NIM|GME|GME_NIM|github.com/Theldus|NIM.elf
+NAPLINK|NapLink|DBG|DBG_NAPLINK||NapLink v1.0.1a.elf
+MTAPSAMPLE|Multitap Sample|DEM|DEM_MTAPSAMP|github.com/ps2dev|mtap_sample.elf
+MPS2CRAFT|M-PS2Craft|GME|GME_MPS2CRAF|PS2 Revival Project|M-PS2Craft v0.0 beta.elf
+GAME|M-PS2Craft|GME|GME_MPS2CRAF|PS2 Revival Project|game.elf
+MINECRAFT|M-PS2Craft|GME|GME_MPS2CRAF|PS2 Revival Project|Minecraft.elf
+MP3STATION|MP3 Station|APP|APP_MP3STATI|ps2reality.net|MP3 Station v0.1 Alpha.elf
+MEGAHAWKSMUSICDISK|Megahawks Music Disk|APP|APP_MEGAHAWK|kopperking|Megahawks Music Disk.elf
+MCLOADER|MC Loader|APP|APP_MCLOADER||MC Loader v1.35.elf
+MCKILLER|MemoryCard Killer|DST|DTS_MCKILLER||MCKILLER.ELF
+MCFORMAT|MemoryCard Killer|DST|DTS_MCKILLER||MCFORMAT.ELF
+MCEXAMPLE|Memory Card Example|DEM|DEM_MCEXAMPL|github.com/ps2dev|mc_example.elf
+MASSQUAKEVESA|Quake (VGA)|GME|GME_QUAKE|Nicolas Plourde|mass_quake_vesa.elf
+MASSQUAKEPAL|Quake (PAL)|GME|GME_QUAKE|Nicolas Plourde|mass_quake_pal.elf
+MASSQUAKENTSC|Quake (NTSC)|GME|GME_QUAKE|Nicolas Plourde|mass_quake_ntsc.elf
+MASSFORMATUTILITY|Mass Format Utility|DST|DST_MASSFORM|github.com/Based-Skid|Mass Format Utility v1.0.elf
+MAKESHIFTDUCKHUNTALPHA1|Makeshift Duck Hunt|GME|GME_DUCKHUNT|Makeshift Development|Makeshift Duckhunt Alpha1 (2005-12-23).elf
+DUCKHUNTHO|Makeshift Duck Hunt|GME|GME_DUCKHUNT|Makeshift Development|duckhunt_ho.elf
+MAIN|Lion Tech Demo|DEM|DEM_LION|Lion|main.elf
+LOBOTOMIA|Lobotomia|DEM|DEM_LOBOTOMI|No Recess/CONDENSE|Lobotomia.elf
+LOBOTOM|Lobotomia|DEM|DEM_LOBOTOMI|No Recess/CONDENSE|LOBOTOM.ELF
+LOADELF|Load ELF|DEM|DEM_LOADELF|github.com/ps2dev|loadelf.elf
+LASERSUNDAYS|Laser Sundays|DEM|DEM_LASERSUN|tpolm|Laser Sundays.elf
+LAMEZOID|Lame Zoid|DEM|DEM_LAMEZOID|blackdroid|LameZoid.elf
+KEYLAUNCHER|PS2 KeyLauncher|APP|APP_KEYLAUNC|github.com/MrSiir|Key Launcher v0.4.elf
+KERMIT|Kermit|DBG|DBG_KERMIT|SilverBull|Kermit v0.4.4 beta1.elf
+ŌKAMIPLCRACTRO|Ōkami PL Cractro|DEM|DEM_OKAMIPLC||Ōkami PL Cractro v1.0c.elf
+KAHTZEEKAPIDEMO|Kahtzee KAPI Demo|GME|GME_KAHTZEEK|KaylaKaze|Kahtzee KAPI Demo.elf
+JUMSPS2MCBOOTMENU|Jum's PS2 MC Boot Menu|APP|APP_JUMSPS2M|Jum|Jum's PS2 MC Boot Menu v1.0.elf
+JUMSBOOTELFUPLOADER|Jum's Boot ELF Uploader|DBG|DBG_JUMSBOOT|Jum|Jum's Boot ELF Uploader.elf
+INNERLOOP|Innerloop|DEM|DEM_INNERLOO|blue,bifat,banana|Innerloop (ps2link).elf
+INFINITYMANAGER|Infinity Manager|APP|APP_INFINITY|Team Matrix|Infinity Manager v1.0b.elf
+INFINITYDE|Infinity DEV2 Installer|DST|DST_INFINITY|Team Matrix|Infinity DEV2 Installer v1.1.elf
+IGRMCPROOFOFCONCEPT|IGR MC (Proof of Concept)|SYS|APP_IGRMCPRO|Fatman|IGR-MC - Proof of Concept.elf
+IGRHDLRE|IGR HDL (Proof of Concept)|APP|APP_IGRHDLRE|Fatman|IGR-HDL Rev2.elf
+IGRCDVDPROOFOFCONCEPT|IGR CDVD (Proof of Concept)|APP|APP_IGRCDVDP|Fatman|IGR-CDVD - Proof of Concept.elf
+HELLO|Hello|DEM|DEM_HELLO|github.com/ps2dev|hello.elf
+HELLBELL|Hell Bell|DEM|DEM_HELLBELL|Lukasz Bruun|HellBell.elf
+GOODBYE|Goodbye|DEM|DEM_GOODBYE|No Recess/CONDENSE|GOODBYE.ELF
+FUNSLOWER|Fun Slower|DEM|DEM_FUNSLOWE|Drückluft & Gibson|FUNSLOWER.elf
+FSLOWER|Fun Slower|DEM|DEM_FUNSLOWE|Drückluft & Gibson|fslower.elf
+FRUITY|Fruit'Y|GME|GME_FRUITY|Retroguru|Fruit'Y.elf
+FLAME19|Flame19|DEM|DEM_FLAME19|Drakonite|flame19.elf
+FISH|Fish|DEM|DEM_FISH|Nicola Farina|fish.elf
+FIREWORKS27|Fireworks27|DEM|DEM_FIREWORK|Drakonite|fireworks27.elf
+EVOLUTION|Evolution|DEM|DEM_EVOLUTIO|No Recess/CONDENSE|Evolution.elf
+EEECHO|EE Echo|DEM|DEM_EEECHO|github.com/ps2dev|ee-echo.elf
+DMSEXPLORER|DMS Explorer|APP|APP_DMSEXPLO|DMS Technologies|DMS Explorer v1.0.elf
+DMSHDDDUMPTOOL|DMS HDD Dump Tool|DST|DST_DMSHDDDU|DMS Technologies|DMS HDD Dump Tool v1.0.elf
+DMSHDDDUMP|DMS HDD Dump Tool|DST|DST_DMSHDDDU|DMS Technologies|DMS-HDD-DUMP.ELF
+DMSHDDEXPLORERINSTALLER|DMS HDD Explorer Installer|DST|DST_DMSHDDEX|DMS Technologies|DMS HDD Explorer Installer v1.0.elf
+DMSHDDFORMATTOOL|DMS HDD Format Tool|DST|DST_DMSHDDFO|DMS Technologies|DMS HDD Format Tool v1.0.elf
+DEMO2D|Demo 2d|DEM|DEM_DEMO2D|github.com/ps2dev|demo2d.elf
+DEMO2C|Demo 2c|DEM|DEM_DEMO2C|github.com/ps2dev|demo2c.elf
+DEMO2B|Demo 2b|DEM|DEM_DEMO2B|github.com/ps2dev|demo2b.elf
+DEMO2A|Demo 2a|DEM|DEM_DEMO2A|github.com/ps2dev|demo2a.elf
+DEMO1|Demo1|DEM|DEM_DEMO1|github.com/ps2dev|demo1.elf
+DAMN|Damn|DEM|DEM_DAMN|Jules|damn.elf
+D136B|d136b|DEM|DEM_D136B|neoscientists|d136b.elf
+CUBEMASTAH|Cube Mastah|DEM|DEM_CUBEMAST|Jules|CubeMastah.elf
+CRUISIN3|Cruisin 3|DEM|DEM_CRUISIN3|Abyss|Cruisin 3.elf
+COOLBOARDERS2001TRAINER|Cool Boarders 2001 Trainer|DEM|DEM_COOLBOAR||Cool Boarders 2001 Trainer.elf
+COLOSSEUM|Colosseum|DEM|DEM_COLOSSEU|Nicola|colosseum.elf
+CLOUDYINTRO|Cloudy|DEM|DEM_CLOUDY|Raizor|cloudy_intro.elf
+CARSHOWROOM|Carshowroom|DEM|DEM_CARSHOWR|Sjeep|carshowroom.elf
+CALLSTACKTEST|Call Stack Test|DEM|DEM_CALLSTAC|github.com/ps2dev|callstacktest.elf
+BYTHEWAY|By the Way|DEM|DEM_BYTHEWAY|Jules|By The Way.elf
+BLABLA|BlaBla|DEM|DEM_BLABLA|Nippy|BLABLA.ELF
+BARULANDIAFORPS2|Barulandia|GME|GME_BARULAND|JMGK|Barulandia for PS2 v1.0.elf
+AURAFORLAURA|Aura for Laura|DEM|DEM_AURAFORL|Soopadoopa|Aura for Laura.elf
+AQUA|Aqua|DEM|DEM_AQUA|mi-ku, malfunction, fuzzy, x-ceed, domkos, nimfadora, ratz, kk|Aqua.elf
+ALTIMIT|Altimit|APP|APP_ALTIMIT|t0mb0la|Altimit v0.1.elf
+AIOLOADER|AIO Loader|APP|APP_AIOLOADE|SP197|AIO Loader.elf
+AIOINTRO|AIO Intro|APP|APP_AIOINTRO||AIO Intro.elf
+AHXMUSICDISK|AHX Music Disk|APP|APP_AHXMUSIC|Raizor|AHX Music Disk.elf
+ADRESDROUND8MEATBALLS|Meatballs|DEM|DEM_MEATBALL|Adresd|Adresd_round8_meatballs.elf
+2HOURS|2 Hours|DEM|DEM_2HOURS|Lion|2 Hours.elf
+TESTLENS|Test Lens|DST|DST_TESTLENS|Hermes|Test Lens.elf
+CLLIVEDEBUG|CL-LiveDebug|DBG|DBG_CLLIVEDE|Gtlepimp|CL-LiveDebug v3.0.4b.elf
+VECXFORPS2|VecX|EMU|EMU_VECXFORP|James Higgs|VecX for PS2 v0.2.elf
+TOPS2|TOPS2 (Thomson TO7/70)|EMU|EMU_TOPS2|Jean-Philippe Lang|TOPS2 v1.0.elf
+PS2BOR|PS2Bor|EMU|EMU_PS2BOR|Nicolas "Pixel" Noble |PS2Bor v0.1b.elf
+FORTUNAFMCBLAUNCHER|Fortuna FMCB Launcher|SYS|SYS_FUNTUNA|VTSTech|Fortuna FMCB Launcher v0.2.elf
+DVDELFDUMPER|DVD ELF Dumper|DST|DST_DVDELFDU||DVD ELF Dumper.elf
+DAEDALUSNEWTOOLCHAIN|DaedalusX64|EMU|EMU_DAEDALUS|github.com/belek666|Daedalus-newtoolchain.elf
+DAEDALUS|DaedalusX64|EMU|EMU_DAEDALUS|github.com/belek666|Daedalus.elf
+YETI3DPS2FIXED1|Yeti3D|GME|GME_YETI3D||YETI3D PS2 fixed1.elf
+YETI3DPS2|Yeti3D|GME|GME_YETI3D||YETI3D PS2.elf
+XRICK|Xrick|GME|GME_XRICK|BigOrno|xrick v021212.elf
+VUTAFLOW|Vuta Flow|DEM|DEM_VUTAFLOW|K2|VUTA_FLOW.elf
+TTC21RAIZOR|Adventures in Wonderland|DEM|DEM_ADVINWON|Raizor|ttc21_raizor_aiw.elf
+TTC20RAIZOR|Christro|DEM|DEM_CHRISTRO|Raizor|ttc20_raizor.elf
+TTC18STOPGA|Stop Gap|DEM|DEM_STOPGAP|Raizor|ttc18_stop_gap.elf
+RPCSERVER|RPC Server|APP|APP_RPCSERVE|github.com/ps2dev|rpcserver.elf
+RISK3DMUTHA|Mutha|DEM|DEM_MUTHA|Raizor|risk_3d_mutha.elf
+PS2SNDSAMPLE|PS2 Sound Sample|DEM|DEM_PS2SNDSA|github.com/ps2dev|ps2snd-sample.elf
+X64MASS|PS2Vice|EMU|EMU_VICE|Georg Hennig|X64mass.ELF
+PS2VICE|PS2Vice|EMU|EMU_VICE|Georg Hennig|PS2Vice v2.2.elf
+VICEMENU|PS2Vice|EMU|EMU_VICE|Georg Hennig|vicemenu.elf
+B000P|b000p|DEM|DEM_B000P|raizor|b000p.elf
+JAMMER|Jammer|GME|GME_JAMMER|cosmito|Jammer v1.0.elf
+JAMMERPS2|Jammer|GME|GME_JAMMER|cosmito|jammerPS2.elf
+GUITARFUN|Guitar Fun|GME|GME_GUITARFU|Hermes|Guitar Fun v1.5 beta.elf
+GUITARF|Guitar Fun|GME|GME_GUITARFU|Hermes|guitarf.elf
+EXECFTPS|ExecFTPs|APP|APP_EXECFTPS|Slicstik|EXECFTPS.ELF
+BALLIONPS2|Ballion|GME|GME_BALLION|Mitglied|Ballion PS2.elf
+PSMS|PSMS|EMU|EMU_PSMS|Sjeep|psm.elf
+PSMS2|PSMS|EMU|EMU_PSMS|Sjeep|psms2.elf
+PSMSRELOADED|PSMS Reloaded|EMU|EMU_PSMS|github.com/infval|PSMS Reloaded v0.4.elf
+MEMORYMANAGERDATEL|Memory Manager Plus|DST|DST_MMPLUS|Datel|Memory-Manager-Datel.ELF
+XPLODERHDTVPLAYER|Xploder HDTV Player|APP|APP_HDTVPLAY|Xploder|XPloder HDTV Player.ELF
+BLAZEVGA|Blaze VGA Adapter|APP|APP_BLAZEVGA|Blaze|BLAZEVGA.ELF
+HDLGAMEINSTALLER|HDL Game Installer|APP|APP_HDLGAMEI|ps2homebrew.github.io|HDLGameInstaller.elf
+PS2DUMPER|PS2 Dumper|DST|DST_PS2DUMPE|github.com/PCSX2|ps2dumper.elf
+DUMPBIOSMASS|PS2 Dumper|DST|DST_PS2DUMPE|github.com/PCSX2|DUMPBIOS-MASS.ELF
+IDDUMPER|ID Dumper|DST|DST_IDDUMPER|krHACKen|ID_DUMPER.elf
+HWCLANGUAGESELECTOR|HWC's Language Selector|SYS|SYS_HWCLANGU|github.com/HowlingWolfHWC|HWC_Language_Selector.ELF
+KELFBINDERDEBUGUDPBD|KELFBinder: UMCS Installer (Debug)|SYS|SYS_KELFBIND|github.com/NathanNeurotic|KELFBinder_debug_udpbd.elf
+KELFBINDER|KELFBinder: UMCS Installer (Debug)|SYS|SYS_KELFBIND|github.com/NathanNeurotic|KELFbinder.elf
+PS2BBLOPENTUNAINSTALLER|PS2BBL OpenTuna Installer|SYS|SYS_PS2BBL|israpps.github.io|PS2BBL_OpenTuna_Installer.ELF
+IDCHANGER|Console ID Changer|DST|DST_IDCHANGE||ID-CHANGER.ELF
+HDDMANAGER|HDD Manager|APP|APP_HDDMANAG||HDDMANAGER.ELF
+CHEATDATABASELAUNCHER|Cheat Database Launcher|APP|APP_CHEATDEV|root670 + El_isra + 1052|CheatDatabaseLauncher.ELF
+LOONIES8192R67PS2|Loonies 8192|GME|GME_LOONIES8|thp.itch.io|loonies8192-r67-ps2.elf
+CCLESTE|ccleste|GME|GME_CCLESTE|fjtrujy|ccleste.elf
+SDCD|Open PS2 Loader (SD Card Debugger)|APP|APP_OPL|ps2homebrew.github.io|sdcd_v0.4.1.elf
+SDCARDDEBUGGER|Open PS2 Loader (SD Card Debugger)|APP|APP_OPL|ps2homebrew.github.io|sdcard_debugger_v0.3.elf
+OPTICRAFT|OptiCraft|GME|GME_OPTICRAF|OptiJogos|OptiCraft 0.6 PS2 V1.2.elf
+SC2MAKERPKD|SoulCalibur2 Conquest Card Maker|APP|APP_SC2MAKER|israpps.github.io|sc2maker_pkd.elf
+PVZPS2|Plants vs. Zombies|GME|GME_PVZPS2|github.com/OptiJuegos|pvz_ps2.elf
+NETCHEAT|NetCheat|APP|APP_NETCHEAT|github.com/Dnawrkshp|NetCheat.elf
+TH06|Touhou 6|GME|GME_TH06|github.com/sammwyy|TH06.ELF
+SHIPPY1984|Shippy 1984|GME|GME_SHIPPY|Evilo|Shippy1984.elf
+SHIPPY|Shippy 1984|GME|GME_SHIPPY|Evilo|shippy.elf
+MODULO|Modulo|APP|APP_MODULO|github.com/AdityaKumar7209|modulo.elf
+MODETEST|PS2 Video Mode Tester|DST|DST_MODETEST|github.com/CosmicScale|modetest.elf
+ARTEMISGUI|Artemis|APP|APP_ARTEMIS|Jimmikaelkael, Lazy Bastard, Misfire|ARTEMIS_GUI.ELF
+ARTEMISGUIB334|Artemis|APP|APP_ARTEMIS|Jimmikaelkael, Lazy Bastard, Misfire|Artemis GUI b334.elf
+ARTEMISGUIB331|Artemis|APP|APP_ARTEMIS|Jimmikaelkael, Lazy Bastard, Misfire|Artemis GUI b331.elf
+OSDMENUCONFIGURATOR|OSDMenu Configurator|SYS|SYS_OSDMCONF|github.com/pcm720|osdmenu-configurator.elf
+RETROLAUNCHER|RETROLauncher|EMU|EMU_RETROLAU|github.com/Spaghetticode-Boon-Tobias|RETROLauncher.elf
+BIOSDRAIN|biosdrain|DST|DST_BIOSDRAI|github.com/F0bes|biosdrain.elf
+HDDCHECKER|PlayStation 2 HDD Checker|DST|DST_HDDCHECK|SP193|HDDChecker.elf
+HDDEMOLISHER|HDDemolisher|DST|DST_HDDEMOLI||HDDemolisher.elf
+HDDHWTEST|HDD HW Test|DST|DST_HDDHWTES||HDD HW Test (2016-08-10).elf
+MACHINEIDCHANGER|Machine ID Changer|DST|DST_MACHINEI|PARADOX Entertainment|Machine ID Changer v0.2a.elf
+PS2DC64|PS2-DC64|EMU|EMU_PS2DC64|Bigboy|PS2DC64.ELF
+MSXPS2|fMSX|EMU|EMU_FMSX||msxps2.elf
+PS2FMSXDEMO|fMSX|EMU|EMU_FMSX||PS2FMSX demo.elf
+PS2FMSX|fMSX|EMU|EMU_FMSX|Francisco Mayoral (ps2devel)|PS2fMSX v0.6b.elf
+NEOPOPPS2|NeoPop|EMU|EMU_NEOPOP|evilo|NeoPop-PS2 v0.10.elf
+PS2PCE|PS2PCE (TurboGrafx 16)|EMU|EMU_PS2PCE|KaylaKaze|PS2PCE v0.22.elf
+TURBOGRAFX16|PS2PCE (TurboGrafx 16)|EMU|EMU_PS2PCE|KaylaKaze|TurboGrafx 16.ELF
+PS2BOCHS|PS2 Bochs|EMU|EMU_PS2BOCHS|KarasQ|PS2Bochs (packed) v2.3.5-v2.elf
+PS2BOCHS235|PS2 Bochs|EMU|EMU_PS2BOCHS|KarasQ|PS2Bochs-2.3.5-v3-packed.elf
+PS2DREAMSPEC|PS2-DreamSpec|EMU|EMU_DREAMSPE|Bigboy|PS2-DreamSpec v1.0.elf
+PS2MAME|PS2Mame|EMU|EMU_PS2MAME|tirfing|PS2Mame v0.5.elf
+SCUMMVM|ScummVM|EMU|EMU_SCUMMVM|lavosspawn, sunmax|ScummVM (with modules embeded) v1.7.0.elf
+UAEFORPS2|UAE for PS2|EMU|EMU_UAE|UAE team, ps2dev team|UAE for PS2 (ECS) v0.8.25.elf
+UAEAGA|UAE for PS2|EMU|EMU_UAE|UAE team, ps2dev team|UAE_AGA.ELF
+UAEECS|UAE for PS2|EMU|EMU_UAE|UAE team, ps2dev team|UAEECS.ELF
+VBAM|VBAM|EMU|EMU_VBAM||VBAM.elf
+WOLF4SDL|Wolf4SDL|GME|GME_WOLF4SDL|github.com/Wolf3s|Wolf4SDL.elf
+BASTET|Bastet (Bastard Tetris)|GME|GME_BASTET|Drakonite|Bastet (Bastard Tetris).elf
+DUNGEONGAME|The Dungeon Game|GME|GME_DUNGEONG|Guilherme R. Lampert aka glampert|dungeon_game.elf
+GEOTRONPS2|Geotron|GME|GME_GEOTRON|Jum|Geotron PS2 v0.5 alpha.elf
+GEOTRON|Geotron|GME|GME_GEOTRON|Jum|geotron.elf
+IFCAROSTETRIS|Ifcaro's Tetris|GME|GME_IFCAROST|Ifcaro|Ifcaro's Tetris.elf
+TETRIS|Tetris|GME|GME_TETRIS|Viktor Gars|tetris.elf
+MKDHOOK|Ultimate Mortal Kombat Deception|GME|GME_MKDHOOK|github.com/ermaccer|MKDHook.elf
+PINTOR|Pintor|GME|GME_PINTOR|Hermes|Pintor.elf
+QBERT|Qbert|GME|GME_QBERT|ps2devman|QBERT.ELF
+TYRACRAFT|TyraCraft|GME|GME_TYRACRAF|Wellinator|Tyracraft.-.v0.86.140-pre-alpha.elf
+XRICK|Xrick|GME|GME_XRICK|gawd|xrick v021212.elf
+XRICKPS2|Xrick|GME|GME_XRICK|gawd|XRICKPS2.ELF
+XUMP||GME|GME_XUMP|Gisberto Rondinella (nop90)|Xump v1.10.elf
+PS1VMODENEG|PS1Drv Video Mode Negater|PS1|PS1_PS1VMODE|ps2homebrew.github.io|PS1VModeNeg.elf
+DISCLAUNCHER|Retro GEM Disc Launcher|APP|APP_GEMDLCHR|github.com/CosmicScale|disc-launcher.elf
+LAUNCHDISC|Retro GEM Disc Launcher|APP|APP_GEMDLCHR|github.com/CosmicScale|Launch-Disc.elf
+CONTROLLER|Controller Test|DST|DST_CONTROLL||CONTROLLER.ELF
+ColemPS2|ColEm|EMU|EMU_COLEMPS2|Jum|colem.elf
+COLEMPS2|ColEm|EMU|EMU_COLEMPS2|Jum|ColemPS2 v2.0.elf
+COLECO|ColEm|EMU|EMU_COLEMPS2|Jum|COLECO.ELF
+DOOM|PS2 Doom|GME|GME_DOOM|github.com/israpps|DOOM.ELF
+PS2DOOM|PS2 Doom|GME|GME_DOOM|Lukasz Bruun, cosmito|PS2Doom v1.0.5.0.elf
+PS2SDLDOOM|SDL Doom|GME|GME_DOOM|Lukasz Bruun|PS2 SDL Doom v1.10.elf
+PRBOOMPLUS|PrBoom-Plus|GME|GME_DOOM|github.com/Wolf3s|prboom-plus.elf
+PS2INFOGBRE|InfoGB|EMU|EMU_INFOGB|KarasQ|PS2InfoGB Rev6b.elf
+PS2INFOGBWITHDS3DS4SUPPORTRE|InfoGB|EMU|EMU_INFOGB|KarasQ|PS2InfoGB with DS3 & DS4 support Rev6c.elf
+GAMEBOYCOLORUSB|InfoGB|EMU|EMU_INFOGB|KarasQ|Game Boy Color- USB.ELF
+INFOGBIRX|InfoGB|EMU|EMU_INFOGB|7not6|InfoGB-IRX.elf
+INFOGB|InfoGB|EMU|EMU_INFOGB|7not6|InfoGB.elf
+JUM52I|Jum52|EMU|EMU_JUM52|James Higgs|JUM52I.ELF
+JUM52NI|Jum52|EMU|EMU_JUM52|James Higgs|JUM52NI.ELF
+JUMSA5200EMULATOR|Jum52|EMU|EMU_JUM52|James Higgs|Jum's A5200 Emulator (mc version) v0.8a.elf
+GAMEBOYADVANCE|TempGBA|EMU|EMU_TEMPGBA|psx-place.com/tags/belek666|Game Boy Advance.ELF
+SEGAMASTERSYSTEM|PSMS Reloaded|EMU|EMU_PSMS|github.com/infval|Sega Master System.ELF
+PGEN12|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN_12.ELF
+PGENB1|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN_B1.ELF
+PGENRC2|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGENRC2.ELF
+PGEN10B|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN10B.ELF
+PGEN11|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN_11.ELF
+PGEN15|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN15.ELF
+1FX|One Effect|DEM|DEM_1FX|Skeet|1fx.elf
+1987|1987|DEM|DEM_1987|Jollytox|1987.elf
+DRESDBLENDREVISITED|Blend Revisited|DEM|DEM_BLENDREV|Adresd|Adresd_blendrevisited.elf
+ADRESDROUND4|Round 4|DEM|DEM_ROUND4|Adresd|Adresd_round4.elf
+ADRESDROUND5|Round 5|DEM|DEM_ROUND4|Adresd|adresd_round5.elf
+ADRESDROUND6242|242|DEM|DEM_242|Adresd|adresd_round6_242.elf
+ADRESDROUND6242NS|242|DEM|DEM_242|Adresd|adresd_round6_242_ns.elf
+ADRESDROUND7BLEND|Blend|DEM|DEM_BLEND|Adresd|adresd_round7_blend.elf
+ADRESDROUND7BLENDNOSOUND|Blend|DEM|DEM_BLEND|Adresd|adresd_round7_blend_nosound.elf
+ADRESDROUND9NEWYEAR|NewYear|DEM|DEM_NEWYEAR|Adresd|adresd_round9_newyear.elf
+ADRESDROUND10QUICKIE|Quickie|DEM|DEM_QUICKIE|Adresd|adresd_round10_quickie.elf
+ADRESDROUND11VUMEVUU|VUME VUU|DEM|DEM_VUMEVUU|Adresd|adresd_round11_vume-vuu.elf
+ADRESDROUND12|Round 12|DEM|DEM_ROUND12|Adresd|adresd_round12.elf
+ADRESDROUND13|Mellow|DEM|DEM_MELLOW|Adresd|adresd_round13.elf
+ADRESDROUND14|Rushed|DEM|DEM_RUSHED|Adresd|adresd_round14.elf
+ADRESDROUND17FORMS|Forms|DEM|DEM_FORMS|Adresd|adresd_round17_forms.elf
+ADRESDROUND20EXPLORATIONS|Explorations in Testing|DEM|DEM_EXPLORAT|Adresd|adresd_round20_explorations.elf
+BEGINNING|Beginning|DEM|DEM_BEGINNIN|Zer0-X|beginning.elf
+BUNNY|Bunny|DEM|DEM_BUNNY|NoRecess|BUNNY.ELF
+COLORS|Colors of My Mind|DEM|DEM_COLORS|Adresd|colors.elf
+COLORS15|Colors of My Mind v1.5|DEM|DEM_COLORS15|Adresd|colors15.elf
+FIRE|FiRE|DEM|DEM_FIRE|Jules|FiRE.elf
+FIREBALLS|Fireballs|DEM|DEM_FIREBALL|Raizor|fireballs.elf
+FLATLINE|Flatline|DEM|DEM_FLATLINE|Tyranid|flatline.elf
+GO|Go for It|DEM|DEM_GOFORIT|Djhuevo|GO.ELF
+ICE|Ice|DEM|DEM_ICE|Nippy|ICE.ELF
+IFS|Round 4 Extra IFS|DEM|DEM_IFS|Wrath Designs|ifs.elf
+SCREENSAVER|Round 4 Extra Screensaver|DEM|DEM_SCREENSA|Wrath Designs|screensaver.elf
+J0MOMMAZ|J0Mommaz|DEM|DEM_J0MOMMAZ|InPulse Team|J0Mommaz.elf
+JUM1|Oh the demos I have done|DEM|DEM_JUM1|Jum|jum1.elf
+MONALISA|Mona Lisa|DEM|DEM_MONALISA|NoRecess|monalisa.elf
+P51|P51 Mustang|DEM|DEM_P51|Longchair|p51.elf
+PIECESR13|Pieces|DEM|DEM_PIECESR1|Tyranid|pieces_r13.elf
+PLASMADREAMS|Plasma Dreams|DEM|DEM_PLASMADR|Adresd|plasmadreams.elf
+PLASMATUNNEL|Plasma Tunnel|DEM|DEM_PLASMATU|Dreamtime|plasma_tunnel.elf
+PS2FLIGHT|PS2 Flight|DEM|DEM_PS2FLIGH|Gabriel DelaRosa|ps2flight.elf
+THECUBENTSC|The Cube|DEM|DEM_THECUBE|Oopo|thecube-ntsc.elf
+THECUBEPAL|The Cube|DEM|DEM_THECUBE|Oopo|thecube-pal.elf
+TTC19JAR|Round 19|DEM|DEM_TTC19JAR|Jar|ttc19_jar.elf
