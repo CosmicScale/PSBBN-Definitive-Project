@@ -718,11 +718,10 @@ macOS support is on the `macos-native` branch of [rflpazini/PSBBN-Definitive-Pro
 Install [Homebrew](https://brew.sh) if it is not already installed. If `brew` asks for the Xcode Command Line Tools, install them and run `brew` again.
 
 ```
-brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs pkg-config icu4c python@3 xz unar
-brew install --cask fuse-t
+brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs mtools pkg-config icu4c python@3 xz unar
 ```
 
-`fuse-t` asks for an administrator password. Approve that install. The menu uses it to mount PlayStation File System partitions.
+`mtools` writes the FAT music partition. `e2fsprogs` writes the ext2 partitions. PlayStation File System partitions are written with the bundled `pfsshell`. macOS 27 panics if those partitions are mounted through FUSE-T or a disk image, so this installer does not do that.
 
 Clone the macOS branch and create the Python environment the script checks for:
 
@@ -739,7 +738,11 @@ The script opens the same [main menu](#main-menu) as on Linux. Quit with `q` bef
 
 Plug in only the PS2 drive. The disk list shows external disks. The internal Mac disk is not listed.
 
-An external PS2 drive can be initialised. The internal Mac disk is refused. When macOS asks for an administrator password, that password is for writing the drive. Enter it once. Later commands reuse it.
+An external PS2 drive can be initialised. The internal Mac disk is refused. When macOS asks for an administrator password, that password is for writing the drive. Enter it once. Later commands reuse it. Creating an EXT2 partition also formats it, matching the Linux PFS Shell. The installer then keeps each partition as a normal folder and writes that folder back onto the drive when the partition is unmounted.
+
+"Installing PSBBN..." is quiet for several minutes. The patch archive is written into the ext2 images with `debugfs` and its output is captured, so nothing reaches the log until that step finishes. It is not a hang. Every image is checked with `e2fsck` before it is written to the drive.
+
+The script runs from a working copy in `$TMPDIR/psbbn-overlay-<uid>`. That is where `logs/PSBBN-installer.log` and the downloaded patch archives live; both survive later launches. Staged partitions are folders under `/tmp/psbbn-storage-<uid>` and are removed when the installer finishes.
 
 ## Installing on Windows
 The recommended way to install the **PSBBN Definitive Project** on Windows is by using the **PSBBN Launcher for Windows**. The **PSBBN Launcher for Windows** is compatible with Windows 10 and 11 Home editions; other editions may not be compatible. For a trouble-free experience, make sure Windows is fully up to date.
@@ -1233,7 +1236,7 @@ wsl --unregister PSBBN
 
 **If you are using [macOS](#installing-on-macos) and the script exits before the menu:**
 
-`/bin/bash` on macOS is too old for this script. Install Homebrew bash with `brew install bash` and run `./PSBBN-Definitive-Patch.sh` again. If partition mounts fail, confirm FUSE-T installed (`brew install --cask fuse-t`) and that the administrator prompt was approved.
+`/bin/bash` on macOS is too old for this script. Install Homebrew bash with `brew install bash` and run `./PSBBN-Definitive-Patch.sh` again. If a partition write fails, confirm `e2fsprogs` and `mtools` are installed and that the administrator prompt was approved.
 
 **If you are using [Linux](#installing-on-linux) and experience issues:**
 1. Delete the `PSBBN-Definitive-Project` folder
