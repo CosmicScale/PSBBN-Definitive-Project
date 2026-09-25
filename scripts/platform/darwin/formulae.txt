@@ -1,0 +1,22 @@
+# Homebrew packages the installer needs on macOS.
+# Setup.sh installs them; check-deps.sh verifies them at every start.
+bash
+coreutils
+findutils
+gnu-sed
+grep
+gawk
+wget
+axel
+rsync
+imagemagick
+ffmpeg
+ffmpegthumbnailer
+bchunk
+e2fsprogs
+mtools
+pkg-config
+icu4c
+python@3
+xz
+unar

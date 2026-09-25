@@ -759,24 +759,17 @@ Apple silicon Macs run the same `PSBBN-Definitive-Patch.sh` menu. This was run o
 
 macOS support is on the `macos-native` branch of [rflpazini/PSBBN-Definitive-Project](https://github.com/rflpazini/PSBBN-Definitive-Project) until it is merged upstream.
 
-Install [Homebrew](https://brew.sh) if it is not already installed. If `brew` asks for the Xcode Command Line Tools, install them and run `brew` again.
-
-```
-brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs mtools pkg-config icu4c python@3 xz unar
-```
-
-`mtools` writes the FAT music partition. `e2fsprogs` writes the ext2 partitions. PlayStation File System partitions are written with the bundled `pfsshell`. macOS 27 panics if those partitions are mounted through FUSE-T or a disk image, so this installer does not do that.
-
-Clone the macOS branch and create the Python environment the script checks for:
+Install [Homebrew](https://brew.sh) if it is not already installed. If `brew` asks for the Xcode Command Line Tools, install them and run `brew` again. Everything else is installed by the script.
 
 ```
 git clone -b macos-native https://github.com/rflpazini/PSBBN-Definitive-Project.git
 cd PSBBN-Definitive-Project
-export PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
-"$(brew --prefix python@3)/bin/python3" -m venv scripts/venv
-./scripts/venv/bin/pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth
 ./PSBBN-Definitive-Patch.sh
 ```
+
+On the first run the script installs Homebrew bash if it is missing, then `Setup.sh` installs the Homebrew packages listed in `scripts/platform/darwin/formulae.txt` and creates the Python environment in `scripts/venv`, the same way it does on Linux. Later runs check those packages at start and run the setup again only if one is missing.
+
+`mtools` writes the FAT music partition. `e2fsprogs` writes the ext2 partitions. PlayStation File System partitions are written with the bundled `pfsshell`. macOS 27 panics if those partitions are mounted through FUSE-T or a disk image, so this installer does not do that.
 
 The script opens the same [main menu](#main-menu) as on Linux. Quit with `q` before you unplug the drive, then eject it from Finder.
 

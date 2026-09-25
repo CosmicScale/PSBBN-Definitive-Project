@@ -550,6 +550,10 @@ check_dep(){
     check_cmd ffmpegthumbnailer
     check_cmd unrar-free
     check_cmd dmsetup
+    if [[ "$(uname -s)" == Darwin ]]; then
+        # The shims answer for the Linux tool names; check the packages behind them.
+        "${SCRIPTS_DIR}/platform/darwin/check-deps.sh" >> "$LOG_FILE" 2>&1 || MISSING=1
+    fi
 
     if ! pkg-config --exists icu-i18n 2>/dev/null; then
         echo "[X] libicu-dev not found." >> "$LOG_FILE"

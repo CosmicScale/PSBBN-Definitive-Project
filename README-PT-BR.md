@@ -715,24 +715,17 @@ Macs com Apple silicon executam o mesmo menu do `PSBBN-Definitive-Patch.sh`. Iss
 
 O suporte a macOS está no branch `macos-native` de [rflpazini/PSBBN-Definitive-Project](https://github.com/rflpazini/PSBBN-Definitive-Project) até ser incorporado ao repositório original.
 
-Instale o [Homebrew](https://brew.sh) se ele ainda não estiver instalado. Se o `brew` pedir as Xcode Command Line Tools, instale-as e execute o `brew` de novo.
-
-```
-brew install bash coreutils findutils gnu-sed grep gawk wget axel rsync imagemagick ffmpeg ffmpegthumbnailer bchunk e2fsprogs mtools pkg-config icu4c python@3 xz unar
-```
-
-O `mtools` grava a partição FAT de música. O `e2fsprogs` grava as partições ext2. As partições PFS são gravadas com o `pfsshell` incluído. O macOS 27 trava se essas partições forem montadas pelo FUSE-T ou por uma imagem de disco, então este instalador não faz isso.
-
-Clone o branch de macOS e crie o ambiente Python que o script verifica:
+Instale o [Homebrew](https://brew.sh) se ele ainda não estiver instalado. Se o `brew` pedir as Xcode Command Line Tools, instale-as e execute o `brew` de novo. Todo o resto é instalado pelo script.
 
 ```
 git clone -b macos-native https://github.com/rflpazini/PSBBN-Definitive-Project.git
 cd PSBBN-Definitive-Project
-export PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
-"$(brew --prefix python@3)/bin/python3" -m venv scripts/venv
-./scripts/venv/bin/pip install lz4 natsort mutagen tqdm PyICU pykakasi pillow Unidecode textual wcwidth
 ./PSBBN-Definitive-Patch.sh
 ```
+
+Na primeira execução o script instala o bash do Homebrew, se estiver faltando, e em seguida o `Setup.sh` instala os pacotes do Homebrew listados em `scripts/platform/darwin/formulae.txt` e cria o ambiente Python em `scripts/venv`, do mesmo jeito que faz no Linux. Nas execuções seguintes o script verifica esses pacotes no início e só roda o setup de novo se algum estiver faltando.
+
+O `mtools` grava a partição FAT de música. O `e2fsprogs` grava as partições ext2. As partições PFS são gravadas com o `pfsshell` incluído. O macOS 27 trava se essas partições forem montadas pelo FUSE-T ou por uma imagem de disco, então este instalador não faz isso.
 
 O script abre o mesmo [menu principal](#menu-principal) do Linux. Saia com `q` antes de desconectar a unidade e ejete-a pelo Finder.
 

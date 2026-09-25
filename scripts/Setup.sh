@@ -37,6 +37,8 @@ LANG_DIR="${ASSETS_DIR}/lang"
 SOURCES_LIST="/etc/apt/sources.list"
 LOG_FILE="${TOOLKIT_PATH}/logs/setup.log"
 arch="$(uname -m)"
+PYTHON="python3"
+VENV_DIR="scripts/venv"
 
 LANG_FILE="$1"
 
@@ -118,7 +120,20 @@ EOF
 echo "${UI_TEXT[INSTALL_DEP]}"
 
 # Detect package manager and install packages
-if [ -x "$(command -v apt-get)" ]; then
+# macOS: Homebrew provides the tools. The scripts run from an overlay, so the
+# Python environment is created in the repository and linked into the overlay.
+if [[ "$(uname -s)" = "Darwin" ]]; then
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "Homebrew not found." >> "${LOG_FILE}"
+        error_msg "Homebrew is required on macOS. Install it from https://brew.sh, then run ./PSBBN-Definitive-Patch.sh again."
+    fi
+    formulae=$(grep -v -E '^[[:space:]]*(#|$)' "${SCRIPTS_DIR}/platform/darwin/formulae.txt" | tr '\n' ' ')
+    # shellcheck disable=SC2086
+    brew install $formulae 2>&1 | tee -a "${LOG_FILE}"
+    PYTHON="$(brew --prefix)/bin/python3"
+    export PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    VENV_DIR="${PSBBN_REPO:-$TOOLKIT_PATH}/scripts/venv"
+elif [ -x "$(command -v apt-get)" ]; then
     if [[ "$arch" = "x86_64" ]]; then
         sudo dpkg --add-architecture i386
         i386="libc6:i386"
@@ -155,11 +170,11 @@ fi
 
 # Python virtual environment setup
 (
-    python3 -m venv scripts/venv >> "${LOG_FILE}" 2>&1 || {
+    "$PYTHON" -m venv "$VENV_DIR" >> "${LOG_FILE}" 2>&1 || {
         echo "Failed to create Python virtual environment." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_1]}"
     }
-    source scripts/venv/bin/activate || {
+    source "$VENV_DIR/bin/activate" || {
         echo "Failed to activate the Python virtual environment." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_2]}"
     }
@@ -171,6 +186,9 @@ fi
 ) &
 PID=$!
 spinner $PID "${UI_TEXT[SETUP_PYTHON]}"
+if [[ "$(uname -s)" = "Darwin" && ! -e scripts/venv ]]; then
+    ln -s "$VENV_DIR" scripts/venv
+fi
 
 echo
 echo "[✓] Setup completed successfully!" >> "${LOG_FILE}"

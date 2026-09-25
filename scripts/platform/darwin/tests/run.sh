@@ -38,6 +38,28 @@ fi
 "$bin/rsync" --psbbn-shim-ok && ok rsync-shim-ok || bad rsync-shim-ok
 rm -rf "$rs"
 
+# --- check-deps: Homebrew packages behind the shims -----------------------
+cd_stub=$(mktemp -d)
+mkdir -p "$cd_stub/opt/present"
+cat > "$cd_stub/brew" << EOF
+#!/bin/bash
+# brew --prefix NAME...: one path per name; "gone" points nowhere.
+shift
+for f in "\$@"; do
+    if [[ "\$f" == gone ]]; then echo "$cd_stub/opt/gone"; else echo "$cd_stub/opt/present"; fi
+done
+EOF
+chmod +x "$cd_stub/brew"
+status=0
+out=$(PSBBN_BREW="$cd_stub/brew" /bin/bash "$root/check-deps.sh" 2>&1) || status=$?
+n=$(grep -c -v -E '^\s*(#|$)' "$root/formulae.txt")
+[[ "$status" -eq 0 && "$(grep -c '^\[✓\]' <<<"$out")" -eq "$n" ]] && ok check-deps-all-present || bad "check-deps-all-present status=$status $(head -n 2 <<<"$out")"
+printf 'gone\n' > "$cd_stub/formulae.txt"; cp "$root/check-deps.sh" "$cd_stub/check-deps.sh"
+status=0
+out=$(PSBBN_BREW="$cd_stub/brew" /bin/bash "$cd_stub/check-deps.sh" 2>&1) || status=$?
+[[ "$status" -eq 1 && "$out" == *"Missing Homebrew package: gone"* ]] && ok check-deps-reports-missing || bad "check-deps-reports-missing status=$status $out"
+rm -rf "$cd_stub"
+
 . "$root/lib.sh"
 got=$(psbbn_rewrite_device /dev/disk63)
 [[ "$got" == /dev/disk6s3 ]] && ok rewrite-disk63 || bad "rewrite-disk63 $got"
