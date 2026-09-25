@@ -151,13 +151,13 @@ elif [ -x "$(command -v emerge)" ]; then
         if sudo modprobe dm_mod 2>/dev/null; then :
         else
             echo "Error: Failed to load the 'dm_mod' kernel module." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[SETUP_FAILED]}"
+            error_msg "${UI_TEXT[SETUP_FAILED]} ${LOG_FILE}"
         fi
     else
     # If it's not present at all, halt and throw this error message
         echo "Error: device-mapper (CONFIG_BLK_DEV_DM) is missing from your kernel."  >> "${LOG_FILE}"
         echo "Please rebuild your kernel with CONFIG_BLK_DEV_DM=y or CONFIG_BLK_DEV_DM=m before running this installer."  >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[SETUP_FAILED]}"
+        error_msg "${UI_TEXT[SETUP_FAILED]} ${LOG_FILE}"
     fi
     sudo mkdir -p /etc/portage/package.use
     cat << 'EOF' | sudo tee /etc/portage/package.use/psbbn-installer > /dev/null
@@ -168,7 +168,7 @@ EOF
 # Swap deprecated exfat-utils with exfatprogs if present
     if portageq has_version / sys-fs/exfat-utils &>/dev/null; then
         echo "Please remove sys-fs/exfat-utils manually before running this script again." >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[SETUP_FAILED]}"
+        error_msg "${UI_TEXT[SETUP_FAILED]} ${LOG_FILE}"
     fi
     sudo emerge --sync && sudo USE='lvm' emerge --update --quiet --quiet-fail --changed-use --ask net-misc/axel media-gfx/imagemagick dev-util/xxd dev-lang/python dev-python/pip sys-devel/bc net-misc/rsync net-misc/curl net-misc/wget media-video/ffmpeg sys-fs/lvm2 sys-fs/fuse:0 sys-fs/dosfstools sys-fs/e2fsprogs sys-fs/exfatprogs sys-apps/util-linux sys-block/parted app-cdr/bchunk dev-libs/icu dev-util/pkgconf media-video/ffmpegthumbnailer app-arch/libarchive $i386 2>&1 | tee -a "${LOG_FILE}"
 elif [ -n "$IN_NIX_SHELL" ]; then
