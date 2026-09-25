@@ -1,5 +1,5 @@
 #!/opt/homebrew/bin/bash
-# Rehearsal of the Game-Installer launcher-partition loop against a file image.
+# Rehearsal of Game-Installer's create_launcher_partitions loop against a file image.
 # No real disk and no sudo. Sends the command streams Game-Installer sends,
 # through the same sudo shim, PFS Shell wrapper and HDL Dump wrapper:
 # toc, rmpart of every PP.* partition, then per launcher toc (size check),
@@ -68,9 +68,10 @@ else
     make_launcher PP.SLUS-00003.01.SHORT DVD nodel
     make_launcher PP.SLES-00004.01.CD_TITLE_1 CD nodel
     make_launcher PP.SLUS-00005.01.PS1_TITLE POPS nodel
-    make_launcher PP.SCPN_601.60.TEST INC del
+    make_launcher PP.SCPN-60160.TEST SYS del
+    make_launcher PP.SLUS-00006.01.SMB_TITLE SMB nodel
     make_launcher PP.APP_TESTAPP APP del
-    make_launcher PP.SYS_TESTCONFIGURATOR INC del
+    make_launcher PP.SYS_TESTCONFIGURATOR SYS del
 fi
 count=${#LAUNCHERS[@]}
 (( count > 0 )) || { bad "no launcher folders"; exit 1; }
@@ -127,7 +128,7 @@ create_launchers() {
         COMMANDS+="cd res\n"
         COMMANDS+="put info.sys\n"
         COMMANDS+="put jkt_001.png\n"
-        if [[ "$type" == POPS ]]; then
+        if [[ "$type" == POPS || "$type" == "__.POPS" || "$type" == SMB ]]; then
             COMMANDS+="lcd '${assets}/POPStarter'\n"
             COMMANDS+="put bg.png\n"
             COMMANDS+="lcd '${assets}/POPStarter/eng'\n"
