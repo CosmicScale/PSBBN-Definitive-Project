@@ -1,0 +1,81 @@
+#!/bin/bash
+# A mapper stamp with a .meta file is an APA slice: the slice file itself is
+# formatted (never the disk with -E offset) and umount writes it back. A real
+# external partition is passed through. An internal disk is refused.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+
+path="${@: -1}"
+real=""
+for candidate in \
+    /opt/homebrew/opt/e2fsprogs/sbin/mke2fs \
+    /usr/local/opt/e2fsprogs/sbin/mke2fs
+do
+    if [[ -x "$candidate" ]]; then
+        real="$candidate"
+        break
+    fi
+done
+if [[ -z "$real" ]]; then
+    echo "mke2fs: e2fsprogs is not installed" >&2
+    exit 127
+fi
+
+if [[ -f "${path}.meta" ]]; then
+    device=""
+    start=""
+    sectors=""
+    # shellcheck disable=SC1091
+    . "${path}.meta"
+    block=4096
+    prev=""
+    args=()
+    for arg in "$@"; do
+        if [[ "$prev" == "-b" ]]; then
+            block="$arg"
+            prev=""
+            args+=("$arg")
+            continue
+        fi
+        if [[ "$arg" == "-b" ]]; then
+            prev="-b"
+            args+=("$arg")
+            continue
+        fi
+        if [[ "$arg" == "$path" ]]; then
+            continue
+        fi
+        args+=("$arg")
+    done
+    if psbbn_is_real_disk "$device" && psbbn_disk_internal "$device"; then
+        echo "mke2fs: refusing internal disk $device" >&2
+        exit 2
+    fi
+    "$real" -F "${args[@]}" "$path"
+    exit $?
+fi
+
+rewritten=$(psbbn_rewrite_device "$path")
+if psbbn_is_real_disk "$rewritten" && psbbn_disk_internal "$rewritten"; then
+    echo "mke2fs: refusing internal disk $rewritten" >&2
+    exit 2
+fi
+args=()
+for arg in "$@"; do
+    if [[ "$arg" == "$path" ]]; then
+        args+=("$rewritten")
+    else
+        args+=("$arg")
+    fi
+done
+if psbbn_is_real_disk "$rewritten"; then
+    platform_elevate "$real" -F "${args[@]}"
+else
+    "$real" "${args[@]}"
+fi

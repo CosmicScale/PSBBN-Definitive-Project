@@ -1,0 +1,34 @@
+#!/bin/bash
+# The installer falls back to mount.exfat-fuse when plain mount fails.
+# Disk Arbitration owns exFAT on macOS. Options such as uid= are ignored.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+src=""
+mnt=""
+prev=""
+for arg in "$@"; do
+    case "$prev" in
+        -o) prev="" ; continue ;;
+    esac
+    case "$arg" in
+        -o) prev="-o" ; continue ;;
+        -o*) continue ;;
+        *)
+            if [[ -z "$src" ]]; then
+                src="$arg"
+            else
+                mnt="$arg"
+            fi
+            ;;
+    esac
+done
+src=$(psbbn_rewrite_device "$src")
+if psbbn_is_real_disk "$src" && psbbn_disk_internal "$src"; then
+    echo "mount.exfat-fuse: refusing internal disk $src" >&2
+    exit 2
+fi
+psbbn_diskutil_mount "$src" "${mnt%/}"

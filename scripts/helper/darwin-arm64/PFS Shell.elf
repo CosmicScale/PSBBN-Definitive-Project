@@ -1,0 +1,59 @@
+#!/bin/bash
+# Upstream pfsshell creates an EXT2 partition and leaves it empty.
+# The Linux PFS Shell shipped with this project formats EXT2 and EXT2SWAP
+# inside mkpart. Mounting depends on that filesystem existing.
+if [[ -t 0 ]]; then
+    exec "$(cd "$(dirname "$0")" && pwd)/pfsshell" "$@"
+fi
+self=$0
+while [[ -L "$self" ]]; do
+    link=$(readlink "$self")
+    case "$link" in
+        /*) self=$link ;;
+        *) self="$(cd "$(dirname "$self")" && pwd)/$link" ;;
+    esac
+done
+here=$(cd "$(dirname "$self")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../platform/load.sh"
+cmds=$(cat)
+device=$(printf '%s\n' "$cmds" | awk '/^device / {print $2; exit}')
+if [[ -n "$device" ]] && psbbn_is_real_disk "$device" && psbbn_disk_internal "$device"; then
+    printf '%s\n' "PFS Shell: refusing internal disk $device" >&2
+    exit 2
+fi
+# macOS refuses the read-write open of the whole disk while Disk Arbitration
+# has a volume of it mounted under /Volumes. pfsshell then prints
+# "<device>: Resource busy" and stops before doing anything, so the script
+# is safe to run again after evicting that mount.
+for attempt in 1 2 3 4 5 6; do
+    [[ -n "$device" ]] && psbbn_evict_automounts "$device"
+    output=$(printf '%s\n' "$cmds" | "$here/pfsshell" "$@")
+    status=$?
+    if [[ -n "$device" ]] && psbbn_pfs_open_busy "$device" "$output"; then
+        sleep "${PSBBN_DA_SETTLE:-1}"
+        continue
+    fi
+    break
+done
+printf '%s\n' "$output"
+if [[ "$status" -gt 128 ]]; then
+    printf '%s\n' "PFS Shell: pfsshell died with signal $((status - 128)); commands after the last prompt did not run." >&2
+fi
+if [[ "$status" -ne 0 ]]; then
+    exit "$status"
+fi
+if [[ -n "$device" ]] && printf '%s\n' "$output" | grep -F -q "$device: "; then
+    # The device could not be opened; nothing below would find partitions.
+    exit 1
+fi
+if [[ -z "$device" ]]; then
+    exit 0
+fi
+if ! printf '%s\n' "$cmds" | grep -q 'mkpart .* EXT2'; then
+    exit 0
+fi
+listing=$(psbbn_hdl_dump "$here/hdl_dump" toc "$device" --dm 2>/dev/null || true)
+# The created-partition check looks at pfsshell's own messages.
+psbbn_format_mkpart_ranges "$device" "$output"$'\n'"$cmds" "$listing"
+exit $?

@@ -1,0 +1,96 @@
+#!/bin/bash
+# Three kinds of source reach this shim:
+#   an APA slice file with a .meta window   -> staged as a directory
+#   a real exFAT/FAT partition (OPL)         -> Disk Arbitration mount
+#   a real partition macOS cannot read       -> staged like a slice
+# Nothing is mounted through FUSE-T or a disk image; both panicked macOS 27.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+args=()
+for arg in "$@"; do
+    args+=("$(psbbn_rewrite_device "$arg")")
+done
+src=""
+mnt=""
+skip=0
+for arg in "${args[@]}"; do
+    if [[ "$skip" -eq 1 ]]; then
+        skip=0
+        continue
+    fi
+    case "$arg" in
+        -o|-t) skip=1; continue ;;
+        -*) continue ;;
+        *)
+            if [[ -z "$src" ]]; then
+                src="$arg"
+            else
+                mnt="$arg"
+            fi
+            ;;
+    esac
+done
+if [[ "$mnt" != "/" ]]; then
+    mnt=${mnt%/}
+fi
+
+stage_slice() {
+    local slice="$1" mnt="$2" device="" start="" sectors="" node="" kind
+    # shellcheck disable=SC1091
+    . "${slice}.meta"
+    kind=$(psbbn_slice_kind "$slice")
+    if [[ "$kind" == empty ]]; then
+        psbbn_copy_range "$device" "$start" "$sectors" "$slice" || return $?
+        kind=$(psbbn_slice_kind "$slice")
+    fi
+    mkdir -p "$mnt"
+    case "$kind" in
+        ext2)
+            psbbn_ext2_export "$slice" "$mnt" || return $?
+            psbbn_stage_save "$mnt" "$slice" ext2
+            psbbn_manifest_write "$mnt" || return $?
+            ;;
+        vfat)
+            psbbn_vfat_export "$slice" "$mnt" || return $?
+            psbbn_stage_save "$mnt" "$slice" vfat
+            ;;
+        *)
+            echo "mount: $slice has no ext2 or FAT filesystem" >&2
+            return 1
+            ;;
+    esac
+}
+
+if [[ -n "$src" && -n "$mnt" && -f "${src}.meta" ]]; then
+    stage_slice "$src" "$mnt"
+    exit $?
+fi
+
+if [[ -n "$src" && -n "$mnt" ]] && psbbn_is_partition_node "$src"; then
+    if psbbn_disk_internal "$src"; then
+        echo "mount: refusing internal disk $src" >&2
+        exit 2
+    fi
+    fstype=$(psbbn_diskutil_fstype "$src")
+    case "$fstype" in
+        exfat|msdos|fat32|fat16|fat)
+            psbbn_diskutil_mount "$src" "$mnt"
+            exit $?
+            ;;
+    esac
+    slice=$(psbbn_node_slice "$src") || exit $?
+    stage_slice "$slice" "$mnt"
+    exit $?
+fi
+
+if [[ -n "$src" ]] && psbbn_is_real_disk "$src"; then
+    echo "mount: refusing whole disk $src" >&2
+    exit 2
+fi
+
+real="${PSBBN_REAL_MOUNT:-/sbin/mount}"
+exec "$real" "${args[@]}"

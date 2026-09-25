@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""Write the three-partition APA-Jail MBR the installer pipes to sfdisk.
+
+The APA header lives in the same sector. Bytes 0-445 (checksum, "APA"
+magic, partition ids, the APAJ-A2 signature at 224, the bootstrap fields at
+304) are read back and preserved; only the disk identifier, the four table
+entries and the 55AA signature are written, which is what Linux sfdisk does
+on this device. Geometry follows libfdisk: 512-byte sectors, first partition
+at LBA 2048, CHS from 255 heads x 63 sectors, capped at 1023/254/63.
+Internal disks are refused. External disks are the PS2 drive.
+"""
+import os
+import plistlib
+import struct
+import subprocess
+import sys
+
+HEADS = 255
+SECTORS = 63
+
+
+def load_sh():
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "load.sh")
+
+
+def lib_sh():
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "lib.sh")
+
+
+def is_disk(path):
+    return path.startswith("/dev/disk") or path.startswith("/dev/rdisk")
+
+
+def refuse(path):
+    if not is_disk(path):
+        return
+    probe = subprocess.run(
+        ["bash", "-c", '. "$1"; psbbn_disk_internal "$2"', "bash", lib_sh(), path],
+        capture_output=True,
+    )
+    # Return code 1 is the only external-disk answer. Anything else refuses.
+    if probe.returncode != 1:
+        sys.stderr.write(f"sfdisk: refusing {path}\n")
+        sys.exit(2)
+
+
+def disk_sectors(path):
+    diskutil = os.environ.get("PSBBN_DISKUTIL", "diskutil")
+    ident = path[5:]
+    if ident.startswith("rdisk"):
+        ident = ident[1:]
+    info = plistlib.loads(subprocess.check_output([diskutil, "info", "-plist", ident]))
+    size = int(info.get("TotalSize") or info.get("Size") or 0)
+    return size // 512
+
+
+def read_sector0(path):
+    if is_disk(path):
+        proc = subprocess.run(
+            ["bash", "-c", '. "$1"; platform_elevate /bin/dd if="$2" bs=512 count=1 2>/dev/null',
+             "bash", load_sh(), path],
+            stdout=subprocess.PIPE,
+        )
+        if proc.returncode != 0 or len(proc.stdout) != 512:
+            sys.stderr.write(f"sfdisk: cannot read sector 0 of {path}\n")
+            sys.exit(1)
+        return bytearray(proc.stdout)
+    with open(path, "rb") as fh:
+        data = fh.read(512)
+    return bytearray(data.ljust(512, b"\0"))
+
+
+def write_sector0(path, blob):
+    if is_disk(path):
+        proc = subprocess.run(
+            ["bash", "-c",
+             '. "$1"; psbbn_quiesce_disk "$2"; platform_elevate /bin/dd of="$2" bs=512 count=1 conv=notrunc',
+             "bash", load_sh(), path],
+            input=bytes(blob),
+        )
+        return proc.returncode
+    with open(path, "r+b") as fh:
+        fh.write(blob)
+    return 0
+
+
+def parse(text, total):
+    start = 2048
+    entries = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split(",")
+        if len(parts) < 3:
+            sys.stderr.write(f"sfdisk: bad line: {line}\n")
+            sys.exit(1)
+        size = parts[1].strip()
+        typ = int(parts[2].strip(), 16)
+        if size == "":
+            count = total - start
+        else:
+            if not size.endswith("MiB"):
+                sys.stderr.write(f"sfdisk: size must be MiB or empty: {size}\n")
+                sys.exit(1)
+            count = int(size[:-3]) * 2048
+        if count <= 0 or start + count > total:
+            sys.stderr.write("sfdisk: partitions do not fit on the device\n")
+            sys.exit(1)
+        entries.append((typ, start, count))
+        start += count
+    return entries
+
+
+def chs(lba):
+    """libfdisk set_hsc(): (head, sector|cyl_hi, cyl_lo)."""
+    spc = HEADS * SECTORS
+    if lba >= 1024 * spc:
+        lba = 1024 * spc - 1
+    cyl = lba // spc
+    head = (lba // SECTORS) % HEADS
+    sec = lba % SECTORS + 1
+    return bytes((head, (sec & 0x3F) | ((cyl >> 2) & 0xC0), cyl & 0xFF))
+
+
+def main(argv):
+    if len(argv) > 1 and argv[1] == "--psbbn-shim-ok":
+        return 0
+    if len(argv) != 2:
+        sys.stderr.write("usage: sfdisk DEVICE\n")
+        return 1
+    path = argv[1]
+    refuse(path)
+    if is_disk(path):
+        total = disk_sectors(path)
+    elif os.path.isfile(path):
+        total = os.path.getsize(path) // 512
+    else:
+        sys.stderr.write(f"sfdisk: not a regular file: {path}\n")
+        return 1
+    entries = parse(sys.stdin.read(), total)
+    blob = read_sector0(path)
+    blob[440:444] = os.urandom(4)          # disk identifier, as sfdisk writes
+    blob[444:446] = b"\0\0"
+    blob[446:510] = bytes(64)
+    for i, (typ, start, count) in enumerate(entries[:4]):
+        off = 446 + i * 16
+        blob[off] = 0x00
+        blob[off + 1:off + 4] = chs(start)
+        blob[off + 4] = typ
+        blob[off + 5:off + 8] = chs(start + count - 1)
+        blob[off + 8:off + 12] = struct.pack("<I", start)
+        blob[off + 12:off + 16] = struct.pack("<I", count)
+    blob[510] = 0x55
+    blob[511] = 0xAA
+    return write_sector0(path, blob)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

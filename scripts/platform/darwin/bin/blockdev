@@ -1,0 +1,34 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+flag="${1:-}"
+path="${2:-}"
+path=$(psbbn_rewrite_device "$path")
+case "$flag" in
+    --getsize|--getsz)
+        if psbbn_is_real_disk "$path"; then
+            if psbbn_disk_internal "$path"; then
+                echo "blockdev: refusing internal disk $path" >&2
+                exit 2
+            fi
+            bytes=$(psbbn_disk_bytes "$path") || exit 1
+            echo $((bytes / 512))
+            exit 0
+        fi
+        if [[ ! -f "$path" ]]; then
+            echo "blockdev: not a file: $path" >&2
+            exit 1
+        fi
+        size=$(wc -c < "$path" | tr -d ' ')
+        echo $((size / 512))
+        exit 0
+        ;;
+    *)
+        echo "blockdev: unsupported args: $*" >&2
+        exit 1
+        ;;
+esac

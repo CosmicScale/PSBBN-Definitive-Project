@@ -1,0 +1,20 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+unar=""
+for candidate in /opt/homebrew/bin/unar /usr/local/bin/unar; do
+    if [[ -x "$candidate" ]]; then
+        unar="$candidate"
+        break
+    fi
+done
+if [[ -z "$unar" ]]; then
+    echo "unrar-free: unar is not installed" >&2
+    exit 127
+fi
+if [[ "${1:-}" == "x" ]]; then
+    shift
+    exec "$unar" -f "$@"
+fi
+exec "$unar" "$@"

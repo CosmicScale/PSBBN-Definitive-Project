@@ -1,0 +1,25 @@
+#!/bin/bash
+# hdl_dump opens the PS2 drive read-write for every command, toc included.
+# macOS refuses that with "Resource busy" while Disk Arbitration has a
+# volume of the drive mounted under /Volumes, which it does on its own after
+# every sector-0 write. Those mounts are evicted and an EBUSY open retried.
+self=$0
+while [[ -L "$self" ]]; do
+    link=$(readlink "$self")
+    case "$link" in
+        /*) self=$link ;;
+        *) self="$(cd "$(dirname "$self")" && pwd)/$link" ;;
+    esac
+done
+here=$(cd "$(dirname "$self")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../platform/load.sh"
+for arg in "$@"; do
+    dev=$(psbbn_rewrite_device "$arg")
+    if psbbn_is_real_disk "$dev" && psbbn_disk_internal "$dev"; then
+        printf '%s\n' "HDL Dump: refusing internal disk $dev" >&2
+        exit 2
+    fi
+done
+psbbn_hdl_dump "$here/hdl_dump" "$@"
+exit $?

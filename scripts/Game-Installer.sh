@@ -37,6 +37,7 @@ ICONS_DIR="${TOOLKIT_PATH}/icons"
 ARTWORK_DIR="${ICONS_DIR}/art"
 VMC_ICON_DIR="${ICONS_DIR}/ico/vmc"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 LANG_DIR="${ASSETS_DIR}/lang"
@@ -53,6 +54,10 @@ MISSING_VMC="${LOGS_DIR}/missing-vmc.log"
 GAMES_PATH="${TOOLKIT_PATH}/games"
 CONFIG_FILE="${SCRIPTS_DIR}/gamepath.cfg"
 STORAGE_DIR="${SCRIPTS_DIR}/storage"
+# macOS writes AppleDouble files when this path is under /var. /tmp does not.
+if [[ "$(uname -s)" == Darwin ]]; then
+    STORAGE_DIR="/tmp/psbbn-storage-${UID}"
+fi
 OPL="${SCRIPTS_DIR}/OPL"
 PFS_POPS_LIST="${SCRIPTS_DIR}/tmp/pfs-pops.list"
 ATA_POPS_LIST="${SCRIPTS_DIR}/tmp/ata-pops.list"
@@ -1634,7 +1639,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {
