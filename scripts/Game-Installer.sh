@@ -1131,6 +1131,10 @@ install_elf() {
             app_name=$(echo "$app_name" | sed -E 's/^[pP][aA][cC][kK][eE][dD][[:space:]]*//')
             app_name=$(echo "$app_name" | sed -E 's/[pP][aA][cC][kK][eE][dD].*//')
 
+            # Remove "pkd"
+            app_name=$(echo "$app_name" | sed -E 's/^[pP][kK][dD][[:space:]]*//')
+            app_name=$(echo "$app_name" | sed -E 's/[pP][kK][dD].*//')
+
             app_name=$(echo "$app_name" | sed 's/\.*$//') # Trim trailing full stops
 
             AppDB_check=$(printf '%s' "$app_name" | sed 's/[^[:alnum:]]//g' | tr '[:lower:]' '[:upper:]')
@@ -1177,6 +1181,9 @@ install_elf() {
                 ;;
             ESR*)
                 AppDB_check="ESR"
+                ;;
+            SUPERMARIO64*)
+                AppDB_check="GME_SM64"
                 ;;
             *)
                 AppDB_check="$AppDB_check"
