@@ -1352,7 +1352,7 @@ Los usuarios de **Linux** pueden encontrar estos registros en `PSBBN-Definitive-
 - Contiene datos de [`TitlesDB_PS1_English.txt`](https://github.com/GDX-X/PFS-BatchKit-Manager/blob/main/PFS-BatchKit-Manager/BAT/TitlesDB/TitlesDB_PS1_English.txt) y [`TitlesDB_PS2_English.txt`](https://github.com/GDX-X/PFS-BatchKit-Manager/blob/main/PFS-BatchKit-Manager/BAT/TitlesDB/TitlesDB_PS2_English.txt) del [PFS-BatchKit-Manager](https://github.com/GDX-X/PFS-BatchKit-Manager) de [GDX-X](https://github.com/GDX-X)
 - Contiene datos de [`vmc_groups.list`](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin/blob/main/List%20Builder/vmc_groups.list) de [XEB+ neutrino Launcher Plugin](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin) de [sync-on-luma](https://github.com/sync-on-luma)
 - PSBBN Equipo de localización
-  - Inglés — [Escala Cósmica](https://github.com/CosmicScale)
+  - Inglés — [CosmicScale](https://github.com/CosmicScale)
   - Alemán — [Argo707](https://github.com/Argo707)
   - Italiano — [plamadika](https://github.com/plamadika) & [lcipria](https://github.com/lcipria)
   - Portugués brasileño — [Emerson Teles (Emertels)](https://github.com/Emertels)
