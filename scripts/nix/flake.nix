@@ -40,8 +40,6 @@
           bc
           rsync
           curl
-          zip
-          unzip
           wget
           exfatprogs
           ffmpeg
@@ -50,7 +48,7 @@
           bchunk
           e2fsprogs
           ffmpegthumbnailer
-          unrar-free
+          libarchive
           lvm2
           dosfstools
           util-linux
