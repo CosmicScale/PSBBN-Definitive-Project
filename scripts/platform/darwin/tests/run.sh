@@ -721,10 +721,12 @@ zipdir=$(mktemp -d)
 mkdir -p "$zipdir/src/sub" "$zipdir/out"
 printf 'a\n' > "$zipdir/src/a.txt"
 printf 'b\n' > "$zipdir/src/sub/b.txt"
+xattr -w com.apple.TextEncoding 'utf-8;134217984' "$zipdir/src/a.txt"
 status=0
-(cd "$zipdir/src" && bsdtar -acf "$zipdir/art.zip" *) >/dev/null 2>&1 || status=$?
+# enter.sh exports COPYFILE_DISABLE=1 for the whole run; no AppleDouble entries may reach the zip.
+(cd "$zipdir/src" && COPYFILE_DISABLE=1 bsdtar -acf "$zipdir/art.zip" *) >/dev/null 2>&1 || status=$?
 if [[ "$status" -eq 0 ]] \
-    && python3 -c 'import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); sys.exit(0 if z.testzip() is None and "sub/b.txt" in z.namelist() else 1)' "$zipdir/art.zip" \
+    && python3 -c 'import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); n = z.namelist(); sys.exit(0 if z.testzip() is None and "sub/b.txt" in n and not [x for x in n if "._" in x] else 1)' "$zipdir/art.zip" \
     && bsdtar -xf "$zipdir/art.zip" -C "$zipdir/out" \
     && [[ "$(cat "$zipdir/out/sub/b.txt")" == b ]]; then
     ok bsdtar-zip-roundtrip
