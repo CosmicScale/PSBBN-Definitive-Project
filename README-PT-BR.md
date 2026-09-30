@@ -1,6 +1,6 @@
 # PSBBN Definitive Project
 
-| **[English](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README.md)** | **Português (Brasil)** |
+| [English](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README.md) | **Português (Brasil)** | [Español](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README-SPA.md) |
 
 [![Licença: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/blob/main/LICENSE)  
 Este é o Projeto Definitivo para o software "PlayStation Broadband Navigator" da Sony (também conhecido como BB Navigator ou PSBBN) para o console de videogame "PlayStation 2" (PS2).
@@ -43,10 +43,12 @@ Ambas as opções de instalação oferecem:
 - Inclui os aplicativos [wLaunchELF-R3Z](#wlaunchelf-r3z), [R3CONFIGURATOR](#r3configurator) e [POPSLoader](#popsloader), com a escolha do [OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl) para o iniciador de jogos
 - Um [Instalador de Jogos e Aplicativos](#instalar-jogos-e-aplicativos) que automatiza totalmente a instalação de jogos de PS1 e PS2, bem como de aplicativos homebrew:
   - Cria recursos e baixa artes e ícones para todos os jogos e aplicativos
+  - Oferece uma opção para instalar hacks widescreen em jogos de PS2, ativando suporte a 16:9 widescreen em jogos compatíveis
   - Oferece uma opção para criar [Memory Cards Virtuais](#memory-cards-virtuais) (VMCs) para jogos de PS2, com suporte para [Grupos VMC](#memory-cards-virtuais) tanto para jogos de PS1 (*MGS*, etc.) quanto de PS2 (*Gran Turismo*, etc.)
   - Configura jogos de PS1 com vários discos para permitir a troca de discos
   - Instala automaticamente as [correções do HugoPocked POPStarter](#popstarter)
   - Converte arquivos `.bin`/`.cue` para `.VCD` (PS1) ou `.ISO` (PS2)
+  - Oferece a opção de comprimir arquivos ISO
   - Configura as definições de compatibilidade do OPL para os jogos
   - Adiciona os aplicativos instalados ao menu de sistema do [HOSDMenu](#hosdmenu)
 
@@ -61,13 +63,54 @@ Ambas as opções de instalação oferecem:
 
 # Registro de Alterações
 
-**13 de agosto de 2026 - Localização em Húngaro, pacotes de idiomas, atualizações do R3CONFIGURATOR e wLaunchELF_R3Z**
+**17 de Setembro de 2026 - Jogos Comprimidos, Hacks Widescreen, Instalador de Homebrews Aprimorado**
+<p></p>
+
+[![Atualização do PSBBN: Compressão de Jogos, Hacks Widescreen, Instalador de Homebrews Aprimorado e mais!](https://github.com/user-attachments/assets/4dfe26c8-7349-4f14-97d1-e88e616ea599)](https://youtu.be/ImmUr69x57Y)
+
+**Novos Recursos:**
+
+**[Instalador de Jogos e Aplicativos](#instalar-jogos-e-aplicativos):**
+- Adicionada uma opção para comprimir imagens `ISO` de PS2 durante a instalação de jogos. Ative esta opção para economizar espaço e colocar mais jogos no seu armazenamento.
+- Adicionada uma opção para instalar hacks widescreen em jogos de PS2, ativando suporte nativo a 16:9 widescreen com maior campo de visão em jogos compatíveis.
+- Instalador de aplicativos homebrew aprimorado. O banco de dados de aplicativos foi expandido para incluir detalhes de mais de 500 apps, incluindo título, desenvolvedor, ID do título e categoria.
+- O [Seletor de Jogos](#seletor-de-jogos) agora separa os aplicativos homebrew nas seguintes categorias: Emuladores, Jogos, Demoscene, Aplicativos, Aplicativos de PS1, Aplicativos de Sistema, Ferramentas de Diagnóstico, Aplicativos de Debug e Ambientes de Execução.
+- Mais de 500 ícones da Rotina de pesquisa para aplicativos foram adicionados ao [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database). O instalador agora baixa esses ícones para exibição na Rotina de pesquisa.
+- Os aplicativos na [Rotina de pesquisa](#hosdmenu) agora exibem a categoria à qual pertencem.
+- O [R3CONFIGURATOR](#r3configurator) agora possui uma [tecla de inicialização](#opções-de-inicialização) atribuída e pode ser iniciado no boot segurando o botão *SELECT*.
+
+**[Extras Opcionais](#extras-opcionais):**
+- Usuários apenas do HOSDMenu agora podem usar a opção [Reatribuir Botões Cruz e Círculo](#reatribuir-botões-cruz-e-círculo) no menu de [Extras Opcionais](#extras-opcionais). Isso inverte as funções dos botões × e ○.
+
+**Melhorias e Correções de Bugs:**
+- Títulos gerados automaticamente aprimorados para aplicativos `ELF` quando não há correspondência no banco de dados.
+- Aplicativos com arquivos `title.cfg` ausentes ou mal formatados agora são instalados corretamente.
+- Adicionada ordenação natural para aplicativos com acentos no título usando o `list-sorter.py`.
+- Detecção aprimorada de numerais romanos no `list-sorter.py`.
+- Removidos os rótulos de categorias, listando os aplicativos em ordem alfabética no [menu OSDSYS](#hosdmenu).
+- A criação de arquivos de mídia dos aplicativos foi movida para depois da execução do seletor de jogos, evitando processamento desnecessário de arquivos.
+- Corrigida a detecção de erros para falhas no [seletor de jogos](#seletor-de-jogos).
+- Corrigida a inversão de botões para o [R3CONFIGURATOR](#r3configurator).
+- Verificações aprimoradas para [wLaunchELF-R3Z](#wlaunchelf-r3z) e [R3CONFIGURATOR](#r3configurator) antes de criar os atalhos.
+- Remove aplicativos existentes atribuídos ao botão de inicialização *START* apenas se o [wLaunchELF-R3Z](#wlaunchelf-r3z) estiver instalado.
+- Removida etapa desnecessária de cópia de kernel ao trocar de idioma.
+- A partição `__linux.9` só é montada quando o idioma for alterado para Japonês.
+- Adicionado o Russo à seleção de idiomas em preparação para a futura localização russa.
+- O instalador agora envia para o log uma lista de todos os arquivos `ELF` instalados e suas respectivas pastas de origem.
+- Corrigida a variável de idioma enviada ao arquivo de log.
+- Corrigida a mensagem de interface "Processing ELF files".
+- Removidos os scripts redundantes `txt_to_icon_sys.py` e `icon_sys_to_txt.py` e suas verificações associadas.
+
+<details>
+<summary><b>13 de agosto de 2026 - Localização em Húngaro, pacotes de idiomas, atualizações do R3CONFIGURATOR e wLaunchELF_R3Z</b></summary>
 
 - O PSBBN Definitive Project agora está totalmente localizado em Húngaro. Você pode alterar o idioma da sua instalação do PSBBN no menu Extras opcionais.
 - Todos os pacotes de idiomas foram atualizados com correções e traduções aprimoradas.
 - O R3CONFIGURATOR foi atualizado para a [v1.3.1](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.1), e o wLaunchELF_R3Z foi atualizado para a [v4.76](https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/v4.76). Para atualizá-los, selecione “Instalar jogos e aplicativos” no menu principal.
+</details>
 
-**29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!**
+<details>
+<summary><b>29 de julho de 2026 - Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!</b></summary>
 <p></p>
 
 [![Seletor de Jogos v2, OSDMenu 1.3.0 e Mais!](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
@@ -91,6 +134,7 @@ Outras alterações:
 - O idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) para o [wLaunchELF_R3Z](#wlaunchelf-r3z) agora são definidos automaticamente
 - Adicionada a tradução em Português do Brasil do README do PSBBN Definitive Project.
 - Diversas correções de bugs e limpeza de código.
+</details>
 
 <details>
 <summary><b>02 de julho de 2026 - Localização Aprimorada, Seletor de Jogos, PS1 em exFAT, POPSLoader, wLaunchELF-R3Z e R3CONFIGURATOR</summary></b>
@@ -841,16 +885,16 @@ Selecionar esta opção verifica online as versões mais recentes do **Software 
 O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e PS2, bem como de aplicativos homebrew:
 - Detecta automaticamente a unidade do PS2
 - Para usuários de Linux, permite definir um caminho personalizado no PC para armazenar jogos e aplicativos antes da instalação
+- Oferece a opção de [sincronizar](#sincronizar-todos-os-jogos-e-aplicativos) os jogos e aplicativos no PC com a unidade do PS2, ou de [adicionar](#adicionar-jogos-e-aplicativos-adicionais) jogos e aplicativos adicionais
 - Oferece a escolha entre o [Open PS2 Loader (OPL)](#open-ps2-loader-opl) ou o [NHDDL](#nhddl) para o iniciador de jogos
-- Atribui o iniciador de jogos escolhido, o [POPSLoader](#popsloader) e o [wLaunchELF-R3Z](#wlaunchelf-r3z) ao [botão de inicialização](#opções-de-inicialização)
 - Instala quaisquer atualizações disponíveis para o [Open PS2 Loader (OPL)](#open-ps2-loader-opl), [NHDDL](#nhddl), [Neutrino](#nhddl), [POPSLoader](#popsloader), [wLaunchELF-R3Z](#wlaunchelf-r3z) e [R3CONFIGURATOR](#r3configurator)
 - Baixa e instala os binários do [POPS](#popstarter) e instala o [POPStarter](#popstarter)
+- Quando o [Open PS2 Loader (OPL)](#open-ps2-loader-opl) for selecionado como iniciador de jogos, oferece a opção de instalar hacks widescreen para jogos de PS2, ativando suporte nativo a 16:9 widescreen com maior campo de visão em jogos compatíveis.
 - Oferece a opção de aplicar uma correção HDTV para jogos de PS1, útil para usuários com uma TV que não suporta 240p
-- Oferece a opção de [sincronizar](#sincronizar-todos-os-jogos-e-aplicativos) os jogos e aplicativos no PC com a unidade do PS2, ou de [adicionar](#adicionar-jogos-e-aplicativos-adicionais) jogos e aplicativos adicionais
 - Converte automaticamente jogos de PS2 no formato `BIN/CUE` para `ISO` quando colocados na pasta `CD` do PC, e jogos de PS1 no formato `BIN/CUE` para `VCD` quando colocados na pasta `POPS` do PC
-- Permite que você selecione quais jogos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu)
+- Quando o [Open PS2 Loader (OPL)](#open-ps2-loader-opl) for selecionado como iniciador de jogos, oferece a opção de comprimir arquivos `ISO` para `ZSO`, permitindo instalar mais jogos no seu armazenamento
 - Para jogos no formato `ZSO`, o "Modo de Compatibilidade 1" é automaticamente ativado em suas configurações individuais do [OPL](#open-ps2-loader-opl)
-- Cria [Memory Cards Virtuais (VMCs)](#memory-cards-virtuais) para todos os jogos de PS1, com a opção de ativar VMCs para todos os jogos de PS2. Também cria [Grupos VMC](#memory-cards-virtuais) para jogos que podem interagir com os dados de salvamento de outros jogos
+- Cria [Memory Cards Virtuais (VMCs)](#memory-cards-virtuais) para todos os jogos de PS1, com a opção de ativar VMCs para todos os jogos de PS2. Também cria [Grupos VMC](#memory-cards-virtuais) que permitem a jogos compatíveis compartilhar dados de salvamento, desbloqueando recursos e bônus com base nos jogos que você já jogou
 - Configura jogos de PS1 de vários discos para permitir a troca de discos
 - Baixa e instala automaticamente as [correções do HugoPocked POPStarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/), melhorando a compatibilidade de mais de 100 jogos de PS1
 - Cria todos os recursos, incluindo metadados, artes e ícones para todos os jogos e aplicativos:
@@ -859,10 +903,12 @@ O **Instalador de Jogos** automatiza totalmente a instalação de jogos de PS1 e
   - Baixa a arte da capa de jogos de PS2 e PS1 do [banco de dados de artes do OPL Manager](https://oplmanager.com/site/?backups) para exibição no [OPL](#open-ps2-loader-opl), [NHDDL](#nhddl) e [POPSLoader](#popsloader)
   - Baixa os ícones para a [Rotina de pesquisa](#hosdmenu) a partir do [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Se os ícones não estiverem disponíveis, mas houver imagens de um jogo no [Banco de Dados de Artes do OPL Manager](https://oplmanager.com/site/?backups), ícones 3D serão gerados automaticamente
   - Contribui automaticamente com ícones do HDD-OSD e relata ícones ausentes para o [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database)
-- Atualiza atalhos para aplicativos homebrew no [Menu Navigator do PSBBN](#coleção-de-jogos) e no menu **OSDSYS** do [HOSDMenu](#hosdmenu)
+- Permite que você selecione quais jogos e aplicativos homebrew exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu)
 - Cria **partições iniciadoras** que permitem que jogos e aplicativos selecionados instalados na unidade, junto com jogos de PS1 armazenados em um compartilhamento de rede SMB, sejam iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu)
+- Atualiza atalhos para aplicativos homebrew no [Menu Navigator do PSBBN](#coleção-de-jogos) e no menu **OSDSYS** do [HOSDMenu](#hosdmenu)
 - Ativa o BDM HDD, Apps e artes no arquivo de configuração do [OPL](#open-ps2-loader-opl)
-- Define o idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) nos arquivos de configuração do [OPL](#open-ps2-loader-opl) e do [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação
+- Define o idioma e a [configuração dos botões](#reatribuir-botões-cruz-e-círculo) nos arquivos de configuração do [OPL](#open-ps2-loader-opl), [POPSLoader](#popsloader), [wLaunchELF-R3Z](#wlaunchelf-r3z) e [R3CONFIGURATOR](#r3configurator) para corresponderem às configurações de instalação
+- Atribui o iniciador de jogos escolhido, o [POPSLoader](#popsloader), o [R3CONFIGURATOR](#r3configurator) e o [wLaunchELF-R3Z](#wlaunchelf-r3z) ao [botão de inicialização](#opções-de-inicialização)
 
 **NOTA:** Para usar arquivos `ZSO`, você deve selecionar o [OPL](#open-ps2-loader-opl) como iniciador de jogos. Ao usar o [NHDDL](#nhddl), quaisquer arquivos `ZSO` na pasta de jogos do PC ou na unidade do ps2 são descompactados em arquivos `ISO`.
 
@@ -893,10 +939,21 @@ Selecionar **Adicionar Jogos e Aplicativos Adicionais** baixa metadados e artes 
 
 Jogos e aplicativos podem ser excluídos manualmente do sistema de arquivos exFAT da unidade do PS2. Selecionar **Adicionar Jogos e Aplicativos Adicionais** também removerá quaisquer títulos excluídos da [Coleção de Jogos](#coleção-de-jogos) e do [HOSDMenu](#hosdmenu).
 
+### Save Application System (SAS)
+O **Save Application System (SAS)** é um novo padrão para distribuição de aplicativos homebrew para o PS2. Todos os aplicativos compatíveis com o SAS são empacotados em um arquivo `PSU` e incluem ícones e metadados, sendo a maneira recomendada para [instalar aplicativos homebrew](#instalar-jogos-e-aplicativos) no [PSBBN](#psbbn) e no [HOSDMenu](#hosdmenu). Você pode baixar aplicativos compatíveis com o SAS na [PS2 Homebrew Store](https://ps2homebrewstore.com/).
+
+### Aplicativos Homebrew em ELF
+Ao instalar aplicativos no formato `ELF`, o arquivo é comparado com um banco de dados. Isso permite que o instalador obtenha o título do aplicativo, desenvolvedor, ID do título e categoria, bem como baixe a arte e o ícone apropriados automaticamente. Para melhores resultados, é recomendado que você não altere o nome do arquivo `ELF`.
+
+### Iniciando Jogos de PS1 via SMB
+Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Antes de executar o Instalador de Jogos:
+1. Instale os jogos de PS1 e os arquivos de suporte necessários no dispositivo externo. Instruções podem ser encontradas [aqui](https://nathanneurotic.github.io/POPSTARTERINFO/smb-network.html)
+2. Coloque os arquivos `POPSTARTER.ELF` renomeados com o prefixo `SB.` na pasta `POPS`, seja no PC ou diretamente na unidade do PS2.
+
 ### Seletor de Jogos
 Ao executar o Instalador de Jogos, será apresentada uma lista de todos os títulos instalados, permitindo que você selecione quais títulos exibir na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Se você tiver uma grande coleção, limitar o número de títulos exibidos pode melhorar sua experiência de navegação.
 
-Até 800 títulos podem ser exibidos na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Todos os jogos de PS2 permanecerão disponíveis no iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)), e todos os jogos de PS1 permanecerão disponíveis no [POPSLoader](#popsloader).
+Até 800 títulos podem ser exibidos na [Coleção de Jogos](#coleção-de-jogos) e na [Rotina de pesquisa](#hosdmenu). Todos os jogos de PS2 permanecerão disponíveis no iniciador de jogos escolhido ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)), e todos os jogos de PS1 permanecerão disponíveis no [POPSLoader](#popsloader). Todos os aplicativos permanecerão disponíveis no [OPL](#open-ps2-loader-opl) e no **menu OSDSYS** do [HOSDMenu](#hosdmenu).
 
 Você também pode personalizar a ordem em que as categorias são exibidas, como Jogos de PS2, Jogos de PS1, Inicializadores e Aplicativos, para ter controle total sobre a organização da biblioteca.
 
@@ -908,14 +965,6 @@ Para iniciar jogos de PS1 pela **Coleção de Jogos** ou pela **Rotina de pesqui
 3. Inicie qualquer jogo de PS1.
 
 Os drivers necessários serão instalados automaticamente no Memory Card de PS2.
-
-### Iniciando Jogos de PS1 via SMB
-Jogos de PS1 no formato `.VCD` armazenados em um compartilhamento de rede SMB podem ser iniciados a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu). Antes de executar o Instalador de Jogos:
-1. Instale os jogos de PS1 e os arquivos de suporte necessários no dispositivo externo. Instruções podem ser encontradas [aqui](https://nathanneurotic.github.io/POPSTARTERINFO/smb-network.html)
-2. Coloque os arquivos `POPSTARTER.ELF` renomeados com o prefixo `SB.` na pasta `POPS`, seja no PC ou diretamente na unidade do PS2.
-
-### Save Application System (SAS)
-O **Save Application System (SAS)** é um novo padrão para distribuição de aplicativos homebrew para o PS2. Todos os aplicativos compatíveis com o SAS são empacotados em um arquivo `PSU` e incluem ícones e metadados, sendo a maneira recomendada para [instalar aplicativos homebrew](#instalar-jogos-e-aplicativos) no [PSBBN](#psbbn) e no [HOSDMenu](#hosdmenu). Você pode baixar aplicativos compatíveis com o SAS na [PS2 Homebrew Store](https://ps2homebrewstore.com/).
 
 ## Instalar Mídia
 **NOTA: Estes recursos são exclusivos para usuários do PSBBN.**  
@@ -1018,6 +1067,7 @@ Você pode segurar determinados botões do controle enquanto liga o console PS2 
 | □     | Qualquer configuração      | Inicializa o iniciador de jogos selecionado ([OPL](#open-ps2-loader-opl) ou [NHDDL](#nhddl)) |
 | △     | Qualquer configuração      | Inicializa o [POPSLoader](#popsloader)                                                       |
 | START | Qualquer configuração      | Inicializa o [wLaunchELF-R3Z](#wlaunchelf-r3z)                                               |
+| SELECT | Qualquer configuração     | Inicializa o [R3CONFIGURATOR](#r3configurator)                                               |
 
 ## PSBBN
 O PlayStation Broadband Navigator (também conhecido como BB Navigator e PSBBN) é um sistema operacional oficial do PlayStation 2 lançado exclusivamente no Japão. Ele possui canais para [jogos](#coleção-de-jogos), [música](#canal-de-música), [filmes](#canal-de-filmes), [fotos](#canal-de-fotos) e [serviços de internet](#canal-de-internet).
@@ -1046,12 +1096,12 @@ Para ver os detalhes completos de todos os recursos e um guia completo do usuár
 
 ### Coleção de Jogos
 Você pode encontrar a **Coleção de Jogos** no **Menu Principal** (Top Menu) do PSBBN. Este é o primeiro menu que você vê quando o PSBBN é iniciado.
-- Quando instalados pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos), todos os aplicativos e [jogos selecionados](#seletor-de-jogos) serão exibidos na coleção em uma interface estilo 'cover flow'.
-- Os itens são agrupados em jogos de PS2, jogos de PS1 e aplicativos homebrew.
-- Jogos de PS2 e PS1 são classificados em ordem alfabética e organizados por franquia (série), com os jogos de uma mesma série ordenados por data de lançamento.
+- Quando instalados pelo [Instalador de Jogos](#instalar-jogos-e-aplicativos), todos os [aplicativos e jogos selecionados](#seletor-de-jogos) serão exibidos na coleção em uma interface estilo 'cover flow'.
+- Os jogos são divididos em Jogos de PS2 e Jogos de PS1.
+- Os jogos são classificados em ordem alfabética e organizados por série, com as entradas de cada série ordenadas por data de lançamento.
 - Quando o idioma está definido como Japonês, os títulos de jogos da região Japonesa são exibidos em Japonês e classificados na ordem 'gojūon' (五十音).
-- Os aplicativos homebrew são classificados em ordem alfabética, enquanto os [aplicativos SAS](#save-application-system-sas) são divididos em subgrupos com base no tipo de aplicativo (sistema, jogo, emulador, etc.).  
-- Você pode visualizar um manual para jogos de PS1 que lista as teclas de atalho suportadas. Para acessar o manual, pressione **△** sobre um jogo de PS1 destacado e selecione *Manual*.
+- Os aplicativos homebrew são divididos nas seguintes categorias: Emuladores, Jogos, Demoscene, Aplicativos, Aplicativos de PS1, Aplicativos de Sistema, Ferramentas de Diagnóstico, Aplicativos de Debug e Ambientes de Execução.
+- Você pode visualizar um manual para jogos de PS1 que lista as [teclas de atalho](#popstarter) suportadas. Para acessar o manual, pressione **△** sobre um jogo de PS1 destacado e selecione *Manual*.
 - Você pode definir atalhos para até quatro itens pressionando **△** sobre um jogo destacado e selecionando *Adicionar ao Menu Navigator*. Você pode acessar rapidamente os atalhos pressionando **SELECT**.
 
 ### Canal de Música
@@ -1086,9 +1136,9 @@ O **HDD-OSD** é um software oficial da Sony que expande o menu de sistema do Pl
 Se instalado junto com o [PSBBN](#psbbn), ele pode ser iniciado a partir da [Coleção de Jogos](#coleção-de-jogos), por meio de um [atalho no Menu Navigator](#coleção-de-jogos), ou segurando o botão × enquanto o console liga. Se apenas o **HOSDMenu** foi instalado, ele inicializará automaticamente.
 
 Quando instalado através do [Instalador de Jogos](#instalar-jogos-e-aplicativos):
-- Os aplicativos aparecerão no menu do **OSDSYS**, permitindo uma inicialização rápida
-- Os [jogos selecionados](#seletor-de-jogos) aparecerão no **Navegador** (Browser) como ícones 3D exclusivos, modelados com base na caixa física do jogo em DVD/CD, provenientes do [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
-- Os [aplicativos compatíveis com o SAS](#save-application-system-sas) baixados na [PS2 Homebrew Store](https://ps2homebrewstore.com/) também aparecerão no **Navegador** representados por ícones exclusivos.
+- Todos os aplicativos aparecerão no menu do **OSDSYS**, permitindo uma inicialização rápida
+- Os [aplicativos e jogos selecionados](#seletor-de-jogos) aparecerão no **Navegador** (Browser). Os jogos serão exibidos como ícones 3D exclusivos, modelados com base na caixa física do jogo em DVD/CD, provenientes do [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
+- Os [aplicativos compatíveis com o SAS](#save-application-system-sas) baixados na [PS2 Homebrew Store](https://ps2homebrewstore.com/) e arquivos `ELF` também aparecerão no **Navegador** representados por ícones exclusivos.
 
 ## Open PS2 Loader (OPL)
 O [Open PS2 Loader (OPL)](https://github.com/ps2homebrew/Open-PS2-Loader) é um carregador de jogos e aplicativos 100% de código aberto para o PS2. Todos os jogos de PS2 instalados serão exibidos no OPL. Se você selecionar o OPL como o iniciador de jogos ao [instalar jogos e aplicativos](#instalar-jogos-e-aplicativos), as configurações por jogo (per-game settings) atribuídas no OPL serão refletidas ao iniciar os jogos a partir da [Coleção de Jogos](#coleção-de-jogos) e da [Rotina de pesquisa](#hosdmenu).
@@ -1260,18 +1310,22 @@ Se o console inicializar na tela clássica do PS2 (OSD regular), travar/congelar
 ## Jogos Não Funcionam
 Alguns jogos podem falhar ao executar ou apresentar problemas de compatibilidade. Primeiro, certifique-se de que a imagem do jogo é um "dump" (cópia) verificado e válido. Verifique o checksum MD5 ou SHA-1 do arquivo `ISO` ou `BIN` e confirme se ele corresponde à respectiva entrada no [redump.org](http://redump.org).
 
-Se você tiver problemas ao iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação estão disponíveis [aqui](#instalando-o-ata-bdm-assault).
+Se você selecionou o [OPL](#open-ps2-loader-opl) como launcher de jogos, tente desativar as trapaças (cheats):
+1. Inicie o [OPL](#open-ps2-loader-opl), selecione o jogo com o qual está tendo problemas na lista de jogos e pressione △
+2. Selecione "Cheat Settings" (Configurações de Trapaças) e desative o "PS2RD Cheat Engine"
+3. Salve as alterações e inicie o jogo
 
-Para problemas com jogos de PS2, se você selecionou o [OPL](#open-ps2-loader-opl) como launcher de jogos, você pode verificar os problemas existentes ou relatar um novo [aqui](https://github.com/ps2homebrew/Open-PS2-Loader/issues). Se você selecionou o [NHDDL](#nhddl), você pode fazer isso [aqui](https://github.com/rickgaiser/neutrino/issues).
+Se você ainda tiver problemas com jogos específicos de PS2, caso tenha selecionado o [OPL](#open-ps2-loader-opl) como launcher de jogos, você pode verificar os problemas existentes ou relatar um novo [aqui](https://github.com/ps2homebrew/Open-PS2-Loader/issues). Se você selecionou o [NHDDL](#nhddl), você pode fazer isso [aqui](https://github.com/rickgaiser/neutrino/issues).
 
 Se todos os jogos de PS1 ou PS2 falharem ao iniciar, siga as etapas abaixo:
 
 Se os jogos falharem ao iniciar a partir da [Coleção de Jogos](#coleção-de-jogos) ou da [Rotina de pesquisa](#hosdmenu), tente o seguinte:
 1. Se o console possui um [Mod Chip](#problemas-conhecidos), desative-o.
-2. Se estiver tendo problemas para iniciar jogos de PS2, remova todos os Memory Cards de PS2 do console e tente novamente. Se isso resolver o problema, exclua quaisquer arquivos de salvamento com o nome `Your System Configuration` dos memory cards, pois dados de configuração corrompidos podem impedir que os jogos iniciem.
-3. Verifique se os conectores do console e do Adaptador de Rede/HDD estão limpos, isentos de poeira e sem detritos.
-4. Certifique-se de que a unidade e o Adaptador de Rede/HDD estão firmemente conectados de forma segura ao console.
-5. Se estiver usando uma placa com Mod SATA, certifique-se de que ela foi instalada corretamente.
+2. Se estiver tendo problemas para iniciar jogos de PS1, certifique-se de ter instalado corretamente os **drivers do ATA BDM Assault** em um Memory Card de PS2 e de que ele esteja inserido no console. As instruções de instalação estão disponíveis [aqui](#instalando-o-ata-bdm-assault).
+3. Se estiver tendo problemas para iniciar jogos de PS2, remova todos os Memory Cards de PS2 do console e tente novamente. Se isso resolver o problema, exclua quaisquer arquivos de salvamento com o nome `Your System Configuration` dos memory cards, pois dados de configuração corrompidos podem impedir que os jogos iniciem.
+4. Verifique se os conectores do console e do Adaptador de Rede/HDD estão limpos, isentos de poeira e sem detritos.
+5. Certifique-se de que a unidade e o Adaptador de Rede/HDD estão firmemente conectados de forma segura ao console.
+6. Se estiver usando uma placa com Mod SATA, certifique-se de que ela foi instalada corretamente.
 
 Se ainda assim os jogos não iniciarem, tente carregar os jogos de PS2 usando o [OPL](#open-ps2-loader-opl) ou o [NHDDL](#nhddl), e os jogos de PS1 usando o [POPSLoader](#popsloader).
 
@@ -1314,7 +1368,7 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 - O PSBBN suporta datas apenas até o final de 2030. Ao configurar a hora e a data, o ano deve ser definido como 2030 ou inferior.
 - Instalações japonesas do PSBBN falharão em unidades menores que 128 GB.
 - A partição exFAT não pode exceder 2 TB. Ao usar uma unidade maior, o espaço restante além desse limite ficará inutilizável.
-- O **wLaunchELF** e outros aplicativos nativos do PS2 não conseguem criar partições APA na unidade do PS2. Novas partições devem ser criadas apenas usando a versão do **PFS Shell** incluída neste projeto.
+- O **wLaunchELF** e outros aplicativos nativos do PS2 podem falhar ao criar partições APA na unidade do PS2. Para evitar corrupção na unidade, novas partições APA devem ser criadas apenas usando a versão do **PFS Shell** incluída neste projeto.
 - Partições APA não devem ser criadas além do espaço reservado para a configuração APA durante a instalação. Fazer isso sobrescreverá os dados na partição exFAT.
 
 # Créditos
@@ -1322,7 +1376,6 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 - `PSBBN-Definitive-Patch.sh`, `Setup.sh`, `PSBBN-Installer.sh`, `HOSDMenu-Installer.sh`, `Game-Installer.sh`, `Media-Installer.sh`, `music-installer.py`, `psmbuild.py`, `Extras.sh`, `art_downloader.py`, `list-builder.py`, `list-sorter.py`, `txt_to_icon_sys.py`, `ps2iconmaker.sh`, `AppDB.csv`, `TitlesDB_PS1.csv`, `TitlesDB_PS2.csv`, `ps1_vmc_groups.list`, `POP-game-fixes.list`, `game-selector.py` escritos por [CosmicScale](https://github.com/CosmicScale)
 - `game-selector.py` baseado em um script escrito por [Luiz Antonio Lazoti](https://github.com/luizoti)
 - `PSBBN-Launcher-For-Windows.ps1` escrito por Yornn
-- `icon_sys_to_txt.py` escrito por [NathanNeurotic (Ripto)](https://github.com/NathanNeurotic)
 - Ícone 3D do PSBBN criado por Yornn
 - Usa código do APA-Jail oriundo do [PS2 HDD Decryption Helper](https://www.psx-place.com/resources/ps2-hdd-decryption-helper.1507/) feito por [Berion](https://www.psx-place.com/members/berion.1431/)
 - Contém código do [`list_builder.py`](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin/blob/main/List%20Builder/list_builder.py) proveniente do [XEB+ neutrino Launcher Plugin](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin) feito por [sync-on-luma](https://github.com/sync-on-luma)
@@ -1349,6 +1402,7 @@ Usuários de **Linux** podem encontrar esses arquivos de log em `PSBBN-Definitiv
 - [`ziso.py`](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/pc/ziso.py) feito por Virtuous Flame
 - cue2pops oriundo do [pops2cue](https://github.com/bucanero/pops2cue) de [Bucanero](https://github.com/Bucanero)
 - [Open PS2 Loader](https://github.com/ps2homebrew/Open-PS2-Loader) mantido por [PS2 Homebrew Projects](https://github.com/ps2homebrew) com contribuições focadas em BDM de [KrahJohlito](https://github.com/KrahJohlito) e modificações no Auto Launch criadas por [CosmicScale](https://github.com/CosmicScale)
+- [Open PS2 Loader Widescreen Hacks](https://github.com/PS2-Widescreen/OPL-Widescreen-Cheats) por [PS2-Widescreen](https://github.com/PS2-Widescreen)
 - [Neutrino](https://github.com/rickgaiser/neutrino) de [Rick Gaiser](https://github.com/rickgaiser)
 - [NHDDL](https://github.com/pcm720/nhddl) de [pcm720](https://github.com/pcm720)
 - [POPStarter](https://www.psx-place.com/resources/popstarter.683/) de [KrHACKen](https://www.psx-place.com/members/krhacken.98/)

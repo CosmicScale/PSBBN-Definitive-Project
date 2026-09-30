@@ -478,7 +478,7 @@ POPS_PATCH_DL() {
         wget -qO- 'https://www.mediafire.com/file/rznkr05pci45w5p/Hugopocked_POPStarter_Fixes_%25282023-08-11%2529.rar/file' \
         | grep -o 'https://download[^"]*Hugopocked+POPStarter+Fixes+%282023-08-11%29.rar' | head -n1)"
 
-    unrar-free x "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" "$ASSETS_DIR"
+    bsdtar -xf "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" -C "$ASSETS_DIR"
 }
 
 CREATE_PS1_VMC() {
@@ -963,7 +963,7 @@ install_pops() {
             if [[ -f "${ASSETS_DIR}/POPS-binaries-main.zip" && ! -f "${ASSETS_DIR}/POPS-binaries-main.zip.st" ]]; then
                 echo | tee -a "${LOG_FILE}"
                 echo "POPS-binaries-main.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     echo "[!] Warning: Failed to extract POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_1]}"
                 fi
@@ -975,7 +975,7 @@ install_pops() {
                     echo "[!] Warning: Failed to download POPS binaries." >> "${LOG_FILE}"
                     error_msg "Warning" "Failed to download POPS binaries."
                 fi
-                if ! unzip -o "${ASSETS_DIR}/POPS-binaries-main.zip" -d "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
+                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
                     error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_2]}"
                 fi
             fi
@@ -1136,6 +1136,10 @@ install_elf() {
             app_name=$(echo "$app_name" | sed -E 's/^[pP][aA][cC][kK][eE][dD][[:space:]]*//')
             app_name=$(echo "$app_name" | sed -E 's/[pP][aA][cC][kK][eE][dD].*//')
 
+            # Remove "pkd"
+            app_name=$(echo "$app_name" | sed -E 's/^[pP][kK][dD][[:space:]]*//')
+            app_name=$(echo "$app_name" | sed -E 's/[pP][kK][dD].*//')
+
             app_name=$(echo "$app_name" | sed 's/\.*$//') # Trim trailing full stops
 
             AppDB_check=$(printf '%s' "$app_name" | sed 's/[^[:alnum:]]//g' | tr '[:lower:]' '[:upper:]')
@@ -1182,6 +1186,9 @@ install_elf() {
                 ;;
             ESR*)
                 AppDB_check="ESR"
+                ;;
+            SUPERMARIO64*)
+                AppDB_check="GME_SM64"
                 ;;
             *)
                 AppDB_check="$AppDB_check"
@@ -4270,9 +4277,9 @@ cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
 
 cd "${ICONS_DIR}/ico/tmp/"
 rm *.png >/dev/null 2>&1
-zip -r "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
 cd "${ARTWORK_DIR}/tmp/" 
-zip -r "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
+bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
 
 if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
     echo "Contributing to the PSBBN art & HDD-OSD databases..." >> "${LOG_FILE}"
