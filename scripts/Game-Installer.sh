@@ -4272,9 +4272,14 @@ cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
 
 cd "${ICONS_DIR}/ico/tmp/"
 rm *.png >/dev/null 2>&1
-bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
+if ! bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1; then
+    rm -f "${ARTWORK_DIR}/tmp/ico.zip"
+fi
+
 cd "${ARTWORK_DIR}/tmp/" 
-bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
+if ! bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1; then
+    rm -f "${ARTWORK_DIR}/tmp/art.zip"
+fi
 
 if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
     echo "Contributing to the PSBBN art & HDD-OSD databases..." >> "${LOG_FILE}"
