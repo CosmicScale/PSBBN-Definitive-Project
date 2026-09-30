@@ -713,9 +713,25 @@ rm "$overlay/scripts/assets/lang/sample.txt"
 if [[ -f "$repo/scripts/assets/lang/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
 if [[ "$(cat "$overlay/scripts/helper/aarch64/cue2pops")" == macho ]]; then ok overlay-helper; else bad overlay-helper; fi
 
-for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt mkfs.vfat mke2fs timeout unrar-free mount.exfat-fuse lsblk sed; do
+for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed; do
     if [[ -x "$bin/$tool" ]]; then ok "exec-$tool"; else bad "exec-$tool"; fi
 done
+
+zipdir=$(mktemp -d)
+mkdir -p "$zipdir/src/sub" "$zipdir/out"
+printf 'a\n' > "$zipdir/src/a.txt"
+printf 'b\n' > "$zipdir/src/sub/b.txt"
+status=0
+(cd "$zipdir/src" && bsdtar -acf "$zipdir/art.zip" *) >/dev/null 2>&1 || status=$?
+if [[ "$status" -eq 0 ]] \
+    && python3 -c 'import sys, zipfile; z = zipfile.ZipFile(sys.argv[1]); sys.exit(0 if z.testzip() is None and "sub/b.txt" in z.namelist() else 1)' "$zipdir/art.zip" \
+    && bsdtar -xf "$zipdir/art.zip" -C "$zipdir/out" \
+    && [[ "$(cat "$zipdir/out/sub/b.txt")" == b ]]; then
+    ok bsdtar-zip-roundtrip
+else
+    bad "bsdtar-zip-roundtrip status=$status"
+fi
+rm -rf "$zipdir"
 
 rm -rf "$stub" "$fix" "$state" "$img" "$repo" "$overlay" "$marker"
 linux_uname=$(mktemp -d)

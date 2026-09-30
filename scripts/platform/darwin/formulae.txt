@@ -19,4 +19,3 @@ pkg-config
 icu4c
 python@3
 xz
-unar
