@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+"""lsblk subset used by the installer. External disks only.
+
+Clustered flags (-ndo, -dp, -ln) are one argv element. A trailing device
+limits the listing to that disk and its slices. -b prints sizes in bytes.
+"""
+import os
+import plistlib
+import subprocess
+import sys
+
+def load(argv):
+    return plistlib.loads(subprocess.check_output(argv))
+
+def human(n):
+    value = float(n)
+    for unit in ("B", "K", "M", "G", "T"):
+        if value < 1000 or unit == "T":
+            if unit == "B":
+                return str(int(value))
+            return f"{value:.1f}{unit}"
+        value /= 1000
+    return str(n)
+
+def parse(argv):
+    flags = set()
+    cols = ["NAME"]
+    device = None
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        if arg == "-o" and i + 1 < len(argv):
+            cols = argv[i + 1].split(",")
+            i += 2
+            continue
+        if arg.startswith("-") and not arg.startswith("--"):
+            letters = arg[1:]
+            flags.update(letters)
+            if letters.endswith("o"):
+                cols = argv[i + 1].split(",")
+                i += 2
+                continue
+            i += 1
+            continue
+        device = arg
+        i += 1
+    return flags, cols, device
+
+def wanted(device, ident):
+    if not device:
+        return True
+    name = device
+    if name.startswith("/dev/"):
+        name = name[5:]
+    return ident == name or ident.startswith(name + "s")
+
+def main(argv):
+    if argv and argv[0] == "--psbbn-shim-ok":
+        return 0
+    flags, cols, device = parse(argv)
+    diskutil = os.environ.get("PSBBN_DISKUTIL", "diskutil")
+    listing = load([diskutil, "list", "-plist", "external", "physical"])
+    rows = []
+    for disk in listing.get("AllDisksAndPartitions") or []:
+        ident = disk.get("DeviceIdentifier")
+        if not wanted(device, ident):
+            continue
+        info = load([diskutil, "info", "-plist", ident])
+        size = int(disk.get("Size") or info.get("TotalSize") or info.get("Size") or 0)
+        rows.append({
+            "NAME": "/dev/" + ident,
+            "VENDOR": "",
+            "MODEL": info.get("MediaName") or info.get("IORegistryEntryName") or "",
+            "SIZE": str(size) if "b" in flags else human(size),
+            "SERIAL": info.get("IOKitSerialNumber") or info.get("DeviceSerialNumber") or "",
+            "LABEL": "",
+            "MOUNTPOINT": "",
+            "TYPE": "disk",
+        })
+        if "d" in flags:
+            continue
+        for part in disk.get("Partitions") or []:
+            pid = part.get("DeviceIdentifier")
+            if not wanted(device, pid):
+                continue
+            psize = int(part.get("Size") or 0)
+            rows.append({
+                "NAME": "/dev/" + pid,
+                "VENDOR": "",
+                "MODEL": "",
+                "SIZE": str(psize) if "b" in flags else human(psize),
+                "SERIAL": "",
+                "LABEL": part.get("VolumeName") or "",
+                "MOUNTPOINT": part.get("MountPoint") or "",
+                "TYPE": "part",
+            })
+    if "n" not in flags:
+        print(" ".join(cols))
+    for row in rows:
+        print(" ".join(row.get(col, "") for col in cols))
+    return 0
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except subprocess.CalledProcessError as exc:
+        sys.stderr.write("lsblk: diskutil failed\n")
+        sys.exit(exc.returncode or 1)

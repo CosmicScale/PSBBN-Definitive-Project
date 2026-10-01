@@ -1,0 +1,80 @@
+#!/bin/bash
+# Ext2 members are written into the filesystem image. The Mac volume cannot
+# hold the archive's device nodes or both casings of one name. Other members
+# land in the directory the installer already has open.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+
+real="${PSBBN_REAL_TAR:-/usr/bin/tar}"
+export COPYFILE_DISABLE=1
+arg=""
+for arg in "$@"; do
+    if [[ -f "$arg" ]]; then
+        xattr -d com.apple.quarantine "$arg" 2>/dev/null || true
+    fi
+done
+
+extract=0
+archive=""
+dest=""
+args=("$@")
+i=0
+n=${#args[@]}
+while [[ $i -lt $n ]]; do
+    a=${args[$i]}
+    if [[ "$a" == "-C" || "$a" == "--directory" ]]; then
+        i=$((i + 1))
+        dest=${args[$i]}
+    elif [[ "$a" == --directory=* ]]; then
+        dest=${a#--directory=}
+    elif [[ "$a" == --* ]]; then
+        exec "$real" "$@"
+    else
+        flags=$a
+        [[ "$flags" == -* ]] && flags=${flags#-}
+        if [[ -z "$archive" && "$flags" =~ ^[zxpfvkmctAC]+$ && "$flags" == *x* && "$flags" != "$a" || ( -z "$archive" && "$extract" -eq 0 && "$flags" =~ ^[zxpfvkmctAC]+$ && "$flags" == *x* ) ]]; then
+            extract=1
+            rest=$flags
+            while [[ -n "$rest" ]]; do
+                c=${rest:0:1}
+                rest=${rest:1}
+                case "$c" in
+                    f)
+                        if [[ -n "$rest" ]]; then
+                            archive=$rest
+                            rest=""
+                        else
+                            i=$((i + 1))
+                            archive=${args[$i]}
+                        fi
+                        ;;
+                    C)
+                        if [[ -n "$rest" ]]; then
+                            dest=$rest
+                            rest=""
+                        else
+                            i=$((i + 1))
+                            dest=${args[$i]}
+                        fi
+                        ;;
+                esac
+            done
+        elif [[ -z "$archive" ]]; then
+            archive=$a
+        fi
+    fi
+    i=$((i + 1))
+done
+
+if [[ "$extract" -ne 1 || -z "$archive" || -z "$dest" ]]; then
+    exec "$real" "$@"
+fi
+if ! psbbn_tar_needs_image "$dest"; then
+    exec "$real" "$@"
+fi
+psbbn_tar_extract "$archive" "$dest" || exit $?
+psbbn_tar_refresh_manifests "$dest"
