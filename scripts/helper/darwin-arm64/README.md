@@ -41,5 +41,7 @@ ninja -C build pfsshell
 
 Rehearsals that exercise these binaries the way the installers do, on a
 file image and without sudo: `scripts/platform/darwin/tests/e2e-image.sh`
-(PSBBN install) and `scripts/platform/darwin/tests/e2e-launchers.sh`
-(Game-Installer launcher partitions, including the 32-character names).
+(PSBBN install), `scripts/platform/darwin/tests/e2e-launchers.sh`
+(Game-Installer launcher partitions, including the 32-character names) and
+`scripts/platform/darwin/tests/e2e-extents.sh` (partitions above the APA
+size cap, which span a main partition and sub-partitions).

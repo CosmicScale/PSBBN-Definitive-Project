@@ -39,12 +39,13 @@ if [[ "$mnt" != "/" ]]; then
 fi
 
 stage_slice() {
-    local slice="$1" mnt="$2" device="" start="" sectors="" node="" kind
+    local slice="$1" mnt="$2" device="" start="" sectors="" extents="" node="" kind
     # shellcheck disable=SC1091
     . "${slice}.meta"
     kind=$(psbbn_slice_kind "$slice")
     if [[ "$kind" == empty ]]; then
-        psbbn_copy_range "$device" "$start" "$sectors" "$slice" || return $?
+        extents=$(psbbn_meta_extents "$extents" "$start" "$sectors") || return 1
+        psbbn_copy_range "$device" "$extents" "$slice" || return $?
         kind=$(psbbn_slice_kind "$slice")
     fi
     mkdir -p "$mnt"

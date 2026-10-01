@@ -136,77 +136,152 @@ else:
 PY
 }
 
-# Copy a 512-byte sector window. seek_sec is where the window starts in dest.
-psbbn_dd_window() {
-    local mode="$1" src="$2" dst="$3" skip_sec="$4" count_sec="$5" seek_sec="$6"
-    local dd="${PSBBN_DD:-/bin/dd}"
-    local -a args
-    if (( skip_sec % 2048 == 0 && count_sec % 2048 == 0 && seek_sec % 2048 == 0 && count_sec > 0 )); then
-        args=(if="$src" of="$dst" bs=1048576 skip=$((skip_sec / 2048)) count=$((count_sec / 2048)) seek=$((seek_sec / 2048)) conv=notrunc)
-    else
-        args=(if="$src" of="$dst" bs=512 skip="$skip_sec" count="$count_sec" seek="$seek_sec" conv=notrunc)
+# Extents of a slice record, "start:count ..." in device sectors, in slice
+# order. Records from before multi-extent support carry one start= window.
+# psbbn_meta_extents EXTENTS START SECTORS
+psbbn_meta_extents() {
+    if [[ -n "$1" ]]; then
+        printf '%s\n' "$1"
+        return 0
     fi
+    if [[ -n "$2" && -n "$3" ]]; then
+        printf '%s:%s\n' "$2" "$3"
+        return 0
+    fi
+    printf '%s\n' "slice: the record lists no extents" >&2
+    return 1
+}
+
+# Turn extents into dd ranges "skip:seek:count ...". read copies the device
+# into the slice, write copies the slice onto the device. The extents must
+# add up to the slice file, so a stale or short slice is never written.
+# psbbn_extent_ranges read|write EXTENTS SLICE
+psbbn_extent_ranges() {
+    local direction="$1" extents="$2" slice="$3" extent first count offset=0 out="" bytes
+    for extent in $extents; do
+        first=${extent%%:*}
+        count=${extent#*:}
+        if [[ "$extent" != *:* || ! "$first" =~ ^[0-9]+$ || ! "$count" =~ ^[0-9]+$ ]]; then
+            printf '%s\n' "slice: bad extent '$extent'" >&2
+            return 1
+        fi
+        if [[ "$direction" == read ]]; then
+            out+="$first:$offset:$count "
+        else
+            out+="$offset:$first:$count "
+        fi
+        offset=$((offset + count))
+    done
+    if [[ -z "$out" ]]; then
+        printf '%s\n' "slice: no extents" >&2
+        return 1
+    fi
+    bytes=$(wc -c < "$slice" 2>/dev/null | tr -d ' ')
+    if [[ "$bytes" != "$((offset * 512))" ]]; then
+        printf '%s\n' "slice: $slice is ${bytes:-missing} bytes, its extents cover $((offset * 512))" >&2
+        return 1
+    fi
+    printf '%s\n' "${out% }"
+}
+
+# Copy sector ranges with dd. RANGES is "skip:seek:count ..." in 512-byte
+# sectors. All ranges run in one process, so a real disk costs one elevated
+# call and one release of its mounts however many ranges there are. dd's
+# record counts are printed only when a range fails.
+# psbbn_dd_ranges direct|elevate SRC DST RANGES
+psbbn_dd_ranges() {
+    local mode="$1" src="$2" dst="$3" ranges="$4" dd="${PSBBN_DD:-/bin/dd}"
+    local -a list
+    read -r -a list <<< "$ranges"
+    [[ ${#list[@]} -gt 0 ]] || return 0
+    # shellcheck disable=SC2016
+    local loop='dd=$1 src=$2 dst=$3
+shift 3
+for range in "$@"; do
+    skip=${range%%:*}
+    rest=${range#*:}
+    seek=${rest%%:*}
+    count=${rest#*:}
+    unit=1
+    for try in 2048 8; do
+        if [ $((skip % try)) -eq 0 ] && [ $((seek % try)) -eq 0 ] && [ $((count % try)) -eq 0 ]; then
+            unit=$try
+            break
+        fi
+    done
+    out=$("$dd" if="$src" of="$dst" bs=$((unit * 512)) skip=$((skip / unit)) seek=$((seek / unit)) count=$((count / unit)) conv=notrunc 2>&1) || {
+        rc=$?
+        printf "%s\n" "$out" >&2
+        exit $rc
+    }
+done'
     if [[ "$mode" == elevate ]]; then
         if psbbn_is_real_disk "$dst" && ! psbbn_is_partition_node "$dst"; then
             psbbn_quiesce_disk "$dst"
         fi
-        platform_elevate "$dd" "${args[@]}"
+        platform_elevate /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}"
     else
-        "$dd" "${args[@]}"
+        /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}"
     fi
 }
 
-# Read the APA slice off its backing device into the slice file.
-# Internal disks are refused. Regular files are copied without sudo.
+psbbn_raw_node() {
+    case "$1" in
+        /dev/disk*) printf '/dev/r%s\n' "${1#/dev/}" ;;
+        *) printf '%s\n' "$1" ;;
+    esac
+}
+
+# Read the APA slice off its backing device into the slice file, extent by
+# extent. Internal disks are refused. Regular files are copied without sudo.
+# psbbn_copy_range DEVICE EXTENTS SLICE
 psbbn_copy_range() {
-    local device="$1" start="$2" sectors="$3" dest="$4" raw
+    local device="$1" extents="$2" dest="$3" ranges
     if psbbn_is_real_disk "$device"; then
         if psbbn_disk_internal "$device"; then
             printf '%s\n' "mount: refusing internal disk $device" >&2
             return 2
         fi
-        raw="$device"
-        case "$device" in
-            /dev/disk*) raw="/dev/r${device#/dev/}" ;;
-        esac
         if ! declare -F platform_elevate >/dev/null 2>&1; then
             printf '%s\n' "mount: cannot read $device" >&2
             return 1
         fi
-        psbbn_dd_window elevate "$raw" "$dest" "$start" "$sectors" 0
+        ranges=$(psbbn_extent_ranges read "$extents" "$dest") || return 1
+        psbbn_dd_ranges elevate "$(psbbn_raw_node "$device")" "$dest" "$ranges"
         return $?
     fi
     if [[ ! -f "$device" ]]; then
         printf '%s\n' "mount: backing device not found: $device" >&2
         return 1
     fi
-    psbbn_dd_window direct "$device" "$dest" "$start" "$sectors" 0
+    ranges=$(psbbn_extent_ranges read "$extents" "$dest") || return 1
+    psbbn_dd_ranges direct "$device" "$dest" "$ranges"
 }
 
-# Write the slice file back onto the same window. conv=notrunc is mandatory.
+# Write the slice file back onto its extents. The sectors between extents
+# hold the APA sub-partition headers and are never written.
+# psbbn_writeback_range DEVICE EXTENTS SLICE
 psbbn_writeback_range() {
-    local device="$1" start="$2" sectors="$3" src="$4" raw
+    local device="$1" extents="$2" src="$3" ranges
     if psbbn_is_real_disk "$device"; then
         if psbbn_disk_internal "$device"; then
             printf '%s\n' "umount: refusing internal disk $device" >&2
             return 2
         fi
-        raw="$device"
-        case "$device" in
-            /dev/disk*) raw="/dev/r${device#/dev/}" ;;
-        esac
         if ! declare -F platform_elevate >/dev/null 2>&1; then
             printf '%s\n' "umount: cannot write $device" >&2
             return 1
         fi
-        psbbn_dd_window elevate "$src" "$raw" 0 "$sectors" "$start"
+        ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
+        psbbn_dd_ranges elevate "$src" "$(psbbn_raw_node "$device")" "$ranges"
         return $?
     fi
     if [[ ! -f "$device" ]]; then
         printf '%s\n' "umount: backing device not found: $device" >&2
         return 1
     fi
-    psbbn_dd_window direct "$src" "$device" 0 "$sectors" "$start"
+    ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
+    psbbn_dd_ranges direct "$src" "$device" "$ranges"
 }
 
 psbbn_mke2fs_bin() {
@@ -316,7 +391,7 @@ PY
 # Linux PFS Shell formats EXT2 and EXT2SWAP inside mkpart. Upstream pfsshell
 # only creates the APA partition, so the following mount has no filesystem.
 psbbn_format_mkpart_ranges() {
-    local device="$1" commands="$2" listing="$3" line name fstype start sectors tmp
+    local device="$1" commands="$2" listing="$3" line name fstype extents sectors tmp
     while IFS= read -r line; do
         [[ "$line" == mkpart\ * ]] || continue
         name=$(printf '%s\n' "$line" | awk '{print $2}')
@@ -328,8 +403,10 @@ psbbn_format_mkpart_ranges() {
         if printf '%s\n' "$commands" | grep -F "${name}: partition already exists." >/dev/null; then
             continue
         fi
-        start=""
+        extents=""
         sectors=""
+        # A partition above the APA size cap is a main partition plus
+        # sub-partitions; the filesystem spans all of them.
         # shellcheck disable=SC1091
         eval "$( "$(psbbn_python)" - "$listing" "$name" << 'PY'
 import sys
@@ -341,12 +418,21 @@ for chunk in listing.split(";"):
     part = chunk.split(",")[0]
     if not part.endswith("-" + want):
         continue
-    bits = chunk.split(",")[4].split()
-    sys.stdout.write("sectors=%s\nstart=%s\n" % (bits[1], bits[4]))
+    extents = []
+    total = 0
+    for table in chunk.split(",")[4:]:
+        bits = table.split()
+        if not bits:
+            continue
+        if len(bits) != 5 or bits[2] != "linear" or int(bits[0]) != total:
+            raise SystemExit(0)
+        extents.append("%s:%s" % (bits[4], bits[1]))
+        total += int(bits[1])
+    sys.stdout.write("sectors=%d\nextents='%s'\n" % (total, " ".join(extents)))
     break
 PY
 )"
-        if [[ -z "$start" || -z "$sectors" ]]; then
+        if [[ -z "$extents" || -z "$sectors" ]]; then
             printf '%s\n' "mkpart: $name was not created on $device" >&2
             return 1
         fi
@@ -362,7 +448,7 @@ PY
         else
             psbbn_format_swap_file "$tmp" || return $?
         fi
-        psbbn_writeback_range "$device" "$start" "$sectors" "$tmp" || return $?
+        psbbn_writeback_range "$device" "$extents" "$tmp" || return $?
         rm -f "${tmp:?}"
     done <<< "$commands"
 }
@@ -817,7 +903,7 @@ fd = os.open(sys.argv[1], os.O_CREAT | os.O_RDWR | os.O_TRUNC, 0o644)
 os.ftruncate(fd, int(sys.argv[2]))
 os.close(fd)
 PY
-    printf 'device=%s\nstart=0\nsectors=%s\nnode=1\n' "$node" "$sectors" > "$slice.meta"
+    printf 'device=%s\nsectors=%s\nextents=%s\nnode=1\n' "$node" "$sectors" "0:$sectors" > "$slice.meta"
     printf '%s\n' "$slice"
 }
 

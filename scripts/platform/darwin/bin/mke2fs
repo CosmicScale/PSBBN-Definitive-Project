@@ -31,6 +31,7 @@ if [[ -f "${path}.meta" ]]; then
     device=""
     start=""
     sectors=""
+    extents=""
     # shellcheck disable=SC1091
     . "${path}.meta"
     block=4096

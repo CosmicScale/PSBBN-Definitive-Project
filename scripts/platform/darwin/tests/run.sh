@@ -1532,6 +1532,114 @@ else
     bad umount-partition-node
 fi
 
+# --- APA partitions above the size cap span several extents -----------------
+ext_dir=$(mktemp -d)
+ext_dm="$ext_dir/dm"
+ext_maps="$ext_dir/maps"
+ext_state="$ext_dir/state"
+ext_dev="$ext_dir/drive.img"
+# hdl_dump toc --dm prints every map on one line, separated by ';'.
+printf 'cut-a,,,rw,0 16 linear %s 2048;cut-b,,,rw,0 16 linear %s 4096;' "$ext_dev" "$ext_dev" \
+    | PSBBN_DM_STATE="$ext_dm" PSBBN_MAPPER_DIR="$ext_maps" "$bin/dmsetup" create --concise || true
+ext_ls=$(PSBBN_DM_STATE="$ext_dm" "$bin/dmsetup" ls)
+if grep -qx cut-a <<<"$ext_ls" && grep -qx cut-b <<<"$ext_ls" && [[ -f "$ext_maps/cut-a" && -f "$ext_maps/cut-b" ]]; then
+    ok dm-concise-semicolons
+else
+    bad "dm-concise-semicolons ls=$ext_ls"
+fi
+rm -rf "${ext_dm:?}" "${ext_maps:?}"
+
+# 96 MiB of random bytes stands in for the drive. The partition is two
+# 20 MiB extents with a 2 MiB gap (the sub-partition header) between them.
+dd if=/dev/urandom of="$ext_dev" bs=1048576 count=96 status=none 2>/dev/null
+ext_line="cut-__linux.8,,,rw,0 40960 linear $ext_dev 4096,40960 40960 linear $ext_dev 49152"
+gap_sum() {
+    {
+        dd if="$ext_dev" bs=512 skip=0 count=4096 2>/dev/null
+        dd if="$ext_dev" bs=512 skip=45056 count=4096 2>/dev/null
+        dd if="$ext_dev" bs=512 skip=90112 2>/dev/null
+    } | /sbin/md5 -q
+}
+extents_of_drive() {
+    dd if="$ext_dev" bs=512 skip=4096 count=40960 2>/dev/null
+    dd if="$ext_dev" bs=512 skip=49152 count=40960 2>/dev/null
+}
+gap_before=$(gap_sum)
+printf '%s\n' "$ext_line" | PSBBN_DM_STATE="$ext_dm" PSBBN_MAPPER_DIR="$ext_maps" "$bin/dmsetup" create --concise || true
+ext_slice="$ext_maps/cut-__linux.8"
+ext_meta=$(cat "$ext_slice.meta" 2>/dev/null) || true
+if [[ "$(wc -c < "$ext_slice" 2>/dev/null | tr -d ' ')" == $((81920 * 512)) ]] && grep -qx 'sectors=81920' <<<"$ext_meta" \
+    && grep -qx "extents='4096:40960 49152:40960'" <<<"$ext_meta" && ! grep -q '^start=' <<<"$ext_meta"; then
+    ok dm-multi-extent-meta
+else
+    bad "dm-multi-extent-meta meta=$ext_meta"
+fi
+
+ext_status=0
+printf 'cut-gap,,,rw,0 16 linear %s 2048,32 16 linear %s 4096\n' "$ext_dev" "$ext_dev" \
+    | PSBBN_DM_STATE="$ext_dm" PSBBN_MAPPER_DIR="$ext_maps" "$bin/dmsetup" create --concise 2>/dev/null || ext_status=$?
+if [[ "$ext_status" -ne 0 ]] && ! PSBBN_DM_STATE="$ext_dm" "$bin/dmsetup" ls | grep -qx cut-gap; then
+    ok dm-rejects-hole-in-map
+else
+    bad "dm-rejects-hole-in-map status=$ext_status"
+fi
+
+# Format, mount, write, unmount: both extents land on the drive, the gap
+# does not change, and a fresh map reads the same file back.
+ext_mnt="$ext_dir/mnt"
+ext_ok=1
+"$bin/mkfs.vfat" -F 32 "$ext_slice" >/dev/null 2>&1 || ext_ok=0
+head -c 3000000 /dev/urandom > "$ext_dir/song.pcm"
+if [[ "$ext_ok" -eq 1 ]] && PSBBN_MOUNT_STATE="$ext_state" "$bin/mount" "$ext_slice" "$ext_mnt"; then
+    mkdir -p "$ext_mnt/MusicCh/contents/album"
+    cp "$ext_dir/song.pcm" "$ext_mnt/MusicCh/contents/album/track01.pcm"
+    PSBBN_MOUNT_STATE="$ext_state" "$bin/umount" "$ext_mnt" || ext_ok=0
+else
+    ext_ok=0
+fi
+if [[ "$ext_ok" -eq 1 && "$(gap_sum)" == "$gap_before" ]] && cmp -s <(extents_of_drive) "$ext_slice"; then
+    ok slice-multi-extent-writeback
+else
+    bad "slice-multi-extent-writeback ok=$ext_ok gap=$([[ "$(gap_sum)" == "$gap_before" ]] && echo same || echo changed)"
+fi
+PSBBN_DM_STATE="$ext_dm" PSBBN_MAPPER_DIR="$ext_maps" "$bin/dmsetup" remove cut-__linux.8 || true
+printf '%s\n' "$ext_line" | PSBBN_DM_STATE="$ext_dm" PSBBN_MAPPER_DIR="$ext_maps" "$bin/dmsetup" create --concise || true
+rm -rf "${ext_mnt:?}"
+if PSBBN_MOUNT_STATE="$ext_state" "$bin/mount" "$ext_slice" "$ext_mnt" \
+    && cmp -s "$ext_dir/song.pcm" "$ext_mnt/MusicCh/contents/album/track01.pcm" \
+    && /sbin/fsck_msdos -n "$ext_slice" >/dev/null 2>&1; then
+    ok slice-multi-extent-read
+else
+    bad "slice-multi-extent-read $(ls -R "$ext_mnt" 2>&1 | head -5)"
+fi
+PSBBN_MOUNT_STATE="$ext_state" "$bin/umount" "$ext_mnt" >/dev/null 2>&1 || true
+
+# On a real disk every extent goes through one elevated call, so the
+# drive's mounts are released and restored once.
+ext_rec=$(mktemp)
+cat > "$stub/elevate-count" << EOF
+#!/bin/bash
+printf 'CALL %s\n' "\$1" >> "$ext_rec"
+exit 0
+EOF
+chmod +x "$stub/elevate-count"
+ext_small=$(mktemp)
+dd if=/dev/zero of="$ext_small" bs=512 count=24 2>/dev/null
+ext_status=0
+PSBBN_SUDO="$stub/elevate-count" PSBBN_DISKUTIL="$stub/diskutil-mount" PSBBN_MOUNT_TABLE=/dev/null /opt/homebrew/bin/bash -c \
+    '. "$1"; psbbn_writeback_range /dev/disk5 "2048:8 4096:8 8192:8" "$2"' _ "$root/../load.sh" "$ext_small" || ext_status=$?
+if [[ "$ext_status" -eq 0 && "$(grep -c '^CALL' "$ext_rec")" -eq 1 ]] && grep -qx 'CALL /bin/sh' "$ext_rec"; then
+    ok slice-extents-one-elevation
+else
+    bad "slice-extents-one-elevation status=$ext_status rec=$(cat "$ext_rec")"
+fi
+# The extents must cover the slice exactly; anything else is refused.
+ext_status=0
+ext_err=$(PSBBN_SUDO="$stub/elevate-count" PSBBN_DISKUTIL="$stub/diskutil-mount" PSBBN_MOUNT_TABLE=/dev/null /opt/homebrew/bin/bash -c \
+    '. "$1"; psbbn_writeback_range /dev/disk5 "2048:8 4096:8" "$2"' _ "$root/../load.sh" "$ext_small" 2>&1) || ext_status=$?
+[[ "$ext_status" -ne 0 && "$ext_err" == *"extents cover"* ]] && ok slice-extents-must-match-size || bad "slice-extents-must-match-size status=$ext_status err=$ext_err"
+rm -rf "${ext_dir:?}" "$ext_rec" "$ext_small"
+
 # --- unmount writes back only what changed since the snapshot -------------
 dbg_rec=$(mktemp)
 cat > "$stub/debugfs-record" << EOF

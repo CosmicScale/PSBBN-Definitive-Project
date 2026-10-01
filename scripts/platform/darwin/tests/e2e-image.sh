@@ -152,10 +152,13 @@ printf 'inodes: tar members=%s image used=%s\n' "$tarcount" "$used"
 (( used >= tarcount - 5 )) && ok inode-count-matches || bad "inode-count tar=$tarcount used=$used"
 
 stamp "verify slices landed in the image"
-device=""; start=""; sectors=""
+device=""; start=""; sectors=""; extents=""
 . "${l1}.meta"
 back="$work/back.bin"
-dd if="$img" of="$back" bs=512 skip="$start" count="$sectors" status=none 2>/dev/null
+: > "$back"
+for extent in $(psbbn_meta_extents "$extents" "$start" "$sectors"); do
+    dd if="$img" bs=512 skip="${extent%%:*}" count="${extent#*:}" status=none 2>/dev/null >> "$back"
+done
 cmp -s "$back" "$l1" && ok slice-written-back || bad slice-written-back
 "$fsck" -fn "$back" >/dev/null 2>&1 && ok e2fsck-on-disk-window || bad e2fsck-on-disk-window
 

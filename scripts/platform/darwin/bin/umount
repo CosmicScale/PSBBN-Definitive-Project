@@ -73,10 +73,12 @@ for arg in "${args[@]}"; do
         device=""
         start=""
         sectors=""
+        extents=""
         node=""
         # shellcheck disable=SC1091
         . "${slice}.meta"
-        psbbn_writeback_range "$device" "$start" "$sectors" "$slice" || exit $?
+        extents=$(psbbn_meta_extents "$extents" "$start" "$sectors") || exit 1
+        psbbn_writeback_range "$device" "$extents" "$slice" || exit $?
         if [[ "$node" == 1 ]]; then
             rm -f "${slice:?}" "${slice:?}.meta"
         fi
