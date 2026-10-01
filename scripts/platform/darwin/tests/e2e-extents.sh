@@ -47,6 +47,45 @@ assemble() {
         dd if="$img" bs=512 skip="${extent%%:*}" count="${extent#*:}" 2>/dev/null
     done
 }
+# Every region the slice holds data for is on the drive at its extent. The
+# slice's holes are never written, so the drive keeps its old bytes there.
+data_matches() {
+    python3 - "$img" "$1" "$2" << 'PY'
+import errno, os, sys
+img, extents, path = sys.argv[1], sys.argv[2].split(), sys.argv[3]
+fd = os.open(path, os.O_RDONLY)
+end = os.fstat(fd).st_size
+regions, off = [], 0
+while off < end:
+    try:
+        a = os.lseek(fd, off, os.SEEK_DATA)
+    except OSError as exc:
+        if exc.errno == errno.ENXIO:
+            break
+        raise
+    b = os.lseek(fd, a, os.SEEK_HOLE)
+    regions.append((a, b))
+    off = b
+os.close(fd)
+spans, pos = [], 0
+for ext in extents:
+    start, count = (int(x) * 512 for x in ext.split(":"))
+    spans.append((pos, pos + count, start))
+    pos += count
+with open(path, "rb") as sl, open(img, "rb") as dr:
+    for a, b in regions:
+        for lo, hi, dev in spans:
+            x, y = max(a, lo), min(b, hi)
+            while x < y:
+                n = min(y - x, 8 << 20)
+                sl.seek(x)
+                dr.seek(dev + x - lo)
+                if sl.read(n) != dr.read(n):
+                    sys.exit(1)
+                x += n
+print(sum(b - a for a, b in regions) // 1048576)
+PY
+}
 # The 4 MiB in front of every extent: the APA header and reserved area of
 # the main partition, the header of each sub-partition.
 headers_sum() {
@@ -58,6 +97,9 @@ headers_sum() {
 
 stamp "image at $img"
 /usr/sbin/mkfile -n 8g "$img"
+# A used drive: random bytes where the partitions will go. Nothing that
+# skips a slice's holes may rely on that space reading as zero.
+dd if=/dev/urandom of="$img" bs=1048576 seek=2048 count=4096 conv=notrunc status=none 2>/dev/null
 
 stamp "PFS Shell: initialize + mkpart above the cap (ext2 formatted by the wrapper)"
 printf 'device %s\ninitialize yes\nmkpart __linux.5 1536M EXT2\nmkpart __linux.8 1536M EXT2\nmkpart __contents 128M PFS\nexit\n' "$img" \
@@ -118,8 +160,8 @@ else
 fi
 "$hdl" toc "$img" > "$work/toc.txt" 2>&1 && grep -q '__linux.8' "$work/toc.txt" && ! grep -qi broken "$work/toc.txt" \
     && ok toc-still-clean || bad "toc-still-clean $(cat "$work/toc.txt")"
-cmp -s <(assemble "$ext5") "${mapper}__linux.5" && ok ext2-extents-match-slice || bad ext2-extents-match-slice
-cmp -s <(assemble "$ext8") "${mapper}__linux.8" && ok vfat-extents-match-slice || bad vfat-extents-match-slice
+if mib=$(data_matches "$ext5" "${mapper}__linux.5"); then ok "ext2-data-on-drive ($mib MiB written)"; else bad ext2-data-on-drive; fi
+if mib=$(data_matches "$ext8" "${mapper}__linux.8"); then ok "vfat-data-on-drive ($mib MiB written)"; else bad vfat-data-on-drive; fi
 assemble "$ext5" > "$work/l5.img"
 "$fsck" -fn "$work/l5.img" > "$work/fsck5.out" 2>&1 && ok ext2-fsck-on-drive || bad "ext2-fsck-on-drive $(tail -5 "$work/fsck5.out")"
 rm -f "$work/l5.img"

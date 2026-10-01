@@ -184,6 +184,60 @@ psbbn_extent_ranges() {
     printf '%s\n' "${out% }"
 }
 
+# Drop the parts of write ranges that are holes in the slice file. A hole is
+# a region nothing ever wrote. A fresh slice is sparse and the formatter
+# writes only its metadata, like mkfs on Linux, which leaves the rest of the
+# partition as it was. A slice read off the drive has no holes and is
+# written back whole. Kept regions are widened to whole MiB inside their
+# range so dd can use 1 MiB blocks. If the filesystem cannot report holes,
+# the ranges are kept as they are.
+# psbbn_skip_holes RANGES SLICE
+psbbn_skip_holes() {
+    "$(psbbn_python)" - "$1" "$2" << 'PY'
+import errno, os, sys
+ranges, path = sys.argv[1].split(), sys.argv[2]
+data = []
+fd = os.open(path, os.O_RDONLY)
+try:
+    end = os.fstat(fd).st_size
+    off = 0
+    while off < end:
+        try:
+            start = os.lseek(fd, off, os.SEEK_DATA)
+        except OSError as exc:
+            if exc.errno == errno.ENXIO:
+                break
+            raise
+        stop = os.lseek(fd, start, os.SEEK_HOLE)
+        data.append((start // 512, -(-stop // 512)))
+        off = stop
+except (OSError, AttributeError):
+    print(" ".join(ranges))
+    raise SystemExit(0)
+finally:
+    os.close(fd)
+MIB = 2048
+out = []
+for item in ranges:
+    skip, seek, count = (int(x) for x in item.split(":"))
+    lo, hi = skip, skip + count
+    pieces = []
+    for a, b in data:
+        a, b = max(a, lo), min(b, hi)
+        if a >= b:
+            continue
+        a = lo + (a - lo) // MIB * MIB
+        b = min(hi, lo + -(-(b - lo) // MIB) * MIB)
+        if pieces and a <= pieces[-1][1]:
+            pieces[-1][1] = max(pieces[-1][1], b)
+        else:
+            pieces.append([a, b])
+    for a, b in pieces:
+        out.append("%d:%d:%d" % (a, seek + (a - lo), b - a))
+print(" ".join(out))
+PY
+}
+
 # Copy sector ranges with dd. RANGES is "skip:seek:count ..." in 512-byte
 # sectors. All ranges run in one process, so a real disk costs one elevated
 # call and one release of its mounts however many ranges there are. dd's
@@ -259,7 +313,8 @@ psbbn_copy_range() {
 }
 
 # Write the slice file back onto its extents. The sectors between extents
-# hold the APA sub-partition headers and are never written.
+# hold the APA sub-partition headers and are never written, and neither are
+# the slice's holes (psbbn_skip_holes).
 # psbbn_writeback_range DEVICE EXTENTS SLICE
 psbbn_writeback_range() {
     local device="$1" extents="$2" src="$3" ranges
@@ -273,6 +328,7 @@ psbbn_writeback_range() {
             return 1
         fi
         ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
+        ranges=$(psbbn_skip_holes "$ranges" "$src") || return 1
         psbbn_dd_ranges elevate "$src" "$(psbbn_raw_node "$device")" "$ranges"
         return $?
     fi
@@ -281,6 +337,7 @@ psbbn_writeback_range() {
         return 1
     fi
     ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
+    ranges=$(psbbn_skip_holes "$ranges" "$src") || return 1
     psbbn_dd_ranges direct "$src" "$device" "$ranges"
 }
 

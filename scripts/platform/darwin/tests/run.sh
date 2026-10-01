@@ -1597,7 +1597,10 @@ if [[ "$ext_ok" -eq 1 ]] && PSBBN_MOUNT_STATE="$ext_state" "$bin/mount" "$ext_sl
 else
     ext_ok=0
 fi
-if [[ "$ext_ok" -eq 1 && "$(gap_sum)" == "$gap_before" ]] && cmp -s <(extents_of_drive) "$ext_slice"; then
+# The slice's holes are not written, so the drive keeps its random bytes
+# there; the filesystem on the drive must still check clean.
+extents_of_drive > "$ext_dir/drive-copy.img"
+if [[ "$ext_ok" -eq 1 && "$(gap_sum)" == "$gap_before" ]] && /sbin/fsck_msdos -n "$ext_dir/drive-copy.img" >/dev/null 2>&1; then
     ok slice-multi-extent-writeback
 else
     bad "slice-multi-extent-writeback ok=$ext_ok gap=$([[ "$(gap_sum)" == "$gap_before" ]] && echo same || echo changed)"
@@ -1639,6 +1642,92 @@ ext_err=$(PSBBN_SUDO="$stub/elevate-count" PSBBN_DISKUTIL="$stub/diskutil-mount"
     '. "$1"; psbbn_writeback_range /dev/disk5 "2048:8 4096:8" "$2"' _ "$root/../load.sh" "$ext_small" 2>&1) || ext_status=$?
 [[ "$ext_status" -ne 0 && "$ext_err" == *"extents cover"* ]] && ok slice-extents-must-match-size || bad "slice-extents-must-match-size status=$ext_status err=$ext_err"
 rm -rf "${ext_dir:?}" "$ext_rec" "$ext_small"
+
+# --- a fresh slice writes only what was written into it ---------------------
+# The drive is random bytes, as a used drive would be. A fresh slice is
+# formatted, filled and unmounted; only its data regions may reach the
+# drive, and the filesystem there must still check clean.
+hs_dir=$(mktemp -d)
+hs_dev="$hs_dir/drive.img"
+hs_bytes="$hs_dir/bytes"
+dd if=/dev/urandom of="$hs_dev" bs=1048576 count=96 status=none 2>/dev/null
+cat > "$stub/dd-count" << EOF
+#!/bin/bash
+# The real dd. Adds up the bytes of every write onto the drive image.
+bs=0; count=0; of=""
+for a in "\$@"; do
+    case "\$a" in bs=*) bs=\${a#bs=} ;; count=*) count=\${a#count=} ;; of=*) of=\${a#of=} ;; esac
+done
+[[ "\$of" == "$hs_dev" ]] && echo \$((bs * count)) >> "$hs_bytes"
+exec /bin/dd "\$@"
+EOF
+chmod +x "$stub/dd-count"
+hs_env=(PSBBN_DM_STATE="$hs_dir/dm" PSBBN_MAPPER_DIR="$hs_dir/maps" PSBBN_MOUNT_STATE="$hs_dir/state" PSBBN_DD="$stub/dd-count")
+hs_slice="$hs_dir/maps/hs-p"
+hs_map() {
+    env "${hs_env[@]}" "$bin/dmsetup" remove hs-p >/dev/null 2>&1 || true
+    printf 'hs-p,,,rw,0 40960 linear %s 4096,40960 40960 linear %s 49152\n' "$hs_dev" "$hs_dev" \
+        | env "${hs_env[@]}" "$bin/dmsetup" create --concise || true
+}
+hs_drive() {
+    dd if="$hs_dev" bs=512 skip=4096 count=40960 2>/dev/null
+    dd if="$hs_dev" bs=512 skip=49152 count=40960 2>/dev/null
+}
+hs_written() { awk '{ s += $1 } END { print s + 0 }' "$hs_bytes" 2>/dev/null; }
+head -c 1000000 /dev/urandom > "$hs_dir/song.pcm"
+hs_slice_bytes=$((81920 * 512))
+
+for hs_kind in vfat ext2; do
+    hs_map
+    : > "$hs_bytes"
+    hs_ok=1
+    if [[ "$hs_kind" == vfat ]]; then
+        "$bin/mkfs.vfat" -F 32 "$hs_slice" >/dev/null 2>&1 || hs_ok=0
+    else
+        env "${hs_env[@]}" "$bin/mke2fs" -t ext2 -b 4096 -I 128 \
+            -O ^large_file,^dir_index,^extent,^huge_file,^flex_bg,^has_journal,^ext_attr,^resize_inode \
+            "$hs_slice" >/dev/null 2>&1 || hs_ok=0
+    fi
+    rm -rf "${hs_dir:?}/mnt"
+    if [[ "$hs_ok" -eq 1 ]] && env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt"; then
+        mkdir -p "$hs_dir/mnt/album"
+        cp "$hs_dir/song.pcm" "$hs_dir/mnt/album/track01.pcm"
+        env "${hs_env[@]}" "$bin/umount" "$hs_dir/mnt" || hs_ok=0
+    else
+        hs_ok=0
+    fi
+    hs_w=$(hs_written)
+    hs_drive > "$hs_dir/check.img"
+    if [[ "$hs_kind" == vfat ]]; then
+        /sbin/fsck_msdos -n "$hs_dir/check.img" >/dev/null 2>&1 || hs_ok=0
+    else
+        /opt/homebrew/opt/e2fsprogs/sbin/e2fsck -fn "$hs_dir/check.img" >/dev/null 2>&1 || hs_ok=0
+    fi
+    if [[ "$hs_ok" -eq 1 && "$hs_w" -gt 0 && "$hs_w" -lt $((hs_slice_bytes / 4)) ]]; then
+        ok "slice-fresh-$hs_kind-skips-holes ($((hs_w / 1048576)) of $((hs_slice_bytes / 1048576)) MiB)"
+    else
+        bad "slice-fresh-$hs_kind-skips-holes ok=$hs_ok written=$hs_w"
+    fi
+done
+
+# A slice read off the drive has no holes: every byte goes back.
+hs_map
+: > "$hs_bytes"
+rm -rf "${hs_dir:?}/mnt"
+hs_ok=1
+if env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt" && cmp -s "$hs_dir/song.pcm" "$hs_dir/mnt/album/track01.pcm"; then
+    printf 'more\n' > "$hs_dir/mnt/album/note.txt"
+    env "${hs_env[@]}" "$bin/umount" "$hs_dir/mnt" || hs_ok=0
+else
+    hs_ok=0
+fi
+hs_w=$(hs_written)
+if [[ "$hs_ok" -eq 1 && "$hs_w" -eq "$hs_slice_bytes" ]] && cmp -s <(hs_drive) "$hs_slice"; then
+    ok slice-read-writes-whole
+else
+    bad "slice-read-writes-whole ok=$hs_ok written=$hs_w of $hs_slice_bytes"
+fi
+rm -rf "${hs_dir:?}"
 
 # --- unmount writes back only what changed since the snapshot -------------
 dbg_rec=$(mktemp)
