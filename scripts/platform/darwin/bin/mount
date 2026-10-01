@@ -58,6 +58,7 @@ stage_slice() {
         vfat)
             psbbn_vfat_export "$slice" "$mnt" || return $?
             psbbn_stage_save "$mnt" "$slice" vfat
+            psbbn_manifest_write "$mnt" || return $?
             ;;
         *)
             echo "mount: $slice has no ext2 or FAT filesystem" >&2

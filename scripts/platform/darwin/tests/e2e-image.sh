@@ -111,7 +111,7 @@ if [[ -f "$sysconf" ]]; then
     printf '<!-- e2e -->\n' >> "$sysconf"
 fi
 
-stamp "umount everything (ext2 diff import, vfat rebuild, pfs put)"
+stamp "umount everything (ext2 and vfat diff import, pfs put)"
 t0=$(date +%s)
 for p in __contents __system __sysconf __common __linux.8 __linux.7 __linux.5 __linux.4 __linux.1; do
     t1=$(date +%s)

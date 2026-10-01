@@ -1341,8 +1341,76 @@ psbbn_vfat_export() {
     COPYFILE_DISABLE=1 "$tool" -i "$image" -s -n ::/ "$dest"
 }
 
+# Write the staged directory back into the FAT image.
+# With a manifest only what changed since the snapshot is touched: files and
+# folders the installer removed are deleted, new folders are created, new
+# and modified files are copied. The filesystem is not re-created, so its
+# serial number, cluster size and every unchanged cluster stay as they
+# were. A record without a manifest re-creates the image and copies
+# everything.
+# psbbn_vfat_import DIR IMAGE [MANIFEST]
 psbbn_vfat_import() {
-    local src="$1" image="$2" bytes sectors tool child base
+    local src="$1" image="$2" manifest="${3:-}" bytes sectors tool child base
+    if [[ -n "$manifest" && -f "$manifest" ]]; then
+        tool=$(psbbn_mcopy_bin) || return 1
+        "$(psbbn_python)" - "$src" "$image" "$manifest" "$(dirname "$tool")" "$_psbbn_darwin_dir" << 'PY'
+import os, subprocess, sys
+src, image, manifest_path, tooldir, libdir = sys.argv[1:6]
+sys.dont_write_bytecode = True
+sys.path.insert(0, libdir)
+import manifest as mf
+
+old = mf.load(manifest_path)
+new = mf.scan(src)
+env = dict(os.environ, COPYFILE_DISABLE="1")
+
+def run(tool, args):
+    cmd = [os.path.join(tooldir, tool), "-i", image] + args
+    proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT, text=True, env=env)
+    if proc.returncode != 0:
+        sys.stderr.write("vfat: %s failed:\n%s" % (" ".join(cmd[:5] + ["..."]), proc.stdout))
+        raise SystemExit(1)
+
+def each(tool, targets):
+    # Batches keep the argument list short. Order is kept, so parents are
+    # created before their children and removed after them.
+    for i in range(0, len(targets), 64):
+        run(tool, targets[i:i + 64])
+
+def dos(rel):
+    return "::/" + rel
+
+for rel, ent in new.items():
+    if ent[0] not in ("f", "d"):
+        sys.stderr.write("vfat: unsupported file %s\n" % os.path.join(src, rel))
+        raise SystemExit(1)
+
+def depth(rel):
+    return rel.count("/")
+
+# Removed first, so a nearly full partition has room for what is added.
+gone_files = sorted(r for r, e in old.items() if e[0] != "d" and new.get(r, [""])[0] != e[0])
+gone_dirs = sorted((r for r, e in old.items() if e[0] == "d" and new.get(r, [""])[0] != "d"),
+                   key=lambda r: (-depth(r), r))
+new_dirs = sorted((r for r, e in new.items() if e[0] == "d" and old.get(r, [""])[0] != "d"),
+                  key=lambda r: (depth(r), r))
+changed = {}
+for rel, ent in sorted(new.items()):
+    if ent[0] == "f" and old.get(rel) != ent:
+        parent = rel.rsplit("/", 1)[0] if "/" in rel else ""
+        changed.setdefault(parent, []).append(os.path.join(src, rel))
+
+each("mdel", [dos(r) for r in gone_files])
+each("mrd", [dos(r) for r in gone_dirs])
+each("mmd", [dos(r) for r in new_dirs])
+for parent, files in sorted(changed.items()):
+    target = dos(parent + "/" if parent else "")
+    for i in range(0, len(files), 64):
+        run("mcopy", ["-D", "o"] + files[i:i + 64] + [target])
+PY
+        return $?
+    fi
     bytes=$(wc -c < "$image")
     sectors=$((bytes / 512))
     if (( sectors < 65536 )); then

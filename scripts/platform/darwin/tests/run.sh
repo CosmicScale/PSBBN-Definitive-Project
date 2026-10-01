@@ -1729,6 +1729,54 @@ else
 fi
 rm -rf "${hs_dir:?}"
 
+# --- FAT unmount changes only what the installer changed --------------------
+# The music partition already holds albums. The installer keeps one, edits
+# one, deletes one and a whole folder, and adds a folder. The volume is not
+# re-created: its serial number survives and the untouched file keeps its
+# clusters.
+vi_dir=$(mktemp -d)
+vi_img="$vi_dir/slice"
+vi_env=(PSBBN_MOUNT_STATE="$vi_dir/state")
+vi_ok=1
+dd if=/dev/zero of="$vi_img" bs=1048576 count=64 status=none 2>/dev/null
+printf 'device=%s\nsectors=131072\nextents=0:131072\n' "$vi_dir/drive" > "$vi_img.meta"
+dd if=/dev/zero of="$vi_dir/drive" bs=1048576 count=64 status=none 2>/dev/null
+/sbin/newfs_msdos -F 32 -s 131072 "$vi_img" >/dev/null 2>&1 || vi_ok=0
+head -c 300000 /dev/urandom > "$vi_dir/keep.pcm"
+printf 'old\n' > "$vi_dir/edit.txt"
+printf 'bye\n' > "$vi_dir/gone.txt"
+mmd -i "$vi_img" ::/MusicCh ::/MusicCh/contents ::/MusicCh/contents/keep ::/MusicCh/contents/old 2>/dev/null || vi_ok=0
+mcopy -i "$vi_img" "$vi_dir/keep.pcm" ::/MusicCh/contents/keep/track01.pcm 2>/dev/null || vi_ok=0
+mcopy -i "$vi_img" "$vi_dir/edit.txt" ::/MusicCh/edit.txt 2>/dev/null || vi_ok=0
+mcopy -i "$vi_img" "$vi_dir/gone.txt" ::/MusicCh/gone.txt 2>/dev/null || vi_ok=0
+mcopy -i "$vi_img" "$vi_dir/gone.txt" ::/MusicCh/contents/old/track01.pcm 2>/dev/null || vi_ok=0
+vi_serial() { dd if="$vi_img" bs=1 skip=67 count=4 2>/dev/null | od -An -tx1 | tr -d ' \n'; }
+vi_serial_before=$(vi_serial)
+vi_cluster_before=$(mshowfat -i "$vi_img" ::/MusicCh/contents/keep/track01.pcm 2>/dev/null) || true
+if [[ "$vi_ok" -eq 1 ]] && env "${vi_env[@]}" "$bin/mount" "$vi_img" "$vi_dir/mnt"; then
+    printf 'new\n' > "$vi_dir/mnt/MusicCh/edit.txt"
+    rm -f "$vi_dir/mnt/MusicCh/gone.txt"
+    rm -rf "$vi_dir/mnt/MusicCh/contents/old"
+    mkdir -p "$vi_dir/mnt/MusicCh/contents/new album"
+    printf 'fresh\n' > "$vi_dir/mnt/MusicCh/contents/new album/track01.pcm"
+    env "${vi_env[@]}" "$bin/umount" "$vi_dir/mnt" || vi_ok=0
+else
+    vi_ok=0
+fi
+vi_listing=$(mdir -i "$vi_img" -/ -b ::/ 2>/dev/null) || true
+vi_cluster_after=$(mshowfat -i "$vi_img" ::/MusicCh/contents/keep/track01.pcm 2>/dev/null) || true
+vi_keep=$(mtype -i "$vi_img" ::/MusicCh/contents/keep/track01.pcm 2>/dev/null | /sbin/md5 -q) || true
+vi_edit=$(mtype -i "$vi_img" ::/MusicCh/edit.txt 2>/dev/null) || true
+vi_fresh=$(mtype -i "$vi_img" "::/MusicCh/contents/new album/track01.pcm" 2>/dev/null) || true
+if [[ "$vi_ok" -eq 1 && "$(vi_serial)" == "$vi_serial_before" && -n "$vi_cluster_before" && "$vi_cluster_after" == "$vi_cluster_before" \
+    && "$vi_keep" == "$(/sbin/md5 -q "$vi_dir/keep.pcm")" && "$vi_edit" == new && "$vi_fresh" == fresh \
+    && "$vi_listing" != *gone.txt* && "$vi_listing" != *contents/old* ]] && /sbin/fsck_msdos -n "$vi_img" >/dev/null 2>&1; then
+    ok slice-umount-vfat-incremental
+else
+    bad "slice-umount-vfat-incremental ok=$vi_ok serial=$vi_serial_before/$(vi_serial) cluster=$vi_cluster_before/$vi_cluster_after edit=$vi_edit fresh=$vi_fresh"
+fi
+rm -rf "${vi_dir:?}"
+
 # --- unmount writes back only what changed since the snapshot -------------
 dbg_rec=$(mktemp)
 cat > "$stub/debugfs-record" << EOF

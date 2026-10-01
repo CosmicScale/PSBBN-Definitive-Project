@@ -56,7 +56,7 @@ for arg in "${args[@]}"; do
             if [[ "$kind" == ext2 ]]; then
                 psbbn_ext2_import "$arg" "$slice" "$manifest" || exit $?
             else
-                psbbn_vfat_import "$arg" "$slice" || exit $?
+                psbbn_vfat_import "$arg" "$slice" "$manifest" || exit $?
             fi
             ;;
         pfs)
