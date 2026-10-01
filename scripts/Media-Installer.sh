@@ -776,7 +776,7 @@ option_one() {
       return 1
     fi
 
-    if ! sudo "${SCRIPTS_DIR}/venv/bin/python" "${HELPER_DIR}/music-installer.py" "${MEDIA_DIR}/music"; then
+    if ! sudo "${SCRIPTS_DIR}/venv/bin/python" "${HELPER_DIR}/music-installer.py" "${MEDIA_DIR}/music" "${STORAGE_DIR}"; then
       echo "[X] Error: Failed to convert music." >> "${LOG_FILE}"
       error_msg "${UI_TEXT[ERROR_MUSIC_INSTALLER_2]}"
       return 1
