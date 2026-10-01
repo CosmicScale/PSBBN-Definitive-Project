@@ -447,7 +447,8 @@ LOONIES8192R67PS2|Loonies 8192|GME|GME_LOONIES8|thp.itch.io|loonies8192-r67-ps2.
 CCLESTE|ccleste|GME|GME_CCLESTE|fjtrujy|ccleste.elf
 SDCD|Open PS2 Loader (SD Card Debugger)|APP|APP_OPL|ps2homebrew.github.io|sdcd_v0.4.1.elf
 SDCARDDEBUGGER|Open PS2 Loader (SD Card Debugger)|APP|APP_OPL|ps2homebrew.github.io|sdcard_debugger_v0.3.elf
-OPTICRAFT|OptiCraft|GME|GME_OPTICRAF|OptiJogos|OptiCraft 0.6 PS2 V1.2.elf
+OPTICRAFTPS2|OptiCraft|GME|GME_OPTICRAF|OptiJogos|OptiCraft-ps2.elf
+OPTICRAFT06PS2|OptiCraft|GME|GME_OPTICRAF|OptiJogos|OptiCraft 0.6 PS2 V1.2.elf
 SC2MAKER|SoulCalibur2 Conquest Card Maker|APP|APP_SC2MAKER|israpps.github.io|sc2maker_pkd.elf
 PVZPS2|Plants vs. Zombies|GME|GME_PVZPS2|github.com/OptiJuegos|pvz_ps2.elf
 NETCHEAT|NetCheat|APP|APP_NETCHEAT|github.com/Dnawrkshp|NetCheat.elf
@@ -507,12 +508,13 @@ DOOM|PS2 Doom|GME|GME_DOOM|github.com/israpps|DOOM.ELF
 PS2DOOM|PS2 Doom|GME|GME_DOOM|Lukasz Bruun, cosmito|PS2Doom v1.0.5.0.elf
 PS2SDLDOOM|SDL Doom|GME|GME_DOOM|Lukasz Bruun|PS2 SDL Doom v1.10.elf
 PRBOOMPLUS|PrBoom-Plus|GME|GME_DOOM|github.com/Wolf3s|prboom-plus.elf
+PS2INFOGB|InfoGB|EMU|EMU_INFOGB|KarasQ|PS2InfoGB.elf
 PS2INFOGBRE|InfoGB|EMU|EMU_INFOGB|KarasQ|PS2InfoGB Rev6b.elf
 PS2INFOGBWITHDS3DS4SUPPORTRE|InfoGB|EMU|EMU_INFOGB|KarasQ|PS2InfoGB with DS3 & DS4 support Rev6c.elf
 GAMEBOYCOLORUSB|InfoGB|EMU|EMU_INFOGB|KarasQ|Game Boy Color- USB.ELF
 INFOGBIRX|InfoGB|EMU|EMU_INFOGB|7not6|InfoGB-IRX.elf
 INFOGB|InfoGB|EMU|EMU_INFOGB|7not6|InfoGB.elf
-GAMEBOYCOLORIHDGAMEBOYCOLORIHD|InfoGB (HDD Version)|EMU|EMU_INFOGB|KaylaKaze|Game Boy Color IHD,Game Boy Color- IHD.ELF
+GAMEBOYCOLORIHD|InfoGB (HDD Version)|EMU|EMU_INFOGB|KaylaKaze|Game Boy Color- IHD.ELF
 JUM52I|Jum52|EMU|EMU_JUM52|James Higgs|JUM52I.ELF
 JUM52NI|Jum52|EMU|EMU_JUM52|James Higgs|JUM52NI.ELF
 JUMSA5200EMULATOR|Jum52|EMU|EMU_JUM52|James Higgs|Jum's A5200 Emulator (mc version) v0.8a.elf
@@ -566,3 +568,4 @@ TTC19JAR|Round 19|DEM|DEM_TTC19JAR|Jar|ttc19_jar.elf
 ATHENA|Athena PS2 Template|APP|APP_ATHENA|github.com/JSLegendDev|athena.elf
 ENCELADUS|Enceladus|RTE|RTE_ENCELADU|github.com/DanielSant0s|enceladus.elf
 MYPS2|myPS2|APP|APP_MYPS2|ntba2|MyPS2 v1.3.elf
+BOLIVIAOS|BoliviaOS|APP|APP_BOLIVIAO|Josema|BoliviaOS.ELF
