@@ -713,7 +713,7 @@ rm "$overlay/scripts/assets/lang/sample.txt"
 if [[ -f "$repo/scripts/assets/lang/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
 if [[ "$(cat "$overlay/scripts/helper/aarch64/cue2pops")" == macho ]]; then ok overlay-helper; else bad overlay-helper; fi
 
-for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed; do
+for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt df mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed; do
     if [[ -x "$bin/$tool" ]]; then ok "exec-$tool"; else bad "exec-$tool"; fi
 done
 

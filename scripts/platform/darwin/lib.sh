@@ -539,6 +539,26 @@ psbbn_stage_table() {
     done
 }
 
+# The staged partition PATH lives in: its record key, kind, mount and slice
+# (or device, for PFS), tab-separated. Fails when PATH is not staged.
+psbbn_stage_find() {
+    local want state f key mnt
+    want=$(psbbn_realpath "$1")
+    state=$(psbbn_mount_state_dir)
+    for f in "$state"/*.mount; do
+        [[ -f "$f" ]] || continue
+        key=${f%.mount}
+        key=${key##*/}
+        [[ -f "$state/$key" && -f "$state/$key.kind" ]] || continue
+        mnt=$(psbbn_realpath "$(cat "$f")")
+        if [[ "$want" == "$mnt" || "$want" == "$mnt"/* ]]; then
+            printf '%s\t%s\t%s\t%s\n' "$key" "$(cat "$state/$key.kind")" "$(cat "$f")" "$(cat "$state/$key")"
+            return 0
+        fi
+    done
+    return 1
+}
+
 psbbn_manifest_path() {
     local state key
     state=$(psbbn_mount_state_dir)

@@ -157,7 +157,8 @@ else
     bad "mount ext2 $(cat "$work/m5.err")"
 fi
 
-stamp "FAT32 music partition: mkfs.vfat, mount, write, unmount"
+stamp "FAT32 music partition: wipefs, mkfs.vfat, mount, write, unmount (Media-Installer's reset)"
+"$bin/wipefs" -a "${mapper}__linux.8" 2>"$work/wf.err" || bad "wipefs $(cat "$work/wf.err")"
 "$bin/mkfs.vfat" -F 32 "${mapper}__linux.8" >/dev/null 2>"$work/vf.err" || bad "mkfs.vfat $(cat "$work/vf.err")"
 mnt8="$work/storage/__linux.8"
 mkdir -p "$mnt8"
@@ -206,6 +207,39 @@ if "$bin/mount" "${mapper}__linux.8" "$mnt8" 2>"$work/m8.err" && cmp -s "$work/p
 else
     bad "vfat-reads-back $(cat "$work/m8.err")"
 fi
+stamp "df on staged partitions answers for the partition, not the Mac"
+avail_kb() { "$bin/df" --output=avail "$1" 2>"$work/df.err" | tail -n 1 | tr -d ' '; }
+# Free space before and after 8 MB is staged: it must drop by about 8 MB.
+df_drop_ok() {
+    local before="$1" after="$2"
+    [[ "$before" =~ ^[0-9]+$ && "$after" =~ ^[0-9]+$ ]] && (( before - after >= 7700 && before - after <= 8100 ))
+}
+e2_free=$("$dumpe2fs" -h "${mapper}__linux.5" 2>/dev/null | awk -F: '/^Free blocks/ { f = $2 } /^Reserved block count/ { r = $2 } END { print (f - r) * 4 }')
+before=$(avail_kb "$mnt5")
+head -c 8000000 /dev/urandom > "$mnt5/deep/more.bin"
+after=$(avail_kb "$mnt5/deep")
+[[ "$before" == "$e2_free" ]] && df_drop_ok "$before" "$after" && ok "df-ext2 ($before KiB, $after after 8 MB)" || bad "df-ext2 before=$before expected=$e2_free after=$after $(cat "$work/df.err")"
+rm -f "$mnt5/deep/more.bin"
+vf_free=$(mdir -i "${mapper}__linux.8" ::/ 2>/dev/null | awk '/bytes free/ { gsub(/[^0-9]/, ""); printf "%d", ($0 + 1023) / 1024 }')
+before=$(avail_kb "$mnt8")
+[[ "$before" == "$vf_free" ]] && ok "df-vfat ($before KiB)" || bad "df-vfat before=$before expected=$vf_free $(cat "$work/df.err")"
+mntc="$work/storage/__contents"
+mkdir -p "$mntc"
+if "$bin/pfs-fuse" -o allow_other --partition=__contents "$img" "$mntc" 2>"$work/pfs.err"; then
+    pfs_free=$(printf 'device %s\nmount __contents\ndf\numount\nexit\n' "$img" | "$helper/pfsshell" 2>/dev/null \
+        | awk '$1 == "__contents" { v = $4; sub(/MiB$/, "", v); print v * 1024 }')
+    before=$(avail_kb "$mntc")
+    head -c 8000000 /dev/urandom > "$mntc/movie.pss"
+    after=$(avail_kb "$mntc")
+    [[ "$before" == "$pfs_free" ]] && df_drop_ok "$before" "$after" && ok "df-pfs ($before KiB, $after after 8 MB)" || bad "df-pfs before=$before expected=$pfs_free after=$after $(cat "$work/df.err")"
+    rm -f "$mntc/movie.pss"
+    "$bin/umount" "$mntc" 2>"$work/uc.err" || bad "umount pfs $(cat "$work/uc.err")"
+else
+    bad "pfs-fuse $(cat "$work/pfs.err")"
+fi
+# Anything else is the real df.
+[[ "$("$bin/df" -k "$work" | awk '{ print $1, $NF }')" == "$(/bin/df -k "$work" | awk '{ print $1, $NF }')" ]] && ok df-passes-through || bad df-passes-through
+
 "$bin/umount" "$mnt5" >/dev/null 2>&1 || bad "umount ext2 after re-read"
 
 stamp "add one album to the music partition that was read back"
