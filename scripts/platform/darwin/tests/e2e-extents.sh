@@ -220,6 +220,10 @@ head -c 8000000 /dev/urandom > "$mnt5/deep/more.bin"
 after=$(avail_kb "$mnt5/deep")
 [[ "$before" == "$e2_free" ]] && df_drop_ok "$before" "$after" && ok "df-ext2 ($before KiB, $after after 8 MB)" || bad "df-ext2 before=$before expected=$e2_free after=$after $(cat "$work/df.err")"
 rm -f "$mnt5/deep/more.bin"
+mkdir -p "$mnt5/small"
+for i in $(seq 1 200); do printf 'x\n' > "$mnt5/small/f$i"; done
+head -c 3000000 /dev/urandom > "$mnt5/small/big.bin"
+e2_predicted=$(avail_kb "$mnt5")
 vf_free=$(mdir -i "${mapper}__linux.8" ::/ 2>/dev/null | awk '/bytes free/ { gsub(/[^0-9]/, ""); printf "%d", ($0 + 1023) / 1024 }')
 before=$(avail_kb "$mnt8")
 [[ "$before" == "$vf_free" ]] && ok "df-vfat ($before KiB)" || bad "df-vfat before=$before expected=$vf_free $(cat "$work/df.err")"
@@ -233,7 +237,19 @@ if "$bin/pfs-fuse" -o allow_other --partition=__contents "$img" "$mntc" 2>"$work
     after=$(avail_kb "$mntc")
     [[ "$before" == "$pfs_free" ]] && df_drop_ok "$before" "$after" && ok "df-pfs ($before KiB, $after after 8 MB)" || bad "df-pfs before=$before expected=$pfs_free after=$after $(cat "$work/df.err")"
     rm -f "$mntc/movie.pss"
+    # Many small files: what df predicts must be what the partition has
+    # left once unmount has put them (pfsshell reports whole MiB).
+    mkdir -p "$mntc/small"
+    for i in $(seq 1 200); do printf 'x\n' > "$mntc/small/f$i"; done
+    predicted=$(avail_kb "$mntc")
     "$bin/umount" "$mntc" 2>"$work/uc.err" || bad "umount pfs $(cat "$work/uc.err")"
+    actual=$(printf 'device %s\nmount __contents\ndf\numount\nexit\n' "$img" | "$helper/pfsshell" 2>/dev/null \
+        | awk '$1 == "__contents" { v = $4; sub(/MiB$/, "", v); print v * 1024 }')
+    if [[ "$predicted" =~ ^[0-9]+$ && "$actual" =~ ^[0-9]+$ ]] && (( before - predicted >= 2400 && predicted - actual <= 1024 && actual - predicted <= 1024 )); then
+        ok "df-pfs-small-files (predicted $predicted KiB, partition has $actual)"
+    else
+        bad "df-pfs-small-files before=$before predicted=$predicted actual=$actual"
+    fi
 else
     bad "pfs-fuse $(cat "$work/pfs.err")"
 fi
@@ -241,6 +257,13 @@ fi
 [[ "$("$bin/df" -k "$work" | awk '{ print $1, $NF }')" == "$(/bin/df -k "$work" | awk '{ print $1, $NF }')" ]] && ok df-passes-through || bad df-passes-through
 
 "$bin/umount" "$mnt5" >/dev/null 2>&1 || bad "umount ext2 after re-read"
+e2_actual=$("$dumpe2fs" -h "${mapper}__linux.5" 2>/dev/null | awk -F: '/^Free blocks/ { f = $2 } /^Reserved block count/ { r = $2 } END { print (f - r) * 4 }')
+# Never more free space than unmount leaves, and close to it.
+if [[ "$e2_predicted" =~ ^[0-9]+$ && "$e2_actual" =~ ^[0-9]+$ ]] && (( e2_predicted <= e2_actual && e2_actual - e2_predicted <= 64 )); then
+    ok "df-ext2-matches-unmount (predicted $e2_predicted KiB, partition has $e2_actual)"
+else
+    bad "df-ext2-matches-unmount predicted=$e2_predicted actual=$e2_actual"
+fi
 
 stamp "add one album to the music partition that was read back"
 head -c 8000000 /dev/urandom > "$work/album2.bin"

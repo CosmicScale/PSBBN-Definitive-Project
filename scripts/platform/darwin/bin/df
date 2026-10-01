@@ -12,10 +12,13 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/../../load.sh"
 
 real_df() {
-    local dir
+    local dir self
     local IFS=:
+    self=$(cd "$here" && pwd -P)
     for dir in $PATH; do
-        [[ "$dir" == "$here" || -z "$dir" ]] && continue
+        [[ -z "$dir" || ! -d "$dir" ]] && continue
+        # Any spelling of this folder would find the shim again.
+        [[ "$(cd "$dir" && pwd -P)" == "$self" ]] && continue
         if [[ -x "$dir/df" ]]; then
             printf '%s\n' "$dir/df"
             return 0
@@ -49,6 +52,8 @@ state=$(psbbn_mount_state_dir)
 case "$kind" in
     pfs)
         part=$(cat "$state/$key.part" 2>/dev/null)
+        # pfsshell formats with 8 KiB zones; each file also takes one for its inode.
+        unit=8192
         out=$(psbbn_pfs_run "$slice" "$(printf 'device %s\nmount %s\ndf\numount\nexit' "$slice" "$part")") || exit 1
         sizes=$(printf '%s\n' "$out" | "$(psbbn_python)" -c '
 import re, sys
@@ -71,15 +76,20 @@ raise SystemExit(1)
             /^Free blocks/ { f = $2 + 0 }
             /^Reserved block count/ { r = $2 + 0 }
             /^Block size/ { b = $2 + 0 }
-            END { if (b) printf "%d %d\n", n * b, (f > r ? f - r : 0) * b; else exit 1 }') \
+            END { if (b) printf "%d %d %d\n", n * b, (f > r ? f - r : 0) * b, b; else exit 1 }') \
             || { echo "df: cannot read $slice" >&2; exit 1; }
+        unit=${sizes##* }
+        sizes=${sizes% *}
         ;;
     vfat)
         tooldir=$(dirname "$(psbbn_mcopy_bin)") || exit 1
-        total=$("$tooldir/minfo" -i "$slice" :: 2>/dev/null | awk -F: '
+        geometry=$("$tooldir/minfo" -i "$slice" :: 2>/dev/null | awk -F: '
             /^sector size/ { s = $2 + 0 }
+            /^cluster size/ { c = $2 + 0 }
             /^big size/ { n = $2 + 0 }
-            END { if (s && n) printf "%d\n", s * n; else exit 1 }') || { echo "df: cannot read $slice" >&2; exit 1; }
+            END { if (s && n && c) printf "%d %d\n", s * n, s * c; else exit 1 }') || { echo "df: cannot read $slice" >&2; exit 1; }
+        total=${geometry% *}
+        unit=${geometry#* }
         free=$("$tooldir/mdir" -i "$slice" ::/ 2>/dev/null | awk '/bytes free/ { gsub(/[^0-9]/, "", $0); print }')
         [[ -n "$free" ]] || { echo "df: cannot read $slice" >&2; exit 1; }
         sizes="$total $free"
@@ -90,17 +100,36 @@ raise SystemExit(1)
         ;;
 esac
 
-"$(psbbn_python)" - "$mnt" "$state/$key.manifest" "$kind" "$sizes" "$_psbbn_darwin_dir" "$@" << 'PY'
+"$(psbbn_python)" - "$mnt" "$state/$key.manifest" "$kind" "$sizes" "$unit" "$_psbbn_darwin_dir" "$@" << 'PY'
 import math, os, sys
-mnt, manifest_path, kind, sizes, libdir = sys.argv[1:6]
-args = sys.argv[6:]
+mnt, manifest_path, kind, sizes, unit_bytes, libdir = sys.argv[1:7]
+args = sys.argv[7:]
+fs_unit = int(unit_bytes)
 sys.dont_write_bytecode = True
 sys.path.insert(0, libdir)
 import manifest as mf
 
 size, avail = (int(x) for x in sizes.split())
-# Bytes staged since the snapshot: new and grown files take space, removed
-# and shrunk ones give it back.
+# Space staged since the snapshot: new and grown files take it, removed
+# and shrunk ones give it back. Each file is counted the way the filesystem
+# allocates it, so a file that fits here also fits at unmount.
+def cost(ent):
+    if not ent:
+        return 0
+    if ent[0] == "d":
+        return fs_unit
+    if ent[0] != "f":
+        return 0
+    units = -(-ent[1] // fs_unit)
+    if kind == "ext2" and units > 12:
+        # Indirect blocks: one per (block size / 4) data blocks, and a
+        # little more for the double-indirect level.
+        per = fs_unit // 4
+        units += -(-(units - 12) // per) + -(-(units - 12) // (per * per))
+    elif kind == "pfs":
+        units += 1
+    return units * fs_unit
+
 old = mf.load(manifest_path)
 new = mf.scan(mnt)
 pending = 0
@@ -108,10 +137,7 @@ for rel in set(old) | set(new):
     a, b = old.get(rel), new.get(rel)
     if a == b:
         continue
-    if b and b[0] == "f":
-        pending += b[1]
-    if a and a[0] == "f":
-        pending -= a[1]
+    pending += cost(b) - cost(a)
 avail = max(0, min(size, avail - pending))
 used = size - avail
 
