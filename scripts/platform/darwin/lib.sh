@@ -184,58 +184,25 @@ psbbn_extent_ranges() {
     printf '%s\n' "${out% }"
 }
 
-# Drop the parts of write ranges that are holes in the slice file. A hole is
-# a region nothing ever wrote. A fresh slice is sparse and the formatter
-# writes only its metadata, like mkfs on Linux, which leaves the rest of the
-# partition as it was. A slice read off the drive has no holes and is
-# written back whole. Kept regions are widened to whole MiB inside their
-# range so dd can use 1 MiB blocks. If the filesystem cannot report holes,
-# the ranges are kept as they are.
-# psbbn_skip_holes RANGES SLICE
-psbbn_skip_holes() {
-    "$(psbbn_python)" - "$1" "$2" << 'PY'
-import errno, os, sys
-ranges, path = sys.argv[1].split(), sys.argv[2]
-data = []
-fd = os.open(path, os.O_RDONLY)
-try:
-    end = os.fstat(fd).st_size
-    off = 0
-    while off < end:
-        try:
-            start = os.lseek(fd, off, os.SEEK_DATA)
-        except OSError as exc:
-            if exc.errno == errno.ENXIO:
-                break
-            raise
-        stop = os.lseek(fd, start, os.SEEK_HOLE)
-        data.append((start // 512, -(-stop // 512)))
-        off = stop
-except (OSError, AttributeError):
-    print(" ".join(ranges))
-    raise SystemExit(0)
-finally:
-    os.close(fd)
-MIB = 2048
-out = []
-for item in ranges:
-    skip, seek, count = (int(x) for x in item.split(":"))
-    lo, hi = skip, skip + count
-    pieces = []
-    for a, b in data:
-        a, b = max(a, lo), min(b, hi)
-        if a >= b:
-            continue
-        a = lo + (a - lo) // MIB * MIB
-        b = min(hi, lo + -(-(b - lo) // MIB) * MIB)
-        if pieces and a <= pieces[-1][1]:
-            pieces[-1][1] = max(pieces[-1][1], b)
-        else:
-            pieces.append([a, b])
-    for a, b in pieces:
-        out.append("%d:%d:%d" % (a, seek + (a - lo), b - a))
-print(" ".join(out))
-PY
+# Which parts of the slice unmount writes: the chunks that changed since
+# the slice was read off the drive, or, for a slice that was formatted
+# rather than read, the chunks that hold data. See slice_sums.py.
+# psbbn_write_plan RANGES SLICE
+psbbn_write_plan() {
+    "$(psbbn_python)" "$_psbbn_darwin_dir/slice_sums.py" plan "$2" "$1"
+}
+
+# Hash a slice that was just read off the drive.
+psbbn_sums_write() {
+    psbbn_sums_forget "$1"
+    if ! "$(psbbn_python)" "$_psbbn_darwin_dir/slice_sums.py" write "$1"; then
+        psbbn_sums_forget "$1"
+        printf '%s\n' "mount: could not hash $1; unmount will write all of it" >&2
+    fi
+}
+
+psbbn_sums_forget() {
+    rm -f "${1:?}.sums" "${1:?}.sums.tmp" "${1:?}.sums.next" "${1:?}.sums.next.tmp"
 }
 
 # Copy sector ranges with dd. RANGES is "skip:seek:count ..." in 512-byte
@@ -313,8 +280,8 @@ psbbn_copy_range() {
 }
 
 # Write the slice file back onto its extents. The sectors between extents
-# hold the APA sub-partition headers and are never written, and neither are
-# the slice's holes (psbbn_skip_holes).
+# hold the APA sub-partition headers and are never written, and only the
+# parts psbbn_write_plan picks are.
 # psbbn_writeback_range DEVICE EXTENTS SLICE
 psbbn_writeback_range() {
     local device="$1" extents="$2" src="$3" ranges
@@ -328,8 +295,9 @@ psbbn_writeback_range() {
             return 1
         fi
         ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
-        ranges=$(psbbn_skip_holes "$ranges" "$src") || return 1
-        psbbn_dd_ranges elevate "$src" "$(psbbn_raw_node "$device")" "$ranges"
+        ranges=$(psbbn_write_plan "$ranges" "$src") || return 1
+        psbbn_dd_ranges elevate "$src" "$(psbbn_raw_node "$device")" "$ranges" || return $?
+        "$(psbbn_python)" "$_psbbn_darwin_dir/slice_sums.py" commit "$src"
         return $?
     fi
     if [[ ! -f "$device" ]]; then
@@ -337,8 +305,9 @@ psbbn_writeback_range() {
         return 1
     fi
     ranges=$(psbbn_extent_ranges write "$extents" "$src") || return 1
-    ranges=$(psbbn_skip_holes "$ranges" "$src") || return 1
-    psbbn_dd_ranges direct "$src" "$device" "$ranges"
+    ranges=$(psbbn_write_plan "$ranges" "$src") || return 1
+    psbbn_dd_ranges direct "$src" "$device" "$ranges" || return $?
+    "$(psbbn_python)" "$_psbbn_darwin_dir/slice_sums.py" commit "$src"
 }
 
 psbbn_mke2fs_bin() {
@@ -506,6 +475,7 @@ PY
             psbbn_format_swap_file "$tmp" || return $?
         fi
         psbbn_writeback_range "$device" "$extents" "$tmp" || return $?
+        psbbn_sums_forget "$tmp"
         rm -f "${tmp:?}"
     done <<< "$commands"
 }
@@ -954,6 +924,7 @@ psbbn_node_slice() {
     dir=$(platform_mapper_dir)
     slice="$dir/$(basename "$node")"
     rm -f "${slice:?}" "${slice:?}.meta"
+    psbbn_sums_forget "$slice"
     "$(psbbn_python)" - "$slice" "$((sectors * 512))" << 'PY'
 import os, sys
 fd = os.open(sys.argv[1], os.O_CREAT | os.O_RDWR | os.O_TRUNC, 0o644)

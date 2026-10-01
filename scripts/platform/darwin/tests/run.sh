@@ -1710,23 +1710,50 @@ for hs_kind in vfat ext2; do
     fi
 done
 
-# A slice read off the drive has no holes: every byte goes back.
+# A slice read off the drive is hashed per MiB; unmount writes only the
+# chunks that changed, and afterwards the drive matches the slice exactly.
+: > "$hs_slice.sums"
 hs_map
+[[ ! -e "$hs_slice.sums" ]] && ok dm-create-drops-old-sums || bad dm-create-drops-old-sums
 : > "$hs_bytes"
 rm -rf "${hs_dir:?}/mnt"
 hs_ok=1
-if env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt" && cmp -s "$hs_dir/song.pcm" "$hs_dir/mnt/album/track01.pcm"; then
-    printf 'more\n' > "$hs_dir/mnt/album/note.txt"
+if env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt" && cmp -s "$hs_dir/song.pcm" "$hs_dir/mnt/album/track01.pcm" && [[ -s "$hs_slice.sums" ]]; then
+    head -c 600000 /dev/urandom > "$hs_dir/mnt/album/track02.pcm"
     env "${hs_env[@]}" "$bin/umount" "$hs_dir/mnt" || hs_ok=0
 else
     hs_ok=0
 fi
 hs_w=$(hs_written)
-if [[ "$hs_ok" -eq 1 && "$hs_w" -eq "$hs_slice_bytes" ]] && cmp -s <(hs_drive) "$hs_slice"; then
-    ok slice-read-writes-whole
+if [[ "$hs_ok" -eq 1 && "$hs_w" -gt 0 && "$hs_w" -lt $((hs_slice_bytes / 4)) ]] && cmp -s <(hs_drive) "$hs_slice"; then
+    ok "slice-read-writes-changed-chunks ($((hs_w / 1048576)) of $((hs_slice_bytes / 1048576)) MiB)"
 else
-    bad "slice-read-writes-whole ok=$hs_ok written=$hs_w of $hs_slice_bytes"
+    bad "slice-read-writes-changed-chunks ok=$hs_ok written=$hs_w of $hs_slice_bytes"
 fi
+# Mounted again in the same run and left alone: nothing to write.
+: > "$hs_bytes"
+rm -rf "${hs_dir:?}/mnt"
+hs_ok=1
+if env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt"; then
+    env "${hs_env[@]}" "$bin/umount" "$hs_dir/mnt" || hs_ok=0
+else
+    hs_ok=0
+fi
+hs_w=$(hs_written)
+[[ "$hs_ok" -eq 1 && "$hs_w" -eq 0 ]] && cmp -s <(hs_drive) "$hs_slice" && ok slice-unchanged-writes-nothing || bad "slice-unchanged-writes-nothing ok=$hs_ok written=$hs_w"
+# A hash file that does not match the slice is ignored: everything goes.
+printf 'junk\n' > "$hs_slice.sums"
+: > "$hs_bytes"
+rm -rf "${hs_dir:?}/mnt"
+hs_ok=1
+if env "${hs_env[@]}" "$bin/mount" "$hs_slice" "$hs_dir/mnt"; then
+    printf 'junk\n' > "$hs_slice.sums"
+    env "${hs_env[@]}" "$bin/umount" "$hs_dir/mnt" || hs_ok=0
+else
+    hs_ok=0
+fi
+hs_w=$(hs_written)
+[[ "$hs_ok" -eq 1 && "$hs_w" -eq "$hs_slice_bytes" ]] && ok slice-bad-sums-writes-all || bad "slice-bad-sums-writes-all ok=$hs_ok written=$hs_w"
 rm -rf "${hs_dir:?}"
 
 # --- FAT unmount changes only what the installer changed --------------------

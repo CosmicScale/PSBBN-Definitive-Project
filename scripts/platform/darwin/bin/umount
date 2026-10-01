@@ -80,6 +80,7 @@ for arg in "${args[@]}"; do
         extents=$(psbbn_meta_extents "$extents" "$start" "$sectors") || exit 1
         psbbn_writeback_range "$device" "$extents" "$slice" || exit $?
         if [[ "$node" == 1 ]]; then
+            psbbn_sums_forget "$slice"
             rm -f "${slice:?}" "${slice:?}.meta"
         fi
     fi

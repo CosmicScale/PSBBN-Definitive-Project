@@ -45,7 +45,9 @@ stage_slice() {
     kind=$(psbbn_slice_kind "$slice")
     if [[ "$kind" == empty ]]; then
         extents=$(psbbn_meta_extents "$extents" "$start" "$sectors") || return 1
+        psbbn_sums_forget "$slice"
         psbbn_copy_range "$device" "$extents" "$slice" || return $?
+        psbbn_sums_write "$slice"
         kind=$(psbbn_slice_kind "$slice")
     fi
     mkdir -p "$mnt"

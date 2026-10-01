@@ -36,6 +36,7 @@ case "$cmd" in
         fi
         rm -f "$state/$name"
         dir=$(platform_mapper_dir)
+        psbbn_sums_forget "$dir/$name"
         rm -f "$dir/$name" "$dir/$name.meta"
         exit 0
         ;;
@@ -51,6 +52,7 @@ case "$cmd" in
             line="${line#"${line%%[![:space:]]*}"}"
             [[ -z "$line" ]] && continue
             name="${line%%,*}"
+            psbbn_sums_forget "$dir/$name"
             if ! "$(psbbn_python)" - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
 import os, shlex, sys
 node, meta_path, line = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -83,8 +85,10 @@ for table in tables:
         sys.exit(1)
     extents.append("%d:%d" % (int(start), int(length)))
     sectors += int(length)
-# The published path is the slice itself, not an empty stamp.
-fd = os.open(node, os.O_CREAT | os.O_RDWR, 0o644)
+# The published path is the slice itself, not an empty stamp. A new map
+# starts empty, so mount reads it off the drive; whatever an earlier run
+# left at this path is not the drive's current content.
+fd = os.open(node, os.O_CREAT | os.O_RDWR | os.O_TRUNC, 0o644)
 os.ftruncate(fd, sectors * 512)
 os.close(fd)
 # No start= line: a reader that does not know extents must fail, not copy

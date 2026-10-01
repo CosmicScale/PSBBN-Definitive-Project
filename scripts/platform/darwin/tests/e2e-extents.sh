@@ -34,6 +34,20 @@ fsck=/opt/homebrew/opt/e2fsprogs/sbin/e2fsck
 dumpe2fs=/opt/homebrew/opt/e2fsprogs/sbin/dumpe2fs
 cut=$(basename "$img")
 mapper="$PSBBN_MAPPER_DIR/$cut-"
+# dd that adds up what reaches the drive image.
+written="$work/written"
+cat > "$work/dd" << EOF
+#!/bin/bash
+bs=0; count=0; of=""
+for a in "\$@"; do
+    case "\$a" in bs=*) bs=\${a#bs=} ;; count=*) count=\${a#count=} ;; of=*) of=\${a#of=} ;; esac
+done
+[[ "\$of" == "$img" ]] && echo \$((bs * count)) >> "$written"
+exec /bin/dd "\$@"
+EOF
+chmod +x "$work/dd"
+export PSBBN_DD="$work/dd"
+mib_written() { awk '{ s += $1 } END { printf "%d", s / 1048576 }' "$written" 2>/dev/null; }
 
 # Extents of a partition from toc --dm, "start:count ...".
 extents_of() {
@@ -135,7 +149,10 @@ mkdir -p "$mnt5"
 if "$bin/mount" "${mapper}__linux.5" "$mnt5" 2>"$work/m5.err"; then
     mkdir -p "$mnt5/deep/dir"
     cp "$work/payload.bin" "$mnt5/deep/dir/payload.bin"
+    : > "$written"
     "$bin/umount" "$mnt5" 2>"$work/u5.err" || bad "umount ext2 $(cat "$work/u5.err")"
+    # The slice was read off the drive: only the changed chunks go back.
+    (( $(mib_written) < 64 )) && ok "ext2-writes-changed-chunks ($(mib_written) MiB of 1536)" || bad "ext2-writes-changed-chunks $(mib_written) MiB"
 else
     bad "mount ext2 $(cat "$work/m5.err")"
 fi
@@ -147,7 +164,10 @@ mkdir -p "$mnt8"
 if "$bin/mount" "${mapper}__linux.8" "$mnt8" 2>"$work/m8.err"; then
     mkdir -p "$mnt8/MusicCh/contents/album"
     cp "$work/payload.bin" "$mnt8/MusicCh/contents/album/track01.pcm"
+    : > "$written"
     "$bin/umount" "$mnt8" 2>"$work/u8.err" || bad "umount vfat $(cat "$work/u8.err")"
+    # A fresh format: only what mkfs and the copy wrote goes to the drive.
+    (( $(mib_written) < 64 )) && ok "vfat-fresh-writes-data-only ($(mib_written) MiB of 1536)" || bad "vfat-fresh-writes-data-only $(mib_written) MiB"
 else
     bad "mount vfat $(cat "$work/m8.err")"
 fi
@@ -160,8 +180,8 @@ else
 fi
 "$hdl" toc "$img" > "$work/toc.txt" 2>&1 && grep -q '__linux.8' "$work/toc.txt" && ! grep -qi broken "$work/toc.txt" \
     && ok toc-still-clean || bad "toc-still-clean $(cat "$work/toc.txt")"
-if mib=$(data_matches "$ext5" "${mapper}__linux.5"); then ok "ext2-data-on-drive ($mib MiB written)"; else bad ext2-data-on-drive; fi
-if mib=$(data_matches "$ext8" "${mapper}__linux.8"); then ok "vfat-data-on-drive ($mib MiB written)"; else bad vfat-data-on-drive; fi
+if mib=$(data_matches "$ext5" "${mapper}__linux.5"); then ok "ext2-data-on-drive ($mib MiB compared)"; else bad ext2-data-on-drive; fi
+if mib=$(data_matches "$ext8" "${mapper}__linux.8"); then ok "vfat-data-on-drive ($mib MiB compared)"; else bad vfat-data-on-drive; fi
 assemble "$ext5" > "$work/l5.img"
 "$fsck" -fn "$work/l5.img" > "$work/fsck5.out" 2>&1 && ok ext2-fsck-on-drive || bad "ext2-fsck-on-drive $(tail -5 "$work/fsck5.out")"
 rm -f "$work/l5.img"
@@ -187,7 +207,21 @@ else
     bad "vfat-reads-back $(cat "$work/m8.err")"
 fi
 "$bin/umount" "$mnt5" >/dev/null 2>&1 || bad "umount ext2 after re-read"
-"$bin/umount" "$mnt8" >/dev/null 2>&1 || bad "umount vfat after re-read"
+
+stamp "add one album to the music partition that was read back"
+head -c 8000000 /dev/urandom > "$work/album2.bin"
+mkdir -p "$mnt8/MusicCh/contents/album2"
+cp "$work/album2.bin" "$mnt8/MusicCh/contents/album2/track01.pcm"
+: > "$written"
+"$bin/umount" "$mnt8" 2>"$work/u8.err" || bad "umount vfat after re-read $(cat "$work/u8.err")"
+(( $(mib_written) < 64 )) && ok "vfat-add-album-writes-album ($(mib_written) MiB of 1536)" || bad "vfat-add-album-writes-album $(mib_written) MiB"
+data_matches "$ext8" "${mapper}__linux.8" >/dev/null && ok vfat-add-album-on-drive || bad vfat-add-album-on-drive
+assemble "$ext8" > "$work/l8.img"
+/sbin/fsck_msdos -n "$work/l8.img" > "$work/fsck8.out" 2>&1 && ok vfat-add-album-fsck || bad "vfat-add-album-fsck $(tail -5 "$work/fsck8.out")"
+mtype -i "$work/l8.img" ::/MusicCh/contents/album2/track01.pcm 2>/dev/null | cmp -s - "$work/album2.bin" \
+    && mtype -i "$work/l8.img" ::/MusicCh/contents/album/track01.pcm 2>/dev/null | cmp -s - "$work/payload.bin" \
+    && ok vfat-both-albums-on-drive || bad vfat-both-albums-on-drive
+rm -f "$work/l8.img"
 
 printf '\n%d passed, %d failed  (work dir %s)\n' "$pass" "$fail" "$work"
 if [[ "$fail" -eq 0 ]]; then
