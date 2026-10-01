@@ -25,9 +25,13 @@ platform_mapper_prefix() {
     fi
 }
 
-_psbbn_platform=${BASH_SOURCE[0]%/*}
-# shellcheck disable=SC1091
-. "${_psbbn_platform}/darwin/lib.sh"
+# The darwin helpers are only needed on macOS. An if, not &&, so a caller
+# running with set -e does not stop on Linux.
+if [[ "$(uname -s)" == Darwin ]]; then
+    _psbbn_platform=${BASH_SOURCE[0]%/*}
+    # shellcheck disable=SC1091
+    . "${_psbbn_platform}/darwin/lib.sh"
+fi
 
 # Password prompt stays on the terminal when the caller has redirected the log.
 # Then the command runs with sudo -n so a later redirect cannot ask again.
