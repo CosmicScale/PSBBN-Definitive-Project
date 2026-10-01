@@ -1345,7 +1345,7 @@ psbbn_vfat_import() {
     if [[ -n "$manifest" && -f "$manifest" ]]; then
         tool=$(psbbn_mcopy_bin) || return 1
         "$(psbbn_python)" - "$src" "$image" "$manifest" "$(dirname "$tool")" "$_psbbn_darwin_dir" << 'PY'
-import os, subprocess, sys
+import json, os, subprocess, sys
 src, image, manifest_path, tooldir, libdir = sys.argv[1:6]
 sys.dont_write_bytecode = True
 sys.path.insert(0, libdir)
@@ -1355,22 +1355,46 @@ old = mf.load(manifest_path)
 new = mf.scan(src)
 env = dict(os.environ, COPYFILE_DISABLE="1")
 
-def run(tool, args):
+def run(tool, args, missing_ok=False):
     cmd = [os.path.join(tooldir, tool), "-i", image] + args
     proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT, text=True, env=env)
-    if proc.returncode != 0:
-        sys.stderr.write("vfat: %s failed:\n%s" % (" ".join(cmd[:5] + ["..."]), proc.stdout))
-        raise SystemExit(1)
+    if proc.returncode == 0:
+        return
+    # A retry after a failed unmount finds earlier deletions already done.
+    lines = [l for l in proc.stdout.splitlines() if l.strip()]
+    if missing_ok and lines and all(l.rstrip().endswith("not found") for l in lines):
+        return
+    sys.stderr.write("vfat: %s failed:\n%s" % (" ".join(cmd[:5] + ["..."]), proc.stdout))
+    raise SystemExit(1)
 
-def each(tool, targets):
-    # Batches keep the argument list short. Order is kept, so parents are
-    # created before their children and removed after them.
-    for i in range(0, len(targets), 64):
-        run(tool, targets[i:i + 64])
+def save():
+    # The manifest follows every step, so a retry after a failure part way
+    # through does not replay what is already in the image.
+    tmp = manifest_path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(old, fh)
+    os.replace(tmp, manifest_path)
+
+def batches(items):
+    for i in range(0, len(items), 64):
+        yield items[i:i + 64]
+
+def quote(part):
+    # mtools matches DOS paths as patterns: File[1].txt would select
+    # File1.txt. A backslash makes the next character literal.
+    return "".join("\\" + c if c in "[]*?\\" else c for c in part)
 
 def dos(rel):
-    return "::/" + rel
+    """An existing path, every component literal."""
+    return "::/" + "/".join(quote(p) for p in rel.split("/")) if rel else "::/"
+
+def dos_new(rel):
+    """A path to create: mmd matches the parents but takes the last name as is.
+    mtools 4.0.49 sometimes stores [ ] in a new name as _ (New [2] can become
+    New _2_). The installers only create [a-z0-9] album folders here."""
+    parent, _, name = rel.rpartition("/")
+    return (dos(parent) + "/" if parent else "::/") + name
 
 for rel, ent in new.items():
     if ent[0] not in ("f", "d"):
@@ -1380,25 +1404,51 @@ for rel, ent in new.items():
 def depth(rel):
     return rel.count("/")
 
-# Removed first, so a nearly full partition has room for what is added.
-gone_files = sorted(r for r, e in old.items() if e[0] != "d" and new.get(r, [""])[0] != e[0])
+def under(rel, dirs):
+    return any(rel.startswith(d + "/") for d in dirs)
+
+# Removed first, so a nearly full partition has room for what is added. A
+# removed folder goes with everything in it, including names the manifest
+# does not track, the way rm -r on the Linux mount would.
 gone_dirs = sorted((r for r, e in old.items() if e[0] == "d" and new.get(r, [""])[0] != "d"),
-                   key=lambda r: (-depth(r), r))
+                   key=lambda r: (depth(r), r))
+gone_tops = []
+for rel in gone_dirs:
+    if not under(rel, gone_tops):
+        gone_tops.append(rel)
+gone_files = sorted(r for r, e in old.items()
+                    if e[0] != "d" and new.get(r, [""])[0] != e[0] and not under(r, gone_tops))
 new_dirs = sorted((r for r, e in new.items() if e[0] == "d" and old.get(r, [""])[0] != "d"),
                   key=lambda r: (depth(r), r))
 changed = {}
 for rel, ent in sorted(new.items()):
     if ent[0] == "f" and old.get(rel) != ent:
         parent = rel.rsplit("/", 1)[0] if "/" in rel else ""
-        changed.setdefault(parent, []).append(os.path.join(src, rel))
+        changed.setdefault(parent, []).append(rel)
 
-each("mdel", [dos(r) for r in gone_files])
-each("mrd", [dos(r) for r in gone_dirs])
-each("mmd", [dos(r) for r in new_dirs])
-for parent, files in sorted(changed.items()):
-    target = dos(parent + "/" if parent else "")
-    for i in range(0, len(files), 64):
-        run("mcopy", ["-D", "o"] + files[i:i + 64] + [target])
+for group in batches(gone_files):
+    run("mdel", [dos(r) for r in group], missing_ok=True)
+    for r in group:
+        old.pop(r, None)
+    save()
+for group in batches(gone_tops):
+    run("mdeltree", [dos(r) for r in group], missing_ok=True)
+    for r in list(old):
+        if r in group or under(r, group):
+            old.pop(r)
+    save()
+for group in batches(new_dirs):
+    run("mmd", [dos_new(r) for r in group])
+    for r in group:
+        old[r] = ["d"]
+    save()
+for parent, rels in sorted(changed.items()):
+    target = dos(parent) + "/" if parent else "::/"
+    for group in batches(rels):
+        run("mcopy", ["-D", "o"] + [os.path.join(src, r) for r in group] + [target])
+        for r in group:
+            old[r] = new[r]
+        save()
 PY
         return $?
     fi

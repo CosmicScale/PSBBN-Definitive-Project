@@ -1804,6 +1804,70 @@ else
 fi
 rm -rf "${vi_dir:?}"
 
+# mtools reads DOS paths as patterns. Names with [ ] must only ever select
+# themselves: removing File[1].txt must not touch File1.txt.
+vg_dir=$(mktemp -d)
+vg_img="$vg_dir/slice"
+vg_env=(PSBBN_MOUNT_STATE="$vg_dir/state")
+vg_ok=1
+dd if=/dev/zero of="$vg_img" bs=1048576 count=64 status=none 2>/dev/null
+printf 'device=%s\nsectors=131072\nextents=0:131072\n' "$vg_dir/drive" > "$vg_img.meta"
+dd if=/dev/zero of="$vg_dir/drive" bs=1048576 count=64 status=none 2>/dev/null
+/sbin/newfs_msdos -F 32 -s 131072 "$vg_img" >/dev/null 2>&1 || vg_ok=0
+printf 'plain\n' > "$vg_dir/plain"
+printf 'bracket\n' > "$vg_dir/bracket"
+mmd -i "$vg_img" ::/Dir1 '::/Dir[1]' '::/Album [USA]' ::/Old 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/plain" ::/File1.txt 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/bracket" '::/File[1].txt' 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/plain" ::/Dir1/keep.txt 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/bracket" '::/Dir\[1\]/gone.txt' 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/plain" ::/Old/track.pcm 2>/dev/null || vg_ok=0
+mcopy -i "$vg_img" "$vg_dir/plain" ::/Old/._track.pcm 2>/dev/null || vg_ok=0
+if [[ "$vg_ok" -eq 1 ]] && env "${vg_env[@]}" "$bin/mount" "$vg_img" "$vg_dir/mnt"; then
+    rm -f "$vg_dir/mnt/File[1].txt"
+    rm -rf "$vg_dir/mnt/Dir[1]" "$vg_dir/mnt/Old"
+    printf 'new\n' > "$vg_dir/mnt/Album [USA]/track01.pcm"
+    mkdir -p "$vg_dir/mnt/New Album/sub"
+    printf 'deep\n' > "$vg_dir/mnt/New Album/sub/track01.pcm"
+    env "${vg_env[@]}" "$bin/umount" "$vg_dir/mnt" || vg_ok=0
+else
+    vg_ok=0
+fi
+vg_list=$(mdir -i "$vg_img" -/ -b ::/ 2>/dev/null | sort | tr '\n' ' ') || true
+vg_want='::/Album [USA]/ ::/Album [USA]/track01.pcm ::/Dir1/ ::/Dir1/keep.txt ::/File1.txt ::/New Album/ ::/New Album/sub/ ::/New Album/sub/track01.pcm '
+vg_plain=$(mtype -i "$vg_img" ::/File1.txt 2>/dev/null) || true
+if [[ "$vg_ok" -eq 1 && "$vg_list" == "$vg_want" && "$vg_plain" == plain ]] && /sbin/fsck_msdos -n "$vg_img" >/dev/null 2>&1; then
+    ok slice-umount-vfat-literal-names
+else
+    bad "slice-umount-vfat-literal-names ok=$vg_ok list=[$vg_list] File1=$vg_plain"
+fi
+
+# An unmount that fails part way can be retried once the cause is gone.
+vg_ok=1
+printf 'bye\n' > "$vg_dir/bye"
+mcopy -i "$vg_img" "$vg_dir/bye" ::/bye.txt 2>/dev/null || vg_ok=0
+rm -rf "${vg_dir:?}/mnt"
+if [[ "$vg_ok" -eq 1 ]] && env "${vg_env[@]}" "$bin/mount" "$vg_img" "$vg_dir/mnt"; then
+    rm -f "$vg_dir/mnt/bye.txt"
+    # FAT cannot store ':' in a name; mcopy refuses it after mdel ran.
+    printf 'x\n' > "$vg_dir/mnt/bad:name.txt"
+    vg_status=0
+    env "${vg_env[@]}" "$bin/umount" "$vg_dir/mnt" 2>/dev/null || vg_status=$?
+    rm -f "$vg_dir/mnt/bad:name.txt"
+    printf 'ok\n' > "$vg_dir/mnt/good.txt"
+    vg_status2=0
+    env "${vg_env[@]}" "$bin/umount" "$vg_dir/mnt" 2>"$vg_dir/retry.err" || vg_status2=$?
+else
+    vg_ok=0
+fi
+vg_list=$(mdir -i "$vg_img" -/ -b ::/ 2>/dev/null | tr '\n' ' ') || true
+if [[ "$vg_ok" -eq 1 && "$vg_status" -ne 0 && "$vg_status2" -eq 0 && "$vg_list" != *bye.txt* && "$vg_list" == *good.txt* ]]; then
+    ok slice-umount-vfat-retry
+else
+    bad "slice-umount-vfat-retry ok=$vg_ok first=${vg_status:-} retry=${vg_status2:-} err=$(cat "$vg_dir/retry.err" 2>/dev/null) list=[$vg_list]"
+fi
+rm -rf "${vg_dir:?}"
+
 # --- unmount writes back only what changed since the snapshot -------------
 dbg_rec=$(mktemp)
 cat > "$stub/debugfs-record" << EOF
