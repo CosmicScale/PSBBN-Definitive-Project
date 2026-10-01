@@ -1702,11 +1702,11 @@ option_five() {
   INI_SPLASH
   mapper_probe
 
-  for path in /dev/mapper/*linux.8*; do
-    linux8="$path"
-    break
-  done
-  
+  linux8=""
+  if [ -e "${MAPPER}__linux.8" ]; then
+    linux8="${MAPPER}__linux.8"
+  fi
+
   if [ -z "$linux8" ]; then
     echo "[X] Error: Could not find music partition." >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_MUSIC_INI_1]}"
