@@ -372,13 +372,13 @@ git_update() {
         # Check the current status of the repository
         LOCAL=$(git rev-parse @)
         REMOTE=$(git rev-parse @{u})
-        BASE=$(git merge-base @ @{u})
 
         if [ "$LOCAL" = "$REMOTE" ]; then
-            echo "No updates available — running the latest version." >> "${LOG_FILE}"
+            echo "No updates available — running the latest version of the PSBBN Definitive Project script." >> "${LOG_FILE}"
         else
             echo "Downloading updates..." >> "${LOG_FILE}"
             echo "${UI_TEXT[UPDATE_GIT_1]}"
+
             # Get a list of files that have changed remotely
             UPDATED_FILES=$(git diff --name-only "$LOCAL" "$REMOTE")
 
@@ -387,13 +387,31 @@ git_update() {
                 echo "${UI_TEXT[UPDATE_GIT_2]}"
                 echo "$UPDATED_FILES" | tee -a "${LOG_FILE}"
 
-                # Reset only the files that were updated remotely (discard local changes to them)
-                echo "$UPDATED_FILES" | xargs git checkout -- >> "${LOG_FILE}" 2>&1
+                # Prepare the working tree for the update
+                while IFS= read -r file; do
+                    [ -z "$file" ] && continue
+
+                    # Does this path exist in the current LOCAL commit?
+                    if git cat-file -e "${LOCAL}:${file}" 2>/dev/null; then
+                        # Existing tracked file:
+                        # discard local modifications so the remote version can be pulled.
+                        git checkout "$LOCAL" -- "$file" >> "${LOG_FILE}" 2>&1
+                    else
+                        # New file in the remote:
+                        # remove it if an untracked local file is occupying the path.
+                        if [ -e "$file" ] || [ -L "$file" ]; then
+                            if ! git ls-files --error-unmatch -- "$file" >/dev/null 2>&1; then
+                                echo "Removing conflicting untracked file: $file" >> "${LOG_FILE}"
+                                rm -rf -- "$file"
+                            fi
+                        fi
+                    fi
+                done <<< "$UPDATED_FILES"
 
                 # Pull the latest changes
                 if ! git pull --ff-only >> "${LOG_FILE}" 2>&1; then
                     echo "[X] Error: Git pull failed." >> "${LOG_FILE}"
-                    error_msg "${UI_TEXT[ERROR_GIT_1]}" "git clone https://github.com/CosmicScale/PSBBN-Definitive-Project.git" "${UI_TEXT[ERROR_GIT_2]}"
+                    error_msg "${UI_TEXT[ERROR_GIT_1]}" "git clone https://github.com/CosmicScale/PSBBN-Definitive-Project.git" " " "${UI_TEXT[ERROR_GIT_2]}"
                 fi
                 echo
                 echo "[✓] The repository has been successfully updated." >> "${LOG_FILE}"
@@ -740,6 +758,7 @@ activate_python() {
         return
     fi
 
+    echo >> "${LOG_FILE}"
     echo "Activating Python virtual environment..." >> "${LOG_FILE}"
     # Try activating the virtual environment twice before failing
     if ! source "${SCRIPTS_DIR}/venv/bin/activate" 2>>"${LOG_FILE}"; then
@@ -808,12 +827,6 @@ display_menu() {
     printf "%*s%s " "$((padding - 3))" "" "${UI_TEXT[MENU_PROMPT]}"
 }
 
-check_required_files
-
-if [ "$wsl" = "false" ]; then
-        git_update
-fi
-
 trap 'echo; exit 130' INT
 trap copy_log EXIT
 
@@ -845,6 +858,12 @@ if [[ "$arch" != "x86_64" && "$arch" != "aarch64" ]]; then
     error_msg "${UI_TEXT[ERROR_UNSUPPORTED_4]}"
     exit 1
 fi
+
+if [ "$wsl" = "false" ]; then
+    git_update
+fi
+
+check_required_files
 
 # Detect WSL
 if grep -qi microsoft /proc/version; then
@@ -958,7 +977,13 @@ else
     fi
 fi
 
-echo "UPDATE: $UPDATE" >> "$LOG_FILE"
+echo >> "$LOG_FILE"
+
+if [ "$UPDATE" == "NO" ]; then
+    echo "PS2 System software is up to date." >> "$LOG_FILE"
+else
+    echo "PS2 System software update available." >> "$LOG_FILE"
+fi
 
 if [ -f "${ASSETS_DIR}/lang/changelog_main_$LANG_FILE.txt" ]; then
     SPLASH
