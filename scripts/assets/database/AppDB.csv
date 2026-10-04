@@ -82,6 +82,7 @@ DVDPLAYERPR|DVD Player|APP|APP_DVDPLAYE||dvdplayer.elf
 INFONES|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES.elf
 INFONESRE|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES rev4.elf
 INFONESHD|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES-HD.elf
+NINTENDO|FCEUltra|EMU|EMU_FCEULTRA|bootsector|Nintendo.ELF
 VECXPS2|VecX|EMU|EMU_VECX|Jum|VECXPS2.ELF
 VECXFORPS2|VecX|EMU|EMU_VECX|Jum|VECXFORPS2.ELF
 TGEMU|TGEmu|EMU|EMU_TGEMU|Charles MacDonald|tgemu v0.1.elf
@@ -346,6 +347,7 @@ KEYLAUNCHER|PS2 KeyLauncher|APP|APP_KEYLAUNC|github.com/MrSiir|Key Launcher v0.4
 KERMIT|Kermit|DBG|DBG_KERMIT|SilverBull|Kermit v0.4.4 beta1.elf
 ŌKAMIPLCRACTRO|Ōkami PL Cractro|DEM|DEM_OKAMIPLC||Ōkami PL Cractro v1.0c.elf
 KAHTZEEKAPIDEMO|Kahtzee KAPI Demo|GME|GME_KAHTZEEK|KaylaKaze|Kahtzee KAPI Demo.elf
+KAHTZEE|Kahtzee KAPI Demo|GME|GME_KAHTZEEK|KaylaKaze|Kahtzee.elf
 JUMSPS2MCBOOTMENU|Jum's PS2 MC Boot Menu|APP|APP_JUMSPS2M|Jum|Jum's PS2 MC Boot Menu v1.0.elf
 JUMSBOOTELFUPLOADER|Jum's Boot ELF Uploader|DBG|DBG_JUMSBOOT|Jum|Jum's Boot ELF Uploader.elf
 INNERLOOP|Innerloop|DEM|DEM_INNERLOO|blue,bifat,banana|Innerloop (ps2link).elf
@@ -569,3 +571,4 @@ ATHENA|Athena PS2 Template|APP|APP_ATHENA|github.com/JSLegendDev|athena.elf
 ENCELADUS|Enceladus|RTE|RTE_ENCELADU|github.com/DanielSant0s|enceladus.elf
 MYPS2|myPS2|APP|APP_MYPS2|ntba2|MyPS2 v1.3.elf
 BOLIVIAOS|BoliviaOS|APP|APP_BOLIVIAO|Josema|BoliviaOS.ELF
+PS2RD|ps2rdmod|APP|APP_PS2RD|pelvicthrustman|PS2 RD,ps2rd.elf
