@@ -1313,6 +1313,21 @@ If PS2 games do not appear in the games list in [NHDDL](#nhddl) or [OPL](#open-p
 4. Use a different official Sony Network Adapter or third-party HDD adapter
 5. Use a different PS2 console
 
+## Known Issues
+- PSBBN will freeze at the "PlayStation 2" logo when booting, if a third-party, unofficial HDD adapter is used. **An official Sony Network Adapter is required**.
+- PSBBN will freeze when launching games or apps if a mod chip is active. To use PSBBN, mod chips must be disabled.
+- In PSBBN, the × and ○ button swap is only supported on DualShock 2 controllers
+- In PSBBN, the media buttons on the PS2 DVD Remote Control are only supported on SCPH-5000x consoles with a built-in IR receiver. The remote control can behave erratically if no controller is plugged into Controller Port 1.
+- MiniDisc support is broken as of patch version 2.10 and above. I hope to fix this in a future update  
+- PSBBN defaults to a Japanese on-screen keyboard. A US English keyboard is also available. Press SELECT repeatedly to switch to it. Due to a bug, the spacebar on the US English keyboard doesn’t work. Instead, use the △ button on the controller to enter a space.
+- Music installed with the Music Installer is only playable if written to the first 3 GB of the music partition. Music ripped from audio CDs in the [Music Channel](#music-channel) is unaffected and can use the full capacity of the partition.
+- PSBBN only supports dates up to the end of 2030. When setting the time and date, the year must be set to 2030 or below.
+- Japanese PSBBN installations will fail on drives smaller than 128 GB
+- exFAT partition cannot exceed 2 TB. When using a larger drive, remaining space beyond that will be unusable.
+- **wLaunchELF** and other native PS2 apps may fail to create APA partitions on the PS2 drive. To avoid drive corruption, new APA partitions should only be created using the version of **PFS Shell** included with this project.
+- APA partitions must not be created beyond the space reserved for APA during installation. Doing so will overwrite data on the exFAT partition.
+- Instances in feega where some Japanese text couldn't be translated due to it being hard-coded in an encrypted file. Atok software has not been translated. 
+
 ## Reporting issues
 If you have tried the relevant steps above and the problem persists, check for an existing issue or open a new one [here](https://github.com/CosmicScale/PSBBN-Definitive-Project/issues).  
 Please include all relevant log files:
@@ -1324,21 +1339,6 @@ Please include all relevant log files:
 - `media.log`
 
 **Linux** users can find these logs in `PSBBN-Definitive-Project/logs`. **Windows** users can find these logs in the folder where their games and media files are stored.
-
-# Known Issues
-- PSBBN will freeze at the "PlayStation 2" logo when booting, if a third-party, unofficial HDD adapter is used. **An official Sony Network Adapter is required**.
-- PSBBN will freeze when launching games or apps if a mod chip is active. To use PSBBN, mod chips must be disabled.  
-- Instances in feega where some Japanese text couldn't be translated due to it being hard-coded in an encrypted file. Atok software has not been translated.  
-- MiniDisc support is broken as of patch version 2.10 and above. I hope to fix this in a future update  
-- PSBBN's default on-screen keyboard is set to Japanese. However, a US English on-screen keyboard has been added, though you’ll need to press the `SELECT` button multiple times to switch to it. There's a bug where spacebar doesn't work on the US English on-screen keyboard, but you can enter a space by pressing the **△** button on the controller instead.  
-- In PSBBN, the × and ○ button swap is only supported on DualShock 2 controllers
-- In PSBBN, the media buttons on the PS2 DVD Remote Control are only supported on SCPH-5000x consoles with a built-in IR receiver. The remote control can behave erratically if no controller is plugged into Controller Port 1.
-- Music installed with the Music Installer is only playable if written to the first 3 GB of the music partition. Music ripped from audio CDs in the [Music Channel](#music-channel) is unaffected and can use the full capacity of the partition.
-- PSBBN only supports dates up to the end of 2030. When setting the time and date, the year must be set to 2030 or below.
-- Japanese PSBBN installations will fail on drives smaller than 128 GB
-- exFAT partition cannot exceed 2 TB. When using a larger drive, remaining space beyond that will be unusable.
-- **wLaunchELF** and other native PS2 apps may fail to create APA partitions on the PS2 drive. To avoid drive corruption, new APA partitions should only be created using the version of **PFS Shell** included with this project.
-- APA partitions must not be created beyond the space reserved for APA during installation. Doing so will overwrite data on the exFAT partition.
 
 # Credits
 **PSBBN Definitive Project - Copyright © 2024-2026 by [CosmicScale](https://github.com/CosmicScale)**
