@@ -3503,17 +3503,20 @@ if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
                 
                 if [[ -s "$png_file" ]]; then
                     echo "[✓] Successfully downloaded artwork for $title_id" >> "${LOG_FILE}"
-
-                    cp "$png_file" "${OPL}/ART/${elf}_COV.png" 2>> "${LOG_FILE}" || {
-                        echo "[X] Error: Failed to create ${OPL}/ART/${elf}_COV.png" >> "${LOG_FILE}"
-                        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${OPL}/ART/${elf}_COV.png"
-                    }
-                    echo "Created: ${OPL}/ART/${elf}_COV.png"  >> "${LOG_FILE}"
                 else
                     rm -f "$png_file"
                     echo "$title_id,$title,$elf" >> "${MISSING_APP_ART}"
                 fi
             fi
+
+            if [[ -s "$png_file" ]]; then
+                cp "$png_file" "${OPL}/ART/${elf}_COV.png" 2>> "${LOG_FILE}" || {
+                    echo "[X] Error: Failed to create ${OPL}/ART/${elf}_COV.png" >> "${LOG_FILE}"
+                    error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${OPL}/ART/${elf}_COV.png"
+                }
+                echo "Created: ${OPL}/ART/${elf}_COV.png"  >> "${LOG_FILE}"
+            fi
+            
             i=$((i + 1))
             show_progress "$i" "$ART_TOTAL"
         done
