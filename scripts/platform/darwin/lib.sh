@@ -587,14 +587,44 @@ psbbn_gnu_sed() {
     printf '%s\n' /usr/bin/sed
 }
 
-# File-level symlinks so `rm` inside the overlay does not delete the repo.
+# The folders the user fills. The installers look for games and media with
+# find -type f, which skips symlinks, and keep their art cache in icons/.
+# The overlay links each one whole, so it is the project's own folder, as
+# it is on Linux.
+_psbbn_user_dirs=(games media icons)
+
+# psbbn_link_user_dir REPO DEST NAME
+# An overlay built by an older version has NAME as a folder of symlinks.
+# After the symlink sweep only empty folders are left, unless someone put
+# files there. Those are never deleted; the user is told where they belong.
+psbbn_link_user_dir() {
+    local repo="$1" dest="$2" name="$3" count
+    [[ -d "$repo/$name" ]] || return 0
+    if [[ -d "$dest/$name" && ! -L "$dest/$name" ]]; then
+        find "$dest/$name" -depth -type d -empty -delete 2>/dev/null || true
+        if [[ -e "$dest/$name" ]]; then
+            count=$(find "$dest/$name" ! -type d 2>/dev/null | wc -l)
+            printf '%s\n' "$dest/$name holds ${count// /} file(s) from an earlier run." \
+                "The installer now uses $repo/$name directly and no longer looks there." \
+                "Move them into $repo/$name (or delete them), then run ./PSBBN-Definitive-Patch.sh again." >&2
+            return 1
+        fi
+    fi
+    ln -s "$repo/$name" "$dest/$name"
+}
+
+# File-level symlinks so `rm` inside the overlay does not delete the repo;
+# the folders the user fills are linked whole (_psbbn_user_dirs above).
 # Real files the installer created in an earlier run (downloaded patch
 # archives, logs, gamepath.cfg) are kept; only the links are rebuilt.
 # build_overlay REPO DEST
 build_overlay() {
-    local repo="$1" dest="$2" rel dir
+    local repo="$1" dest="$2" rel dir name
     mkdir -p "${dest:?}"
     find "${dest:?}" -type l -delete 2>/dev/null || true
+    for name in "${_psbbn_user_dirs[@]}"; do
+        psbbn_link_user_dir "$repo" "$dest" "$name" || return 1
+    done
     (
         cd "$repo" || exit 1
         find . -print0
@@ -603,6 +633,9 @@ build_overlay() {
             ./.git|./.git/*) continue ;;
             ./scripts/venv|./scripts/venv/*) continue ;;
         esac
+        name=${rel#./}
+        name=${name%%/*}
+        [[ " ${_psbbn_user_dirs[*]} " == *" $name "* ]] && continue
         if [[ -d "$repo/$rel" && ! -L "$repo/$rel" ]]; then
             mkdir -p "$dest/$rel"
         elif [[ -e "$repo/$rel" || -L "$repo/$rel" ]]; then

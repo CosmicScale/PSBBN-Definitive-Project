@@ -2040,6 +2040,64 @@ if [[ "$(cat "$ov_dest/logs/setup.log")" == log && "$(cat "$ov_dest/scripts/asse
 else
     bad "overlay-keeps-downloads $(ls -la "$ov_dest/scripts/assets" "$ov_dest/logs")"
 fi
+rm -rf "$ov_repo" "$ov_dest"
+
+# --- the folders the user fills are the project's own folders ------------
+# The installers find games and media with find -type f, which skips symlinks.
+ov_repo=$(mktemp -d)
+mkdir -p "$ov_repo/scripts/helper/darwin-arm64" "$ov_repo/scripts/helper/aarch64" \
+    "$ov_repo/games/DVD" "$ov_repo/games/POPS" "$ov_repo/media/music" "$ov_repo/icons/art"
+echo iso > "$ov_repo/games/DVD/Game.iso"
+echo mp3 > "$ov_repo/media/music/track.mp3"
+echo png > "$ov_repo/icons/art/APP.png"
+ov_dest=$(mktemp -d)
+status=0
+build_overlay "$ov_repo" "$ov_dest" 2>/dev/null || status=$?
+# Game-Installer's and Media-Installer's own detection expressions.
+games=$(find "$ov_dest/games/DVD/" -maxdepth 1 -type f ! -path '*/.*' -iname "*.iso" 2>/dev/null) || true
+music=$(find "$ov_dest/media/music/" -type f ! -name ".*" \( -iname "*.mp3" -o -iname "*.flac" \) 2>/dev/null) || true
+art=$(find "$ov_dest/icons/art" -maxdepth 1 -type f 2>/dev/null) || true
+if [[ "$status" -eq 0 && "$games" == */Game.iso && "$music" == */track.mp3 && "$art" == */APP.png ]]; then
+    ok overlay-user-dirs-found-by-find
+else
+    bad "overlay-user-dirs-found-by-find status=$status games=[$games] music=[$music] art=[$art]"
+fi
+echo vcd > "$ov_dest/games/POPS/New.VCD" 2>/dev/null || true
+if [[ "$(cat "$ov_repo/games/POPS/New.VCD" 2>/dev/null)" == vcd ]]; then
+    ok overlay-user-dirs-write-to-project
+else
+    bad overlay-user-dirs-write-to-project
+fi
+rm -rf "$ov_dest"
+
+# An overlay from an older version has games/ as a folder of symlinks.
+ov_dest=$(mktemp -d)
+mkdir -p "$ov_dest/games/DVD"
+ln -s "$ov_repo/games/DVD/Game.iso" "$ov_dest/games/DVD/Game.iso"
+status=0
+build_overlay "$ov_repo" "$ov_dest" 2>/dev/null || status=$?
+if [[ "$status" -eq 0 && -L "$ov_dest/games" && "$(cat "$ov_dest/games/DVD/Game.iso" 2>/dev/null)" == iso ]]; then
+    ok overlay-replaces-old-user-dir
+else
+    bad "overlay-replaces-old-user-dir status=$status $(ls -la "$ov_dest/games" 2>&1)"
+fi
+rm -rf "$ov_dest"
+
+# Files someone copied into that old folder are never deleted. enter.sh
+# runs build_overlay under set -euo pipefail; the message must still print.
+ov_dest=$(mktemp -d)
+mkdir -p "$ov_dest/games/DVD"
+echo copy > "$ov_dest/games/DVD/Copy.iso"
+for n in 1 2 3 4 5 6 7 8; do echo copy > "$ov_dest/games/DVD/More$n.iso"; done
+status=0
+out=$( (set -euo pipefail; build_overlay "$ov_repo" "$ov_dest") 2>&1) || status=$?
+if [[ "$status" -ne 0 && "$(cat "$ov_dest/games/DVD/Copy.iso" 2>/dev/null)" == copy \
+    && "$out" == *"$ov_dest/games holds 9 file(s)"* && "$out" == *"Move them into $ov_repo/games"* ]]; then
+    ok overlay-keeps-files-in-old-user-dir
+else
+    bad "overlay-keeps-files-in-old-user-dir status=$status out=[$out]"
+fi
+rm -rf "$ov_repo" "$ov_dest"
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]
