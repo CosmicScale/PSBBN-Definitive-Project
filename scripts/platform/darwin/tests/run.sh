@@ -2099,10 +2099,25 @@ for n in 1 2 3 4 5 6 7 8; do echo copy > "$ov_dest/games/DVD/More$n.iso"; done
 status=0
 out=$( (set -euo pipefail; build_overlay "$ov_repo" "$ov_dest") 2>&1) || status=$?
 if [[ "$status" -ne 0 && "$(cat "$ov_dest/games/DVD/Copy.iso" 2>/dev/null)" == copy \
-    && "$out" == *"$ov_dest/games holds 9 file(s)"* && "$out" == *"Move them into $ov_repo/games"* ]]; then
+    && "$out" == *"$ov_dest/games holds 9 file(s)"* && "$out" == *"They belong in $ov_repo/games."* ]]; then
     ok overlay-keeps-files-in-old-user-dir
 else
     bad "overlay-keeps-files-in-old-user-dir status=$status out=[$out]"
+fi
+rm -rf "$ov_dest"
+
+# Game-Installer also cached art in the old icons/ folder. One stop names
+# every folder, so the user does not clear one and hit the next.
+ov_dest=$(mktemp -d)
+mkdir -p "$ov_dest/games/DVD" "$ov_dest/icons/art"
+echo copy > "$ov_dest/games/DVD/Copy.iso"
+echo art > "$ov_dest/icons/art/SLUS_000.01.png"
+status=0
+out=$( (set -euo pipefail; build_overlay "$ov_repo" "$ov_dest") 2>&1) || status=$?
+if [[ "$status" -ne 0 && "$out" == *"$ov_dest/games holds 1 file(s)"* && "$out" == *"$ov_dest/icons holds 1 file(s)"* ]]; then
+    ok overlay-names-every-old-user-dir
+else
+    bad "overlay-names-every-old-user-dir status=$status out=[$out]"
 fi
 rm -rf "$ov_repo" "$ov_dest"
 

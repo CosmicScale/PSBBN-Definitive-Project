@@ -604,9 +604,7 @@ psbbn_link_user_dir() {
         find "$dest/$name" -depth -type d -empty -delete 2>/dev/null || true
         if [[ -e "$dest/$name" ]]; then
             count=$(find "$dest/$name" ! -type d 2>/dev/null | wc -l)
-            printf '%s\n' "$dest/$name holds ${count// /} file(s) from an earlier run." \
-                "The installer now uses $repo/$name directly and no longer looks there." \
-                "Move them into $repo/$name (or delete them), then run ./PSBBN-Definitive-Patch.sh again." >&2
+            printf '%s\n' "$dest/$name holds ${count// /} file(s) from an earlier run. They belong in $repo/$name." >&2
             return 1
         fi
     fi
@@ -619,12 +617,17 @@ psbbn_link_user_dir() {
 # archives, logs, gamepath.cfg) are kept; only the links are rebuilt.
 # build_overlay REPO DEST
 build_overlay() {
-    local repo="$1" dest="$2" rel dir name
+    local repo="$1" dest="$2" rel dir name left=0
     mkdir -p "${dest:?}"
     find "${dest:?}" -type l -delete 2>/dev/null || true
     for name in "${_psbbn_user_dirs[@]}"; do
-        psbbn_link_user_dir "$repo" "$dest" "$name" || return 1
+        psbbn_link_user_dir "$repo" "$dest" "$name" || left=1
     done
+    if [[ "$left" -ne 0 ]]; then
+        printf '%s\n' "The installer now uses the project's folders directly and no longer looks there." \
+            "Move these files into the project (or delete them), then run ./PSBBN-Definitive-Patch.sh again." >&2
+        return 1
+    fi
     (
         cd "$repo" || exit 1
         find . -print0
