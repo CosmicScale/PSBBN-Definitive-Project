@@ -706,12 +706,19 @@ mkdir -p "$repo/scripts/assets/lang" "$repo/scripts/helper/aarch64" "$repo/scrip
 echo keep-me > "$repo/scripts/assets/lang/sample.txt"
 echo elf > "$repo/scripts/helper/aarch64/cue2pops"
 echo macho > "$repo/scripts/helper/darwin-arm64/cue2pops"
+echo macho > "$repo/scripts/helper/darwin-arm64/pops2cue"
 overlay=$(mktemp -d)
 . "$root/lib.sh"
 build_overlay "$repo" "$overlay"
 rm "$overlay/scripts/assets/lang/sample.txt"
 if [[ -f "$repo/scripts/assets/lang/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
 if [[ "$(cat "$overlay/scripts/helper/aarch64/cue2pops")" == macho ]]; then ok overlay-helper; else bad overlay-helper; fi
+# No Linux pops2cue is shipped yet; the overlay still has both names for it.
+if [[ "$(cat "$overlay/scripts/helper/pops2cue" 2>/dev/null)" == macho && "$(cat "$overlay/scripts/helper/aarch64/pops2cue" 2>/dev/null)" == macho ]]; then
+    ok overlay-helper-pops2cue
+else
+    bad overlay-helper-pops2cue
+fi
 
 for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt df mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed; do
     if [[ -x "$bin/$tool" ]]; then ok "exec-$tool"; else bad "exec-$tool"; fi
@@ -2169,6 +2176,26 @@ if [[ -z "$hard" ]]; then
 else
     bad "installers-ask-platform-for-mapper-dir $hard"
 fi
+
+# --- pops2cue gives back the BIN+CUE that cue2pops made the VCD from -------
+pc=$(mktemp -d)
+helper="$root/../../helper/darwin-arm64"
+mkdir -p "$pc/out"
+python3 -c 'import os, sys; open(sys.argv[1], "wb").write(os.urandom(2352 * 600))' "$pc/Game.bin"
+printf 'FILE "Game.bin" BINARY\n  TRACK 01 MODE2/2352\n    INDEX 01 00:00:00\n  TRACK 02 AUDIO\n    INDEX 00 00:02:00\n    INDEX 01 00:04:00\n  TRACK 03 AUDIO\n    INDEX 00 00:05:10\n    INDEX 01 00:07:10\n' > "$pc/Game.cue"
+# cue2pops opens the BIN relative to the current folder.
+(cd "$pc" && "$helper/cue2pops" Game.cue Game.VCD < /dev/null > /dev/null 2>&1) || true
+cp "$pc/Game.VCD" "$pc/out/" 2>/dev/null || true
+status=0
+"$helper/pops2cue" "$pc/out/Game.VCD" > "$pc/pops2cue.out" 2>&1 || status=$?
+cue_in=$(sed 's/^ *//' "$pc/Game.cue")
+cue_out=$(sed 's/^ *//' "$pc/out/Game.cue" 2>/dev/null) || true
+if [[ "$status" -eq 0 && "$cue_out" == "$cue_in" ]] && cmp -s "$pc/Game.bin" "$pc/out/Game.bin"; then
+    ok pops2cue-roundtrip
+else
+    bad "pops2cue-roundtrip status=$status cue=[$cue_out] $(tail -n 3 "$pc/pops2cue.out" 2>/dev/null)"
+fi
+rm -rf "$pc"
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

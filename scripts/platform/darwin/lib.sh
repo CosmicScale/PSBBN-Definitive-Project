@@ -671,6 +671,7 @@ psbbn_link_helpers() {
         "PFS Fuse.elf"
         "PFS Shell.elf"
         "PS2 APA Header Checksum Fixer.elf"
+        "pops2cue"
         "PSU Extractor.elf"
         "sqlite"
     )
