@@ -1104,7 +1104,7 @@ option_two() {
     mount_cfs    && \
     mount_pfs    || return 1
 
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     case "$choice" in
@@ -1155,7 +1155,7 @@ option_two() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 }
 
@@ -1459,7 +1459,7 @@ option_three() {
         mount_cfs    && \
         mount_pfs    || return 1
 
-        ls -l /dev/mapper >> "${LOG_FILE}"
+        ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
         df >> "${LOG_FILE}"
 
         sudo tar zxpf "$LANG_PACK" -C "${STORAGE_DIR}/" >> "${LOG_FILE}" 2>&1 || {
@@ -1568,7 +1568,7 @@ option_three() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     LANGUAGE_SPLASH
@@ -1701,7 +1701,7 @@ option_four() {
     mount_cfs    && \
     mount_pfs    || return 1
 
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     mkdir -p "${SCRIPTS_DIR}/tmp"
@@ -1764,7 +1764,7 @@ option_four() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     SCREEN_SPLASH

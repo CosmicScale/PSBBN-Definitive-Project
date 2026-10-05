@@ -2161,5 +2161,14 @@ else
 fi
 rm -rf "$fd"
 
+# On macOS the maps live in platform_mapper_dir, not /dev/mapper. A literal
+# /dev/mapper in an installer is a path that does not exist there.
+hard=$(grep -n '/dev/mapper' "$root/../../"*.sh "$root/../../../PSBBN-Definitive-Patch.sh") || true
+if [[ -z "$hard" ]]; then
+    ok installers-ask-platform-for-mapper-dir
+else
+    bad "installers-ask-platform-for-mapper-dir $hard"
+fi
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]
