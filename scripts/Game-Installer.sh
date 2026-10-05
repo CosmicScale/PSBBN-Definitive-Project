@@ -3968,7 +3968,8 @@ swap_select_btn=$OPL_ENTER
 EOL
 
 echo "R3CONFIGURATOR Language: $R3CONFIG_LANG" >> "${LOG_FILE}"
-if [[ -d "${OPL}/APPS/SYS_R3CONFIGURATOR" ]]; then
+if [[ -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.elf" ]]; then
+    R3CONFIG_INSTALLED="YES"
     if [[ -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" ]]; then
         sed -i \
         -e '/^default_language[[:space:]]*=/d' \
@@ -3997,7 +3998,8 @@ EOL
 fi
 
 echo "wLE Language: $WLE_LANG" >> "${LOG_FILE}"
-if [[ -d "${OPL}/APPS/APP_WLE-R3Z" ]]; then
+if [[ -f "${OPL}/APPS/APP_WLE-R3Z/WLE-R3Z.ELF" ]]; then
+    WLE_INSTALLED="YES"
     if [[ -f "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" ]]; then
         sed -i \
         -e '/^language[[:space:]]*=/d' \
@@ -4179,9 +4181,17 @@ echo -n "${UI_TEXT[GAME_INSTALLER_52]}"
 
 cp "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" "${OSDMBR_CNF}"
 
-# Remove any existing boot_square lines
+# Remove any existing boot_ lines
 sed -i '/^boot_square/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
 sed -i '/^boot_triangle/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
+
+if [ "$WLE_INSTALLED" = "YES" ]; then
+    sed -i '/^boot_start/d' "$OSDMBR_CNF" 2>>"$LOG_FILE"
+fi
+
+if [ "$R3CONFIG_INSTALLED" = "YES" ]; then
+    sed -i '/^boot_select/d' "$OSDMBR_CNF" 2>>"$LOG_FILE"
+fi
 
 # Ensure the file ends with a new line
 [ -n "$(tail -c1 "$OSDMBR_CNF" | tr -d '\n')" ] && echo >> "$OSDMBR_CNF"
@@ -4193,13 +4203,11 @@ sed -i '/^boot_triangle/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
         echo 'boot_square_arg1 = -mode=ata'
     fi
 
-    if [[ -f "${OPL}/APPS/APP_WLE-R3Z/WLE-R3Z.ELF" ]]; then
-        sed -i '/^boot_start/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
+    if [ "$WLE_INSTALLED" = "YES" ]; then
         echo 'boot_start = ata:/APPS/APP_WLE-R3Z/WLE-R3Z.ELF'
     fi
 
-    if [[ -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.elf" ]]; then
-        sed -i '/^boot_select/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
+    if [ "$R3CONFIG_INSTALLED" = "YES" ]; then
         echo 'boot_select = ata:/APPS/SYS_R3CONFIGURATOR/r3configurator.elf'
     fi
 
@@ -4277,9 +4285,14 @@ cp "${MISSING_ICON}" "${ICONS_DIR}/ico/tmp" >> "${LOG_FILE}" 2>&1
 
 cd "${ICONS_DIR}/ico/tmp/"
 rm *.png >/dev/null 2>&1
-bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1
+if ! bsdtar -acf "${ARTWORK_DIR}/tmp/ico.zip" * >/dev/null 2>&1; then
+    rm -f "${ARTWORK_DIR}/tmp/ico.zip"
+fi
+
 cd "${ARTWORK_DIR}/tmp/" 
-bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1
+if ! bsdtar -acf "${ARTWORK_DIR}/tmp/art.zip" * >/dev/null 2>&1; then
+    rm -f "${ARTWORK_DIR}/tmp/art.zip"
+fi
 
 if [ -f "${ARTWORK_DIR}/tmp/art.zip" ]; then
     echo "Contributing to the PSBBN art & HDD-OSD databases..." >> "${LOG_FILE}"

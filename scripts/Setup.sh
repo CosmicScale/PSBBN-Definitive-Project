@@ -204,6 +204,7 @@ fi
 
 # Python virtual environment setup
 (
+    rm -rf "$VENV_DIR"
     "$PYTHON" -m venv "$VENV_DIR" >> "${LOG_FILE}" 2>&1 || {
         echo "Failed to create Python virtual environment." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_PYTHON_ENV_1]}"

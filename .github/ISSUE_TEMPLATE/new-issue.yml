@@ -106,6 +106,21 @@ body:
         4. Use a different official Sony Network Adapter or third-party HDD adapter
         5. Use a different PS2 console
 
+        ## Known Issues
+        - PSBBN will freeze at the "PlayStation 2" logo when booting, if a third-party, unofficial HDD adapter is used. **An official Sony Network Adapter is required**.
+        - PSBBN will freeze when launching games or apps if a mod chip is active. To use PSBBN, mod chips must be disabled.
+        - In PSBBN, the × and ○ button swap is only supported on DualShock 2 controllers
+        - In PSBBN, the media buttons on the PS2 DVD Remote Control are only supported on SCPH-5000x consoles with a built-in IR receiver. The remote control can behave erratically if no controller is plugged into Controller Port 1.
+        - MiniDisc support is broken as of patch version 2.10 and above. I hope to fix this in a future update  
+        - PSBBN defaults to a Japanese on-screen keyboard. A US English keyboard is also available. Press SELECT repeatedly to switch to it. Due to a bug, the spacebar on the US English keyboard doesn’t work. Instead, use the △ button on the controller to enter a space.
+        - Music installed with the Music Installer is only playable if written to the first 3 GB of the music partition. Music ripped from audio CDs in the Music Channel is unaffected and can use the full capacity of the partition.
+        - PSBBN only supports dates up to the end of 2030. When setting the time and date, the year must be set to 2030 or below.
+        - Japanese PSBBN installations will fail on drives smaller than 128 GB
+        - exFAT partition cannot exceed 2 TB. When using a larger drive, remaining space beyond that will be unusable.
+        - **wLaunchELF** and other native PS2 apps may fail to create APA partitions on the PS2 drive. To avoid drive corruption, new APA partitions should only be created using the version of **PFS Shell** included with this project.
+        - APA partitions must not be created beyond the space reserved for APA during installation. Doing so will overwrite data on the exFAT partition.
+        - Instances in feega where some Japanese text couldn't be translated due to it being hard-coded in an encrypted file. Atok software has not been translated. 
+
         ---
 
         ✅ **If you have tried the relevant steps and the problem persists, check for an existing issue. If none exists, continue below to open a new issue.**  
