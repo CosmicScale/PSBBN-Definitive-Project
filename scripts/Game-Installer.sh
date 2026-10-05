@@ -3372,14 +3372,13 @@ if [ "$APP_COUNT" -gt 0 ]; then
 
                 case "$key" in
                     title) title="$value" ;;
-                    Title) title_short="$value" ;;
                     boot) elf="$value" ;;
                     Developer) publisher="$value" ;;
                     Title_ID) title_id="$value" ;;
                 esac
             done < "$dir/title.cfg"
 
-            if [ -z "$title" ] || [ -z "$title_short" ] || [ -z "$elf" ]; then
+            if [ -z "$title" ] || [ -z "$elf" ]; then
                 continue
             fi
 
@@ -3388,6 +3387,9 @@ if [ "$APP_COUNT" -gt 0 ]; then
                 title_id="${title_id:0:12}"
                 title_id="${title_id^^}"
             fi
+
+            title="${title#\[*\]}"
+            title="${title#"${title%%[![:space:]]*}"}"
 
             if [[ $folder_name =~ ^(...)\_ ]]; then
                 category="${BASH_REMATCH[1]}"
@@ -3401,7 +3403,7 @@ if [ "$APP_COUNT" -gt 0 ]; then
             esac
 
             cat >> "${APPS_LIST}" <<EOL
-$title_short|$title_id|$publisher|$category|ata:/APPS/$folder_name/$elf||$pp_name
+$title|$title_id|$publisher|$category|ata:/APPS/$folder_name/$elf||$pp_name
 EOL
 
             i=$((i + 1))
@@ -3516,7 +3518,7 @@ if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
                 }
                 echo "Created: ${OPL}/ART/${elf}_COV.png"  >> "${LOG_FILE}"
             fi
-            
+
             i=$((i + 1))
             show_progress "$i" "$ART_TOTAL"
         done
