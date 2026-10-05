@@ -901,6 +901,8 @@ if ! check_dep; then
     if ! "${TOOLKIT_PATH}/scripts/Setup.sh" $LANG_FILE; then
         exit 1
     else
+        # Forget where commands were found before Setup.sh installed packages.
+        hash -r
         check_dep || {
             echo "[X] Error: Dependencies still missing after setup." >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHECK_DEP]}"

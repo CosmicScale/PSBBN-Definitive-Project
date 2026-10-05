@@ -57,22 +57,25 @@ export PSBBN_DARWIN_INNER=1
 
 orig_path="${PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
 path="$here/bin"
+# brew --prefix NAME prints where NAME is linked even before it is installed.
+# On a first launch Setup.sh installs the packages during this session, so
+# the paths go in whether they exist yet or not.
 if command -v brew >/dev/null 2>&1; then
     icu=$(brew --prefix icu4c 2>/dev/null || true)
     pkg="$here/pkgconfig"
-    if [[ -n "${icu:-}" && -d "$icu/lib/pkgconfig" ]]; then
+    if [[ -n "${icu:-}" ]]; then
         pkg="$pkg:$icu/lib/pkgconfig"
     fi
     export PKG_CONFIG_PATH="${pkg}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
     for formula in coreutils grep gnu-sed gawk findutils; do
         prefix=$(brew --prefix "$formula" 2>/dev/null || true)
-        if [[ -n "${prefix:-}" && -d "$prefix/libexec/gnubin" ]]; then
+        if [[ -n "${prefix:-}" ]]; then
             path="$path:$prefix/libexec/gnubin"
         fi
     done
     e2=$(brew --prefix e2fsprogs 2>/dev/null || true)
-    if [[ -n "${e2:-}" && -d "$e2/sbin" ]]; then
+    if [[ -n "${e2:-}" ]]; then
         path="$path:$e2/sbin"
     fi
 fi

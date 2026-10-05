@@ -2099,5 +2099,67 @@ else
 fi
 rm -rf "$ov_repo" "$ov_dest"
 
+# --- first launch: Setup.sh installs the packages after enter.sh started ---
+# brew --prefix NAME prints where NAME goes even before it is installed.
+fl=$(mktemp -d)
+mkdir -p "$fl/repo/scripts/platform" "$fl/fakebin" "$fl/brew/opt" "$fl/tmp"
+cp -R "$root" "$fl/repo/scripts/platform/"
+cp "$root/../load.sh" "$fl/repo/scripts/platform/"
+cat > "$fl/fakebin/brew" << EOF
+#!/bin/bash
+[[ "\$1" == --prefix ]] || exit 1
+shift
+[[ \$# -eq 0 ]] && { echo "$fl/brew"; exit 0; }
+for f; do echo "$fl/brew/opt/\$f"; done
+EOF
+chmod +x "$fl/fakebin/brew"
+# The front door's place: Setup.sh installs the packages, then it looks for them.
+cat > "$fl/repo/PSBBN-Definitive-Patch.sh" << EOF
+#!/bin/bash
+mkdir -p "$fl/brew/opt/icu4c/lib/pkgconfig" "$fl/brew/opt/coreutils/libexec/gnubin" "$fl/brew/opt/e2fsprogs/sbin"
+printf 'Name: icu-i18n\nDescription: test\nVersion: 78\n' > "$fl/brew/opt/icu4c/lib/pkgconfig/icu-i18n.pc"
+printf '#!/bin/sh\n' > "$fl/brew/opt/coreutils/libexec/gnubin/psbbn-gnu-tool"
+printf '#!/bin/sh\n' > "$fl/brew/opt/e2fsprogs/sbin/psbbn-e2-tool"
+chmod +x "$fl/brew/opt/coreutils/libexec/gnubin/psbbn-gnu-tool" "$fl/brew/opt/e2fsprogs/sbin/psbbn-e2-tool"
+pkg-config --exists icu-i18n && echo icu-found || echo icu-missing
+command -v psbbn-gnu-tool >/dev/null && echo gnubin-found || echo gnubin-missing
+command -v psbbn-e2-tool >/dev/null && echo e2fsprogs-found || echo e2fsprogs-missing
+EOF
+chmod +x "$fl/repo/PSBBN-Definitive-Patch.sh"
+out=$(PATH="$fl/fakebin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin" TMPDIR="$fl/tmp" PKG_CONFIG_PATH="" \
+    "$fl/repo/scripts/platform/darwin/enter.sh" 2>&1) || true
+if [[ "$out" == *icu-found* && "$out" == *gnubin-found* && "$out" == *e2fsprogs-found* ]]; then
+    ok enter-finds-packages-installed-later
+else
+    bad "enter-finds-packages-installed-later [$out]"
+fi
+rm -rf "$fl"
+
+# The front door runs grep before Setup.sh (the WSL check). GNU grep only
+# appears once Setup.sh ran, and get_latest_file needs grep -P. This runs the
+# front door's own Setup block.
+fd=$(mktemp -d)
+mkdir -p "$fd/gnubin" "$fd/scripts"
+block=$(awk '/^if ! check_dep; then$/ { f = 1 } f { print } f && /^fi$/ { exit }' "$root/../../../PSBBN-Definitive-Patch.sh")
+cat > "$fd/scripts/Setup.sh" << EOF
+#!/bin/bash
+printf '#!/bin/sh\necho gnu-grep\n' > "$fd/gnubin/grep"
+chmod +x "$fd/gnubin/grep"
+EOF
+chmod +x "$fd/scripts/Setup.sh"
+out=$(PATH="$fd/gnubin:/usr/bin:/bin" TOOLKIT_PATH="$fd" BLOCK="$block" /opt/homebrew/bin/bash -c '
+    calls=0
+    check_dep() { calls=$((calls + 1)); [[ $calls -gt 1 ]]; }
+    error_msg() { echo "error_msg $*"; exit 1; }
+    grep -q x <<< x
+    eval "$BLOCK"
+    grep -oP x <<< x 2>/dev/null || echo bsd-grep' 2>&1) || true
+if [[ -n "$block" && "$out" == gnu-grep ]]; then
+    ok front-door-forgets-command-paths-after-setup
+else
+    bad "front-door-forgets-command-paths-after-setup [$out]"
+fi
+rm -rf "$fd"
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]
