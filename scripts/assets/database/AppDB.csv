@@ -31,6 +31,7 @@ UOPNPS2LD|Unofficial Open PS2 Loader|APP|APP_UOPL|github.com/KrahJohlito|UOPNPS2
 HDLSVR093|HDL Server|APP|APP_HDLSVR|ps2homebrew.github.io|HDL-SERVER-093.ELF
 3DPINBALLPLAYER|3D Pinball XP Player|GME|GME_3DPINBAL|Usagiru Release|3DPINBALL-PLAYER.ELF
 3DPINBALLPS2|3D Pinball XP Player|GME|GME_3DPINBAL|Usagiru Release|3dpinball-ps2.elf
+3DPINBALL|3D Pinball XP Player|GME|GME_3DPINBAL|Usagiru Release|3DPINBALL.ELF
 PGEN|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN v1.5.1s.elf
 PGEN151|PGen|EMU|EMU_PGEN|ps2homebrew.github.io|PGEN151.ELF
 PGENCJABCDPATCH48BIT|PGEN|EMU|EMU_PGEN|Datel|PGENCJ_ABCD_PATCH_48BIT.ELF
@@ -106,8 +107,8 @@ KHSKIP|Kingdom Hearts (Skip Mod)|GME|GME_KHSKIP|github.com/fniq5|khskip.elf
 SWAPMAGIC38|Swap Magic 3 Plus|APP|APP_SWAPMAGI|Datel|SWAPMAGIC38.ELF
 SMDVD38|Swap Magic 3 Plus|APP|APP_SWAPMAGI|Datel|SMDVD38.ELF
 WOPNPS2LD|Double Unofficial Open PS2 Loader|APP|APP_WOPL|ps2homebrew.github.io|WOPNPS2LD.ELF 
-RIPTOPL|RiptOPL|APP|APP_RIPTOPL|github.com/NathanNeurotic|RIPTOPL.ELF
-RIPTOPLRA|RiptOPL|APP|APP_RIPTOPL|github.com/NathanNeurotic|RIPTOPL-RA.ELF
+RIPTOPL|Open PS2 Loader: RiptOPL|APP|APP_RIPTOPL|github.com/NathanNeurotic|RIPTOPL.ELF
+RIPTOPLRA|Open PS2 Loader: RiptOPL RA|APP|APP_RIPTOPLR|github.com/NathanNeurotic|RIPTOPL-RA.ELF
 APOLLO|Apollo Save Tool|APP|APP_APOLLO|github.com/bucanero|APOLLO.ELF
 ARGON|Argon XMB Media Player|APP|APP_ARGON|sourceforge.net/u/argonps2/profile/|ARGON.ELF
 CHEATDEVICEFORWARDER|Cheat Device PS2BBL Forwarder|APP|APP_CHEATDEV|israpps.github.io|CHEATDEVICE-FORWARDER.ELF
@@ -573,3 +574,6 @@ ENCELADUS|Enceladus|RTE|RTE_ENCELADU|github.com/DanielSant0s|enceladus.elf
 MYPS2|myPS2|APP|APP_MYPS2|ntba2|MyPS2 v1.3.elf
 BOLIVIAOS|BoliviaOS|APP|APP_BOLIVIAO|Josema|BoliviaOS.ELF
 PS2RD|ps2rdmod|APP|APP_PS2RD|pelvicthrustman|ps2rd.elf
+MELONDS|MelonDS|EMU|EMU_MELONDS|github.com/DanielSant0s|melonDS.elf
+LUNA|LUNA|APP|APP_LUNA|github.com/dnunezx|luna.elf
+RIPPS2|RIP PS2|APP|APP_RIPPS2|github.com/akilluminati47|RIPPS2.elf
