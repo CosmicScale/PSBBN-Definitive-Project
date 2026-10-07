@@ -376,50 +376,55 @@ git_update() {
         if [ "$LOCAL" = "$REMOTE" ]; then
             echo "No updates available — running the latest version of the PSBBN Definitive Project script." >> "${LOG_FILE}"
         else
-            echo "Downloading updates..." >> "${LOG_FILE}"
-            echo "${UI_TEXT[UPDATE_GIT_1]}"
+            if [ "$wsl" = "true" ]; then
+                echo "[X] Error: Git pull failed." >> "${LOG_FILE}"
+                error_msg "${UI_TEXT[ERROR_GIT_1]}" " " "${UI_TEXT[ERROR_TROUBLE]}" " " "${UI_TEXT[TROUBLE_URL_2]}"
+            else
+                echo "Downloading updates..." >> "${LOG_FILE}"
+                echo "${UI_TEXT[UPDATE_GIT_1]}"
 
-            # Get a list of files that have changed remotely
-            UPDATED_FILES=$(git diff --name-only "$LOCAL" "$REMOTE")
+                # Get a list of files that have changed remotely
+                UPDATED_FILES=$(git diff --name-only "$LOCAL" "$REMOTE")
 
-            if [ -n "$UPDATED_FILES" ]; then
-                echo "Files updated in the remote repository:" >> "${LOG_FILE}"
-                echo "${UI_TEXT[UPDATE_GIT_2]}"
-                echo "$UPDATED_FILES" | tee -a "${LOG_FILE}"
+                if [ -n "$UPDATED_FILES" ]; then
+                    echo "Files updated in the remote repository:" >> "${LOG_FILE}"
+                    echo "${UI_TEXT[UPDATE_GIT_2]}"
+                    echo "$UPDATED_FILES" | tee -a "${LOG_FILE}"
 
-                # Prepare the working tree for the update
-                while IFS= read -r file; do
-                    [ -z "$file" ] && continue
+                    # Prepare the working tree for the update
+                    while IFS= read -r file; do
+                        [ -z "$file" ] && continue
 
-                    # Does this path exist in the current LOCAL commit?
-                    if git cat-file -e "${LOCAL}:${file}" 2>/dev/null; then
-                        # Existing tracked file:
-                        # discard local modifications so the remote version can be pulled.
-                        git checkout "$LOCAL" -- "$file" >> "${LOG_FILE}" 2>&1
-                    else
-                        # New file in the remote:
-                        # remove it if an untracked local file is occupying the path.
-                        if [ -e "$file" ] || [ -L "$file" ]; then
-                            if ! git ls-files --error-unmatch -- "$file" >/dev/null 2>&1; then
-                                echo "Removing conflicting untracked file: $file" >> "${LOG_FILE}"
-                                rm -rf -- "$file"
+                        # Does this path exist in the current LOCAL commit?
+                        if git cat-file -e "${LOCAL}:${file}" 2>/dev/null; then
+                            # Existing tracked file:
+                            # discard local modifications so the remote version can be pulled.
+                            git checkout "$LOCAL" -- "$file" >> "${LOG_FILE}" 2>&1
+                        else
+                            # New file in the remote:
+                            # remove it if an untracked local file is occupying the path.
+                            if [ -e "$file" ] || [ -L "$file" ]; then
+                                if ! git ls-files --error-unmatch -- "$file" >/dev/null 2>&1; then
+                                    echo "Removing conflicting untracked file: $file" >> "${LOG_FILE}"
+                                    rm -rf -- "$file"
+                                fi
                             fi
                         fi
-                    fi
-                done <<< "$UPDATED_FILES"
+                    done <<< "$UPDATED_FILES"
 
-                # Pull the latest changes
-                if ! git pull --ff-only >> "${LOG_FILE}" 2>&1; then
-                    echo "[X] Error: Git pull failed." >> "${LOG_FILE}"
-                    error_msg "${UI_TEXT[ERROR_GIT_1]}" "git clone https://github.com/CosmicScale/PSBBN-Definitive-Project.git" " " "${UI_TEXT[ERROR_GIT_2]}"
+                    # Pull the latest changes
+                    if ! git pull --ff-only >> "${LOG_FILE}" 2>&1; then
+                        echo "[X] Error: Git pull failed." >> "${LOG_FILE}"
+                        error_msg "${UI_TEXT[ERROR_GIT_1]}" " " "${UI_TEXT[ERROR_TROUBLE]}" " " "${UI_TEXT[TROUBLE_URL_2]}"
+                    fi
+                    echo
+                    echo "[✓] The repository has been successfully updated." >> "${LOG_FILE}"
+                    echo "[✓] ${UI_TEXT[UPDATE_GIT_3]}"
+                    echo
+                    read -n 1 -s -r -p "${UI_TEXT[UPDATE_GIT_4]}" </dev/tty
+                    echo
+                    exit 0
                 fi
-                echo
-                echo "[✓] The repository has been successfully updated." >> "${LOG_FILE}"
-                echo "[✓] ${UI_TEXT[UPDATE_GIT_3]}"
-                echo
-                read -n 1 -s -r -p "${UI_TEXT[UPDATE_GIT_4]}" </dev/tty
-                echo
-                exit 0
             fi
         fi
     fi
@@ -859,9 +864,7 @@ if [[ "$arch" != "x86_64" && "$arch" != "aarch64" ]]; then
     exit 1
 fi
 
-if [ "$wsl" = "false" ]; then
-    git_update
-fi
+git_update
 
 check_required_files
 
