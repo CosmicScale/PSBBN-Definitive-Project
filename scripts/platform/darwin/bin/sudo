@@ -1,0 +1,58 @@
+#!/bin/bash
+# The installer calls `sudo`, never /usr/bin/sudo.
+# Shims run as the user without a password, whether the installer named
+# them bare (`sudo mount`) or through a helper symlink (`sudo "$PFS_FUSE"`).
+# Missing commands fail without prompting. Everything else goes to the real
+# sudo with PATH and the shim state directories preserved.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=${0%/*}
+[[ "$here" == "$0" ]] && here=.
+here=$(cd "$here" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+cmd="${1:-}"
+if [[ -z "$cmd" ]]; then
+    echo "usage: sudo command" >&2
+    exit 1
+fi
+shift
+if [[ -x "$here/$cmd" ]]; then
+    exec "$here/$cmd" "$@"
+fi
+if [[ "$cmd" == */* && -e "$cmd" ]]; then
+    resolved=$cmd
+    while [[ -L "$resolved" ]]; do
+        link=$(/usr/bin/readlink "$resolved")
+        case "$link" in
+            /*) resolved=$link ;;
+            *) resolved="$(cd "${resolved%/*}" && pwd)/$link" ;;
+        esac
+    done
+    if [[ -x "$resolved" && "$(cd "${resolved%/*}" && pwd)" == "$here" ]]; then
+        exec "$resolved" "$@"
+    fi
+fi
+if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "sudo: $cmd: command not found" >&2
+    exit 1
+fi
+env_args=(
+    PATH="$PATH"
+    COPYFILE_DISABLE=1
+    PSBBN_MOUNT_STATE="$(psbbn_mount_state_dir)"
+    PSBBN_MAPPER_DIR="$(platform_mapper_dir)"
+)
+if [[ -n "${PSBBN_REAL_SUDO:-}" ]]; then
+    exec "$PSBBN_REAL_SUDO" env "${env_args[@]}" "$cmd" "$@"
+fi
+if [[ "${cmd##*/}" == "PFS Shell.elf" && ! -t 0 ]]; then
+    # pfsshell gets the drive on stdin, not as an argument, so the
+    # release and restore of the drive's mounts has to happen here.
+    cmds=$(cat)
+    device=$(printf '%s\n' "$cmds" | /usr/bin/awk '/^device / {print $2; exit}')
+    printf '%s\n' "$cmds" | psbbn_with_disk_released "${device:-}" platform_elevate env "${env_args[@]}" "$cmd" "$@"
+    exit $?
+fi
+platform_elevate env "${env_args[@]}" "$cmd" "$@"

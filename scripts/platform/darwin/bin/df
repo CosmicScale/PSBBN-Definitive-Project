@@ -1,0 +1,190 @@
+#!/bin/bash
+# A staged partition is a folder on the Mac, so plain df reports the Mac's
+# free space for it. Media-Installer checks there is room on __contents for
+# a converted movie. For a path inside a staged partition this answers for
+# the partition on the PS2 drive instead: its free space less what has been
+# staged and not yet written back. Every other path goes to the real df.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+
+real_df() {
+    local dir self
+    local IFS=:
+    self=$(cd "$here" && pwd -P)
+    for dir in $PATH; do
+        [[ -z "$dir" || ! -d "$dir" ]] && continue
+        # Any spelling of this folder would find the shim again.
+        [[ "$(cd "$dir" && pwd -P)" == "$self" ]] && continue
+        if [[ -x "$dir/df" ]]; then
+            printf '%s\n' "$dir/df"
+            return 0
+        fi
+    done
+    printf '%s\n' /bin/df
+}
+
+paths=()
+for arg in "$@"; do
+    [[ "$arg" == -* ]] || paths+=("$arg")
+done
+row=""
+for path in ${paths[@]+"${paths[@]}"}; do
+    if found=$(psbbn_stage_find "$path"); then
+        row=$found
+        break
+    fi
+done
+if [[ -z "$row" ]]; then
+    exec "$(real_df)" "$@"
+fi
+if [[ ${#paths[@]} -ne 1 ]]; then
+    echo "df: a staged partition must be the only path" >&2
+    exit 1
+fi
+IFS=$'\t' read -r key kind mnt slice <<< "$row"
+state=$(psbbn_mount_state_dir)
+
+# Size and free bytes of the partition as the drive holds it now.
+case "$kind" in
+    pfs)
+        part=$(cat "$state/$key.part" 2>/dev/null)
+        # pfsshell formats with 8 KiB zones; each file also takes one for its inode.
+        unit=8192
+        out=$(psbbn_pfs_run "$slice" "$(printf 'device %s\nmount %s\ndf\numount\nexit' "$slice" "$part")") || exit 1
+        sizes=$(printf '%s\n' "$out" | "$(psbbn_python)" -c '
+import re, sys
+part = sys.argv[1]
+units = {"B": 1, "KiB": 1 << 10, "MiB": 1 << 20, "GiB": 1 << 30, "TiB": 1 << 40}
+num = r"(\d+(?:\.\d+)?)(B|KiB|MiB|GiB|TiB)"
+for line in sys.stdin:
+    m = re.match(r"\s*" + re.escape(part) + r"\s+" + num + r"\s+" + num + r"\s+" + num + r"\s", line)
+    if m:
+        size, avail = float(m.group(1)) * units[m.group(2)], float(m.group(5)) * units[m.group(6)]
+        print(int(size), int(avail))
+        raise SystemExit(0)
+raise SystemExit(1)
+' "$part") || { echo "df: pfsshell did not report $part" >&2; exit 1; }
+        ;;
+    ext2)
+        debugfs=$(psbbn_debugfs_bin) || exit 1
+        sizes=$("${debugfs%/*}/dumpe2fs" -h "$slice" 2>/dev/null | awk -F: '
+            /^Block count/ { n = $2 + 0 }
+            /^Free blocks/ { f = $2 + 0 }
+            /^Reserved block count/ { r = $2 + 0 }
+            /^Block size/ { b = $2 + 0 }
+            END { if (b) printf "%d %d %d\n", n * b, (f > r ? f - r : 0) * b, b; else exit 1 }') \
+            || { echo "df: cannot read $slice" >&2; exit 1; }
+        unit=${sizes##* }
+        sizes=${sizes% *}
+        ;;
+    vfat)
+        tooldir=$(dirname "$(psbbn_mcopy_bin)") || exit 1
+        geometry=$("$tooldir/minfo" -i "$slice" :: 2>/dev/null | awk -F: '
+            /^sector size/ { s = $2 + 0 }
+            /^cluster size/ { c = $2 + 0 }
+            /^big size/ { n = $2 + 0 }
+            END { if (s && n && c) printf "%d %d\n", s * n, s * c; else exit 1 }') || { echo "df: cannot read $slice" >&2; exit 1; }
+        total=${geometry% *}
+        unit=${geometry#* }
+        free=$("$tooldir/mdir" -i "$slice" ::/ 2>/dev/null | awk '/bytes free/ { gsub(/[^0-9]/, "", $0); print }')
+        [[ -n "$free" ]] || { echo "df: cannot read $slice" >&2; exit 1; }
+        sizes="$total $free"
+        ;;
+    *)
+        echo "df: $mnt: unknown stage kind '$kind'" >&2
+        exit 1
+        ;;
+esac
+
+"$(psbbn_python)" - "$mnt" "$state/$key.manifest" "$kind" "$sizes" "$unit" "$_psbbn_darwin_dir" "$@" << 'PY'
+import math, os, sys
+mnt, manifest_path, kind, sizes, unit_bytes, libdir = sys.argv[1:7]
+args = sys.argv[7:]
+fs_unit = int(unit_bytes)
+sys.dont_write_bytecode = True
+sys.path.insert(0, libdir)
+import manifest as mf
+
+size, avail = (int(x) for x in sizes.split())
+# Space staged since the snapshot: new and grown files take it, removed
+# and shrunk ones give it back. Each file is counted the way the filesystem
+# allocates it, so a file that fits here also fits at unmount.
+def cost(ent):
+    if not ent:
+        return 0
+    if ent[0] == "d":
+        return fs_unit
+    if ent[0] != "f":
+        return 0
+    units = -(-ent[1] // fs_unit)
+    if kind == "ext2" and units > 12:
+        # Indirect blocks: one per (block size / 4) data blocks, and a
+        # little more for the double-indirect level.
+        per = fs_unit // 4
+        units += -(-(units - 12) // per) + -(-(units - 12) // (per * per))
+    elif kind == "pfs":
+        units += 1
+    return units * fs_unit
+
+old = mf.load(manifest_path)
+new = mf.scan(mnt)
+pending = 0
+for rel in set(old) | set(new):
+    a, b = old.get(rel), new.get(rel)
+    if a == b:
+        continue
+    pending += cost(b) - cost(a)
+avail = max(0, min(size, avail - pending))
+used = size - avail
+
+unit = 1024
+fields = None
+posix = False
+for arg in args:
+    if not arg.startswith("-"):
+        continue
+    if arg == "-k":
+        unit = 1024
+    elif arg == "-m":
+        unit = 1 << 20
+    elif arg == "-P":
+        posix = True
+    elif arg in ("-Pk", "-kP"):
+        posix, unit = True, 1024
+    elif arg.startswith("--output="):
+        fields = arg.split("=", 1)[1].split(",")
+    else:
+        sys.stderr.write("df: %s is not supported for a staged partition\n" % arg)
+        raise SystemExit(1)
+
+def blocks(n):
+    return str(math.ceil(n / unit))
+
+label = "1K-blocks" if unit == 1024 else "1M-blocks"
+pcent = "%d%%" % math.ceil(100 * used / size) if size else "-"
+source = "ps2:" + os.path.basename(mnt.rstrip("/"))
+columns = {
+    "source": ("Filesystem", source),
+    "size": (label, blocks(size)),
+    "used": ("Used", blocks(used)),
+    "avail": ("Avail", blocks(avail)),
+    "pcent": ("Use%", pcent),
+    "target": ("Mounted on", mnt),
+}
+if fields is None:
+    fields = ["source", "size", "used", "avail", "pcent", "target"]
+    if posix:
+        columns["size"] = ("1024-blocks" if unit == 1024 else "1048576-blocks", blocks(size))
+        columns["avail"] = ("Available", blocks(avail))
+        columns["pcent"] = ("Capacity", pcent)
+for name in fields:
+    if name not in columns:
+        sys.stderr.write("df: field %s is not supported for a staged partition\n" % name)
+        raise SystemExit(1)
+print(" ".join(columns[f][0] for f in fields))
+print(" ".join(columns[f][1] for f in fields))
+PY

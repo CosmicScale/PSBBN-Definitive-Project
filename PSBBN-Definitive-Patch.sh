@@ -26,6 +26,13 @@ if [ -z "$BASH_VERSION" ]; then
     exit 1
 fi
 
+# macOS /bin/bash is 3.2 and stops on ${var,,} and declare -A, so this
+# block comes first and uses only bash 3.2 syntax.
+if [[ "$(uname -s)" == Darwin && -z "${PSBBN_DARWIN_ENTERED:-}" ]]; then
+    export PSBBN_DARWIN_ENTERED=1
+    exec "$(cd "$(dirname "$0")" && pwd)/scripts/platform/darwin/enter.sh" "$@"
+fi
+
 [[ -t 0 && -t 1 ]] || exit 1
 
 echo -e "\e[8;45;110t"
@@ -564,6 +571,10 @@ check_dep(){
     check_cmd ffmpegthumbnailer
     check_cmd bsdtar
     check_cmd dmsetup
+    if [[ "$(uname -s)" == Darwin ]]; then
+        # The shims answer for the Linux tool names; check the packages behind them.
+        "${SCRIPTS_DIR}/platform/darwin/check-deps.sh" >> "$LOG_FILE" 2>&1 || MISSING=1
+    fi
 
     if ! pkg-config --exists icu-i18n 2>/dev/null; then
         echo "[X] libicu-dev not found." >> "$LOG_FILE"
@@ -586,11 +597,11 @@ check_dep(){
     echo >> "$LOG_FILE"
     echo "--- exFAT support ---" >> "$LOG_FILE"
 
-    if grep -qw exfat /proc/filesystems; then
+    if grep -qw exfat /proc/filesystems 2>/dev/null; then
         echo "[✓] Native kernel exFAT support detected." >> "$LOG_FILE"
     else
         sudo modprobe exfat 2>/dev/null
-        if grep -qw exfat /proc/filesystems; then
+        if grep -qw exfat /proc/filesystems 2>/dev/null; then
             echo "[✓] Native kernel exFAT support detected (after modprobe)." >> "$LOG_FILE"
         elif command -v mount.exfat-fuse &>/dev/null; then
             echo "[✓] FUSE-based exFAT support detected (mount.exfat-fuse)." >> "$LOG_FILE"
@@ -869,7 +880,7 @@ git_update
 check_required_files
 
 # Detect WSL
-if grep -qi microsoft /proc/version; then
+if grep -qi microsoft /proc/version 2>/dev/null; then
     # Detect distro
     if [ -f /etc/os-release ]; then
         . /etc/os-release
@@ -893,6 +904,8 @@ if ! check_dep; then
     if ! "${TOOLKIT_PATH}/scripts/Setup.sh" $LANG_FILE; then
         exit 1
     else
+        # Forget where commands were found before Setup.sh installed packages.
+        hash -r
         check_dep || {
             echo "[X] Error: Dependencies still missing after setup." >> "${LOG_FILE}"
             error_msg "${UI_TEXT[ERROR_CHECK_DEP]}"

@@ -1,0 +1,110 @@
+#!/bin/bash
+# Userspace stand-in. Does not create kernel device-mapper devices.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+state="${PSBBN_DM_STATE:-/tmp/psbbn-dm}"
+mkdir -p "$state"
+here=${0%/*}
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+    ls)
+        for f in "$state"/*; do
+            [[ -e "$f" ]] || continue
+            printf '%s\n' "$(basename "$f")"
+        done
+        exit 0
+        ;;
+    remove)
+        name=""
+        for arg in "$@"; do
+            case "$arg" in
+                -f|--force) ;;
+                -*)
+                    echo "dmsetup remove: unsupported flag $arg" >&2
+                    exit 1
+                    ;;
+                *) name="$arg" ;;
+            esac
+        done
+        if [[ -z "$name" || ! -e "$state/$name" ]]; then
+            echo "dmsetup remove: no such map ${name:-}" >&2
+            exit 1
+        fi
+        rm -f "$state/$name"
+        dir=$(platform_mapper_dir)
+        psbbn_sums_forget "$dir/$name"
+        rm -f "$dir/$name" "$dir/$name.meta"
+        exit 0
+        ;;
+    create)
+        if [[ "${1:-}" != "--concise" ]]; then
+            echo "dmsetup create: only --concise is implemented" >&2
+            exit 1
+        fi
+        dir=$(platform_mapper_dir)
+        # --concise takes several maps separated by ';'. hdl_dump toc --dm
+        # prints them all on one line.
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            line="${line#"${line%%[![:space:]]*}"}"
+            [[ -z "$line" ]] && continue
+            name="${line%%,*}"
+            psbbn_sums_forget "$dir/$name"
+            if ! "$(psbbn_python)" - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
+import os, shlex, sys
+node, meta_path, line = sys.argv[1], sys.argv[2], sys.argv[3]
+parts = line.split(",")
+tables = [p.strip() for p in parts[4:] if p.strip()]
+if not tables:
+    sys.stderr.write("dmsetup: %s has no table\n" % parts[0])
+    sys.exit(1)
+# A partition above the APA size cap is a main partition plus
+# sub-partitions: one linear extent each, back to back in the map.
+device = None
+extents = []
+sectors = 0
+for table in tables:
+    fields = table.split()
+    if len(fields) != 5:
+        sys.stderr.write("dmsetup: cannot parse table '%s'\n" % table)
+        sys.exit(1)
+    logical, length, kind, dev, start = fields
+    if kind != "linear":
+        sys.stderr.write("dmsetup: unsupported target %s\n" % kind)
+        sys.exit(1)
+    if device is None:
+        device = dev
+    elif dev != device:
+        sys.stderr.write("dmsetup: %s spans two devices\n" % parts[0])
+        sys.exit(1)
+    if int(logical) != sectors:
+        sys.stderr.write("dmsetup: %s extent at %s, expected %d\n" % (parts[0], logical, sectors))
+        sys.exit(1)
+    extents.append("%d:%d" % (int(start), int(length)))
+    sectors += int(length)
+# The published path is the slice itself, not an empty stamp. A new map
+# starts empty, so mount reads it off the drive; whatever an earlier run
+# left at this path is not the drive's current content.
+fd = os.open(node, os.O_CREAT | os.O_RDWR | os.O_TRUNC, 0o644)
+os.ftruncate(fd, sectors * 512)
+os.close(fd)
+# No start= line: a reader that does not know extents must fail, not copy
+# one window across the sub-partition headers.
+with open(meta_path, "w") as fh:
+    fh.write("device=%s\nsectors=%d\nextents=%s\n" % (shlex.quote(device), sectors, shlex.quote(" ".join(extents))))
+PY
+            then
+                exit 1
+            fi
+            printf '%s\n' "$line" > "$state/$name"
+        done < <(tr ';' '\n')
+        exit 0
+        ;;
+    *)
+        echo "dmsetup: unsupported command: $cmd" >&2
+        exit 1
+        ;;
+esac

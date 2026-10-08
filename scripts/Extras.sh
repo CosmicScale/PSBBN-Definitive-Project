@@ -32,10 +32,15 @@ term_width=110
 # Set paths
 TOOLKIT_PATH="$(pwd)"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 LANG_DIR="${ASSETS_DIR}/lang"
 STORAGE_DIR="${SCRIPTS_DIR}/storage"
+# macOS writes AppleDouble files when this path is under /var. /tmp does not.
+if [[ "$(uname -s)" == Darwin ]]; then
+    STORAGE_DIR="/tmp/psbbn-storage-${UID}"
+fi
 ICONS_DIR="${TOOLKIT_PATH}/icons"
 ARTWORK_DIR="${ICONS_DIR}/art"
 ICO_DIR="${ICONS_DIR}/ico"
@@ -477,7 +482,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {
@@ -1099,7 +1104,7 @@ option_two() {
     mount_cfs    && \
     mount_pfs    || return 1
 
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     case "$choice" in
@@ -1150,7 +1155,7 @@ option_two() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 }
 
@@ -1454,7 +1459,7 @@ option_three() {
         mount_cfs    && \
         mount_pfs    || return 1
 
-        ls -l /dev/mapper >> "${LOG_FILE}"
+        ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
         df >> "${LOG_FILE}"
 
         sudo tar zxpf "$LANG_PACK" -C "${STORAGE_DIR}/" >> "${LOG_FILE}" 2>&1 || {
@@ -1563,7 +1568,7 @@ option_three() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     LANGUAGE_SPLASH
@@ -1696,7 +1701,7 @@ option_four() {
     mount_cfs    && \
     mount_pfs    || return 1
 
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     mkdir -p "${SCRIPTS_DIR}/tmp"
@@ -1759,7 +1764,7 @@ option_four() {
 
     clean_up || return 1
     echo clean up afterwards: >> "${LOG_FILE}"
-    ls -l /dev/mapper >> "${LOG_FILE}"
+    ls -l "$(platform_mapper_dir)" >> "${LOG_FILE}"
     df >> "${LOG_FILE}"
 
     SCREEN_SPLASH

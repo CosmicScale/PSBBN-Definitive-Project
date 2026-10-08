@@ -1,0 +1,68 @@
+#!/bin/bash
+# Map exfatprogs `mkfs.exfat -c 32K -L OPL` onto newfs_exfat.
+# The installer passes ${DEVICE}3, which is /dev/diskN concatenated with 3.
+# newfs_exfat needs a device node (it sizes the volume with an ioctl), so the
+# OPL slice of the external PS2 drive is formatted in place. Internal disks
+# are refused.
+here=$(cd "$(dirname "$0")/../../platform/darwin" && pwd)
+# shellcheck disable=SC1091
+. "$here/../load.sh"
+
+cluster=""
+label=""
+device=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c)
+            cluster="${2:-}"
+            shift 2
+            ;;
+        -L)
+            label="${2:-}"
+            shift 2
+            ;;
+        *)
+            device="$1"
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$device" ]]; then
+    /sbin/newfs_exfat 2>&1 || true
+    exit 1
+fi
+
+rewritten=$(psbbn_rewrite_device "$device")
+if psbbn_is_real_disk "$rewritten"; then
+    if psbbn_disk_internal "$rewritten"; then
+        echo "mkfs.exfat: refusing internal disk $rewritten (from $device)" >&2
+        exit 2
+    fi
+    if ! psbbn_is_partition_node "$rewritten"; then
+        echo "mkfs.exfat: refusing whole disk $rewritten (from $device)" >&2
+        exit 2
+    fi
+    # Disk Arbitration may already have mounted a previous volume here.
+    current=$(psbbn_diskutil_mountpoint "$rewritten")
+    if [[ -n "$current" ]]; then
+        psbbn_diskutil_unmount "$current" || exit 1
+    fi
+fi
+
+args=()
+if [[ "$cluster" == "32K" || "$cluster" == "32k" ]]; then
+    # -R derives the layout from the device size instead of an existing volume.
+    args+=(-R -b 32768)
+fi
+if [[ -n "$label" ]]; then
+    args+=(-v "$label")
+fi
+args+=("$rewritten")
+
+newfs="${PSBBN_NEWFS_EXFAT:-/sbin/newfs_exfat}"
+if psbbn_is_real_disk "$rewritten" && [[ -z "${PSBBN_NEWFS_EXFAT:-}" ]]; then
+    platform_elevate "$newfs" "${args[@]}"
+    exit $?
+fi
+exec "$newfs" "${args[@]}"

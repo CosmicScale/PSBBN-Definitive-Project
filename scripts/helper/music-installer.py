@@ -52,6 +52,9 @@ LOG_PATH = "logs/media.log"
 
 if len(sys.argv) > 1:
     MUSIC_DIR = sys.argv[1]
+# The installer's STORAGE_DIR. macOS keeps it outside the toolkit folder.
+if len(sys.argv) > 2:
+    CONVERTED_DIR = os.path.join(sys.argv[2], "__linux.8", "MusicCh", "contents")
 
 # SQL headers and footer
 header_music = """BEGIN TRANSACTION;

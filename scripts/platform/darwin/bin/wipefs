@@ -1,0 +1,33 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+all=0
+path=""
+for arg in "$@"; do
+    case "$arg" in
+        -a) all=1 ;;
+        *) path="$arg" ;;
+    esac
+done
+path=$(psbbn_rewrite_device "$path")
+if psbbn_is_real_disk "$path"; then
+    if psbbn_disk_internal "$path"; then
+        echo "wipefs: refusing internal disk $path" >&2
+        exit 2
+    fi
+    # External disk. The installer zeros the start and end itself on the next dd.
+    [[ "$all" -eq 1 ]] && exit 0
+    echo "wipefs: expected -a" >&2
+    exit 1
+fi
+if [[ "$all" -eq 1 && -f "$path" ]]; then
+    dd if=/dev/zero of="$path" bs=1048576 count=1 conv=notrunc status=none 2>/dev/null || \
+        dd if=/dev/zero of="$path" bs=1048576 count=1 conv=notrunc 2>/dev/null
+    exit 0
+fi
+echo "wipefs: expected -a and a regular file" >&2
+exit 1
