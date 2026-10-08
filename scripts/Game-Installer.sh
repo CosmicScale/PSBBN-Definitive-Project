@@ -1149,6 +1149,9 @@ install_elf() {
             OPL08CHILDPROOF*)
                 AppDB_check="OPL08CHILDPROOF"
                 ;;
+            OPLRA*)
+                AppDB_check="OPLRA"
+                ;;
             OPL*|OPNPS2LD*)
                 AppDB_check="OPNPS2LD"
                 ;;

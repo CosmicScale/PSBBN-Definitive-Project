@@ -15,10 +15,12 @@ HWCLBFNUPDATEDLIBCDVD|LbFn (with updated libcdvd)|APP|APP_LBFNHWC|psx-place.com/
 RABOOT|RetroArch|EMU|EMU_RETROARC|retroarch.com|raboot.elf
 REGBA|ReGBA|EMU|EMU_REGBA|psx-place.com/tags/belek666|ReGBA.elf
 TEMPGBA|TempGBA|EMU|EMU_TEMPGBA|psx-place.com/tags/belek666|TempGBA.elf
+TEMPGBA20261003|TempGBA|EMU|EMU_TEMPGBA|github.com/andymcca|TempGBA-20261003.elf
+TEMPGBAMMCE|TempGBA|EMU|EMU_TEMPGBA|github.com/andymcca|TempGBA_MMCE.elf
 XEBPLUS|Xtreme Elite Boot+|APP|APP_XEBPLUS|Howling Wolf & Chelsea|XEBPLUS.ELF
 XEBPLUSXMAS|Xtreme Elite Boot+|APP|APP_XEBPLUS|Howling Wolf & Chelsea|XEBPLUS_XMAS.ELF
 PS2OGCARDTEST|Original Card Test|DST|DST_OGCARDTE|israpps.github.io|PS2_OG_CARD_TEST.ELF
-MEMCARDANNIHILATOR|Memory Card Annihilator|DST|DST_MCA|ffgriever-pl|Memory Card Annihilator.ELF
+MEMORYCARDANNIHILATOR|Memory Card Annihilator|DST|DST_MCA|ffgriever-pl|Memory Card Annihilator.ELF
 MCA|Memory Card Annihilator|DST|DST_MCA|ffgriever-pl|mca_v20.elf
 MCAARCADE|Memory Card Annihilator (Arcade)|DST|DST_MCA|ffgriever-pl|mca_ARCADE.elf
 MCADEVELOPER|Memory Card Annihilator (Developer)|DST|DST_MCA|ffgriever-pl|mca_DEVELOPER.elf
@@ -81,6 +83,7 @@ SNESEMU024S|SNES Station|EMU|EMU_SNESSTAT|pinguinoctis|SNESEMU024S.ELF
 SNESTICLEREVIVE|SNESticle Revive|EMU|EMU_SNESREVI|github.com/ReyFxck|SNESticleRevive v1.0.5.elf
 SNESTICLE|SNESticle Aurora|EMU|EMU_SNESAURO|github.com/itsveenee|SNESticle.elf
 DVDPLAYERPR|DVD Player|APP|APP_DVDPLAYE||dvdplayer.elf
+DVDPLAYERPR|DVD Player|APP|APP_DVDPLAYE||DVD.ELF
 INFONES|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES.elf
 INFONESRE|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES rev4.elf
 INFONESHD|InfoNES|EMU|EMU_INFONES|Ronald Andersson (AKA: dlanor)|InfoNES-HD.elf
@@ -164,6 +167,7 @@ POPSLOADER|POPSLoader|PS1|PS1_POPSLOAD|israpps.github.io/|POPSLOADER.ELF
 KERNELLDR3|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|KERNELLDR3.ELF
 KERNELLOADER|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|Kernel Loader v3.0.elf
 KLOADER30|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|kloader3.0.elf
+KLOADER|Kernel Loader|RTE|RTE_KERNELLD|Jrgen Urban|KLOADER.ELF
 PS2LAUNCHER|PS2 Launcher|APP|APP_PS2LAUNC|github.com/Irfanlesnar|PS2-Launcher-v3.1.0.ELF
 PS2LAUNCHER400|PS2 Launcher|APP|APP_PS2LAUNC|github.com/Irfanlesnar|PS2-Launcher-4.0.0.ELF
 NETFS|smbLaunchELF|APP|APP_NETFS|github.com/sahlberg|NETFS.ELF
@@ -577,3 +581,4 @@ PS2RD|ps2rdmod|APP|APP_PS2RD|pelvicthrustman|ps2rd.elf
 MELONDS|MelonDS|EMU|EMU_MELONDS|github.com/DanielSant0s|melonDS.elf
 LUNA|LUNA|APP|APP_LUNA|github.com/dnunezx|luna.elf
 RIPPS2|RIP PS2|APP|APP_RIPPS2|github.com/akilluminati47|RIPPS2.elf
+OPLRA|Open PS2 Loader (RetroAchievements)|APP|APP_OPLRA|github.com/hacan359|OPNPS2LD.ELF
