@@ -1154,6 +1154,9 @@ install_elf() {
             OPL08CHILDPROOF*)
                 AppDB_check="OPL08CHILDPROOF"
                 ;;
+            OPLRA*)
+                AppDB_check="OPLRA"
+                ;;
             OPL*|OPNPS2LD*)
                 AppDB_check="OPNPS2LD"
                 ;;
@@ -3377,14 +3380,13 @@ if [ "$APP_COUNT" -gt 0 ]; then
 
                 case "$key" in
                     title) title="$value" ;;
-                    Title) title_short="$value" ;;
                     boot) elf="$value" ;;
                     Developer) publisher="$value" ;;
                     Title_ID) title_id="$value" ;;
                 esac
             done < "$dir/title.cfg"
 
-            if [ -z "$title" ] || [ -z "$title_short" ] || [ -z "$elf" ]; then
+            if [ -z "$title" ] || [ -z "$elf" ]; then
                 continue
             fi
 
@@ -3393,6 +3395,9 @@ if [ "$APP_COUNT" -gt 0 ]; then
                 title_id="${title_id:0:12}"
                 title_id="${title_id^^}"
             fi
+
+            title="${title#\[*\]}"
+            title="${title#"${title%%[![:space:]]*}"}"
 
             if [[ $folder_name =~ ^(...)\_ ]]; then
                 category="${BASH_REMATCH[1]}"
@@ -3406,7 +3411,7 @@ if [ "$APP_COUNT" -gt 0 ]; then
             esac
 
             cat >> "${APPS_LIST}" <<EOL
-$title_short|$title_id|$publisher|$category|ata:/APPS/$folder_name/$elf||$pp_name
+$title|$title_id|$publisher|$category|ata:/APPS/$folder_name/$elf||$pp_name
 EOL
 
             i=$((i + 1))
@@ -3508,17 +3513,20 @@ if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
                 
                 if [[ -s "$png_file" ]]; then
                     echo "[✓] Successfully downloaded artwork for $title_id" >> "${LOG_FILE}"
-
-                    cp "$png_file" "${OPL}/ART/${elf}_COV.png" 2>> "${LOG_FILE}" || {
-                        echo "[X] Error: Failed to create ${OPL}/ART/${elf}_COV.png" >> "${LOG_FILE}"
-                        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${OPL}/ART/${elf}_COV.png"
-                    }
-                    echo "Created: ${OPL}/ART/${elf}_COV.png"  >> "${LOG_FILE}"
                 else
                     rm -f "$png_file"
                     echo "$title_id,$title,$elf" >> "${MISSING_APP_ART}"
                 fi
             fi
+
+            if [[ -s "$png_file" ]]; then
+                cp "$png_file" "${OPL}/ART/${elf}_COV.png" 2>> "${LOG_FILE}" || {
+                    echo "[X] Error: Failed to create ${OPL}/ART/${elf}_COV.png" >> "${LOG_FILE}"
+                    error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${OPL}/ART/${elf}_COV.png"
+                }
+                echo "Created: ${OPL}/ART/${elf}_COV.png"  >> "${LOG_FILE}"
+            fi
+
             i=$((i + 1))
             show_progress "$i" "$ART_TOTAL"
         done
