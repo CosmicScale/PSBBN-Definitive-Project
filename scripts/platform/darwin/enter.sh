@@ -50,10 +50,30 @@ if [[ -z "${PSBBN_DARWIN_INNER:-}" && "${BASH_VERSINFO[0]}" -lt 4 ]]; then
 fi
 
 # shellcheck disable=SC1091
-. "$here/lib.sh"
+. "$here/../load.sh"
 
 export PSBBN_DARWIN_ENTERED=1
 export PSBBN_DARWIN_INNER=1
+
+# sudo ./PSBBN-Definitive-Patch.sh: the session runs as the user who typed
+# sudo, the way it runs without sudo. The shims elevate what needs root,
+# Homebrew refuses root, and state a root run left in /tmp and in the
+# project could not be written by that user's next run; it is handed back
+# first. sudo -u sets SUDO_* to root's; they would key the state to root.
+if [[ "${PSBBN_EUID:-$EUID}" -eq 0 && -n "${SUDO_UID:-}" && "$SUDO_UID" != 0 ]]; then
+    claim=()
+    while IFS= read -r line; do
+        claim+=("$line")
+    done < <(psbbn_user_paths "$SUDO_UID")
+    psbbn_claim_paths "$SUDO_UID" "${SUDO_GID:-$(id -g "$SUDO_UID")}" "${claim[@]}"
+    exec "${PSBBN_SUDO_BIN:-/usr/bin/sudo}" -u "#$SUDO_UID" -H -E \
+        /usr/bin/env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND "$bash5" "$0" "$@"
+fi
+# sudo leaves no TMPDIR, or root's.
+if [[ -z "${TMPDIR:-}" || ! -w "$TMPDIR" ]]; then
+    TMPDIR=$(getconf DARWIN_USER_TEMP_DIR 2>/dev/null) || TMPDIR=/tmp
+    export TMPDIR
+fi
 
 orig_path="${PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
 path="$here/bin"
@@ -84,10 +104,22 @@ export PATH="$path"
 # macOS creates AppleDouble files on copies. The PS2 partitions must not get them.
 export COPYFILE_DISABLE=1
 
-overlay="${TMPDIR:-/tmp}/psbbn-overlay-${UID}"
+# macOS TMPDIR ends in a slash.
+overlay="${TMPDIR%/}/psbbn-overlay-${UID}"
+psbbn_unquarantine_helpers "$repo"
 build_overlay "$repo" "$overlay"
 cd "$overlay"
+# The installers take their folder from pwd; it is the overlay as cd wrote it.
+export PSBBN_OVERLAY="$PWD"
+eval "$(psbbn_git_env "$repo")"
 # exec keeps this pid. da-veto refuses Disk Arbitration mounts of the
 # selected drive for as long as this process lives.
 export PSBBN_SESSION_PID=$$
+psbbn_sudo_session_start "$$"
+# Left by a run under sudo before the session dropped to the user.
+claim=()
+while IFS= read -r line; do
+    claim+=("$line")
+done < <(psbbn_user_paths "$UID")
+psbbn_claim_paths "$UID" "$(id -g)" "${claim[@]}"
 exec "$bash5" "$overlay/PSBBN-Definitive-Patch.sh" "$@"

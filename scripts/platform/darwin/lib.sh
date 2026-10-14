@@ -236,14 +236,32 @@ for range in "$@"; do
         exit $rc
     }
 done'
-    if [[ "$mode" == elevate ]]; then
+    if [[ "$mode" != elevate ]]; then
+        /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}"
+        return $?
+    fi
+    # Disk Arbitration can land a mount between the eviction and the open,
+    # and macOS refuses the open with EBUSY. Ranges are written whole, so
+    # running them again after another eviction is safe.
+    local attempt errf status disk
+    disk=$dst
+    psbbn_is_real_disk "$disk" || disk=$src
+    errf=$(mktemp)
+    for attempt in 1 2 3 4 5 6; do
         if psbbn_is_real_disk "$dst" && ! psbbn_is_partition_node "$dst"; then
             psbbn_quiesce_disk "$dst"
         fi
-        platform_elevate /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}"
-    else
-        /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}"
-    fi
+        platform_elevate /bin/sh -c "$loop" sh "$dd" "$src" "$dst" "${list[@]}" 2> "$errf"
+        status=$?
+        if [[ "$status" -eq 0 ]] || ! grep -q 'Resource busy' "$errf"; then
+            break
+        fi
+        psbbn_evict_automounts "$disk"
+        sleep "${PSBBN_DA_SETTLE:-1}"
+    done
+    cat "$errf" >&2
+    rm -f "${errf:?}"
+    return "$status"
 }
 
 psbbn_raw_node() {
@@ -490,6 +508,89 @@ psbbn_mount_state_dir() {
     printf '%s\n' "$dir"
 }
 
+psbbn_dm_state_dir() {
+    printf '%s\n' "${PSBBN_DM_STATE:-/tmp/psbbn-dm-${SUDO_UID:-$UID}}"
+}
+
+# Where a session of user UID keeps state: the shims' records, the slices,
+# the maps, the installers' STORAGE_DIR, and the project itself (logs,
+# downloads, .git). Printed, never created. The project as its real folder:
+# find does not walk a link it is given.
+psbbn_user_paths() {
+    local u="$1"
+    printf '%s\n' "${PSBBN_MOUNT_STATE:-/tmp/psbbn-mounts-$u}" \
+        "${PSBBN_MAPPER_DIR:-/tmp/psbbn-mapper-$u}" \
+        "${PSBBN_DM_STATE:-/tmp/psbbn-dm-$u}" \
+        "${PSBBN_STORAGE_DIR:-/tmp/psbbn-storage-$u}"
+    if [[ -n "${PSBBN_REPO:-}" ]]; then
+        (cd -P -- "$PSBBN_REPO" 2>/dev/null && pwd -P) || printf '%s\n' "$PSBBN_REPO"
+    fi
+}
+
+# A run started with sudo made these as root, and the user's next run could
+# not write its own records. What root owns under each PATH goes back to
+# UID:GID; nothing else changes owner. Anyone can create /tmp/psbbn-*-UID
+# first, so a PATH is only walked when it is a folder, not a link, that
+# root or UID owns and others cannot write. chown runs inside each folder
+# it changes (-execdir), so no folder on the way can be swapped for a link,
+# and a file with another hard link, which may be any file on the volume,
+# keeps its owner. PSBBN_CLAIM_FROM stands in for root in the tests.
+# psbbn_claim_paths UID GID PATH...
+psbbn_claim_paths() {
+    local uid="$1" gid="$2" path owner perm left from="${PSBBN_CLAIM_FROM:-0}" chown="${PSBBN_CHOWN:-/usr/sbin/chown}"
+    shift 2
+    [[ "$uid" != "$from" ]] || return 0
+    for path in "$@"; do
+        [[ -e "$path" || -L "$path" ]] || continue
+        if [[ -L "$path" || ! -d "$path" ]]; then
+            printf '%s\n' "warning: $path is not a folder; its owner was left as it is" >&2
+            continue
+        fi
+        read -r owner perm < <(/usr/bin/stat -f '%u %Lp' "$path" 2>/dev/null) || continue
+        if [[ ( "$owner" != "$from" && "$owner" != "$uid" ) || $(( 8#$perm & 8#002 )) -ne 0 ]]; then
+            printf '%s\n' "warning: others can change $path; its files were not handed back" >&2
+            continue
+        fi
+        [[ -n "$(/usr/bin/find "$path" -xdev -user "$from" -print -quit 2>/dev/null)" ]] || continue
+        local take=(/usr/bin/find . -xdev -user "$from" \( -type d -o -links 1 \) -execdir "$chown" -h -- "$uid:$gid" {} +)
+        if [[ "${PSBBN_EUID:-$EUID}" -eq 0 ]]; then
+            (cd -P -- "$path" && "${take[@]}")
+        else
+            (cd -P -- "$path" && platform_elevate "${take[@]}")
+        fi
+        left=$(/usr/bin/find "$path" -xdev -user "$from" -print -quit 2>/dev/null)
+        if [[ -n "$left" ]]; then
+            printf '%s\n' "warning: some files under $path still belong to root, such as $left" >&2
+        fi
+    done
+    return 0
+}
+
+# macOS keeps a sudo ticket for 5 minutes. Copying games takes longer, and
+# the password prompt that followed was drawn under a spinner. The ticket
+# is refreshed while the session (PID) lives.
+psbbn_sudo_keepalive() {
+    local pid="$1" sudo="${PSBBN_SUDO_BIN:-/usr/bin/sudo}" every="${PSBBN_SUDO_REFRESH:-60}"
+    while kill -0 "$pid" 2>/dev/null; do
+        "$sudo" -n -v >/dev/null 2>&1 || return 0
+        sleep "$every"
+    done
+}
+
+# Ask for the password once, before the menu, as Linux does at its first
+# `sudo blkid`, and keep the ticket for the session. Without a ticket the
+# shims still ask when they need one.
+psbbn_sudo_session_start() {
+    local pid="$1" sudo="${PSBBN_SUDO_BIN:-/usr/bin/sudo}"
+    [[ -z "${PSBBN_SUDO:-}" && -t 0 ]] || return 0
+    if ! "$sudo" -n true 2>/dev/null; then
+        printf '%s\n' "The PSBBN installer needs your administrator password to write the PS2 drive." >/dev/tty
+        "$sudo" -v </dev/tty >/dev/tty 2>/dev/tty || return 0
+    fi
+    psbbn_sudo_keepalive "$pid" </dev/null >/dev/null 2>&1 &
+    disown "$!" 2>/dev/null || true
+}
+
 psbbn_mount_key() {
     "$(psbbn_python)" -c 'import hashlib,sys; sys.stdout.write(hashlib.sha256(sys.argv[1].encode()).hexdigest())' "$1"
 }
@@ -559,6 +660,31 @@ psbbn_stage_find() {
     return 1
 }
 
+# A slice that dmsetup is about to remove or re-create may still be under a
+# stage. Linux has that stage's files on the drive already; here they are
+# written back now, by unmounting it. When that fails the slice is busy.
+# FORCE (dmsetup remove -f) also drops the stage, as Linux swaps the map
+# for one that fails every I/O, so the next run is not stuck on it; the
+# slice stays busy for this call, as the Linux remove still fails with the
+# mount up.
+# psbbn_slice_release SLICE [force]
+psbbn_slice_release() {
+    local slice="$1" force="${2:-}" table kind mnt staged rc=0
+    # Read whole first: unmounting changes the records being listed.
+    table=$(psbbn_stage_table)
+    while IFS=$'\t' read -r kind mnt staged; do
+        [[ "$kind" == ext2 || "$kind" == vfat ]] || continue
+        [[ "$staged" == "$slice" ]] || continue
+        "$_psbbn_darwin_dir/bin/umount" "$mnt" </dev/null && continue
+        rc=1
+        if [[ -n "$force" ]]; then
+            printf '%s\n' "$mnt: its map was removed; what it held was not written back" >&2
+            psbbn_stage_forget "$mnt"
+        fi
+    done <<< "$table"
+    return "$rc"
+}
+
 psbbn_manifest_path() {
     local state key
     state=$(psbbn_mount_state_dir)
@@ -590,8 +716,9 @@ psbbn_gnu_sed() {
 # The folders the user fills. The installers look for games and media with
 # find -type f, which skips symlinks, and keep their art cache in icons/.
 # The overlay links each one whole, so it is the project's own folder, as
-# it is on Linux.
-_psbbn_user_dirs=(games media icons)
+# it is on Linux. So are the logs, and the language folder the front door
+# deletes the changelog from once it has been shown.
+_psbbn_user_dirs=(games media icons logs scripts/assets/lang)
 
 # psbbn_link_user_dir REPO DEST NAME
 # An overlay built by an older version has NAME as a folder of symlinks.
@@ -608,7 +735,21 @@ psbbn_link_user_dir() {
             return 1
         fi
     fi
+    mkdir -p "$(dirname "$dest/$name")"
     ln -s "$repo/$name" "$dest/$name"
+}
+
+# Overlays before this version kept the logs in the overlay. They move to
+# the project's logs folder; one already there is kept.
+psbbn_move_old_logs() {
+    local repo="$1" dest="$2" log
+    mkdir -p "$repo/logs"
+    [[ -d "$dest/logs" && ! -L "$dest/logs" ]] || return 0
+    for log in "$dest/logs"/* "$dest/logs"/.[!.]*; do
+        [[ -f "$log" ]] || continue
+        [[ -e "$repo/logs/${log##*/}" ]] || mv "$log" "$repo/logs/"
+    done
+    rm -rf "${dest:?}/logs"
 }
 
 # File-level symlinks so `rm` inside the overlay does not delete the repo;
@@ -620,6 +761,7 @@ build_overlay() {
     local repo="$1" dest="$2" rel dir name left=0
     mkdir -p "${dest:?}"
     find "${dest:?}" -type l -delete 2>/dev/null || true
+    psbbn_move_old_logs "$repo" "$dest"
     for name in "${_psbbn_user_dirs[@]}"; do
         psbbn_link_user_dir "$repo" "$dest" "$name" || left=1
     done
@@ -637,8 +779,9 @@ build_overlay() {
             ./scripts/venv|./scripts/venv/*) continue ;;
         esac
         name=${rel#./}
-        name=${name%%/*}
-        [[ " ${_psbbn_user_dirs[*]} " == *" $name "* ]] && continue
+        for dir in "${_psbbn_user_dirs[@]}"; do
+            [[ "$name" == "$dir" || "$name" == "$dir"/* ]] && continue 2
+        done
         if [[ -d "$repo/$rel" && ! -L "$repo/$rel" ]]; then
             mkdir -p "$dest/$rel"
         elif [[ -e "$repo/$rel" || -L "$repo/$rel" ]]; then
@@ -653,6 +796,20 @@ build_overlay() {
         ln -s "$repo/scripts/venv" "$dest/scripts/venv"
     fi
     psbbn_link_helpers "$repo" "$dest"
+}
+
+# A copy of the project macOS marked as downloaded (com.apple.quarantine)
+# has Gatekeeper stop each bundled helper on first use ("PSU Extractor.elf"
+# Not Opened), in the middle of an install. Those helpers ship with the
+# project; their sources and build steps are in helper/darwin-arm64/README.md.
+# Only that folder is cleared.
+psbbn_unquarantine_helpers() {
+    local dir="$1/scripts/helper/darwin-arm64"
+    [[ -d "$dir" ]] || return 0
+    if /usr/bin/xattr -r -l "$dir" 2>/dev/null | grep -q 'com.apple.quarantine'; then
+        /usr/bin/xattr -r -d com.apple.quarantine "$dir" 2>/dev/null || true
+    fi
+    return 0
 }
 
 psbbn_link_helpers() {
@@ -690,6 +847,14 @@ psbbn_link_helpers() {
             ln -s "$src" "$slot"
         done
     done
+}
+
+# The installers run in the overlay, and the overlay's .git is a link to
+# the project's. Git takes the folder holding .git for the work tree, so an
+# update from the overlay moved HEAD and left the project's files as they
+# were. Prints the exports that point git at the project.
+psbbn_git_env() {
+    printf 'export GIT_DIR=%q GIT_WORK_TREE=%q\n' "$1/.git" "$1"
 }
 
 # Canonical directory path. diskutil reports mount points with symlinks
@@ -731,7 +896,10 @@ psbbn_veto_allow_file() {
 # the user; code running under sudo relies on the user side having started it.
 psbbn_veto_start() {
     local whole ident state pidfile pid bin i
-    [[ -n "${PSBBN_SESSION_PID:-}" && "$EUID" -ne 0 ]] || return 0
+    [[ -n "${PSBBN_SESSION_PID:-}" ]] || return 0
+    # Under the session's own sudo; the user side started it. A session
+    # that is root itself (no sudo above it) starts its own.
+    [[ "$EUID" -ne 0 || -z "${SUDO_UID:-}" ]] || return 0
     whole=$(psbbn_whole_disk "$(psbbn_rewrite_device "$1")")
     psbbn_is_real_disk "$whole" || return 0
     psbbn_disk_internal "$whole" && return 0
@@ -1150,7 +1318,7 @@ psbbn_tar_extract() {
     table=$(mktemp)
     psbbn_stage_table > "$table"
     "$(psbbn_python)" - "$archive" "$dest" "$table" "$_psbbn_darwin_dir" << 'PY'
-import os, shutil, stat, subprocess, sys, tarfile, tempfile
+import bz2, gzip, io, lzma, os, shutil, stat, subprocess, sys, tarfile, tempfile
 
 archive, dest, table_path, libdir = sys.argv[1:5]
 dest = os.path.abspath(dest)
@@ -1212,7 +1380,10 @@ def meta(image, name, mode, uid, gid, mtime):
     cmds.append("set_inode_field %s gid %d" % (q(name), gid))
     cmds.append("set_inode_field %s mtime %d" % (q(name), int(mtime)))
 
-def host_member(name, member, tf):
+# data is the member's bytes already copied to a file, or None to read
+# them from the archive. The archive is a stream read once, so a member's
+# bytes can only be taken from it once.
+def host_member(name, member, tf, data=None):
     path = os.path.join(dest, name) if name else dest
     if member.isdir():
         os.makedirs(path, exist_ok=True)
@@ -1235,15 +1406,19 @@ def host_member(name, member, tf):
         os.link(target, path)
         return
     if member.isreg():
-        src = tf.extractfile(member)
-        with open(path, "wb") as out:
-            if src is not None:
-                shutil.copyfileobj(src, out)
+        if data is not None:
+            shutil.copyfile(data, path)
+        else:
+            src = tf.extractfile(member)
+            with open(path, "wb") as out:
+                if src is not None:
+                    shutil.copyfileobj(src, out)
         os.chmod(path, member.mode & 0o777)
         return
     sys.stderr.write("tar: cannot create %s on this filesystem\n" % member.name)
     raise SystemExit(1)
 
+# Returns the file holding a regular member's bytes, for host_member.
 def ext2_member(image, rel, member, tf):
     global seq
     perm = member.mode & 0o7777
@@ -1283,7 +1458,7 @@ def ext2_member(image, rel, member, tf):
         cmds_for(image).append("rm %s" % q(path))
         cmds_for(image).append("write %s %s" % (q(host), q(path)))
         meta(image, path, stat.S_IFREG | (perm & 0o777), member.uid, member.gid, member.mtime)
-        return
+        return host
     if member.ischr() or member.isblk() or member.isfifo():
         parent = os.path.dirname(rel)
         base = os.path.basename(rel)
@@ -1306,7 +1481,9 @@ def ext2_member(image, rel, member, tf):
     raise SystemExit(1)
 
 def apply_debugfs(image, lines):
-    script = tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8")
+    # tarfile keeps name bytes that are not UTF-8 (Latin-1 names in
+    # PS2Linux.tar.gz) as surrogates; they go to debugfs as the same bytes.
+    script = tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8", errors="surrogateescape")
     script.write("\n".join(lines) + "\n")
     script.close()
     proc = subprocess.run([sys.executable, os.path.join(libdir, "debugfs_apply.py"), image, script.name])
@@ -1314,10 +1491,42 @@ def apply_debugfs(image, lines):
     if proc.returncode != 0:
         raise SystemExit(1)
 
+class Prefixed(io.RawIOBase):
+    # The magic bytes already read, then the rest of the file.
+    def __init__(self, head, rest):
+        self.head, self.rest = head, rest
+    def readable(self):
+        return True
+    def readinto(self, buf):
+        if self.head:
+            n = min(len(buf), len(self.head))
+            buf[:n] = self.head[:n]
+            self.head = self.head[n:]
+            return n
+        return self.rest.readinto(buf)
+
+# tarfile's own "r|gz" stops after the first gzip member, so a file of
+# several (pigz, or pieces joined) ends early or fails; gzip, bz2 and lzma
+# read them all, front to back.
+def open_stream(path):
+    raw = open(path, "rb")
+    head = raw.read(6)
+    stream = io.BufferedReader(Prefixed(head, raw))
+    if head.startswith(b"\x1f\x8b"):
+        return gzip.GzipFile(fileobj=stream, mode="rb")
+    if head.startswith(b"BZh"):
+        return bz2.BZ2File(stream)
+    if head.startswith(b"\xfd7zXZ\x00"):
+        return lzma.LZMAFile(stream)
+    return stream
+
 def extract():
+    # A stream, read once front to back. Reading a member a second time
+    # would seek back, and a compressed stream seeks back by decompressing
+    # again from the start, once per member.
     try:
-        tf = tarfile.open(archive, "r:*")
-    except tarfile.TarError as exc:
+        tf = tarfile.open(fileobj=open_stream(archive), mode="r|")
+    except (OSError, EOFError, tarfile.TarError) as exc:
         sys.stderr.write("tar: %s\n" % exc)
         raise SystemExit(1)
     links = []
@@ -1331,11 +1540,13 @@ def extract():
                 links.append((name, image, rel, member))
                 continue
             if kind == "ext2":
-                ext2_member(image, rel, member, tf)
+                data = ext2_member(image, rel, member, tf)
                 if member.ischr() or member.isblk() or member.isfifo():
                     continue
+                # APFS refuses names that are not UTF-8 and folds case;
+                # the image already has the member.
                 try:
-                    host_member(name, member, tf)
+                    host_member(name, member, tf, data)
                 except OSError:
                     pass
             else:
@@ -1659,8 +1870,10 @@ def arg(text):
 
 cmds = ["device " + arg(device), "mount " + arg(partition), "lcd " + arg(src)]
 seen = set()
+changed = False
 
 def walk(local, rel):
+    global changed
     names = sorted(n for n in os.listdir(local) if not mf.skip(n))
     for name in names:
         full = os.path.join(local, name)
@@ -1672,6 +1885,7 @@ def walk(local, rel):
         if os.path.isdir(full):
             if dest not in old:
                 cmds.append("mkdir " + arg(name))
+                changed = True
             cmds.append("cd " + arg(name))
             cmds.append("lcd " + arg(full))
             walk(full, dest)
@@ -1680,6 +1894,7 @@ def walk(local, rel):
         elif os.path.isfile(full):
             if old.get(dest) != mf.entry(full):
                 cmds.append("put " + arg(name))
+                changed = True
         else:
             sys.stderr.write("pfs: unsupported file %s\n" % full)
             raise SystemExit(1)
@@ -1703,10 +1918,15 @@ for parent, names in gone_files.items():
     cmds.extend(descend(parent))
     for name in names:
         cmds.append("rm " + arg(name))
+        changed = True
     cmds.extend(["cd .."] * len(parent))
 cmds.extend(["umount", "exit"])
+# Nothing changed since the snapshot: pfsshell does not open the drive. A
+# write-back before the installer wrote the APA header itself (see
+# psbbn_pfs_sync) leaves nothing for unmount to do, and pfsshell refuses a
+# drive whose header checksum the installer has not fixed yet.
 with open(path, "w", encoding="utf-8") as fh:
-    fh.write("\n".join(cmds) + "\n")
+    fh.write("\n".join(cmds) + "\n" if changed else "")
 
 rm = []
 if gone_dirs:
@@ -1720,7 +1940,7 @@ with open(rmpath, "w", encoding="utf-8") as fh:
     fh.write("\n".join(rm) + ("\n" if rm else ""))
 PY
     local rc=$?
-    if [[ "$rc" -eq 0 ]]; then
+    if [[ "$rc" -eq 0 && -s "$script" ]]; then
         psbbn_pfs_run "$device" "$(cat "$script")" >/dev/null || rc=$?
     fi
     if [[ "$rc" -eq 0 && -s "$rmscript" ]]; then
@@ -1728,4 +1948,42 @@ PY
     fi
     rm -f "${script:?}" "${rmscript:?}"
     return "$rc"
+}
+
+# Write this session's PFS stages of DEVICE back now, before the installer
+# writes the drive itself. Linux's PFS Fuse has put the files on the drive
+# by then. Here they go at unmount, and HOSDMenu-Installer's BOOTSTRAP
+# writes into the APA header of sector 0 before it unmounts: until
+# apa_checksum_fix the header checksum is stale and pfsshell will not mount
+# a partition ("Operation not supported by device", -19). The stage stays
+# mounted with a fresh snapshot, so unmount writes only what changes after.
+# psbbn_pfs_sync DEVICE_OR_IMAGE
+psbbn_pfs_sync() {
+    local target state kind mnt src key part session
+    target=$(psbbn_rewrite_device "$1")
+    if psbbn_is_real_disk "$target"; then
+        psbbn_is_partition_node "$target" && return 0
+        target=$(psbbn_whole_disk "$target")
+    fi
+    state=$(psbbn_mount_state_dir)
+    while IFS=$'\t' read -r kind mnt src; do
+        [[ "$kind" == pfs && -d "$mnt" ]] || continue
+        if psbbn_is_real_disk "$src"; then
+            [[ "$(psbbn_whole_disk "$src")" == "$target" ]] || continue
+        else
+            [[ "$src" == "$target" ]] || continue
+        fi
+        key=$(psbbn_mount_key "$mnt")
+        session=""
+        [[ -f "$state/$key.session" ]] && session=$(cat "$state/$key.session")
+        [[ "$session" == "${PSBBN_SESSION_PID:-}" ]] || continue
+        part=""
+        [[ -f "$state/$key.part" ]] && part=$(cat "$state/$key.part")
+        psbbn_pfs_import "$mnt" "$src" "$part" "$state/$key.manifest" || {
+            printf '%s\n' "$mnt: could not write it to $src before $target is written" >&2
+            return 1
+        }
+        psbbn_manifest_write "$mnt" || return 1
+    done < <(psbbn_stage_table)
+    return 0
 }

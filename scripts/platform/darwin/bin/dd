@@ -22,6 +22,14 @@ for arg in "$@"; do
     esac
 done
 needs_root=0
+# The installer writing the drive itself: PFS stages of the drive go first,
+# as they already have on Linux (see psbbn_pfs_sync). Nothing is written
+# when that fails.
+for arg in "${args[@]}"; do
+    case "$arg" in
+        of=*) psbbn_pfs_sync "${arg#of=}" || exit 1 ;;
+    esac
+done
 for arg in "${args[@]}"; do
     case "$arg" in
         of=/dev/disk*|of=/dev/rdisk*|if=/dev/disk*|if=/dev/rdisk*)

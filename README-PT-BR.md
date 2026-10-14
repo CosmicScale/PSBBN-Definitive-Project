@@ -775,11 +775,11 @@ O script abre o mesmo [menu principal](#menu-principal) do Linux. Saia com `q` a
 
 Conecte apenas a unidade do PS2. A lista de discos mostra unidades externas. O disco interno do Mac não aparece.
 
-Uma unidade externa do PS2 pode ser inicializada. O disco interno do Mac é recusado. Quando o macOS pedir a senha de administrador, essa senha é para gravar na unidade. Digite-a uma vez. Os comandos seguintes reutilizam essa autorização. Criar uma partição EXT2 também a formata, como o PFS Shell do Linux. O instalador mantém cada partição como uma pasta comum e grava essa pasta de volta na unidade quando a partição é desmontada.
+Uma unidade externa do PS2 pode ser inicializada. O disco interno do Mac é recusado. O script pede a senha de administrador uma vez, antes do menu, para gravar na unidade, e a mantém durante a sessão. Execute-o sem `sudo`; se for iniciado com `sudo`, ele volta para o seu usuário. Criar uma partição EXT2 também a formata, como o PFS Shell do Linux. O instalador mantém cada partição como uma pasta comum e grava essa pasta de volta na unidade quando a partição é desmontada.
 
-"Instalando o PSBBN..." fica em silêncio por vários minutos. O arquivo do patch é gravado nas imagens ext2 com o `debugfs` e a saída é capturada, então nada chega ao log até essa etapa terminar. Não é um travamento. Cada imagem é verificada com `e2fsck` antes de ser gravada na unidade.
+"Instalando o PSBBN..." fica em silêncio enquanto o arquivo do patch é gravado nas imagens ext2 com o `debugfs`; a saída é capturada, então nada chega ao log até essa etapa terminar. Não é um travamento. Cada imagem é verificada com `e2fsck` antes de ser gravada na unidade.
 
-O script roda a partir de uma cópia de trabalho em `$TMPDIR/psbbn-overlay-<uid>`. É lá que ficam o `logs/PSBBN-installer.log` e os arquivos do patch baixados; os dois sobrevivem a execuções seguintes. As partições em preparação são pastas em `/tmp/psbbn-storage-<uid>` e são removidas quando o instalador termina.
+O script roda a partir de uma cópia de trabalho em `$TMPDIR/psbbn-overlay-<uid>`, onde os arquivos do patch baixados ficam guardados entre execuções. As pastas `games`, `media`, `icons` e `logs` dessa cópia são as próprias pastas do projeto, então os instaladores mostram e usam essas pastas, e os logs ficam na pasta `logs` do projeto, como no Linux. As partições em preparação são pastas em `/tmp/psbbn-storage-<uid>` e são removidas quando o instalador termina.
 
 ## Instalando no Windows
 A maneira recomendada de instalar o **PSBBN Definitive Project** no Windows é usando o **PSBBN Launcher for Windows**. O **PSBBN Launcher for Windows** é compatível com as edições Home do Windows 10 e 11; outras edições podem não ser compatíveis. Para uma experiência sem problemas, certifique-se de que o Windows esteja totalmente atualizado.

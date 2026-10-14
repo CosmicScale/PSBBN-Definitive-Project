@@ -3,11 +3,11 @@
 if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
     exit 0
 fi
-state="${PSBBN_DM_STATE:-/tmp/psbbn-dm}"
-mkdir -p "$state"
 here=${0%/*}
 # shellcheck disable=SC1091
 . "$here/../../load.sh"
+state=$(psbbn_dm_state_dir)
+mkdir -p "$state"
 cmd="${1:-}"
 shift || true
 case "$cmd" in
@@ -20,9 +20,10 @@ case "$cmd" in
         ;;
     remove)
         name=""
+        force=""
         for arg in "$@"; do
             case "$arg" in
-                -f|--force) ;;
+                -f|--force) force=1 ;;
                 -*)
                     echo "dmsetup remove: unsupported flag $arg" >&2
                     exit 1
@@ -34,8 +35,12 @@ case "$cmd" in
             echo "dmsetup remove: no such map ${name:-}" >&2
             exit 1
         fi
-        rm -f "$state/$name"
         dir=$(platform_mapper_dir)
+        if ! psbbn_slice_release "$dir/$name" "$force"; then
+            echo "dmsetup remove: $name: Device or resource busy" >&2
+            exit 1
+        fi
+        rm -f "$state/$name"
         psbbn_sums_forget "$dir/$name"
         rm -f "$dir/$name" "$dir/$name.meta"
         exit 0
@@ -52,6 +57,12 @@ case "$cmd" in
             line="${line#"${line%%[![:space:]]*}"}"
             [[ -z "$line" ]] && continue
             name="${line%%,*}"
+            # The new map starts empty; a stage still on the old one goes
+            # to the drive first.
+            if ! psbbn_slice_release "$dir/$name" </dev/null; then
+                echo "dmsetup create: $name: Device or resource busy" >&2
+                exit 1
+            fi
             psbbn_sums_forget "$dir/$name"
             if ! "$(psbbn_python)" - "$dir/$name" "$dir/$name.meta" "$line" << 'PY'
 import os, shlex, sys

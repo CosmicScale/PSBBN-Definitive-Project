@@ -581,6 +581,10 @@ else
     # For Linux paths, display_path is the same as MEDIA_DIR
     display_path="$MEDIA_DIR/"
 fi
+# macOS runs the installer from a temporary copy; show the project's folder.
+if [[ "$(uname -s)" == Darwin ]]; then
+    display_path=$(platform_display_path "$display_path")
+fi
 }
 
 download_ps2str() {

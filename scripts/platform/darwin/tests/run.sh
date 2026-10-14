@@ -702,16 +702,18 @@ else
 fi
 
 repo=$(mktemp -d)
+# scripts/assets/lang is linked whole on purpose (the changelog the front
+# door deletes), so the sample lives one level up.
 mkdir -p "$repo/scripts/assets/lang" "$repo/scripts/helper/aarch64" "$repo/scripts/helper/darwin-arm64"
-echo keep-me > "$repo/scripts/assets/lang/sample.txt"
+echo keep-me > "$repo/scripts/assets/sample.txt"
 echo elf > "$repo/scripts/helper/aarch64/cue2pops"
 echo macho > "$repo/scripts/helper/darwin-arm64/cue2pops"
 echo macho > "$repo/scripts/helper/darwin-arm64/pops2cue"
 overlay=$(mktemp -d)
 . "$root/lib.sh"
 build_overlay "$repo" "$overlay"
-rm "$overlay/scripts/assets/lang/sample.txt"
-if [[ -f "$repo/scripts/assets/lang/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
+rm "$overlay/scripts/assets/sample.txt"
+if [[ -f "$repo/scripts/assets/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
 if [[ "$(cat "$overlay/scripts/helper/aarch64/cue2pops")" == macho ]]; then ok overlay-helper; else bad overlay-helper; fi
 # No Linux pops2cue is shipped yet; the overlay still has both names for it.
 if [[ "$(cat "$overlay/scripts/helper/pops2cue" 2>/dev/null)" == macho && "$(cat "$overlay/scripts/helper/aarch64/pops2cue" 2>/dev/null)" == macho ]]; then
@@ -720,7 +722,7 @@ else
     bad overlay-helper-pops2cue
 fi
 
-for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt df mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed; do
+for tool in uname sudo blkid ldconfig lvm dmsetup sfdisk partprobe blockdev wipefs mount umount findmnt df mkfs.vfat mke2fs timeout mount.exfat-fuse lsblk sed convert; do
     if [[ -x "$bin/$tool" ]]; then ok "exec-$tool"; else bad "exec-$tool"; fi
 done
 
@@ -1285,6 +1287,38 @@ if [[ "$pfs_fail_rc" -ne 0 ]] && grep -q 'did not mount' /tmp/psbbn-pfs-fail.out
 else
     bad "pfs-mount-fails-closed rc=$pfs_fail_rc out=$(cat /tmp/psbbn-pfs-fail.out 2>/dev/null)"
 fi
+
+# --- a dd to the drive writes the session's PFS stages first ---------------
+# HOSDMenu-Installer's BOOTSTRAP writes sector 0 with its PFS partitions
+# still staged, and leaves the APA header checksum stale until it fixes it
+# later: pfsshell then refuses the drive (-19). The stage goes to the drive
+# before the dd, and its unmount, with nothing new, leaves pfsshell alone.
+sync=$(mktemp -d)
+cp -c "$pfs_img" "$sync/img"
+mkdir -p "$sync/mnt" "$sync/state" "$sync/back"
+sync_env=(PSBBN_SESSION_PID=$$ PSBBN_MOUNT_STATE="$sync/state")
+sync_rc=0
+env "${sync_env[@]}" "$bin/pfs-fuse" -o allow_other --partition=__contents "$sync/img" "$sync/mnt/" > "$sync/out" 2>&1 || sync_rc=$?
+printf 'synced\n' > "$sync/mnt/early.txt"
+env "${sync_env[@]}" "$bin/dd" if=/dev/zero of="$sync/img" bs=1 count=0 conv=notrunc >> "$sync/out" 2>&1 || sync_rc=$?
+printf 'device %s\nmount __contents\nlcd %s\nget early.txt\numount\nexit\n' "$sync/img" "$sync/back" | "$pfs_bin" >/dev/null 2>&1 || true
+if [[ "$sync_rc" -eq 0 && "$(cat "$sync/back/early.txt" 2>/dev/null)" == synced ]]; then
+    ok dd-writes-pfs-stage-first
+else
+    bad "dd-writes-pfs-stage-first rc=$sync_rc got=[$(cat "$sync/back/early.txt" 2>/dev/null)] $(tail -n 3 "$sync/out")"
+fi
+# The stale checksum, as BOOTSTRAP leaves it: a byte of the header changes.
+printf 'X' | /bin/dd of="$sync/img" bs=1 seek=304 conv=notrunc 2>/dev/null
+stale=$(printf 'device %s\nmount __contents\numount\nexit\n' "$sync/img" | "$pfs_bin" 2>&1 || true)
+sync_rc=0
+env "${sync_env[@]}" "$bin/umount" "$sync/mnt" >> "$sync/out" 2>&1 || sync_rc=$?
+if [[ "$stale" == *"-19"* && "$sync_rc" -eq 0 ]] \
+    && [[ -z "$(env "${sync_env[@]}" "$bin/findmnt" -nr -o TARGET | grep -F "$sync/mnt")" ]]; then
+    ok pfs-umount-unchanged-skips-pfsshell
+else
+    bad "pfs-umount-unchanged-skips-pfsshell rc=$sync_rc stale=[$(tail -n 2 <<< "$stale")] $(tail -n 3 "$sync/out")"
+fi
+rm -rf "$sync"
 
 link_dest=$(mktemp -d)
 mkdir -p "$link_dest/scripts/helper/aarch64"
@@ -2149,7 +2183,8 @@ command -v psbbn-e2-tool >/dev/null && echo e2fsprogs-found || echo e2fsprogs-mi
 EOF
 chmod +x "$fl/repo/PSBBN-Definitive-Patch.sh"
 out=$(PATH="$fl/fakebin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin" TMPDIR="$fl/tmp" PKG_CONFIG_PATH="" \
-    "$fl/repo/scripts/platform/darwin/enter.sh" 2>&1) || true
+    PSBBN_MOUNT_STATE="$fl/state" PSBBN_MAPPER_DIR="$fl/maps" PSBBN_DM_STATE="$fl/dm" PSBBN_STORAGE_DIR="$fl/storage" \
+    "$fl/repo/scripts/platform/darwin/enter.sh" 2>&1 < /dev/null) || true
 if [[ "$out" == *icu-found* && "$out" == *gnubin-found* && "$out" == *e2fsprogs-found* ]]; then
     ok enter-finds-packages-installed-later
 else
@@ -2211,6 +2246,584 @@ else
     bad "pops2cue-roundtrip status=$status cue=[$cue_out] $(tail -n 3 "$pc/pops2cue.out" 2>/dev/null)"
 fi
 rm -rf "$pc"
+
+# --- tar reads the archive once, front to back ------------------------------
+# A second read of a member seeks back in the compressed stream, and gzip
+# can only do that by decompressing again from the start: PS2Linux.tar.gz
+# took over an hour that way. A pipe allows no way back, so an extract fed
+# through one proves the single pass.
+once=$(mktemp -d)
+dd if=/dev/zero of="$once/slice" bs=1048576 count=32 status=none 2>/dev/null
+psbbn_format_ext2_file "$once/slice" >/dev/null
+printf 'device=%s\nstart=0\nsectors=65536\n' "$once/slice" > "$once/slice.meta"
+mkdir -p "$once/storage/__linux.3" "$once/state" "$once/src/etc"
+# Random 1 MiB members: larger than any read buffer, so a second read of a
+# member has to seek back in the stream itself.
+for i in 1 2 3 4 5 6; do head -c 1048576 /dev/urandom > "$once/src/etc/blob$i"; done
+/usr/bin/tar -czf "$once/archive.tar.gz" -C "$once/src" etc
+once_rc=0
+PSBBN_MOUNT_STATE="$once/state" "$bin/mount" "$once/slice" "$once/storage/__linux.3" > "$once/out" 2>&1 || once_rc=$?
+if [[ "$once_rc" -eq 0 ]]; then
+    mkfifo "$once/pipe"
+    cat "$once/archive.tar.gz" > "$once/pipe" &
+    PSBBN_MOUNT_STATE="$once/state" "$bin/tar" zxpf "$once/pipe" -C "$once/storage/__linux.3" >> "$once/out" 2>&1 || once_rc=$?
+    wait
+fi
+"$dbg" -R 'dump /etc/blob6 '"$once/image-blob6" "$once/slice" >/dev/null 2>&1 || true
+if [[ "$once_rc" -eq 0 ]] && cmp -s "$once/src/etc/blob6" "$once/image-blob6" \
+    && cmp -s "$once/src/etc/blob1" "$once/storage/__linux.3/etc/blob1" \
+    && cmp -s "$once/src/etc/blob6" "$once/storage/__linux.3/etc/blob6"; then
+    ok tar-reads-archive-once
+else
+    bad "tar-reads-archive-once rc=$once_rc host=$(ls "$once/storage/__linux.3/etc" 2>/dev/null | tr '\n' ' ') $(tail -n 3 "$once/out")"
+fi
+PSBBN_MOUNT_STATE="$once/state" "$bin/umount" "$once/storage/__linux.3" >/dev/null 2>&1 || true
+rm -rf "$once"
+
+# gzip allows a file of several members back to back (pigz, or pieces
+# compressed apart and joined); GNU tar on Linux reads them as one stream.
+# One cut falls inside a file, the other on a tar header: ustar puts etc/ at
+# 0 and each 512 KiB blob's header 512 + 524288 bytes after the last.
+for cut in 700000 525312; do
+    multi=$(mktemp -d)
+    dd if=/dev/zero of="$multi/slice" bs=1048576 count=16 status=none 2>/dev/null
+    psbbn_format_ext2_file "$multi/slice" >/dev/null
+    printf 'device=%s\nstart=0\nsectors=32768\n' "$multi/slice" > "$multi/slice.meta"
+    mkdir -p "$multi/storage/__linux.3" "$multi/state" "$multi/src/etc"
+    for i in 1 2 3 4; do head -c 524288 /dev/urandom > "$multi/src/etc/blob$i"; done
+    python3 - "$multi/src" "$multi/archive.tar" << 'PY'
+import os, sys, tarfile
+src, archive = sys.argv[1:3]
+with tarfile.open(archive, "w", format=tarfile.USTAR_FORMAT) as tf:
+    tf.add(os.path.join(src, "etc"), "etc", recursive=False)
+    for i in range(1, 5):
+        tf.add(os.path.join(src, "etc", "blob%d" % i), "etc/blob%d" % i)
+PY
+    head -c "$cut" "$multi/archive.tar" | gzip -c > "$multi/archive.tar.gz"
+    tail -c +"$((cut + 1))" "$multi/archive.tar" | gzip -c >> "$multi/archive.tar.gz"
+    multi_rc=0
+    PSBBN_MOUNT_STATE="$multi/state" "$bin/mount" "$multi/slice" "$multi/storage/__linux.3" > "$multi/out" 2>&1 || multi_rc=$?
+    if [[ "$multi_rc" -eq 0 ]]; then
+        mkfifo "$multi/pipe"
+        cat "$multi/archive.tar.gz" > "$multi/pipe" &
+        PSBBN_MOUNT_STATE="$multi/state" timeout 60 "$bin/tar" zxpf "$multi/pipe" -C "$multi/storage/__linux.3" >> "$multi/out" 2>&1 || multi_rc=$?
+        # A reader that hung leaves cat blocked on the pipe.
+        kill %% 2>/dev/null || true
+        wait 2>/dev/null || true
+    fi
+    "$dbg" -R 'dump /etc/blob4 '"$multi/image-blob4" "$multi/slice" >/dev/null 2>&1 || true
+    if [[ "$multi_rc" -eq 0 ]] && cmp -s "$multi/src/etc/blob4" "$multi/image-blob4" \
+        && cmp -s "$multi/src/etc/blob4" "$multi/storage/__linux.3/etc/blob4"; then
+        ok "tar-reads-multi-member-gzip-$cut"
+    else
+        bad "tar-reads-multi-member-gzip-$cut rc=$multi_rc host=$(ls "$multi/storage/__linux.3/etc" 2>/dev/null | tr '\n' ' ') $(tail -n 3 "$multi/out")"
+    fi
+    PSBBN_MOUNT_STATE="$multi/state" "$bin/umount" "$multi/storage/__linux.3" >/dev/null 2>&1 || true
+    rm -rf "$multi"
+done
+
+# PS2Linux.tar.gz names some files in Latin-1. The bytes are not UTF-8, so
+# APFS cannot hold them, but ext2 can and the PS2 expects them as they are.
+latin=$(mktemp -d)
+dd if=/dev/zero of="$latin/slice" bs=1048576 count=16 status=none 2>/dev/null
+psbbn_format_ext2_file "$latin/slice" >/dev/null
+printf 'device=%s\nstart=0\nsectors=32768\n' "$latin/slice" > "$latin/slice.meta"
+mkdir -p "$latin/storage/__linux.3" "$latin/state"
+python3 - "$latin/archive.tar.gz" << 'PY'
+import io, sys, tarfile
+with tarfile.open(sys.argv[1], "w:gz", format=tarfile.GNU_FORMAT,
+                  encoding="utf-8", errors="surrogateescape") as tf:
+    for name, data in (("doc/caf\udce9.txt", b"latin-1 name\n"), ("doc/plain.txt", b"plain\n")):
+        info = tarfile.TarInfo(name)
+        info.size, info.mode, info.mtime = len(data), 0o644, 1700000000
+        tf.addfile(info, io.BytesIO(data))
+PY
+latin_rc=0
+PSBBN_MOUNT_STATE="$latin/state" "$bin/mount" "$latin/slice" "$latin/storage/__linux.3" > "$latin/out" 2>&1 || latin_rc=$?
+[[ "$latin_rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$latin/state" "$bin/tar" zxpf "$latin/archive.tar.gz" -C "$latin/storage/__linux.3" >> "$latin/out" 2>&1 || latin_rc=$?; }
+[[ "$latin_rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$latin/state" "$bin/umount" "$latin/storage/__linux.3" >> "$latin/out" 2>&1 || latin_rc=$?; }
+latin_got=$(LC_ALL=C "$dbg" -R "$(printf 'cat /doc/caf\351.txt')" "$latin/slice" 2>/dev/null || true)
+latin_fsck=0
+/opt/homebrew/opt/e2fsprogs/sbin/e2fsck -fn "$latin/slice" >/dev/null 2>&1 || latin_fsck=$?
+if [[ "$latin_rc" -eq 0 && "$latin_got" == "latin-1 name" && "$latin_fsck" -eq 0 ]]; then
+    ok tar-ext2-keeps-latin1-names
+else
+    bad "tar-ext2-keeps-latin1-names rc=$latin_rc got=[$latin_got] fsck=$latin_fsck $(tail -n 4 "$latin/out")"
+fi
+rm -rf "$latin"
+
+# --- a stage whose folder was deleted writes nothing back -------------------
+# HOSDMenu-, Media-Installer and Extras delete STORAGE_DIR when they start,
+# before their own clean_up unmounts what an earlier, failed option left.
+# A missing folder must not read as "every file was deleted".
+gone=$(mktemp -d)
+dd if=/dev/zero of="$gone/slice" bs=1048576 count=16 status=none 2>/dev/null
+psbbn_format_ext2_file "$gone/slice" >/dev/null
+printf 'keep me\n' > "$gone/keep.txt"
+"$dbg" -w -R "write $gone/keep.txt keep.txt" "$gone/slice" >/dev/null 2>&1
+printf 'device=%s\nstart=0\nsectors=32768\n' "$gone/slice" > "$gone/slice.meta"
+mkdir -p "$gone/storage/__linux.4" "$gone/state"
+gone_rc=0
+PSBBN_MOUNT_STATE="$gone/state" "$bin/mount" "$gone/slice" "$gone/storage/__linux.4" > "$gone/out" 2>&1 || gone_rc=$?
+rm -rf "$gone/storage"
+gone_err=$(PSBBN_MOUNT_STATE="$gone/state" "$bin/umount" "$gone/storage/__linux.4" 2>&1) || gone_rc=$?
+gone_keep=$("$dbg" -R 'cat keep.txt' "$gone/slice" 2>/dev/null || true)
+if [[ "$gone_rc" -eq 0 && "$gone_keep" == "keep me" && "$gone_err" == *"nothing"* ]] \
+    && [[ -z "$(PSBBN_MOUNT_STATE="$gone/state" "$bin/findmnt" -nr -o TARGET | grep -F "$gone/storage")" ]]; then
+    ok umount-gone-folder-writes-nothing
+else
+    bad "umount-gone-folder-writes-nothing rc=$gone_rc keep=[$gone_keep] err=[$gone_err]"
+fi
+# The PFS stage of SammyCola's repeat install: pfsshell is never started.
+mkdir -p "$gone/pfs-state"
+gone_key=$(psbbn_mount_key "$gone/storage/__common")
+printf '%s\n' "$gone/no-such-drive" > "$gone/pfs-state/$gone_key"
+printf 'pfs\n' > "$gone/pfs-state/$gone_key.kind"
+printf '%s\n' "$gone/storage/__common" > "$gone/pfs-state/$gone_key.mount"
+printf '__common\n' > "$gone/pfs-state/$gone_key.part"
+gone_rc=0
+gone_err=$(PSBBN_PFSSHELL=/usr/bin/false PSBBN_MOUNT_STATE="$gone/pfs-state" "$bin/umount" "$gone/storage/__common" 2>&1) || gone_rc=$?
+if [[ "$gone_rc" -eq 0 && ! -f "$gone/pfs-state/$gone_key" && "$gone_err" != *Traceback* ]]; then
+    ok umount-gone-pfs-folder
+else
+    bad "umount-gone-pfs-folder rc=$gone_rc err=[$gone_err]"
+fi
+rm -rf "$gone"
+
+# --- a slice still mounted is written back before dmsetup drops it ---------
+# Linux has the files on the drive the moment they are copied; here they go
+# at unmount. When clean_up's unmount loop stops early it still removes
+# every map, and the stages left behind lost their slices ("slice ...
+# vanished during this run").
+busy=$(mktemp -d)
+mkdir -p "$busy/maps" "$busy/dm" "$busy/state" "$busy/storage/__linux.1"
+dd if=/dev/zero of="$busy/drive" bs=1048576 count=16 status=none 2>/dev/null
+psbbn_format_ext2_file "$busy/drive" >/dev/null
+busy_env=(PSBBN_MAPPER_DIR="$busy/maps" PSBBN_DM_STATE="$busy/dm" PSBBN_MOUNT_STATE="$busy/state")
+busy_create() {
+    printf '%s\n' "drive-__linux.1,,,rw,0 32768 linear $busy/drive 0" | env "${busy_env[@]}" "$bin/dmsetup" create --concise
+}
+busy_rc=0
+busy_create || busy_rc=$?
+env "${busy_env[@]}" "$bin/mount" "$busy/maps/drive-__linux.1" "$busy/storage/__linux.1" > "$busy/out" 2>&1 || busy_rc=$?
+printf 'staged\n' > "$busy/storage/__linux.1/added.txt"
+env "${busy_env[@]}" "$bin/dmsetup" remove -f drive-__linux.1 >> "$busy/out" 2>&1 || busy_rc=$?
+busy_got=$("$dbg" -R 'cat added.txt' "$busy/drive" 2>/dev/null || true)
+if [[ "$busy_rc" -eq 0 && "$busy_got" == staged && ! -e "$busy/maps/drive-__linux.1" ]] \
+    && [[ -z "$(env "${busy_env[@]}" "$bin/findmnt" -nr -o TARGET | grep -F "$busy/storage")" ]]; then
+    ok dmsetup-remove-writes-back-mounted-slice
+else
+    bad "dmsetup-remove-writes-back-mounted-slice rc=$busy_rc got=[$busy_got] $(tail -n 3 "$busy/out")"
+fi
+# Media-Installer maps the drive again with a stage still up: the new map
+# must not start from an empty slice under it.
+busy_rc=0
+busy_create || busy_rc=$?
+env "${busy_env[@]}" "$bin/mount" "$busy/maps/drive-__linux.1" "$busy/storage/__linux.1" > "$busy/out" 2>&1 || busy_rc=$?
+printf 'second\n' > "$busy/storage/__linux.1/second.txt"
+busy_create >> "$busy/out" 2>&1 || busy_rc=$?
+busy_got=$("$dbg" -R 'cat second.txt' "$busy/drive" 2>/dev/null || true)
+if [[ "$busy_rc" -eq 0 && "$busy_got" == second ]] \
+    && [[ -z "$(env "${busy_env[@]}" "$bin/findmnt" -nr -o TARGET | grep -F "$busy/storage")" ]]; then
+    ok dmsetup-create-writes-back-mounted-slice
+else
+    bad "dmsetup-create-writes-back-mounted-slice rc=$busy_rc got=[$busy_got] $(tail -n 3 "$busy/out")"
+fi
+# The write-back fails: plain remove leaves everything as it was (Linux:
+# device busy). -f drops the stage, so the next run is not stuck on it, and
+# still fails busy, as Linux does with the mount up: clean_up stops before
+# it deletes STORAGE_DIR, the only copy of what was not written.
+env "${busy_env[@]}" "$bin/mount" "$busy/maps/drive-__linux.1" "$busy/storage/__linux.1" > "$busy/out" 2>&1 || true
+printf 'lost\n' > "$busy/storage/__linux.1/lost.txt"
+mv "$busy/drive" "$busy/drive.away"
+busy_rc=0
+env "${busy_env[@]}" "$bin/dmsetup" remove drive-__linux.1 > "$busy/out" 2>&1 || busy_rc=$?
+if [[ "$busy_rc" -ne 0 && -e "$busy/maps/drive-__linux.1" && -n "$(env "${busy_env[@]}" "$bin/findmnt" -nr -o TARGET | grep -F "$busy/storage")" ]]; then
+    ok dmsetup-remove-busy-keeps-stage
+else
+    bad "dmsetup-remove-busy-keeps-stage rc=$busy_rc $(cat "$busy/out")"
+fi
+busy_rc=0
+busy_err=$(env "${busy_env[@]}" "$bin/dmsetup" remove -f drive-__linux.1 2>&1) || busy_rc=$?
+busy_again=0
+env "${busy_env[@]}" "$bin/dmsetup" remove -f drive-__linux.1 >/dev/null 2>&1 || busy_again=$?
+if [[ "$busy_rc" -ne 0 && "$busy_err" == *"not written back"* && "$busy_err" == *busy* \
+    && -f "$busy/storage/__linux.1/lost.txt" && "$busy_again" -eq 0 && ! -e "$busy/maps/drive-__linux.1" ]] \
+    && [[ -z "$(env "${busy_env[@]}" "$bin/findmnt" -nr -o TARGET | grep -F "$busy/storage")" ]]; then
+    ok dmsetup-remove-force-drops-stage
+else
+    bad "dmsetup-remove-force-drops-stage rc=$busy_rc again=$busy_again err=[$busy_err]"
+fi
+rm -rf "$busy"
+
+# --- a whole-disk dd that macOS refused as busy is tried again -------------
+# "dd: /dev/rdisk4: Resource busy": Disk Arbitration landed a mount between
+# the eviction and the open. Nothing was written; the open is retried.
+ebusy=$(mktemp -d)
+cat > "$ebusy/dd" << EOF
+#!/bin/bash
+n=\$(cat "$ebusy/calls" 2>/dev/null || echo 0)
+echo \$((n + 1)) > "$ebusy/calls"
+if [[ \$n -lt 2 ]]; then echo "dd: /dev/rdisk5: Resource busy" >&2; exit 1; fi
+exit 0
+EOF
+printf '#!/bin/bash\nexec "$@"\n' > "$ebusy/sudo"
+python3 - "$ebusy/diskutil" << 'PY'
+import plistlib, sys
+info = plistlib.dumps({"Internal": False, "Size": 1 << 30, "TotalSize": 1 << 30}).decode()
+open(sys.argv[1], "w").write('#!/bin/bash\nif [[ "$1" == info ]]; then cat << \'EOF\'\n' + info + 'EOF\nexit 0; fi\nexit 1\n')
+PY
+chmod +x "$ebusy/dd" "$ebusy/sudo" "$ebusy/diskutil"
+: > "$ebusy/table"
+head -c 4096 /dev/urandom > "$ebusy/src"
+ebusy_rc=0
+ebusy_err=$(PSBBN_DD="$ebusy/dd" PSBBN_SUDO="$ebusy/sudo" PSBBN_DISKUTIL="$ebusy/diskutil" PSBBN_MOUNT_TABLE="$ebusy/table" PSBBN_DA_SETTLE=0 \
+    /opt/homebrew/bin/bash -c '. "$1"; psbbn_dd_ranges elevate "$2" /dev/rdisk5 "0:0:8"' _ "$root/../load.sh" "$ebusy/src" 2>&1) || ebusy_rc=$?
+if [[ "$ebusy_rc" -eq 0 && "$(cat "$ebusy/calls")" -eq 3 ]]; then
+    ok dd-ranges-retries-busy-open
+else
+    bad "dd-ranges-retries-busy-open rc=$ebusy_rc calls=$(cat "$ebusy/calls" 2>/dev/null) err=[$ebusy_err]"
+fi
+# Any other failure is not retried.
+cat > "$ebusy/dd" << EOF
+#!/bin/bash
+n=\$(cat "$ebusy/calls" 2>/dev/null || echo 0)
+echo \$((n + 1)) > "$ebusy/calls"
+echo "dd: /dev/rdisk5: Input/output error" >&2
+exit 1
+EOF
+echo 5 > "$ebusy/calls"
+ebusy_rc=0
+PSBBN_DD="$ebusy/dd" PSBBN_SUDO="$ebusy/sudo" PSBBN_DISKUTIL="$ebusy/diskutil" PSBBN_MOUNT_TABLE="$ebusy/table" PSBBN_DA_SETTLE=0 \
+    /opt/homebrew/bin/bash -c '. "$1"; psbbn_dd_ranges elevate "$2" /dev/rdisk5 "0:0:8"' _ "$root/../load.sh" "$ebusy/src" >/dev/null 2>&1 || ebusy_rc=$?
+if [[ "$ebusy_rc" -ne 0 && "$(cat "$ebusy/calls")" -eq 6 ]]; then
+    ok dd-ranges-no-retry-other-errors
+else
+    bad "dd-ranges-no-retry-other-errors rc=$ebusy_rc calls=$(cat "$ebusy/calls" 2>/dev/null)"
+fi
+rm -rf "$ebusy"
+
+# --- the PSBBN databases are SQLite 2 ---------------------------------------
+# music.db, photo.db and movie.db on the drive are SQLite 2.1 files and the
+# Linux helper is SQLite 2.8.17. SQLite 3 cannot read them ("file is not a
+# database") and writes files PSBBN cannot read. This is Media-Installer's
+# round trip: dump, add a row before COMMIT, load into a new file.
+sq=$(mktemp -d)
+sqlite2="$root/../../helper/darwin-arm64/sqlite"
+sq_ver=$("$sqlite2" -version 2>&1 || true)
+sq_err=$("$sqlite2" "$root/../../assets/music/music.db" .dump 2>&1 > "$sq/dump.sql") || true
+awk '/^COMMIT;/ { print "INSERT INTO SCEI_Jukebox (trackno, songname) VALUES(1, '"'"'Rehearsal'"'"');" } { print }' "$sq/dump.sql" > "$sq/rebuilt.sql"
+sq_load=$("$sqlite2" "$sq/new.db" < "$sq/rebuilt.sql" 2>&1) || true
+sq_head=$(head -c 47 "$sq/new.db" 2>/dev/null || true)
+sq_row=$("$sqlite2" "$sq/new.db" 'SELECT songname FROM SCEI_Jukebox WHERE trackno = 1;' 2>&1 || true)
+if [[ "$sq_ver" == 2.8.17 && -z "$sq_err" && -z "$sq_load" && "$(head -n 1 "$sq/dump.sql")" == "BEGIN TRANSACTION;" \
+    && "$sq_head" == "** This file contains an SQLite 2.1 database **" && "$sq_row" == Rehearsal ]]; then
+    ok sqlite-is-sqlite2
+else
+    bad "sqlite-is-sqlite2 version=[$sq_ver] dump=[$sq_err] load=[$sq_load] head=[$sq_head] row=[$sq_row]"
+fi
+rm -rf "$sq"
+
+# --- with or without sudo, the session runs as the user ---------------------
+# State the shims keep in /tmp is the invoking user's. dmsetup's was one
+# folder for everybody.
+dm_dir=$(env -u PSBBN_DM_STATE /opt/homebrew/bin/bash -c '. "$1"; psbbn_dm_state_dir' _ "$root/lib.sh" 2>&1) || true
+[[ "$dm_dir" == "/tmp/psbbn-dm-$UID" ]] && ok dm-state-per-user || bad "dm-state-per-user [$dm_dir]"
+dm_dir=$(env -u PSBBN_DM_STATE SUDO_UID=4321 /opt/homebrew/bin/bash -c '. "$1"; psbbn_dm_state_dir' _ "$root/lib.sh" 2>&1) || true
+[[ "$dm_dir" == "/tmp/psbbn-dm-4321" ]] && ok dm-state-follows-sudo-uid || bad "dm-state-follows-sudo-uid [$dm_dir]"
+paths=$(env -u PSBBN_MOUNT_STATE -u PSBBN_MAPPER_DIR -u PSBBN_DM_STATE PSBBN_REPO=/some/repo \
+    /opt/homebrew/bin/bash -c '. "$1"; psbbn_user_paths 4321' _ "$root/lib.sh" 2>&1) || true
+want=$(printf '%s\n' /tmp/psbbn-mounts-4321 /tmp/psbbn-mapper-4321 /tmp/psbbn-dm-4321 /tmp/psbbn-storage-4321 /some/repo)
+[[ "$paths" == "$want" ]] && ok user-paths || bad "user-paths [$paths]"
+# The project reached through a link: find does not walk a link it is given.
+up=$(mktemp -d)
+mkdir -p "$up/real"
+ln -s "$up/real" "$up/link"
+paths=$(PSBBN_REPO="$up/link" /opt/homebrew/bin/bash -c '. "$1"; psbbn_user_paths 4321' _ "$root/lib.sh" 2>&1 | tail -n 1) || true
+[[ "$paths" == "$(cd -P "$up/real" && pwd -P)" ]] && ok user-paths-project-behind-link || bad "user-paths-project-behind-link [$paths]"
+rm -rf "$up"
+
+# A run under sudo left these owned by root; the user's next run could not
+# write its own state. What root owns is handed back, nothing else. The
+# test's own files stand in for root's (PSBBN_CLAIM_FROM). The recorder
+# notes the folder chown ran in and its arguments.
+claim=$(mktemp -d)
+claim_p=$(cd -P "$claim" && pwd -P)
+mkdir -p "$claim/state/sub" "$claim/other"
+: > "$claim/state/sub/rec"
+# Another name of a file anywhere else: chown would change that file too.
+: > "$claim/state/sub/linked"
+ln "$claim/state/sub/linked" "$claim/other/elsewhere"
+printf '#!/bin/bash\nprintf "%%s|%%s\\n" "$(pwd -P)" "$*" >> "%s/chown.rec"\n' "$claim" > "$claim/chown"
+printf '#!/bin/bash\nexec "$@"\n' > "$claim/run-sudo"
+chmod +x "$claim/chown" "$claim/run-sudo"
+claim_env=(PSBBN_SUDO="$claim/run-sudo" PSBBN_CHOWN="$claim/chown" PSBBN_CLAIM_FROM="$(id -u)")
+env "${claim_env[@]}" /opt/homebrew/bin/bash -c '. "$1"; psbbn_claim_paths 4321 20 "$2" "$3/missing"' _ "$root/../load.sh" "$claim/state" "$claim" 2>/dev/null || true
+claim_got=$(sort "$claim/chown.rec" 2>/dev/null | tr '\n' ' ') || true
+claim_want=$(printf '%s\n' "$claim_p/state|-h -- 4321:20 ." "$claim_p/state|-h -- 4321:20 sub" "$claim_p/state/sub|-h -- 4321:20 rec" | sort | tr '\n' ' ')
+if [[ "$claim_got" == "$claim_want" ]]; then
+    ok claim-hands-back-roots-files
+else
+    bad "claim-hands-back-roots-files [$(cat "$claim/chown.rec" 2>/dev/null)]"
+fi
+: > "$claim/chown.rec"
+env "${claim_env[@]}" /opt/homebrew/bin/bash -c '. "$1"; psbbn_claim_paths "$(id -u)" "$(id -g)" "$2"' _ "$root/../load.sh" "$claim/state" || true
+[[ ! -s "$claim/chown.rec" ]] && ok claim-leaves-own-paths || bad "claim-leaves-own-paths [$(cat "$claim/chown.rec" 2>/dev/null)]"
+# Anyone can make /tmp/psbbn-dm-UID first. A link there, or a folder others
+# can write, is left alone.
+ln -s "$claim/state" "$claim/planted-link"
+mkdir -p "$claim/open"
+: > "$claim/open/x"
+chmod 777 "$claim/open"
+: > "$claim/chown.rec"
+claim_err=$(env "${claim_env[@]}" /opt/homebrew/bin/bash -c '. "$1"; psbbn_claim_paths 4321 20 "$2" "$3"' _ "$root/../load.sh" "$claim/planted-link" "$claim/open" 2>&1) || true
+if [[ ! -s "$claim/chown.rec" && "$claim_err" == *planted-link* && "$claim_err" == *open* ]]; then
+    ok claim-skips-unsafe-folders
+else
+    bad "claim-skips-unsafe-folders chown=[$(cat "$claim/chown.rec" 2>/dev/null)] err=[$claim_err]"
+fi
+# A session that is root itself (sudo su): nothing is handed to root.
+: > "$claim/chown.rec"
+PSBBN_SUDO="$claim/run-sudo" PSBBN_CHOWN="$claim/chown" /opt/homebrew/bin/bash -c '. "$1"; psbbn_claim_paths 0 0 "$2"' _ "$root/../load.sh" "$claim/state" 2>/dev/null || true
+[[ ! -s "$claim/chown.rec" ]] && ok claim-nothing-for-root || bad "claim-nothing-for-root [$(cat "$claim/chown.rec" 2>/dev/null)]"
+rm -rf "$claim"
+
+# The sudo ticket is kept fresh while the session lives, then left alone.
+# macOS keeps it 5 minutes; a game copy takes longer, and the next password
+# prompt landed under a spinner.
+ka=$(mktemp -d)
+printf '#!/bin/bash\nprintf "%%s\\n" "$*" >> "%s/sudo.rec"\n' "$ka" > "$ka/sudo"
+chmod +x "$ka/sudo"
+sleep 1 &
+ka_pid=$!
+PSBBN_SUDO_BIN="$ka/sudo" PSBBN_SUDO_REFRESH=0.1 /opt/homebrew/bin/bash -c '. "$1"; psbbn_sudo_keepalive "$2"' _ "$root/lib.sh" "$ka_pid" &
+ka_loop=$!
+wait "$ka_pid" || true
+ka_done=0
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+    kill -0 "$ka_loop" 2>/dev/null || { ka_done=1; break; }
+    sleep 0.2
+done
+kill "$ka_loop" 2>/dev/null || true
+ka_calls=$(grep -c '^-n -v$' "$ka/sudo.rec" 2>/dev/null || echo 0)
+if [[ "$ka_done" -eq 1 && "$ka_calls" -ge 3 ]]; then
+    ok sudo-keepalive-while-session-lives
+else
+    bad "sudo-keepalive-while-session-lives done=$ka_done calls=$ka_calls"
+fi
+rm -rf "$ka"
+
+# sudo ./PSBBN-Definitive-Patch.sh: enter.sh hands the state back and runs
+# the session as the user who typed sudo.
+rs=$(mktemp -d)
+mkdir -p "$rs/repo/scripts/platform" "$rs/state" "$rs/tmp"
+cp -R "$root" "$rs/repo/scripts/platform/"
+cp "$root/../load.sh" "$rs/repo/scripts/platform/"
+printf '#!/bin/bash\nprintf "uid=%%s euid=%%s\\n" "$(id -u)" "${PSBBN_EUID:-unset}"\n' > "$rs/repo/PSBBN-Definitive-Patch.sh"
+chmod +x "$rs/repo/PSBBN-Definitive-Patch.sh"
+cat > "$rs/sudo" << EOF
+#!/bin/bash
+# Stands in for /usr/bin/sudo. Records the drop to the user, then runs the rest.
+printf '%s\n' "\$*" >> "$rs/sudo.rec"
+[[ "\$1" == -n ]] && exit 0
+while [[ "\$1" == -* ]]; do
+    case "\$1" in -u|-g) shift 2 ;; *) shift ;; esac
+done
+exec env -u PSBBN_EUID "\$@"
+EOF
+printf '#!/bin/bash\nprintf "%%s|%%s\\n" "$(pwd -P)" "$*" >> "%s/chown.rec"\n' "$rs" > "$rs/chown"
+chmod +x "$rs/sudo" "$rs/chown"
+rs_out=$(PSBBN_EUID=0 SUDO_UID=4321 SUDO_GID=20 SUDO_USER=nobody PSBBN_SUDO_BIN="$rs/sudo" PSBBN_CHOWN="$rs/chown" \
+    PSBBN_CLAIM_FROM="$(id -u)" \
+    PSBBN_MOUNT_STATE="$rs/state" PSBBN_MAPPER_DIR="$rs/maps" PSBBN_DM_STATE="$rs/dm" PSBBN_STORAGE_DIR="$rs/storage" \
+    TMPDIR="$rs/tmp" PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin" \
+    "$rs/repo/scripts/platform/darwin/enter.sh" 2>&1 < /dev/null) || true
+if grep -q -- "-u #4321" "$rs/sudo.rec" 2>/dev/null && [[ "$rs_out" == *"euid=unset"* ]] \
+    && grep -qxF -- "$(cd -P "$rs/state" && pwd -P)|-h -- 4321:20 ." "$rs/chown.rec" 2>/dev/null; then
+    ok enter-under-sudo-runs-as-user
+else
+    bad "enter-under-sudo-runs-as-user out=[$rs_out] sudo=[$(cat "$rs/sudo.rec" 2>/dev/null)] chown=[$(cat "$rs/chown.rec" 2>/dev/null)]"
+fi
+rm -rf "$rs"
+
+# --- what the installer writes into the project reaches the project --------
+ovr=$(mktemp -d)
+mkdir -p "$ovr/repo/scripts/assets/lang" "$ovr/repo/games/DVD"
+printf 'changes\n' > "$ovr/repo/scripts/assets/lang/changelog_main_eng.txt"
+printf 'KEY=value\n' > "$ovr/repo/scripts/assets/lang/eng.txt"
+printf '#!/bin/bash\n' > "$ovr/repo/PSBBN-Definitive-Patch.sh"
+# An overlay from before this version, with its own logs folder.
+mkdir -p "$ovr/dest/logs"
+printf 'old run\n' > "$ovr/dest/logs/game-installer.log"
+ovr_rc=0
+(set -euo pipefail; build_overlay "$ovr/repo" "$ovr/dest") > "$ovr/out" 2>&1 || ovr_rc=$?
+# Logs go to the project's logs folder, as on Linux.
+if [[ "$ovr_rc" -eq 0 && -L "$ovr/dest/logs" && "$(cat "$ovr/repo/logs/game-installer.log" 2>/dev/null)" == "old run" ]]; then
+    printf 'new run\n' >> "$ovr/dest/logs/setup.log"
+    [[ -f "$ovr/repo/logs/setup.log" ]] && ok overlay-logs-in-project || bad "overlay-logs-in-project no setup.log in repo"
+else
+    bad "overlay-logs-in-project rc=$ovr_rc $(cat "$ovr/out")"
+fi
+# The front door shows the changelog once and deletes it. Linux deletes the
+# project's file; deleting the overlay's link only showed it every launch.
+rm "$ovr/dest/scripts/assets/lang/changelog_main_eng.txt" 2>/dev/null || true
+if [[ ! -e "$ovr/repo/scripts/assets/lang/changelog_main_eng.txt" && -f "$ovr/repo/scripts/assets/lang/eng.txt" ]]; then
+    (set -euo pipefail; build_overlay "$ovr/repo" "$ovr/dest") > "$ovr/out" 2>&1 || true
+    [[ ! -e "$ovr/dest/scripts/assets/lang/changelog_main_eng.txt" && -f "$ovr/dest/scripts/assets/lang/eng.txt" ]] \
+        && ok overlay-changelog-shown-once || bad "overlay-changelog-shown-once came back after rebuild"
+else
+    bad "overlay-changelog-shown-once repo file still there"
+fi
+rm -rf "$ovr"
+
+# The update runs in the overlay, whose .git is a link to the project's.
+# Git took the overlay for the work tree: HEAD moved to the new commit and
+# the project's files stayed as they were, so every later launch ran the
+# old scripts while git reported them up to date. This is the front door's
+# own git_update, under the environment enter.sh exports.
+gu=$(mktemp -d)
+gitq() { git -c user.email=t@t -c user.name=t -c init.defaultBranch=main "$@"; }
+gitq init -q "$gu/upstream"
+printf 'v1\n' > "$gu/upstream/a.txt"
+gitq -C "$gu/upstream" add a.txt
+gitq -C "$gu/upstream" commit -qm one
+git clone -q "$gu/upstream" "$gu/repo" 2>/dev/null
+printf 'v2\n' > "$gu/upstream/a.txt"
+gitq -C "$gu/upstream" commit -qam two
+mkdir -p "$gu/overlay"
+ln -s "$gu/repo/a.txt" "$gu/overlay/a.txt"
+ln -s "$gu/repo/.git" "$gu/overlay/.git"
+gu_fn=$(awk '/^git_update\(\) \{$/ { f = 1 } f { print } f && /^\}$/ { exit }' "$root/../../../PSBBN-Definitive-Patch.sh")
+gu_env=$(/opt/homebrew/bin/bash -c '. "$1"; psbbn_git_env "$2"' _ "$root/lib.sh" "$gu/repo" 2>/dev/null) || true
+(
+    cd "$gu/overlay" || exit 1
+    eval "$gu_env"
+    LOG_FILE="$gu/log" wsl=false GU_FN="$gu_fn" /opt/homebrew/bin/bash -c '
+        declare -A UI_TEXT
+        error_msg() { echo "error_msg $*"; exit 1; }
+        eval "$GU_FN"
+        git_update' < /dev/null > "$gu/out" 2>&1
+) || true
+if [[ -n "$gu_fn" && "$(cat "$gu/repo/a.txt")" == v2 && -z "$(git -C "$gu/repo" status --porcelain)" && "$(cat "$gu/overlay/a.txt")" == v2 ]]; then
+    ok update-from-overlay-updates-project
+else
+    bad "update-from-overlay-updates-project repo=$(cat "$gu/repo/a.txt") status=[$(git -C "$gu/repo" status --porcelain)] env=[$gu_env] $(tail -n 3 "$gu/out")"
+fi
+rm -rf "$gu"
+
+# The installers show where to put games, music and photos. On macOS that
+# was the overlay in /tmp, not the project folder the user fills.
+dp=$(mktemp -d)
+for inst in Game-Installer Media-Installer; do
+    fn=$(awk '/^get_display_path\(\) \{$/ { f = 1 } f { print } f && /^\}$/ { exit }' "$root/../../$inst.sh")
+    case "$inst" in
+        Game-Installer) want="$dp/repo/games" ;;
+        *) want="$dp/repo/media/" ;;
+    esac
+    got=$(PSBBN_REPO="$dp/repo" PSBBN_OVERLAY="$dp/overlay" FN="$fn" GAMES_PATH="$dp/overlay/games" MEDIA_DIR="$dp/overlay/media" \
+        /opt/homebrew/bin/bash -c '. "$1"; eval "$FN"; get_display_path; printf "%s" "$display_path"' _ "$root/../load.sh" 2>&1) || true
+    [[ -n "$fn" && "$got" == "$want" ]] && ok "display-path-is-project-$inst" || bad "display-path-is-project-$inst [$got]"
+done
+# A folder the user chose elsewhere is shown as it is.
+fn=$(awk '/^get_display_path\(\) \{$/ { f = 1 } f { print } f && /^\}$/ { exit }' "$root/../../Game-Installer.sh")
+got=$(PSBBN_REPO="$dp/repo" PSBBN_OVERLAY="$dp/overlay" FN="$fn" GAMES_PATH=/Volumes/Games \
+    /opt/homebrew/bin/bash -c '. "$1"; eval "$FN"; get_display_path; printf "%s" "$display_path"' _ "$root/../load.sh" 2>&1) || true
+[[ "$got" == /Volumes/Games ]] && ok display-path-keeps-chosen-folder || bad "display-path-keeps-chosen-folder [$got]"
+# The installers take their folder from pwd, under enter.sh. macOS TMPDIR
+# ends in a slash.
+mkdir -p "$dp/full/repo/scripts/platform" "$dp/full/tmp" "$dp/full/fakebin"
+cp -R "$root" "$dp/full/repo/scripts/platform/"
+cp "$root/../load.sh" "$dp/full/repo/scripts/platform/"
+printf '#!/bin/bash\nexit 1\n' > "$dp/full/fakebin/brew"
+cat > "$dp/full/repo/PSBBN-Definitive-Patch.sh" << EOF
+#!/bin/bash
+. "$dp/full/repo/scripts/platform/load.sh"
+TOOLKIT_PATH="\$(pwd)"
+platform_display_path "\$TOOLKIT_PATH/games"
+EOF
+chmod +x "$dp/full/fakebin/brew" "$dp/full/repo/PSBBN-Definitive-Patch.sh"
+got=$(PATH="$dp/full/fakebin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin" TMPDIR="$dp/full/tmp/" \
+    PSBBN_MOUNT_STATE="$dp/full/state" PSBBN_MAPPER_DIR="$dp/full/maps" PSBBN_DM_STATE="$dp/full/dm" PSBBN_STORAGE_DIR="$dp/full/storage" \
+    "$dp/full/repo/scripts/platform/darwin/enter.sh" 2>&1 < /dev/null | tail -n 1) || true
+[[ "$got" == "$dp/full/repo/games" ]] && ok display-path-under-macos-tmpdir || bad "display-path-under-macos-tmpdir [$got]"
+rm -rf "$dp"
+
+# --- Game-Installer cleans up from a folder that stays ----------------------
+# It finishes inside icons/art/tmp, and clean_up deletes that folder. Every
+# command after that starts in a deleted folder; the macOS shims are bash
+# scripts, and bash says so ("shell-init: error retrieving current
+# directory") once per command, across the whole screen.
+gc=$(mktemp -d)
+mkdir -p "$gc/kit/icons/art/tmp" "$gc/kit/icons/ico/tmp" "$gc/kit/scripts/tmp" "$gc/kit/games/APPS" "$gc/bin"
+printf '#!/bin/bash\nexec "$@"\n' > "$gc/bin/sudo"
+printf '#!/bin/bash\nexit 0\n' > "$gc/bin/findmnt"
+chmod +x "$gc/bin/sudo" "$gc/bin/findmnt"
+gc_fn=$(awk '/^clean_up\(\) \{$/ { f = 1 } f { print } f && /^\}$/ { exit }' "$root/../../Game-Installer.sh")
+gc_err=$(cd "$gc/kit/icons/art/tmp" && TOOLKIT_PATH="$gc/kit" FN="$gc_fn" PATH="$gc/bin:/usr/bin:/bin" /opt/homebrew/bin/bash -c '
+    ICONS_DIR="$TOOLKIT_PATH/icons" ARTWORK_DIR="$TOOLKIT_PATH/icons/art" SCRIPTS_DIR="$TOOLKIT_PATH/scripts"
+    GAMES_PATH="$TOOLKIT_PATH/games" OPL="$TOOLKIT_PATH/scripts/OPL" STORAGE_DIR="$TOOLKIT_PATH/storage" LOG_FILE=/dev/null
+    declare -A UI_TEXT
+    unmount_apa() { sudo true; }
+    error_msg() { echo "error_msg $*"; }
+    eval "$FN"
+    clean_up' 2>&1) || true
+if [[ -n "$gc_fn" && ! -d "$gc/kit/icons/art/tmp" && "$gc_err" != *getcwd* && "$gc_err" != *shell-init* ]]; then
+    ok game-installer-cleans-up-from-a-folder-that-stays
+else
+    bad "game-installer-cleans-up-from-a-folder-that-stays [$(head -n 2 <<< "$gc_err")]"
+fi
+rm -rf "$gc"
+
+# --- convert without ImageMagick 7's deprecation warning --------------------
+# Homebrew's ImageMagick is 7: every convert, and every magick convert,
+# prints "WARNING: The convert command is deprecated in IMv7" and a blank
+# line, through Game-Installer's progress bar. Plain magick would parse the
+# options its own way, so the command stays convert and only the warning goes.
+cv=$(mktemp -d)
+cat > "$cv/magick" << 'EOF'
+#!/bin/bash
+printf '%s\n' "$*" > "${0%/*}/args"
+printf 'WARNING: The convert command is deprecated in IMv7, use "magick" instead of "convert" or "magick convert"\n\n' >&2
+printf 'real error\n' >&2
+printf 'image-bytes'
+exit 3
+EOF
+chmod +x "$cv/magick"
+cv_rc=0
+cv_out=$(PATH="$bin:$cv:/usr/bin:/bin" "$bin/convert" in.png -resize 64x64 out.png 2> "$cv/err") || cv_rc=$?
+if [[ "$cv_rc" -eq 3 && "$cv_out" == image-bytes && "$(cat "$cv/args")" == "convert in.png -resize 64x64 out.png" && "$(cat "$cv/err")" == "real error" ]]; then
+    ok convert-drops-im7-deprecation-warning
+else
+    bad "convert-drops-im7-deprecation-warning rc=$cv_rc out=[$cv_out] args=[$(cat "$cv/args" 2>/dev/null)] err=[$(cat "$cv/err")]"
+fi
+if command -v /opt/homebrew/bin/magick >/dev/null 2>&1; then
+    /opt/homebrew/bin/magick -size 8x8 xc:red "$cv/red.png"
+    cv_err=$(PATH="$bin:/opt/homebrew/bin:/usr/bin:/bin" "$bin/convert" "$cv/red.png" -resize 4x4 "$cv/small.png" 2>&1) || true
+    [[ -z "$cv_err" && "$(/opt/homebrew/bin/magick identify -format '%wx%h' "$cv/small.png" 2>/dev/null)" == 4x4 ]] \
+        && ok convert-real-imagemagick-quiet || bad "convert-real-imagemagick-quiet [$cv_err]"
+fi
+rm -rf "$cv"
+
+# --- the project's own helpers are not held by Gatekeeper -------------------
+# A copy of the project that macOS marked as downloaded made Gatekeeper
+# stop every bundled helper ("PSU Extractor.elf" Not Opened) halfway
+# through an install. Only the helpers that ship with the project are
+# cleared; nothing outside that folder is touched.
+gk=$(mktemp -d)
+mkdir -p "$gk/repo/scripts/helper/darwin-arm64" "$gk/repo/games"
+printf '#!/bin/sh\n' > "$gk/repo/scripts/helper/darwin-arm64/PSU Extractor.elf"
+printf 'iso\n' > "$gk/repo/games/game.iso"
+for f in "$gk/repo/scripts/helper/darwin-arm64/PSU Extractor.elf" "$gk/repo/games/game.iso"; do
+    xattr -w com.apple.quarantine '0081;6700f000;Safari;' "$f"
+done
+/opt/homebrew/bin/bash -c '. "$1"; psbbn_unquarantine_helpers "$2"' _ "$root/lib.sh" "$gk/repo" > /dev/null 2>&1 || true
+if ! xattr -p com.apple.quarantine "$gk/repo/scripts/helper/darwin-arm64/PSU Extractor.elf" >/dev/null 2>&1 \
+    && xattr -p com.apple.quarantine "$gk/repo/games/game.iso" >/dev/null 2>&1; then
+    ok helpers-unquarantined
+else
+    bad "helpers-unquarantined $(xattr -l "$gk/repo/scripts/helper/darwin-arm64/PSU Extractor.elf" 2>&1 | head -1)"
+fi
+rm -rf "$gk"
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

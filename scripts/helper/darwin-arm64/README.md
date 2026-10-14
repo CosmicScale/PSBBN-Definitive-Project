@@ -14,6 +14,7 @@ names the scripts expect (`HDL Dump.elf`, `PFS Shell.elf`, ...).
 | `mkfs.exfat` | Wrapper that maps the Linux `mkfs.exfat` arguments onto `/sbin/newfs_exfat`. |
 | `cue2pops` | BIN+CUE to POPS VCD converter from <https://github.com/bucanero/pops2cue>, the project the main README credits for `cue2pops`. |
 | `pops2cue` | POPS VCD to BIN+CUE converter from <https://github.com/bucanero/pops2cue> (commit `981e776`), built with `MACOSX_DEPLOYMENT_TARGET=11.0 make pops2cue`. It writes the CUE and BIN next to the VCD and recognises only an upper-case `.VCD` name; with any other name it builds the output names wrongly. |
+| `sqlite` | SQLite **2.8.17** from <https://www.sqlite.org/sqlite-2.8.17.tar.gz> (SHA-256 `3f35ebfb67867fb5b583a03e480f900206af637efe7179b32294a6a0cf806f37`), the version of the Linux helper, built with the same ISO8859 encoding and no readline. PSBBN's `music.db`, `photo.db` and `movie.db` are SQLite 2.1 files: the macOS `sqlite3` cannot read them ("file is not a database") and writes files PSBBN cannot open. |
 | `da-veto` | Disk Arbitration mount-approval client, built from `da-veto.c` next to it with `clang -O2 -Wall -framework CoreFoundation -framework DiskArbitration -o da-veto da-veto.c`. Disk Arbitration re-probes the drive after every whole-disk write closes and mounts its volumes under `/Volumes` again; such a mount makes the next whole-disk open fail with EBUSY, and for a few seconds after it appears macOS will not even unmount it. The shims start `da-veto` for the selected drive on first contact; it refuses every mount of that drive until the installer session ends (`PSBBN_SESSION_PID` from `enter.sh` is gone), except while the allow file the mount shim creates around the installer's own OPL mounts exists. Runs as the user. |
 | `PFS Fuse.elf` | Not used. The overlay links `PFS Fuse.elf` to `scripts/platform/darwin/bin/pfs-fuse`, which stages a PFS partition as a plain folder through `pfsshell`. |
 | `hdl-dump-apple.patch` | The one source change needed for macOS: accept character devices and regular files as disks, since raw disks are character devices there. |
@@ -50,9 +51,36 @@ git checkout 981e776
 MACOSX_DEPLOYMENT_TARGET=11.0 make pops2cue
 ```
 
+To rebuild `sqlite` (its 2005 `configure` does not know Apple silicon, so
+`main.mk` is driven directly, the way the source's `Makefile.linux-gcc` does):
+
+```sh
+curl -LO https://www.sqlite.org/sqlite-2.8.17.tar.gz
+tar xzf sqlite-2.8.17.tar.gz
+mkdir build && cd build
+cat > Makefile << 'EOF'
+TOP = ../sqlite-2.8.17
+FLAGS = -O2 -Wno-deprecated-non-prototype -mmacosx-version-min=11.0
+# BCC builds only the build-time probe and the lemon parser generator.
+BCC = cc $(FLAGS) -Wno-implicit-function-declaration -Wno-implicit-int -Wno-format
+TCC = cc $(FLAGS) -Werror=implicit-function-declaration -Werror=int-conversion
+USLEEP = -DHAVE_USLEEP=1
+THREADSAFE = -DTHREADSAFE=0
+OPTS = -DNDEBUG=1
+AR = ar cr
+RANLIB = ranlib
+ENCODING = ISO8859
+include $(TOP)/main.mk
+EOF
+make sqlite
+```
+
 Rehearsals that exercise these binaries the way the installers do, on a
 file image and without sudo: `scripts/platform/darwin/tests/e2e-image.sh`
 (PSBBN install), `scripts/platform/darwin/tests/e2e-launchers.sh`
-(Game-Installer launcher partitions, including the 32-character names) and
+(Game-Installer launcher partitions, including the 32-character names),
 `scripts/platform/darwin/tests/e2e-extents.sh` (partitions above the APA
-size cap, which span a main partition and sub-partitions).
+size cap, which span a main partition and sub-partitions) and
+`scripts/platform/darwin/tests/e2e-hosdmenu.sh` (HOSDMenu-only install,
+whose BOOTSTRAP writes the APA header while its PFS partitions are still
+mounted).

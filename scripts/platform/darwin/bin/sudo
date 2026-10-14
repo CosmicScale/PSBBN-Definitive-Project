@@ -43,6 +43,7 @@ env_args=(
     COPYFILE_DISABLE=1
     PSBBN_MOUNT_STATE="$(psbbn_mount_state_dir)"
     PSBBN_MAPPER_DIR="$(platform_mapper_dir)"
+    PSBBN_DM_STATE="$(psbbn_dm_state_dir)"
 )
 if [[ -n "${PSBBN_REAL_SUDO:-}" ]]; then
     exec "$PSBBN_REAL_SUDO" env "${env_args[@]}" "$cmd" "$@"

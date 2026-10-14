@@ -59,10 +59,15 @@ def benign(line):
     return False
 
 
+# ext2 names are bytes. Names that are not UTF-8 travel as surrogates and
+# reach debugfs, and come back from it, as the same bytes.
+TEXT = {"encoding": "utf-8", "errors": "surrogateescape"}
+
+
 def run(debugfs, image, lines, write=True):
     script = "\n".join(lines) + "\n"
     argv = [debugfs] + (["-w"] if write else []) + ["-f", "/dev/stdin", image]
-    proc = subprocess.run(argv, input=script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    proc = subprocess.run(argv, input=script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **TEXT)
     return proc.returncode, proc.stdout
 
 
@@ -179,7 +184,7 @@ def apply(debugfs, image, lines):
 
 def fsck(image):
     e2fsck = tool("e2fsck", "PSBBN_E2FSCK")
-    proc = subprocess.run([e2fsck, "-fn", image], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    proc = subprocess.run([e2fsck, "-fn", image], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **TEXT)
     return proc.returncode, proc.stdout
 
 
@@ -232,7 +237,7 @@ def main(argv):
         return 2
     image, script_path = argv[1], argv[2]
     debugfs = tool("debugfs", "PSBBN_DEBUGFS")
-    with open(script_path, encoding="utf-8") as fh:
+    with open(script_path, **TEXT) as fh:
         lines = [line.rstrip("\n") for line in fh if line.strip()]
     rc = apply(debugfs, image, lines)
     if rc != 0:

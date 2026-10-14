@@ -272,6 +272,8 @@ error_msg() {
 }
 
 clean_up() {
+    # The installer can be inside one of the folders removed below.
+    cd "${TOOLKIT_PATH}"
     failure=0
 
     # Remove unwanted directories inside $ICONS_DIR except 'art' and 'ico'
@@ -1620,6 +1622,10 @@ get_display_path() {
     else
         # For Linux paths, display_path is the same as GAMES_PATH
         display_path="$GAMES_PATH"
+    fi
+    # macOS runs the installer from a temporary copy; show the project's folder.
+    if [[ "$(uname -s)" == Darwin ]]; then
+        display_path=$(platform_display_path "$display_path")
     fi
 }
 

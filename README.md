@@ -775,11 +775,11 @@ The script opens the same [main menu](#main-menu) as on Linux. Quit with `q` bef
 
 Plug in only the PS2 drive. The disk list shows external disks. The internal Mac disk is not listed.
 
-An external PS2 drive can be initialised. The internal Mac disk is refused. When macOS asks for an administrator password, that password is for writing the drive. Enter it once. Later commands reuse it. Creating an EXT2 partition also formats it, matching the Linux PFS Shell. The installer then keeps each partition as a normal folder and writes that folder back onto the drive when the partition is unmounted.
+An external PS2 drive can be initialised. The internal Mac disk is refused. The script asks for your administrator password once, before the menu, to write the drive, and keeps it for the session. Run it without `sudo`; started with `sudo`, it switches back to your user. Creating an EXT2 partition also formats it, matching the Linux PFS Shell. The installer then keeps each partition as a normal folder and writes that folder back onto the drive when the partition is unmounted.
 
-"Installing PSBBN..." is quiet for several minutes. The patch archive is written into the ext2 images with `debugfs` and its output is captured, so nothing reaches the log until that step finishes. It is not a hang. Every image is checked with `e2fsck` before it is written to the drive.
+"Installing PSBBN..." is quiet while the patch archive is written into the ext2 images with `debugfs`; its output is captured, so nothing reaches the log until that step finishes. It is not a hang. Every image is checked with `e2fsck` before it is written to the drive.
 
-The script runs from a working copy in `$TMPDIR/psbbn-overlay-<uid>`. That is where `logs/PSBBN-installer.log` and the downloaded patch archives live; both survive later launches. Staged partitions are folders under `/tmp/psbbn-storage-<uid>` and are removed when the installer finishes.
+The script runs from a working copy in `$TMPDIR/psbbn-overlay-<uid>`, where the downloaded patch archives are kept between launches. Its `games`, `media`, `icons` and `logs` folders are the project's own folders, so the installers show and use those, and the logs are in the project's `logs` folder as on Linux. Staged partitions are folders under `/tmp/psbbn-storage-<uid>` and are removed when the installer finishes.
 
 ## Installing on Windows
 The recommended way to install the **PSBBN Definitive Project** on Windows is by using the **PSBBN Launcher for Windows**. The **PSBBN Launcher for Windows** is compatible with Windows 10 and 11 Home editions; other editions may not be compatible. For a trouble-free experience, make sure Windows is fully up to date.

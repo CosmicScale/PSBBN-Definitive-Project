@@ -25,6 +25,20 @@ platform_mapper_prefix() {
     fi
 }
 
+# Darwin runs the installers from an overlay in TMPDIR (PSBBN_OVERLAY) whose
+# folders link to the project (PSBBN_REPO). A path in the overlay is shown
+# as the project path, the folder the user actually fills.
+platform_display_path() {
+    local p="$1"
+    if [[ "$(uname -s)" == Darwin && -n "${PSBBN_OVERLAY:-}" && -n "${PSBBN_REPO:-}" ]]; then
+        case "$p" in
+            "$PSBBN_OVERLAY") p=$PSBBN_REPO ;;
+            "$PSBBN_OVERLAY"/*) p="${PSBBN_REPO}${p#"$PSBBN_OVERLAY"}" ;;
+        esac
+    fi
+    printf '%s\n' "$p"
+}
+
 # The darwin helpers are only needed on macOS. An if, not &&, so a caller
 # running with set -e does not stop on Linux.
 if [[ "$(uname -s)" == Darwin ]]; then

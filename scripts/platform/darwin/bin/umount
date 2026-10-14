@@ -38,6 +38,20 @@ for arg in "${args[@]}"; do
     [[ -f "$state/$key.kind" ]] && kind=$(cat "$state/$key.kind")
     manifest="$state/$key.manifest"
     [[ -f "$manifest" ]] || manifest=""
+    if [[ ! -d "$arg" ]]; then
+        # The installer deleted the folder: HOSDMenu-, Media-Installer and
+        # Extras delete STORAGE_DIR when they start, before their clean_up
+        # unmounts what an earlier, failed option left. Against the
+        # snapshot a missing folder reads as every file deleted, so nothing
+        # is written back.
+        echo "umount: $arg: its folder was deleted; nothing was written back" >&2
+        if [[ -f "${slice}.meta" ]] && grep -q '^node=1$' "${slice}.meta"; then
+            psbbn_sums_forget "$slice"
+            rm -f "${slice:?}" "${slice:?}.meta"
+        fi
+        psbbn_stage_forget "$arg"
+        continue
+    fi
     case "$kind" in
         ext2|vfat)
             if [[ ! -f "$slice" ]]; then
