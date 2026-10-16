@@ -95,4 +95,10 @@ size cap, which span a main partition and sub-partitions, checked as the
 PS2 kernel maps them) and
 `scripts/platform/darwin/tests/e2e-hosdmenu.sh` (HOSDMenu-only install,
 whose BOOTSTRAP writes the APA header while its PFS partitions are still
-mounted).
+mounted). `scripts/platform/darwin/tests/e2e-docker.sh PS2Linux.tar.gz`
+needs Docker: in a Linux container it formats the same PS2 Linux
+partitions with the Linux `PFS Shell.elf`, maps the home partition the way
+the PS2 kernel does, runs PS2 Linux's `/bin/mkhome` on it and copies files
+in, for the Linux build and for this wrapper, and compares `genvmc`'s cards
+with Game-Installer's Linux build. `PSBBN_BEFORE=<revision>` adds that
+revision's wrapper to the run.
