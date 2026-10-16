@@ -14,6 +14,8 @@ names the scripts expect (`HDL Dump.elf`, `PFS Shell.elf`, ...).
 | `mkfs.exfat` | Wrapper that maps the Linux `mkfs.exfat` arguments onto `/sbin/newfs_exfat`. |
 | `cue2pops` | BIN+CUE to POPS VCD converter from <https://github.com/bucanero/pops2cue>, the project the main README credits for `cue2pops`. |
 | `pops2cue` | POPS VCD to BIN+CUE converter from <https://github.com/bucanero/pops2cue> (commit `981e776`), built with `MACOSX_DEPLOYMENT_TARGET=11.0 make pops2cue`. It writes the CUE and BIN next to the VCD and recognises only an upper-case `.VCD` name; with any other name it builds the output names wrongly. |
+| `genvmc` | The PS2 VMC generator Game-Installer otherwise compiles from `scripts/helper/genvmc.c` with `gcc`, built from that file with `genvmc-magic.patch` applied. `genvmc.c` copies the 29-byte magic string, terminator included, into the 28-byte magic field; Linux's unoptimized gcc build lets it through, while Apple clang's fortified `strcpy` stops it ("Trace/BPT trap: 5") and every card is left empty. The cards are byte for byte the Linux build's. The overlay links it over any `genvmc` an earlier run compiled. |
+| `genvmc-magic.patch` | Fills the magic and version fields with `memcpy`. |
 | `sqlite` | SQLite **2.8.17** from <https://www.sqlite.org/sqlite-2.8.17.tar.gz> (SHA-256 `3f35ebfb67867fb5b583a03e480f900206af637efe7179b32294a6a0cf806f37`), the version of the Linux helper, built with the same ISO8859 encoding and no readline. PSBBN's `music.db`, `photo.db` and `movie.db` are SQLite 2.1 files: the macOS `sqlite3` cannot read them ("file is not a database") and writes files PSBBN cannot open. |
 | `da-veto` | Disk Arbitration mount-approval client, built from `da-veto.c` next to it with `clang -O2 -Wall -framework CoreFoundation -framework DiskArbitration -o da-veto da-veto.c`. Disk Arbitration re-probes the drive after every whole-disk write closes and mounts its volumes under `/Volumes` again; such a mount makes the next whole-disk open fail with EBUSY, and for a few seconds after it appears macOS will not even unmount it. The shims start `da-veto` for the selected drive on first contact; it refuses every mount of that drive until the installer session ends (`PSBBN_SESSION_PID` from `enter.sh` is gone), except while the allow file the mount shim creates around the installer's own OPL mounts exists. Runs as the user. |
 | `PFS Fuse.elf` | Not used. The overlay links `PFS Fuse.elf` to `scripts/platform/darwin/bin/pfs-fuse`, which stages a PFS partition as a plain folder through `pfsshell`. |
@@ -49,6 +51,15 @@ git clone https://github.com/bucanero/pops2cue.git
 cd pops2cue
 git checkout 981e776
 MACOSX_DEPLOYMENT_TARGET=11.0 make pops2cue
+```
+
+To rebuild `genvmc`, from the project folder:
+
+```sh
+mkdir build && cp scripts/helper/genvmc.c scripts/helper/genvmc.h build/
+cd build
+patch -p1 < ../scripts/helper/darwin-arm64/genvmc-magic.patch
+cc -std=gnu99 -O2 -Wall -mmacosx-version-min=11.0 -o genvmc genvmc.c
 ```
 
 To rebuild `sqlite` (its 2005 `configure` does not know Apple silicon, so

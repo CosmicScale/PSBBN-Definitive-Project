@@ -824,8 +824,11 @@ psbbn_link_helpers() {
         return 0
     fi
     [[ -d "$base" ]] || return 0
+    # genvmc replaces the copy Game-Installer compiled in an earlier run:
+    # that one traps (see helper/darwin-arm64/README.md).
     local names=(
         "cue2pops"
+        "genvmc"
         "HDL Dump.elf"
         "mkfs.exfat"
         "PFS Fuse.elf"

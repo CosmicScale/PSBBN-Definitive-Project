@@ -2825,5 +2825,77 @@ else
 fi
 rm -rf "$gk"
 
+# --- VMCs for PS2 games -----------------------------------------------------
+# Game-Installer compiles helper/genvmc.c with gcc when helper/genvmc is
+# missing. genvmc.c copies the 29-byte magic string into the 28-byte magic
+# field; Apple clang's fortified strcpy stops that with a trap ("Trace/BPT
+# trap: 5") and every VMC is left empty. The overlay links a macOS build,
+# over the copy an earlier run compiled, and it must write the same card
+# the Linux build does (gcc without optimization, so no fortify).
+gv=$(mktemp -d)
+mkdir -p "$gv/scripts/helper/aarch64"
+printf 'compiled by an earlier run\n' > "$gv/scripts/helper/genvmc"
+chmod +x "$gv/scripts/helper/genvmc"
+psbbn_link_helpers "$root/../../.." "$gv"
+gv_bin="$gv/scripts/helper/genvmc"
+gv_want="$(cd "$root/../.." && pwd)/helper/darwin-arm64/genvmc"
+if [[ -L "$gv_bin" && "$(readlink "$gv_bin")" == "$gv_want" ]]; then
+    ok genvmc-linked-over-compiled
+else
+    bad "genvmc-linked-over-compiled $(ls -l "$gv_bin" 2>&1)"
+fi
+gv_rc=0
+"$gv_bin" 8 "$gv/SLUS_200.90_0.bin" > "$gv/out" 2>&1 || gv_rc=$?
+gv_size=$(wc -c < "$gv/SLUS_200.90_0.bin" 2>/dev/null | tr -d ' ')
+gv_magic=$(head -c 40 "$gv/SLUS_200.90_0.bin" 2>/dev/null | LC_ALL=C tr -d '\0')
+if [[ "$gv_rc" -eq 0 && "$gv_size" == 8388608 && "$gv_magic" == "Sony PS2 Memory Card Format 1.2.0.0" ]]; then
+    ok genvmc-writes-card
+else
+    bad "genvmc-writes-card rc=$gv_rc size=$gv_size magic=[$gv_magic] $(tail -n 2 "$gv/out")"
+fi
+# The cards carry the time they were made; both builds run in one second.
+if cc -std=gnu99 -D_FORTIFY_SOURCE=0 -o "$gv/genvmc-linux" "$root/../../helper/genvmc.c" 2>"$gv/cc.err"; then
+    gv_same=1
+    for gv_mb in 8 32; do
+        for _ in 1 2 3; do
+            gv_t0=$(date +%s)
+            "$gv_bin" "$gv_mb" "$gv/mac.bin" >/dev/null 2>&1 || true
+            "$gv/genvmc-linux" "$gv_mb" "$gv/linux.bin" >/dev/null 2>&1 || true
+            [[ "$(date +%s)" == "$gv_t0" ]] && break
+        done
+        cmp -s "$gv/mac.bin" "$gv/linux.bin" || gv_same=0
+    done
+    [[ "$gv_same" -eq 1 ]] && ok genvmc-card-matches-linux-build || bad genvmc-card-matches-linux-build
+else
+    bad "genvmc-card-matches-linux-build cc: $(head -n 2 "$gv/cc.err")"
+fi
+# Game-Installer makes a game's card only when there is no file for it, and
+# the trapping genvmc left an empty one on the OPL partition for each game.
+# Those are made again; a card that holds saves is left alone.
+gv_fn=$(awk '/^CREATE_PS2_VMC\(\) \{$/ { f = 1 } f { print } f && /^\}$/ { exit }' "$root/../../Game-Installer.sh")
+mkdir -p "$gv/OPL/VMC" "$gv/OPL/CFG" "$gv/OPL/nhddl"
+: > "$gv/OPL/VMC/SLUS_200.90_0.bin"
+printf 'saves\n' > "$gv/OPL/VMC/SCUS_971.05_0.bin"
+printf '%s\n' 'TimeSplitters|SLUS_200.90|Eidos Interactive|CD|TimeSplitters (USA) (v2.00).zso|' \
+    'Fantavision|SCUS_971.05|Sony Computer Entertainment|DVD|Fantavision.zso|' > "$gv/ps2.list"
+(
+    cd "$gv" || exit 1
+    HELPER_DIR="$gv/scripts/helper" ASSETS_DIR="$root/../../assets" TOOLKIT_PATH="$gv" OPL="$gv/OPL" \
+        LOG_FILE="$gv/vmc.log" PS2_LIST="$gv/ps2.list" FN="$gv_fn" /opt/homebrew/bin/bash -c '
+        declare -A UI_TEXT
+        SPLASH() { :; }
+        show_progress() { :; }
+        error_msg() { echo "error_msg $*"; }
+        eval "$FN"
+        CREATE_PS2_VMC' > "$gv/vmc.out" 2>&1
+) || true
+gv_redo=$(wc -c < "$gv/OPL/VMC/SLUS_200.90_0.bin" | tr -d ' ')
+if [[ -n "$gv_fn" && "$gv_redo" == 8388608 && "$(cat "$gv/OPL/VMC/SCUS_971.05_0.bin")" == saves ]]; then
+    ok game-installer-remakes-empty-vmc
+else
+    bad "game-installer-remakes-empty-vmc size=$gv_redo $(head -n 2 "$gv/vmc.out")"
+fi
+rm -rf "$gv"
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

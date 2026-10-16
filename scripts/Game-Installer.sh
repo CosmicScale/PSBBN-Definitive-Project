@@ -674,7 +674,8 @@ CREATE_PS2_VMC() {
         vmc_file="${vmc_name}.bin"
 
         # Create VMC .bin if it doesn't already exist
-        if [[ ! -f "${OPL}/VMC/${vmc_file}" && ! -f "${OPL}/VMC/${vmc_name%_0}.bin" ]] && [[ -z "${created_vmcs[$vmc_name]}" ]]; then
+        # An empty one is what a genvmc that failed left behind.
+        if [[ ! -s "${OPL}/VMC/${vmc_file}" && ! -s "${OPL}/VMC/${vmc_name%_0}.bin" ]] && [[ -z "${created_vmcs[$vmc_name]}" ]]; then
 
             # Check available space (in KB)
             available_kb=$(df -Pk "${OPL}" | awk 'NR==2 {print $4}')

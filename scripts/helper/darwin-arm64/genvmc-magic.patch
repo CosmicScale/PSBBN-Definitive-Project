@@ -1,0 +1,16 @@
+diff --git a/genvmc.c b/genvmc.c
+index 108078e..9fcfb26 100644
+--- a/genvmc.c
++++ b/genvmc.c
+@@ -192,8 +192,9 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize)
+ 
+     // set superblock magic & version
+     memset((void *)&mcdi->magic, 0, sizeof(mcdi->magic) + sizeof(mcdi->version));
+-    strcpy((char *)&mcdi->magic, SUPERBLOCK_MAGIC);
+-    strcat((char *)&mcdi->magic, SUPERBLOCK_VERSION);
++    // The magic fills its 28 bytes, with no room for a terminator.
++    memcpy(mcdi->magic, SUPERBLOCK_MAGIC, sizeof(mcdi->magic));
++    memcpy(mcdi->version, SUPERBLOCK_VERSION, sizeof(SUPERBLOCK_VERSION));
+ 
+     // set mc specs
+     mcdi->cluster_size = 1024;   // size in KB of clusters
