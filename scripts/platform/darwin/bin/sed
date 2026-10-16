@@ -1,0 +1,22 @@
+#!/bin/bash
+# One installer pipeline is `sed 's/[0-9]*$//'`.
+# On /dev/sda3 that yields /dev/sda. On /dev/disk6s3 it yields /dev/disk6s.
+# For diskNsM paths, return the whole disk. Every other call is GNU sed.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+real=$(psbbn_gnu_sed)
+if [[ $# -eq 1 && "$1" == 's/[0-9]*$//' ]]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ ^(/dev/r?disk[0-9]+)s[0-9]+$ ]]; then
+            printf '%s\n' "${BASH_REMATCH[1]}"
+        else
+            printf '%s\n' "$line" | "$real" 's/[0-9]*$//'
+        fi
+    done
+    exit 0
+fi
+exec "$real" "$@"

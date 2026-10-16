@@ -42,10 +42,15 @@ fi
 # Set paths
 TOOLKIT_PATH="$(pwd)"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 LANG_DIR="${ASSETS_DIR}/lang"
 STORAGE_DIR="${SCRIPTS_DIR}/storage"
+# macOS writes AppleDouble files when this path is under /var. /tmp does not.
+if [[ "$(uname -s)" == Darwin ]]; then
+    STORAGE_DIR="/tmp/psbbn-storage-${UID}"
+fi
 SYSCONF_XML="${SCRIPTS_DIR}/tmp/sysconf.xml"
 OPL="${SCRIPTS_DIR}/OPL"
 arch="$(uname -m)"
@@ -547,7 +552,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {

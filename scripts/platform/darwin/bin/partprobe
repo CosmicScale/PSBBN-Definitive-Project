@@ -1,0 +1,30 @@
+#!/bin/bash
+# macOS re-reads the partition map when the whole disk is closed after a
+# write. That happens asynchronously. Wait for the slices sfdisk just
+# described to appear, and poke the disk once if they do not.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../../load.sh"
+dev=$(psbbn_rewrite_device "${1:-}")
+psbbn_is_real_disk "$dev" || exit 0
+whole=$(psbbn_whole_disk "$dev")
+if psbbn_disk_internal "$whole"; then
+    echo "partprobe: refusing internal disk $whole" >&2
+    exit 2
+fi
+ident=${whole#/dev/}
+for attempt in $(seq 1 "${PSBBN_PARTPROBE_TRIES:-40}"); do
+    if [[ -e "/dev/${ident}s3" ]]; then
+        exit 0
+    fi
+    if [[ "$attempt" -eq 10 ]]; then
+        # Open for write and close: that is the event the kernel re-probes on.
+        platform_elevate "$(psbbn_python)" -c 'import sys; open(sys.argv[1], "r+b").close()' "$whole" >/dev/null 2>&1 || true
+    fi
+    sleep 0.5
+done
+echo "partprobe: $whole did not expose its partitions" >&2
+exit 1

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Report a FUSE library only when the file is on disk.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+if [[ "${1:-}" == "-p" ]]; then
+    if [[ -n "${PSBBN_FUSE_LIB:-}" && -e "$PSBBN_FUSE_LIB" ]]; then
+        printf 'libfuse.so.2 (libc6,x86-64) => %s\n' "$PSBBN_FUSE_LIB"
+    fi
+    exit 0
+fi
+exit 0

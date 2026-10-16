@@ -1,0 +1,29 @@
+#!/bin/bash
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$here/../lib.sh"
+path="${@: -1}"
+path=$(psbbn_rewrite_device "$path")
+if psbbn_is_real_disk "$path"; then
+    if psbbn_disk_internal "$path"; then
+        echo "mkfs.vfat: refusing internal disk $path" >&2
+        exit 2
+    fi
+    echo "mkfs.vfat: refusing raw disk $path; format the slice file" >&2
+    exit 2
+fi
+if [[ ! -f "$path" && ! -f "${path}.meta" ]]; then
+    echo "mkfs.vfat: not a slice file: $path" >&2
+    exit 2
+fi
+# newfs_msdos cannot ioctl a regular file. -s is the sector count.
+bytes=$(wc -c < "$path")
+sectors=$((bytes / 512))
+if (( sectors < 65536 )); then
+    echo "mkfs.vfat: $path is too small for FAT32 ($sectors sectors)" >&2
+    exit 1
+fi
+exec /sbin/newfs_msdos -F 32 -s "$sectors" "$path"

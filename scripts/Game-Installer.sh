@@ -37,6 +37,7 @@ ICONS_DIR="${TOOLKIT_PATH}/icons"
 ARTWORK_DIR="${ICONS_DIR}/art"
 VMC_ICON_DIR="${ICONS_DIR}/ico/vmc"
 SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
+. "${SCRIPTS_DIR}/platform/load.sh"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 LANG_DIR="${ASSETS_DIR}/lang"
@@ -53,6 +54,10 @@ MISSING_VMC="${LOGS_DIR}/missing-vmc.log"
 GAMES_PATH="${TOOLKIT_PATH}/games"
 CONFIG_FILE="${SCRIPTS_DIR}/gamepath.cfg"
 STORAGE_DIR="${SCRIPTS_DIR}/storage"
+# macOS writes AppleDouble files when this path is under /var. /tmp does not.
+if [[ "$(uname -s)" == Darwin ]]; then
+    STORAGE_DIR="/tmp/psbbn-storage-${UID}"
+fi
 OPL="${SCRIPTS_DIR}/OPL"
 PFS_POPS_LIST="${SCRIPTS_DIR}/tmp/pfs-pops.list"
 ATA_POPS_LIST="${SCRIPTS_DIR}/tmp/ata-pops.list"
@@ -267,6 +272,8 @@ error_msg() {
 }
 
 clean_up() {
+    # The installer can be inside one of the folders removed below.
+    cd "${TOOLKIT_PATH}"
     failure=0
 
     # Remove unwanted directories inside $ICONS_DIR except 'art' and 'ico'
@@ -667,7 +674,8 @@ CREATE_PS2_VMC() {
         vmc_file="${vmc_name}.bin"
 
         # Create VMC .bin if it doesn't already exist
-        if [[ ! -f "${OPL}/VMC/${vmc_file}" && ! -f "${OPL}/VMC/${vmc_name%_0}.bin" ]] && [[ -z "${created_vmcs[$vmc_name]}" ]]; then
+        # An empty one is what a genvmc that failed left behind.
+        if [[ ! -s "${OPL}/VMC/${vmc_file}" && ! -s "${OPL}/VMC/${vmc_name%_0}.bin" ]] && [[ -z "${created_vmcs[$vmc_name]}" ]]; then
 
             # Check available space (in KB)
             available_kb=$(df -Pk "${OPL}" | awk 'NR==2 {print $4}')
@@ -1616,6 +1624,10 @@ get_display_path() {
         # For Linux paths, display_path is the same as GAMES_PATH
         display_path="$GAMES_PATH"
     fi
+    # macOS runs the installer from a temporary copy; show the project's folder.
+    if [[ "$(uname -s)" == Darwin ]]; then
+        display_path=$(platform_display_path "$display_path")
+    fi
 }
 
 mapper_probe() {
@@ -1644,7 +1656,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="/dev/mapper/${DEVICE_CUT}-"
+    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {

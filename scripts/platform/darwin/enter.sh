@@ -1,0 +1,125 @@
+#!/bin/bash
+# Front door for ./PSBBN-Definitive-Patch.sh on macOS.
+# The preamble execs this file under bash 3.2. Re-exec Homebrew bash 5
+# before any bash-4 syntax. Intel Homebrew lives in /usr/local.
+
+set -euo pipefail
+
+here=$(cd "$(dirname "$0")" && pwd)
+repo=$(cd "$here/../../.." && pwd)
+
+bash5=""
+for candidate in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+    if [[ -x "$candidate" ]]; then
+        bash5="$candidate"
+        break
+    fi
+done
+brew_bin=""
+for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x "$candidate" ]]; then
+        brew_bin="$candidate"
+        break
+    fi
+done
+if [[ -z "$bash5" ]]; then
+    if [[ -z "$brew_bin" ]]; then
+        echo "Homebrew is required. Install it from https://brew.sh and run ./PSBBN-Definitive-Patch.sh again." >&2
+        exit 1
+    fi
+    echo "Installing Homebrew bash, which this installer needs."
+    "$brew_bin" install bash
+    for candidate in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+        if [[ -x "$candidate" ]]; then
+            bash5="$candidate"
+            break
+        fi
+    done
+    if [[ -z "$bash5" ]]; then
+        echo "Homebrew bash did not install. Run: brew install bash" >&2
+        exit 1
+    fi
+fi
+# Setup.sh creates the Python environment here, not in the overlay.
+export PSBBN_REPO="$repo"
+
+if [[ -z "${PSBBN_DARWIN_INNER:-}" && "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+    export PSBBN_DARWIN_INNER=1
+    export PSBBN_DARWIN_ENTERED=1
+    exec "$bash5" "$0" "$@"
+fi
+
+# shellcheck disable=SC1091
+. "$here/../load.sh"
+
+export PSBBN_DARWIN_ENTERED=1
+export PSBBN_DARWIN_INNER=1
+
+# sudo ./PSBBN-Definitive-Patch.sh: the session runs as the user who typed
+# sudo, the way it runs without sudo. The shims elevate what needs root,
+# Homebrew refuses root, and state a root run left in /tmp and in the
+# project could not be written by that user's next run; it is handed back
+# first. sudo -u sets SUDO_* to root's; they would key the state to root.
+if [[ "${PSBBN_EUID:-$EUID}" -eq 0 && -n "${SUDO_UID:-}" && "$SUDO_UID" != 0 ]]; then
+    claim=()
+    while IFS= read -r line; do
+        claim+=("$line")
+    done < <(psbbn_user_paths "$SUDO_UID")
+    psbbn_claim_paths "$SUDO_UID" "${SUDO_GID:-$(id -g "$SUDO_UID")}" "${claim[@]}"
+    exec "${PSBBN_SUDO_BIN:-/usr/bin/sudo}" -u "#$SUDO_UID" -H -E \
+        /usr/bin/env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND "$bash5" "$0" "$@"
+fi
+# sudo leaves no TMPDIR, or root's.
+if [[ -z "${TMPDIR:-}" || ! -w "$TMPDIR" ]]; then
+    TMPDIR=$(getconf DARWIN_USER_TEMP_DIR 2>/dev/null) || TMPDIR=/tmp
+    export TMPDIR
+fi
+
+orig_path="${PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
+path="$here/bin"
+# brew --prefix NAME prints where NAME is linked even before it is installed.
+# On a first launch Setup.sh installs the packages during this session, so
+# the paths go in whether they exist yet or not.
+if command -v brew >/dev/null 2>&1; then
+    icu=$(brew --prefix icu4c 2>/dev/null || true)
+    pkg="$here/pkgconfig"
+    if [[ -n "${icu:-}" ]]; then
+        pkg="$pkg:$icu/lib/pkgconfig"
+    fi
+    export PKG_CONFIG_PATH="${pkg}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+    for formula in coreutils grep gnu-sed gawk findutils; do
+        prefix=$(brew --prefix "$formula" 2>/dev/null || true)
+        if [[ -n "${prefix:-}" ]]; then
+            path="$path:$prefix/libexec/gnubin"
+        fi
+    done
+    e2=$(brew --prefix e2fsprogs 2>/dev/null || true)
+    if [[ -n "${e2:-}" ]]; then
+        path="$path:$e2/sbin"
+    fi
+fi
+path="$path:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:$orig_path"
+export PATH="$path"
+# macOS creates AppleDouble files on copies. The PS2 partitions must not get them.
+export COPYFILE_DISABLE=1
+
+# macOS TMPDIR ends in a slash.
+overlay="${TMPDIR%/}/psbbn-overlay-${UID}"
+psbbn_unquarantine_helpers "$repo"
+build_overlay "$repo" "$overlay"
+cd "$overlay"
+# The installers take their folder from pwd; it is the overlay as cd wrote it.
+export PSBBN_OVERLAY="$PWD"
+eval "$(psbbn_git_env "$repo")"
+# exec keeps this pid. da-veto refuses Disk Arbitration mounts of the
+# selected drive for as long as this process lives.
+export PSBBN_SESSION_PID=$$
+psbbn_sudo_session_start "$$"
+# Left by a run under sudo before the session dropped to the user.
+claim=()
+while IFS= read -r line; do
+    claim+=("$line")
+done < <(psbbn_user_paths "$UID")
+psbbn_claim_paths "$UID" "$(id -g)" "${claim[@]}"
+exec "$bash5" "$overlay/PSBBN-Definitive-Patch.sh" "$@"

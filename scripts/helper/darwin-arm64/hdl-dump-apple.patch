@@ -1,0 +1,21 @@
+diff --git a/osal_unix.c b/osal_unix.c
+index 1298b9f..e065910 100644
+--- a/osal_unix.c
++++ b/osal_unix.c
+@@ -404,7 +404,16 @@ osal_map_device_name(const char *input,
+     int result = stat64(input, &st) == 0 ? RET_OK : RET_ERR;
+     if (result == RET_OK) { /* accept the input, only if it is a block device */
+ #if !defined(_DEBUG)        /* in debug mode treat files as devices */
++#if defined(__APPLE__)
++        /* Release builds reject regular files, but macOS disk images are
++           files and raw disks are character devices. Block devices stay valid. */
++        if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode) || S_ISREG(st.st_mode))
++            result = RET_OK;
++        else
++            result = RET_BAD_DEVICE;
++#else
+         result = st.st_mode & S_IFBLK ? RET_OK : RET_BAD_DEVICE;
++#endif
+ #endif
+         if (result == RET_OK)
+             strcpy(output, input);

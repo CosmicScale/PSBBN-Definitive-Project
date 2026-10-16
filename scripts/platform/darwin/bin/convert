@@ -1,0 +1,29 @@
+#!/bin/bash
+# Homebrew's ImageMagick is 7. Every convert, and every magick convert,
+# prints "WARNING: The convert command is deprecated in IMv7" and a blank
+# line to stderr, into Game-Installer's progress bar. Plain magick parses
+# options its own way, so the command stays convert; only that warning is
+# dropped. Output, other messages and the exit status are convert's.
+if [[ "${1:-}" == "--psbbn-shim-ok" ]]; then
+    exit 0
+fi
+here=$(cd "$(dirname "$0")" && pwd)
+magick=""
+IFS=: read -r -a dirs <<< "$PATH"
+for dir in "${dirs[@]}" /opt/homebrew/bin /usr/local/bin; do
+    [[ -n "$dir" && "$dir" != "$here" && -x "$dir/magick" ]] || continue
+    magick="$dir/magick"
+    break
+done
+if [[ -z "$magick" ]]; then
+    echo "convert: ImageMagick is not installed (brew install imagemagick)" >&2
+    exit 127
+fi
+{
+    "$magick" convert "$@" 2>&1 1>&3 3>&- | /usr/bin/awk '
+        drop && /^$/ { drop = 0; next }
+        /^WARNING: The convert command is deprecated in IMv7/ { drop = 1; next }
+        { drop = 0; print; fflush() }' >&2
+    status=${PIPESTATUS[0]}
+} 3>&1
+exit "$status"

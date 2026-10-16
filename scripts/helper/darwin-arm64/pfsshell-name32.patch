@@ -1,0 +1,26 @@
+diff --git a/src/shell.c b/src/shell.c
+index c6b99da..2700661 100644
+--- a/src/shell.c
++++ b/src/shell.c
+@@ -357,14 +357,18 @@ static int do_mkpart(context_t *ctx, int arg, char *argv[])
+     unsigned int size_in_mb = 0;
+ 
+     char tmp[128];
+-    char openString[32 + 5];
++    /* "hdd0:" + an APA id of up to 32 characters + NUL. */
++    char openString[5 + 32 + 1];
+     char part_type[9];
+     int i = 9;
+     int result = -1;
+     int partfd = 0;
+ 
+-    sprintf(openString, "hdd0:%s", argv[1]);
+-    openString[32 + 5 - 1] = '\0';
++    if (strlen(argv[1]) > 32) {
++        fprintf(stderr, "%s: partition name is longer than 32 characters.\n", argv[1]);
++        return (-1);
++    }
++    snprintf(openString, sizeof(openString), "hdd0:%s", argv[1]);
+     partfd = iomanX_open(openString, FIO_O_RDONLY);
+     if (partfd != -2) // partition already exists+
+     {
