@@ -2897,5 +2897,45 @@ else
 fi
 rm -rf "$gv"
 
+# --- mkpart EXT2 as the PS2 kernel reads it ---------------------------------
+# fs/partitions/ps2.c maps a __linux.N partition as its main partition from
+# 4 MiB in, then each sub-partition from 4 KiB in; the Linux PFS Shell
+# formats in that layout. hdl_dump toc --dm starts a sub-partition 1 MiB
+# in, so a filesystem written along those extents has every block past the
+# main partition 2040 sectors away from where the PS2 reads it ("Allocating
+# block in system zone"). Two groups, the second one in the sub-partition,
+# on a used drive.
+kl=$(mktemp -d)
+kl_img="$kl/drive.img"
+/usr/sbin/mkfile -n 512m "$kl_img"
+LC_ALL=C tr '\0' '\245' < /dev/zero | /bin/dd of="$kl_img" bs=1048576 seek=128 count=384 conv=notrunc 2>/dev/null
+kl_main=262144 kl_sub=524288 kl_len=262144
+kl_listing="drive.img-__linux.10,,,rw,0 $((kl_len - 8192)) linear $kl_img $((kl_main + 8192)),$((kl_len - 8192)) $((kl_len - 2048)) linear $kl_img $((kl_sub + 2048));"
+kl_sum() { /bin/dd if="$kl_img" bs=512 skip="$1" count="$2" 2>/dev/null | /sbin/md5 -q; }
+kl_hdr_main=$(kl_sum "$kl_main" 8192)
+kl_hdr_sub=$(kl_sum "$kl_sub" 8)
+kl_rc=0
+psbbn_format_mkpart_ranges "$kl_img" "mkpart __linux.10 256M EXT2" "$kl_listing" > "$kl/out" 2>&1 || kl_rc=$?
+{
+    /bin/dd if="$kl_img" bs=512 skip=$((kl_main + 8192)) count=$((kl_len - 8192)) 2>/dev/null
+    /bin/dd if="$kl_img" bs=512 skip=$((kl_sub + 8)) count=$((kl_len - 8)) 2>/dev/null
+} > "$kl/ps2-view.img"
+kl_e2=/opt/homebrew/opt/e2fsprogs/sbin
+kl_blocks=$("$kl_e2/dumpe2fs" -h "$kl/ps2-view.img" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')
+if [[ "$kl_rc" -eq 0 && "$kl_blocks" == $(((2 * kl_len - 8192 - 8) / 8)) ]] \
+    && "$kl_e2/e2fsck" -fn "$kl/ps2-view.img" > "$kl/fsck.out" 2>&1; then
+    ok mkpart-ext2-kernel-layout
+else
+    bad "mkpart-ext2-kernel-layout rc=$kl_rc blocks=$kl_blocks $(tail -n 3 "$kl/out") $(grep -m 3 -E 'differences|Bad|bad|corrupt' "$kl/fsck.out")"
+fi
+[[ "$(kl_sum "$kl_main" 8192)" == "$kl_hdr_main" && "$(kl_sum "$kl_sub" 8)" == "$kl_hdr_sub" ]] \
+    && ok mkpart-ext2-keeps-apa-headers || bad mkpart-ext2-keeps-apa-headers
+# PS2 Linux's /bin/mkhome copies the ps2 user's home onto the new /home
+# only when ls finds nothing there; the Linux PFS Shell leaves no
+# lost+found, and the root folder belongs to root.
+kl_root=$("$kl_e2/debugfs" -R "ls -p /" "$kl/ps2-view.img" 2>/dev/null | awk -F/ 'NF > 5 { print $6 ":" $4 ":" $5 }' | sort | tr '\n' ' ')
+[[ "$kl_root" == ".:0:0 ..:0:0 " ]] && ok mkpart-ext2-empty-root-owned-by-root || bad "mkpart-ext2-empty-root-owned-by-root [$kl_root]"
+rm -rf "$kl"
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

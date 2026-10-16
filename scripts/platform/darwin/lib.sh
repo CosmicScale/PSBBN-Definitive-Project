@@ -399,6 +399,7 @@ psbbn_pfsshell_bin() {
 
 # Same ext2 the installer uses when it formats a Linux partition itself.
 # -F is required because the slice is a file, and a tty would otherwise prompt.
+# psbbn_format_ext2_file PATH [BLOCKS]
 psbbn_format_ext2_file() {
     local path="$1" mke2fs
     mke2fs=$(psbbn_mke2fs_bin) || {
@@ -407,7 +408,26 @@ psbbn_format_ext2_file() {
     }
     "$mke2fs" -F -q -t ext2 -b 4096 -I 128 \
         -O ^large_file,^dir_index,^extent,^huge_file,^flex_bg,^has_journal,^ext_attr,^resize_inode \
-        "$path"
+        "$path" ${2:+"$2"}
+}
+
+# The ext2 the Linux PFS Shell's mkpart writes (pfsshell ext2 branch,
+# mkext2.c): every whole 4 KiB block of the partition, and no lost+found.
+# PS2 Linux's /bin/mkhome copies the ps2 user's home onto a new home
+# partition only when ls finds nothing there. mke2fs left to size the
+# filesystem itself rounds it down to whole memory pages, 16 KiB on Apple
+# silicon.
+psbbn_format_mkpart_ext2_file() {
+    local path="$1" debugfs err bytes
+    bytes=$(wc -c < "$path" | tr -d ' ')
+    psbbn_format_ext2_file "$path" "$((bytes / 4096))" || return $?
+    debugfs=$(psbbn_debugfs_bin) || return 127
+    # debugfs exits 0 when a request fails; it says so after its banner.
+    err=$("$debugfs" -w -R "rmdir lost+found" "$path" 2>&1 >/dev/null | grep -v '^debugfs [0-9]') || true
+    if [[ -n "$err" ]]; then
+        printf 'mkpart: %s\n' "$err" >&2
+        return 1
+    fi
 }
 
 # Linux swap v1. The signature sits at the end of the first 4096-byte page.
@@ -434,6 +454,12 @@ PY
 
 # Linux PFS Shell formats EXT2 and EXT2SWAP inside mkpart. Upstream pfsshell
 # only creates the APA partition, so the following mount has no filesystem.
+# The filesystem goes where the PS2 reads it. Its kernel (fs/partitions/
+# ps2.c) and the Linux PFS Shell take a partition from 4 MiB into the main
+# partition and from 4 KiB into each sub-partition; toc --dm, which this
+# reads, starts a sub-partition 1 MiB in. In toc --dm's layout every block
+# past the main partition was 2040 sectors off on the PS2, and PS2 Linux
+# reported "Allocating block in system zone" on a large home partition.
 psbbn_format_mkpart_ranges() {
     local device="$1" commands="$2" listing="$3" line name fstype extents sectors tmp
     while IFS= read -r line; do
@@ -454,6 +480,8 @@ psbbn_format_mkpart_ranges() {
         # shellcheck disable=SC1091
         eval "$( "$(psbbn_python)" - "$listing" "$name" << 'PY'
 import sys
+# Sectors in front of the data of a sub-partition: toc --dm, the PS2 kernel.
+DM_SUB, PS2_SUB = 2048, 8
 listing, want = sys.argv[1], sys.argv[2]
 for chunk in listing.split(";"):
     chunk = chunk.strip()
@@ -463,15 +491,21 @@ for chunk in listing.split(";"):
     if not part.endswith("-" + want):
         continue
     extents = []
+    mapped = 0
     total = 0
     for table in chunk.split(",")[4:]:
         bits = table.split()
         if not bits:
             continue
-        if len(bits) != 5 or bits[2] != "linear" or int(bits[0]) != total:
+        if len(bits) != 5 or bits[2] != "linear" or int(bits[0]) != mapped:
             raise SystemExit(0)
-        extents.append("%s:%s" % (bits[4], bits[1]))
-        total += int(bits[1])
+        start, count = int(bits[4]), int(bits[1])
+        mapped += count
+        if extents:
+            start -= DM_SUB - PS2_SUB
+            count += DM_SUB - PS2_SUB
+        extents.append("%d:%d" % (start, count))
+        total += count
     sys.stdout.write("sectors=%d\nextents='%s'\n" % (total, " ".join(extents)))
     break
 PY
@@ -488,7 +522,7 @@ os.ftruncate(fd, int(sys.argv[2]))
 os.close(fd)
 PY
         if [[ "$fstype" == EXT2 ]]; then
-            psbbn_format_ext2_file "$tmp" >/dev/null || return $?
+            psbbn_format_mkpart_ext2_file "$tmp" >/dev/null || return $?
         else
             psbbn_format_swap_file "$tmp" || return $?
         fi

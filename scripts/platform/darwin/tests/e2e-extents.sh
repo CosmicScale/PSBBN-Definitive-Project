@@ -32,6 +32,7 @@ img="$work/disk.img"
 hdl="$helper/hdl_dump"
 fsck=/opt/homebrew/opt/e2fsprogs/sbin/e2fsck
 dumpe2fs=/opt/homebrew/opt/e2fsprogs/sbin/dumpe2fs
+debugfs=/opt/homebrew/opt/e2fsprogs/sbin/debugfs
 cut=$(basename "$img")
 mapper="$PSBBN_MAPPER_DIR/$cut-"
 # dd that adds up what reaches the drive image.
@@ -53,6 +54,24 @@ mib_written() { awk '{ s += $1 } END { printf "%d", s / 1048576 }' "$written" 2>
 extents_of() {
     "$hdl" toc "$img" --dm | tr ';' '\n' | grep "^$cut-$1," | tr ',' '\n' | tail -n +5 \
         | awk 'NF == 5 { printf "%s%s:%s", sep, $5, $2; sep = " " }'
+}
+# The partition as the PS2 kernel maps it (fs/partitions/ps2.c): the main
+# partition from 4 MiB in, each sub-partition from 4 KiB in. toc --dm
+# starts a sub-partition 1 MiB in.
+ps2_extents_of() {
+    local extent out=""
+    for extent in $(extents_of "$1"); do
+        if [[ -z "$out" ]]; then
+            out=$extent
+        else
+            out+=" $((${extent%%:*} - 2040)):$((${extent#*:} + 2040))"
+        fi
+    done
+    printf '%s\n' "$out"
+}
+# A sub-partition starts with its APA header: magic "APA\0" at byte 4.
+apa_header_at() {
+    [[ "$(dd if="$img" bs=512 skip="$1" count=1 2>/dev/null | dd bs=1 skip=4 count=4 2>/dev/null | xxd -p)" == 41504100 ]]
 }
 # The partition as the filesystem sees it: its extents back to back.
 assemble() {
@@ -100,12 +119,15 @@ with open(path, "rb") as sl, open(img, "rb") as dr:
 print(sum(b - a for a, b in regions) // 1048576)
 PY
 }
-# The 4 MiB in front of every extent: the APA header and reserved area of
-# the main partition, the header of each sub-partition.
+# What is in front of each extent: the APA header and reserved area of the
+# main partition (4 MiB), the header of each sub-partition (1 MiB in toc
+# --dm). Further in front of a sub-partition is whatever piece lies before
+# it on the drive, and its own unmount may write there.
 headers_sum() {
-    local extent
+    local extent skip=8192
     for extent in $1; do
-        dd if="$img" bs=512 skip=$((${extent%%:*} - 8192)) count=8192 2>/dev/null
+        dd if="$img" bs=512 skip=$((${extent%%:*} - skip)) count="$skip" 2>/dev/null
+        skip=2048
     done | md5 -q
 }
 
@@ -116,33 +138,49 @@ stamp "image at $img"
 dd if=/dev/urandom of="$img" bs=1048576 seek=2048 count=4096 conv=notrunc status=none 2>/dev/null
 
 stamp "PFS Shell: initialize + mkpart above the cap (ext2 formatted by the wrapper)"
-printf 'device %s\ninitialize yes\nmkpart __linux.5 1536M EXT2\nmkpart __linux.8 1536M EXT2\nmkpart __contents 128M PFS\nexit\n' "$img" \
+# __linux.10 is the PS2 Linux home partition, sized by the user.
+printf 'device %s\ninitialize yes\nmkpart __linux.5 1536M EXT2\nmkpart __linux.8 1536M EXT2\nmkpart __contents 128M PFS\nmkpart __linux.10 1536M EXT2\nexit\n' "$img" \
     | "$helper/PFS Shell.elf" > "$work/pfsshell.out" 2>&1 || { bad "pfsshell $(tail -5 "$work/pfsshell.out")"; exit 1; }
 ext5=$(extents_of __linux.5)
 ext8=$(extents_of __linux.8)
 n5=$(wc -w <<<"$ext5" | tr -d ' ')
 n8=$(wc -w <<<"$ext8" | tr -d ' ')
-[[ "$n5" -ge 2 && "$n8" -ge 2 ]] && ok "partitions-span-extents ($n5 and $n8)" || { bad "partitions-span-extents $ext5 / $ext8"; exit 1; }
+n10=$(extents_of __linux.10 | wc -w | tr -d ' ')
+[[ "$n5" -ge 2 && "$n8" -ge 2 && "$n10" -ge 2 ]] && ok "partitions-span-extents ($n5, $n8 and $n10)" || { bad "partitions-span-extents $ext5 / $ext8"; exit 1; }
 headers5=$(headers_sum "$ext5")
 headers8=$(headers_sum "$ext8")
 
-# mkpart formats the whole partition, not just the main piece.
-assemble "$ext5" > "$work/l5.img"
-blocks=$("$dumpe2fs" -h "$work/l5.img" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')
-total=0
-for extent in $ext5; do total=$((total + ${extent#*:})); done
-if [[ "$((blocks * 4096))" -eq "$((total * 512))" ]] && "$fsck" -fn "$work/l5.img" >/dev/null 2>&1; then
-    ok mkpart-ext2-spans-extents
-else
-    bad "mkpart-ext2-spans-extents blocks=$blocks sectors=$total"
-fi
-rm -f "$work/l5.img"
+# mkpart formats the whole partition, not just the main piece, where the
+# PS2 reads it: a filesystem the PS2 sees shifted past the main piece is
+# what PS2 Linux reported as "Allocating block in system zone".
+for p in __linux.5 __linux.10; do
+    ps2=$(ps2_extents_of "$p")
+    heads=1
+    for extent in ${ps2#* }; do
+        apa_header_at $((${extent%%:*} - 8)) || heads=0
+    done
+    assemble "$ps2" > "$work/ps2.img"
+    blocks=$("$dumpe2fs" -h "$work/ps2.img" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')
+    total=0
+    for extent in $ps2; do total=$((total + ${extent#*:})); done
+    if [[ "$heads" -eq 1 && "$blocks" -eq "$((total / 8))" ]] && "$fsck" -fn "$work/ps2.img" > "$work/fsck-ps2.out" 2>&1; then
+        ok "mkpart-ext2-as-the-ps2-reads-it ($p)"
+    else
+        bad "mkpart-ext2-as-the-ps2-reads-it ($p) headers=$heads blocks=$blocks sectors=$total $(grep -m 2 -v -E '^(e2fsck|Pass)' "$work/fsck-ps2.out")"
+    fi
+    # PS2 Linux's /bin/mkhome fills /home only when ls finds nothing there.
+    root_ls=$("$debugfs" -R "ls -p /" "$work/ps2.img" 2>/dev/null | awk -F/ 'NF > 5 { print $6 }' | sort | tr '\n' ' ')
+    [[ "$root_ls" == ". .. " ]] && ok "mkpart-ext2-root-empty ($p)" || bad "mkpart-ext2-root-empty ($p) [$root_ls]"
+done
+rm -f "$work/ps2.img"
 
 stamp "dmsetup: the whole toc --dm line in one call, like Media-Installer"
 "$hdl" toc "$img" --dm | "$bin/dmsetup" create --concise 2>"$work/dm.err" || bad "dmsetup create $(cat "$work/dm.err")"
 [[ -f "${mapper}__linux.5" && -f "${mapper}__linux.8" && -f "${mapper}__contents" ]] && ok dmsetup-maps-all || bad "dmsetup-maps-all $(ls "$PSBBN_MAPPER_DIR")"
 
-stamp "ext2: mount, write, unmount"
+stamp "ext2: mke2fs on the map like PSBBN-Installer, mount, write, unmount"
+"$bin/mke2fs" -t ext2 -b 4096 -I 128 -O ^large_file,^dir_index,^extent,^huge_file,^flex_bg,^has_journal,^ext_attr,^resize_inode \
+    "${mapper}__linux.5" > "$work/mk5.out" 2>&1 || bad "mke2fs map $(tail -3 "$work/mk5.out")"
 head -c 5000000 /dev/urandom > "$work/payload.bin"
 mnt5="$work/storage/__linux.5"
 mkdir -p "$mnt5"
