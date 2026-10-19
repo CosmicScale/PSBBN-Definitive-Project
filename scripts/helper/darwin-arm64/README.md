@@ -99,8 +99,10 @@ PS2 kernel maps them) and
 whose BOOTSTRAP writes the APA header while its PFS partitions are still
 mounted). `scripts/platform/darwin/tests/e2e-docker.sh PS2Linux.tar.gz`
 needs Docker: in a Linux container it formats the same PS2 Linux
-partitions with the Linux `PFS Shell.elf`, maps the home partition the way
-the PS2 kernel does, runs PS2 Linux's `/bin/mkhome` on it and copies files
-in, for the Linux build and for this wrapper, and compares `genvmc`'s cards
-with Game-Installer's Linux build. `PSBBN_BEFORE=<revision>` adds that
-revision's wrapper to the run.
+partitions with the Linux `PFS Shell.elf` and compares the drive with the
+one this `pfsshell` formats, maps the home partition the way the PS2
+kernel does, runs PS2 Linux's `/bin/mkhome` on it and copies files in. It
+installs PS2 Linux's root partition the way Extras does on each system and
+compares every path, setuid bits and times included, and compares
+`genvmc`'s cards with Game-Installer's Linux build. `PSBBN_BEFORE=<revision>`
+adds that revision's macOS side to the run.

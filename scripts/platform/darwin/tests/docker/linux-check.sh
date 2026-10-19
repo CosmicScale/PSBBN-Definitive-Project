@@ -7,6 +7,12 @@
 #                                       with PS2 Linux's /bin/mkhome from TARBALL
 #   linux-check.sh vmc DIR              genvmc as Game-Installer builds it on Linux,
 #                                       against DIR/mac-8.bin and DIR/mac-32.bin
+#   linux-check.sh root IMAGE OUT [TARBALL [OPTION]]
+#                                       __linux.3 the way the PS2 kernel maps it;
+#                                       with TARBALL, tar zxpf it in as root first,
+#                                       as Extras does on Linux (OPTION, such as
+#                                       --numeric-owner, goes to tar). Lists every
+#                                       path in OUT.
 #
 # /helper is the project's scripts/helper folder.
 set -u
@@ -17,13 +23,11 @@ format() {
     echo "format_rc=$?"
 }
 
-home() {
-    local img="$1" tarball="$2" loop line table dev name="psbbn-hda10-$$" root=/tmp/ps2root
-    local base rc n errors
-    loop=$(losetup -f --show "$img") || { echo "error=losetup"; return 1; }
-    # shellcheck disable=SC2064
-    trap "umount $root/home $root/proc 2>/dev/null; dmsetup remove --noudevsync $name 2>/dev/null; losetup -d $loop" EXIT
-    line=$("$helper/HDL Dump.elf" toc "$loop" --dm | tr ';' '\n' | grep -- "-__linux.10,")
+# ps2_map LOOP PART NAME: PART on LOOP as /dev/mapper/NAME, the way the PS2
+# kernel reads it.
+ps2_map() {
+    local loop="$1" part="$2" name="$3" line table
+    line=$("$helper/HDL Dump.elf" toc "$loop" --dm | tr ';' '\n' | grep -- "-$part,")
     # fs/partitions/ps2.c maps the main partition from 4 MiB in and each
     # sub-partition from 4 KiB in; toc --dm starts a sub-partition 1 MiB in.
     # A sub-partition starts with its APA header, magic "APA\0" at byte 4.
@@ -51,6 +55,15 @@ PY
     echo "pieces=$(wc -l <<< "$table" | tr -d ' ')"
     printf '%s\n' "$table" | dmsetup create --noudevsync "$name" || { echo "error=dmsetup"; return 1; }
     dmsetup mknodes
+}
+
+home() {
+    local img="$1" tarball="$2" loop dev name="psbbn-hda10-$$" root=/tmp/ps2root
+    local base rc n errors
+    loop=$(losetup -f --show "$img") || { echo "error=losetup"; return 1; }
+    # shellcheck disable=SC2064
+    trap "umount $root/home $root/proc 2>/dev/null; dmsetup remove --noudevsync $name 2>/dev/null; losetup -d $loop" EXIT
+    ps2_map "$loop" __linux.10 "$name" || return 1
     dev="/dev/mapper/$name"
     echo "blocks=$(dumpe2fs -h "$dev" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')"
     echo "sectors=$(blockdev --getsz "$dev")"
@@ -130,9 +143,70 @@ PY
     echo "linux_fortify_says=$(grep -m 1 -o 'buffer overflow detected' /tmp/fortify.out)"
 }
 
+root() {
+    local img="$1" out="$2" tarball="${3:-}" option="${4:-}" loop dev name="psbbn-hda3-$$" mnt=/tmp/ps2-hda3 rc
+    loop=$(losetup -f --show "$img") || { echo "error=losetup"; return 1; }
+    # shellcheck disable=SC2064
+    trap "umount $mnt 2>/dev/null; dmsetup remove --noudevsync $name 2>/dev/null; losetup -d $loop" EXIT
+    ps2_map "$loop" __linux.3 "$name" || return 1
+    dev="/dev/mapper/$name"
+    mkdir -p "$mnt"
+    if [[ -n "$tarball" ]]; then
+        mount -t ext2 "$dev" "$mnt" || { echo "error=mount"; return 1; }
+        rc=0
+        tar ${option:+"$option"} -zxpf "$tarball" -C "$mnt" > /tmp/tar.out 2>&1 || rc=$?
+        echo "tar_rc=$rc"
+        umount "$mnt"
+    fi
+    rc=0
+    e2fsck -fn "$dev" > /tmp/fsck-root.out 2>&1 || rc=$?
+    echo "fsck_root=$rc"
+    mount -t ext2 -o ro "$dev" "$mnt" || { echo "error=mount"; return 1; }
+    # One line per path, the root folder too: mode, owner and links, then
+    # the size and MD5 of a file, the target of a link or the numbers of a
+    # device, then the modification time. Names are the bytes on the disk.
+    python3 -I - "$mnt" "$out" << 'PY'
+import hashlib, os, stat, sys
+top, out = os.fsencode(sys.argv[1]), sys.argv[2]
+rows = []
+def row(full):
+    info = os.lstat(full)
+    mode = info.st_mode
+    if stat.S_ISREG(mode):
+        md5 = hashlib.md5()
+        with open(full, "rb") as fh:
+            for block in iter(lambda: fh.read(1 << 20), b""):
+                md5.update(block)
+        what = b"f %d %s" % (info.st_size, md5.hexdigest().encode())
+    elif stat.S_ISDIR(mode):
+        what = b"d"
+    elif stat.S_ISLNK(mode):
+        what = b"l " + os.readlink(full)
+    elif stat.S_ISCHR(mode) or stat.S_ISBLK(mode):
+        what = b"%s %d:%d" % (b"c" if stat.S_ISCHR(mode) else b"b", os.major(info.st_rdev), os.minor(info.st_rdev))
+    elif stat.S_ISFIFO(mode):
+        what = b"p"
+    else:
+        what = b"?"
+    rel = os.path.relpath(full, top)
+    rows.append(b"%s\t%04o %d:%d %d\t%s\t%d" % (rel, stat.S_IMODE(mode), info.st_uid, info.st_gid, info.st_nlink, what, int(info.st_mtime)))
+row(top)
+for dirpath, dirnames, filenames in os.walk(top):
+    for name in dirnames + filenames:
+        row(os.path.join(dirpath, name))
+with open(out, "wb") as fh:
+    fh.write(b"\n".join(sorted(rows)) + b"\n")
+special = sum(1 for r in rows if int(r.split(b"\t")[1].split()[0], 8) & 0o7000)
+print("root_paths=%d" % len(rows))
+print("root_special=%d" % special)
+PY
+    umount "$mnt"
+}
+
 case "${1:-}" in
     format) format ;;
     home) home "$2" "$3" ;;
     vmc) vmc "$2" ;;
-    *) sed -n '2,13p' "$0" >&2; exit 2 ;;
+    root) root "$2" "$3" "${4:-}" "${5:-}" ;;
+    *) sed -n '2,18p' "$0" >&2; exit 2 ;;
 esac
