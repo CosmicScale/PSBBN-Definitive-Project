@@ -137,7 +137,7 @@ stamp "image at $img"
 # skips a slice's holes may rely on that space reading as zero.
 dd if=/dev/urandom of="$img" bs=1048576 seek=2048 count=4096 conv=notrunc status=none 2>/dev/null
 
-stamp "PFS Shell: initialize + mkpart above the cap (ext2 formatted by the wrapper)"
+stamp "PFS Shell: initialize + mkpart above the cap (mkpart formats ext2)"
 # __linux.10 is the PS2 Linux home partition, sized by the user.
 printf 'device %s\ninitialize yes\nmkpart __linux.5 1536M EXT2\nmkpart __linux.8 1536M EXT2\nmkpart __contents 128M PFS\nmkpart __linux.10 1536M EXT2\nexit\n' "$img" \
     | "$helper/PFS Shell.elf" > "$work/pfsshell.out" 2>&1 || { bad "pfsshell $(tail -5 "$work/pfsshell.out")"; exit 1; }

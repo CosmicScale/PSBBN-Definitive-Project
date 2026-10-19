@@ -9,8 +9,8 @@ names the scripts expect (`HDL Dump.elf`, `PFS Shell.elf`, ...).
 | --- | --- |
 | `hdl_dump` | hdl-dump from <https://github.com/AKuHAK/hdl-dump>, branch **`8M`**, with `hdl-dump-apple.patch` applied, built with `make RELEASE=yes`. The `8M` branch is required: the master branch treats every partition smaller than 128 MB as a broken table, and the launcher partitions Game-Installer creates are 8 MB. |
 | `HDL Dump.elf` | Wrapper around `hdl_dump` that evicts Disk Arbitration's automounts of the drive and retries an open that macOS refused with "Resource busy". |
-| `pfsshell` | pfsshell from <https://github.com/ps2homebrew/pfsshell> (commit `8c92467`, ps2sdk submodule `023b678`) with `pfsshell-name32.patch` applied, built with `meson setup build && ninja -C build pfsshell`. Creates and packs 8 MB partitions. The patch is required: upstream `mkpart` writes "hdd0:" plus the partition name into a 37-byte buffer, one byte short for the 32-character names Game-Installer produces. Linux at -O0 truncates silently; macOS clang's fortified `sprintf` traps, pfsshell dies after the first prompt and the partition is never created. |
-| `PFS Shell.elf` | Wrapper around `pfsshell`. Adds the EXT2 and EXT2SWAP formatting that the Linux build (AKuHAK's `ext2` branch) does inside `mkpart`, and the same eviction and retry as `HDL Dump.elf`. Like the Linux build, it puts the filesystem where the PS2 kernel reads the partition (`fs/partitions/ps2.c`: the main partition from 4 MiB in, each sub-partition from 4 KiB in; `hdl_dump toc --dm` starts a sub-partition 1 MiB in) and leaves no `lost+found`, so PS2 Linux's `/bin/mkhome` fills a new home partition. |
+| `pfsshell` | pfsshell from <https://github.com/AKuHAK/pfsshell>, branch **`ext2`** (commit `7586a0d`, ps2sdk submodule `e94c67e`), the source of the Linux `PFS Shell.elf`, with `pfsshell-name32.patch` applied; build steps below. Its `mkpart` formats EXT2 and EXT2SWAP the way the Linux build does, where the PS2 kernel reads the partition (`fs/partitions/ps2.c`: the main partition from 4 MiB in, each sub-partition from 4 KiB in) and with no `lost+found`, so PS2 Linux's `/bin/mkhome` fills a new home partition; the partitions it writes are byte for byte the Linux build's apart from the times. Creates and packs 8 MB partitions. The patch is required: `mkpart` writes "hdd0:" plus the partition name into a 37-byte buffer, one byte short for the 32-character names Game-Installer produces. Linux at -O0 truncates silently; macOS clang's fortified `sprintf` traps, pfsshell dies after the first prompt and the partition is never created. |
+| `PFS Shell.elf` | Wrapper around `pfsshell`: refuses an internal disk, and evicts and retries like `HDL Dump.elf`. |
 | `mkfs.exfat` | Wrapper that maps the Linux `mkfs.exfat` arguments onto `/sbin/newfs_exfat`. |
 | `cue2pops` | BIN+CUE to POPS VCD converter from <https://github.com/bucanero/pops2cue>, the project the main README credits for `cue2pops`. |
 | `pops2cue` | POPS VCD to BIN+CUE converter from <https://github.com/bucanero/pops2cue> (commit `981e776`), built with `MACOSX_DEPLOYMENT_TARGET=11.0 make pops2cue`. It writes the CUE and BIN next to the VCD and recognises only an upper-case `.VCD` name; with any other name it builds the output names wrongly. |
@@ -33,14 +33,16 @@ make RELEASE=yes
 
 The result is ad-hoc signed by the linker, which is enough to run locally.
 
-To rebuild `pfsshell` (needs `meson` and `ninja` from Homebrew):
+To rebuild `pfsshell` (needs `meson` and `ninja`, from Homebrew or
+`pip install meson ninja`):
 
 ```sh
-git clone https://github.com/ps2homebrew/pfsshell.git
+git clone -b ext2 https://github.com/AKuHAK/pfsshell.git
 cd pfsshell
+git checkout 7586a0d
 git submodule update --init --depth 1 external/ps2sdk
 patch -p1 < /path/to/pfsshell-name32.patch
-meson setup build -Denable_pfs2tar=false
+CFLAGS=-mmacosx-version-min=11.0 LDFLAGS=-mmacosx-version-min=11.0 meson setup build -Denable_pfs2tar=false
 ninja -C build pfsshell
 ```
 

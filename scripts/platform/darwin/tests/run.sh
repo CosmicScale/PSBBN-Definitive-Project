@@ -975,14 +975,6 @@ if psbbn_format_ext2_file "$ext2_file" >/dev/null; then
 else
     bad format-ext2
 fi
-swap_file=$(mktemp)
-dd if=/dev/zero of="$swap_file" bs=1048576 count=8 status=none 2>/dev/null || dd if=/dev/zero of="$swap_file" bs=1048576 count=8 >/dev/null
-if psbbn_format_swap_file "$swap_file"; then
-    swap_sig=$(python3 -c 'import struct,sys; f=open(sys.argv[1],"rb"); f.seek(1024); ver=struct.unpack("<I", f.read(4))[0]; f.seek(4086); print("%s %s" % (ver, f.read(10)))' "$swap_file")
-    [[ "$swap_sig" == "1 b'SWAPSPACE2'" ]] && ok format-swap || bad "format-swap $swap_sig"
-else
-    bad format-swap
-fi
 
 pass_dir=$(mktemp -d)
 echo hi > "$pass_dir/hi.txt"
@@ -3087,42 +3079,56 @@ rm -rf "$gv"
 
 # --- mkpart EXT2 as the PS2 kernel reads it ---------------------------------
 # fs/partitions/ps2.c maps a __linux.N partition as its main partition from
-# 4 MiB in, then each sub-partition from 4 KiB in; the Linux PFS Shell
-# formats in that layout. hdl_dump toc --dm starts a sub-partition 1 MiB
-# in, so a filesystem written along those extents has every block past the
-# main partition 2040 sectors away from where the PS2 reads it ("Allocating
-# block in system zone"). Two groups, the second one in the sub-partition,
-# on a used drive.
+# 4 MiB in, then each sub-partition from 4 KiB in; the PFS Shell formats in
+# that layout. hdl_dump toc --dm starts a sub-partition 1 MiB in, so a
+# filesystem written along those extents had every block past the main
+# partition 2040 sectors away from where the PS2 reads it ("Allocating
+# block in system zone"). On a 16 GiB drive APA caps a partition at 1 GiB,
+# so 1536M is a main partition and one sub-partition.
 kl=$(mktemp -d)
 kl_img="$kl/drive.img"
-/usr/sbin/mkfile -n 512m "$kl_img"
-LC_ALL=C tr '\0' '\245' < /dev/zero | /bin/dd of="$kl_img" bs=1048576 seek=128 count=384 conv=notrunc 2>/dev/null
-kl_main=262144 kl_sub=524288 kl_len=262144
-kl_listing="drive.img-__linux.10,,,rw,0 $((kl_len - 8192)) linear $kl_img $((kl_main + 8192)),$((kl_len - 8192)) $((kl_len - 2048)) linear $kl_img $((kl_sub + 2048));"
-kl_sum() { /bin/dd if="$kl_img" bs=512 skip="$1" count="$2" 2>/dev/null | /sbin/md5 -q; }
-kl_hdr_main=$(kl_sum "$kl_main" 8192)
-kl_hdr_sub=$(kl_sum "$kl_sub" 8)
+/usr/sbin/mkfile -n 16g "$kl_img"
 kl_rc=0
-psbbn_format_mkpart_ranges "$kl_img" "mkpart __linux.10 256M EXT2" "$kl_listing" > "$kl/out" 2>&1 || kl_rc=$?
-{
-    /bin/dd if="$kl_img" bs=512 skip=$((kl_main + 8192)) count=$((kl_len - 8192)) 2>/dev/null
-    /bin/dd if="$kl_img" bs=512 skip=$((kl_sub + 8)) count=$((kl_len - 8)) 2>/dev/null
-} > "$kl/ps2-view.img"
+printf 'device %s\ninitialize yes\nmkpart __linux.10 1536M EXT2\nmkpart __linux.2 128M EXT2SWAP\nexit\n' "$kl_img" \
+    | "$root/../../helper/darwin-arm64/PFS Shell.elf" > "$kl/out" 2>&1 || kl_rc=$?
+# kl_view NAME OUT: NAME as the PS2 kernel maps it; prints the number of pieces.
+kl_view() {
+    "$root/../../helper/darwin-arm64/hdl_dump" toc "$kl_img" --dm | tr ';' '\n' | grep -- "-$1," | python3 -I -c '
+import sys
+line, img, out = sys.stdin.read().strip(), sys.argv[1], sys.argv[2]
+pieces = [p.split() for p in line.split(",")[4:] if len(p.split()) == 5]
+with open(img, "rb") as disk, open(out, "wb") as dst:
+    for n, bits in enumerate(pieces):
+        start, count = int(bits[4]), int(bits[1])
+        if n:
+            start, count = start - 2040, count + 2040
+        disk.seek(start * 512)
+        dst.write(disk.read(count * 512))
+print(len(pieces))' "$kl_img" "$2"
+}
 kl_e2=/opt/homebrew/opt/e2fsprogs/sbin
-kl_blocks=$("$kl_e2/dumpe2fs" -h "$kl/ps2-view.img" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')
-if [[ "$kl_rc" -eq 0 && "$kl_blocks" == $(((2 * kl_len - 8192 - 8) / 8)) ]] \
-    && "$kl_e2/e2fsck" -fn "$kl/ps2-view.img" > "$kl/fsck.out" 2>&1; then
+kl_pieces=$(kl_view __linux.10 "$kl/home.img")
+kl_blocks=$("$kl_e2/dumpe2fs" -h "$kl/home.img" 2>/dev/null | awk -F: '/^Block count/ { gsub(/ /, "", $2); print $2 }')
+# 1536 MiB less the 4 MiB in front of the main partition and the 4 KiB in
+# front of the sub-partition, in whole 4 KiB blocks.
+if [[ "$kl_rc" -eq 0 && "$kl_pieces" == 2 && "$kl_blocks" == $(((1536 * 2048 - 8192 - 8) / 8)) ]] \
+    && "$kl_e2/e2fsck" -fn "$kl/home.img" > "$kl/fsck.out" 2>&1; then
     ok mkpart-ext2-kernel-layout
 else
-    bad "mkpart-ext2-kernel-layout rc=$kl_rc blocks=$kl_blocks $(tail -n 3 "$kl/out") $(grep -m 3 -E 'differences|Bad|bad|corrupt' "$kl/fsck.out")"
+    bad "mkpart-ext2-kernel-layout rc=$kl_rc pieces=$kl_pieces blocks=$kl_blocks $(tail -n 3 "$kl/out") $(grep -m 3 -E 'differences|Bad|bad|corrupt' "$kl/fsck.out")"
 fi
-[[ "$(kl_sum "$kl_main" 8192)" == "$kl_hdr_main" && "$(kl_sum "$kl_sub" 8)" == "$kl_hdr_sub" ]] \
-    && ok mkpart-ext2-keeps-apa-headers || bad mkpart-ext2-keeps-apa-headers
+"$root/../../helper/darwin-arm64/hdl_dump" toc "$kl_img" > "$kl/toc" 2>&1
+grep -q '__linux.10$' "$kl/toc" && ! grep -qi broken "$kl/toc" \
+    && ok mkpart-ext2-keeps-apa-headers || bad "mkpart-ext2-keeps-apa-headers $(cat "$kl/toc")"
 # PS2 Linux's /bin/mkhome copies the ps2 user's home onto the new /home
-# only when ls finds nothing there; the Linux PFS Shell leaves no
-# lost+found, and the root folder belongs to root.
-kl_root=$("$kl_e2/debugfs" -R "ls -p /" "$kl/ps2-view.img" 2>/dev/null | awk -F/ 'NF > 5 { print $6 ":" $4 ":" $5 }' | sort | tr '\n' ' ')
+# only when ls finds nothing there; the PFS Shell leaves no lost+found, and
+# the root folder belongs to root.
+kl_root=$("$kl_e2/debugfs" -R "ls -p /" "$kl/home.img" 2>/dev/null | awk -F/ 'NF > 5 { print $6 ":" $4 ":" $5 }' | sort | tr '\n' ' ')
 [[ "$kl_root" == ".:0:0 ..:0:0 " ]] && ok mkpart-ext2-empty-root-owned-by-root || bad "mkpart-ext2-empty-root-owned-by-root [$kl_root]"
+# Linux swap v1: version 1 at byte 1024, SWAPSPACE2 at the end of the first page.
+kl_view __linux.2 "$kl/swap.img" > /dev/null
+kl_swap=$(python3 -I -c 'import struct,sys; f=open(sys.argv[1],"rb"); f.seek(1024); ver=struct.unpack("<I", f.read(4))[0]; f.seek(4086); print("%s %s" % (ver, f.read(10)))' "$kl/swap.img")
+[[ "$kl_swap" == "1 b'SWAPSPACE2'" ]] && ok mkpart-ext2swap || bad "mkpart-ext2swap $kl_swap"
 rm -rf "$kl"
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"

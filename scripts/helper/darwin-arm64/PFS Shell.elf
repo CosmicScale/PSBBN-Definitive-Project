@@ -1,7 +1,7 @@
 #!/bin/bash
-# Upstream pfsshell creates an EXT2 partition and leaves it empty.
-# The Linux PFS Shell shipped with this project formats EXT2 and EXT2SWAP
-# inside mkpart. Mounting depends on that filesystem existing.
+# pfsshell, built from the same source as the Linux PFS Shell (AKuHAK's ext2
+# branch), formats EXT2 and EXT2SWAP inside mkpart. This wrapper refuses an
+# internal disk and gets the drive back from Disk Arbitration first.
 if [[ -t 0 ]]; then
     exec "$(cd "$(dirname "$0")" && pwd)/pfsshell" "$@"
 fi
@@ -44,16 +44,7 @@ if [[ "$status" -ne 0 ]]; then
     exit "$status"
 fi
 if [[ -n "$device" ]] && printf '%s\n' "$output" | grep -F -q "$device: "; then
-    # The device could not be opened; nothing below would find partitions.
+    # The device could not be opened.
     exit 1
 fi
-if [[ -z "$device" ]]; then
-    exit 0
-fi
-if ! printf '%s\n' "$cmds" | grep -q 'mkpart .* EXT2'; then
-    exit 0
-fi
-listing=$(psbbn_hdl_dump "$here/hdl_dump" toc "$device" --dm 2>/dev/null || true)
-# The created-partition check looks at pfsshell's own messages.
-psbbn_format_mkpart_ranges "$device" "$output"$'\n'"$cmds" "$listing"
-exit $?
+exit 0

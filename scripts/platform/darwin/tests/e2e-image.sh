@@ -36,7 +36,7 @@ stamp "image at $img"
 # be large enough for 512 MiB partitions; 40 GiB costs no real space.
 /usr/sbin/mkfile -n 40g "$img"
 
-stamp "PFS Shell: initialize + mkpart (ext2 formatted by the wrapper)"
+stamp "PFS Shell: initialize + mkpart (mkpart formats ext2)"
 printf 'device %s\ninitialize yes\nmkpart __linux.1 512M EXT2\nmkpart __linux.2 128M EXT2SWAP\nmkpart __linux.4 512M EXT2\nmkpart __linux.5 512M EXT2\nmkpart __linux.7 256M EXT2\nmkpart __linux.8 512M EXT2\nmkpart __contents 128M PFS\nexit\n' "$img" \
     | "$pfs_shell_wrapper" > "$work/pfsshell.out" 2>&1 || { bad "pfsshell init $(tail -5 "$work/pfsshell.out")"; exit 1; }
 "$hdl" toc "$img" > "$work/toc.txt" 2>&1 || { bad "hdl_dump toc"; exit 1; }
