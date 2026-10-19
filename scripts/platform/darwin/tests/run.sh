@@ -451,10 +451,12 @@ n=\$(cat "$tree/pfs-calls" 2>/dev/null || echo 0)
 n=\$((n + 1))
 echo "\$n" > "$tree/pfs-calls"
 cat >/dev/null
-echo "pfsshell for POSIX systems"
+# pfsshell prints its banner and prompts on stderr, and a device it cannot
+# open with perror, then exits 1.
+echo "pfsshell for POSIX systems" >&2
 if [[ "\$n" -le 1 ]]; then
-    echo "> /dev/disk4: Resource busy"
-    exit 0
+    echo "> /dev/disk4: Resource busy" >&2
+    exit 1
 fi
 echo "> hdd0: 149GiB"
 EOF
