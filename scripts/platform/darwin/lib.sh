@@ -750,9 +750,15 @@ psbbn_gnu_sed() {
 # The folders the user fills. The installers look for games and media with
 # find -type f, which skips symlinks, and keep their art cache in icons/.
 # The overlay links each one whole, so it is the project's own folder, as
-# it is on Linux. So are the logs, and the language folder the front door
-# deletes the changelog from once it has been shown.
-_psbbn_user_dirs=(games media icons logs scripts/assets/lang)
+# it is on Linux. So are the logs, and scripts/assets: the installers
+# download into it, and the front door deletes the changelog in its lang
+# folder once it has been shown. The overlay is in TMPDIR, which macOS
+# empties on restart.
+_psbbn_user_dirs=(games media icons logs scripts/assets)
+
+# Game-Installer and Media-Installer keep the games and media folders the
+# user chose in these files.
+_psbbn_user_files=(scripts/gamepath.cfg scripts/media.cfg)
 
 # psbbn_link_user_dir REPO DEST NAME
 # An overlay built by an older version has NAME as a folder of symlinks.
@@ -773,31 +779,53 @@ psbbn_link_user_dir() {
     ln -s "$repo/$name" "$dest/$name"
 }
 
-# Overlays before this version kept the logs in the overlay. They move to
-# the project's logs folder; one already there is kept.
-psbbn_move_old_logs() {
-    local repo="$1" dest="$2" log
-    mkdir -p "$repo/logs"
-    [[ -d "$dest/logs" && ! -L "$dest/logs" ]] || return 0
-    for log in "$dest/logs"/* "$dest/logs"/.[!.]*; do
-        [[ -f "$log" ]] || continue
-        [[ -e "$repo/logs/${log##*/}" ]] || mv "$log" "$repo/logs/"
-    done
-    rm -rf "${dest:?}/logs"
+# psbbn_move_old_files REPO DEST NAME
+# Overlays before this version kept the logs and the downloads in the
+# overlay. After the symlink sweep only files the installers made are left
+# in DEST/NAME. They move to the project's folder; one already there is kept.
+psbbn_move_old_files() {
+    local repo="$1" dest="$2" name="$3" file rel
+    mkdir -p "$repo/$name"
+    [[ -d "$dest/$name" && ! -L "$dest/$name" ]] || return 0
+    while IFS= read -r -d '' file; do
+        rel=${file#"$dest/$name/"}
+        [[ -e "$repo/$name/$rel" || -L "$repo/$name/$rel" ]] && continue
+        mkdir -p "$(dirname "$repo/$name/$rel")"
+        mv "$file" "$repo/$name/$rel"
+    done < <(find "$dest/$name" -type f -print0)
+    rm -rf "${dest:?}/$name"
+}
+
+# psbbn_link_user_file REPO DEST NAME
+# A link to the project's file, made before the project has it: the
+# installer's first write creates the project's file, and until then the
+# installer's -f check finds nothing, as on Linux. A file an older overlay
+# kept moves to the project, unless the project has one.
+psbbn_link_user_file() {
+    local repo="$1" dest="$2" name="$3"
+    if [[ -f "$dest/$name" && ! -L "$dest/$name" ]]; then
+        [[ -e "$repo/$name" ]] || mv "$dest/$name" "$repo/$name"
+        rm -f "${dest:?}/$name"
+    fi
+    mkdir -p "$(dirname "$dest/$name")"
+    ln -sfn "$repo/$name" "$dest/$name"
 }
 
 # File-level symlinks so `rm` inside the overlay does not delete the repo;
-# the folders the user fills are linked whole (_psbbn_user_dirs above).
-# Real files the installer created in an earlier run (downloaded patch
-# archives, logs, gamepath.cfg) are kept; only the links are rebuilt.
+# the folders the user fills are linked whole (_psbbn_user_dirs above), and
+# so are the files that keep the folders the user chose (_psbbn_user_files).
 # build_overlay REPO DEST
 build_overlay() {
     local repo="$1" dest="$2" rel dir name left=0
     mkdir -p "${dest:?}"
     find "${dest:?}" -type l -delete 2>/dev/null || true
-    psbbn_move_old_logs "$repo" "$dest"
+    psbbn_move_old_files "$repo" "$dest" logs
+    psbbn_move_old_files "$repo" "$dest" scripts/assets
     for name in "${_psbbn_user_dirs[@]}"; do
         psbbn_link_user_dir "$repo" "$dest" "$name" || left=1
+    done
+    for name in "${_psbbn_user_files[@]}"; do
+        psbbn_link_user_file "$repo" "$dest" "$name"
     done
     if [[ "$left" -ne 0 ]]; then
         printf '%s\n' "The installer now uses the project's folders directly and no longer looks there." \

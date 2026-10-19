@@ -702,18 +702,18 @@ else
 fi
 
 repo=$(mktemp -d)
-# scripts/assets/lang is linked whole on purpose (the changelog the front
-# door deletes), so the sample lives one level up.
+# scripts/assets is linked whole on purpose (the downloads, and the
+# changelog the front door deletes), so the sample lives one level up.
 mkdir -p "$repo/scripts/assets/lang" "$repo/scripts/helper/aarch64" "$repo/scripts/helper/darwin-arm64"
-echo keep-me > "$repo/scripts/assets/sample.txt"
+echo keep-me > "$repo/scripts/sample.txt"
 echo elf > "$repo/scripts/helper/aarch64/cue2pops"
 echo macho > "$repo/scripts/helper/darwin-arm64/cue2pops"
 echo macho > "$repo/scripts/helper/darwin-arm64/pops2cue"
 overlay=$(mktemp -d)
 . "$root/lib.sh"
 build_overlay "$repo" "$overlay"
-rm "$overlay/scripts/assets/sample.txt"
-if [[ -f "$repo/scripts/assets/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
+rm "$overlay/scripts/sample.txt"
+if [[ -f "$repo/scripts/sample.txt" ]]; then ok overlay-rm; else bad overlay-rm; fi
 if [[ "$(cat "$overlay/scripts/helper/aarch64/cue2pops")" == macho ]]; then ok overlay-helper; else bad overlay-helper; fi
 # No Linux pops2cue is shipped yet; the overlay still has both names for it.
 if [[ "$(cat "$overlay/scripts/helper/pops2cue" 2>/dev/null)" == macho && "$(cat "$overlay/scripts/helper/aarch64/pops2cue" 2>/dev/null)" == macho ]]; then
@@ -2207,22 +2207,67 @@ else
     bad "pfs-restage-diff mount: $(cat "$stub/pfs2-mount.out")"
 fi
 
-# --- overlay rebuilds keep files the installer created ------------------
+# --- what the installers download and the folders the user chose ---------
+# The overlay is in TMPDIR, which macOS empties on restart. The downloads in
+# scripts/assets and the games and media folders kept in gamepath.cfg and
+# media.cfg go to the project, where Linux keeps them.
 ov_repo=$(mktemp -d)
-mkdir -p "$ov_repo/scripts/assets" "$ov_repo/scripts/helper/darwin-arm64" "$ov_repo/scripts/helper/aarch64"
+mkdir -p "$ov_repo/scripts/assets/lang" "$ov_repo/scripts/helper/darwin-arm64" "$ov_repo/scripts/helper/aarch64"
 echo a > "$ov_repo/scripts/assets/a.txt"
 echo b > "$ov_repo/scripts/assets/b.txt"
 ov_dest=$(mktemp -d)
 build_overlay "$ov_repo" "$ov_dest"
-mkdir -p "$ov_dest/logs"
-echo log > "$ov_dest/logs/setup.log"
-echo dl > "$ov_dest/scripts/assets/patch.tar.gz"
+mkdir -p "$ov_dest/scripts/assets/POPS-binaries-main"
+echo dl > "$ov_dest/scripts/assets/PS2Linux.tar.gz"
+echo elf > "$ov_dest/scripts/assets/POPS-binaries-main/POPS.ELF"
+# Game-Installer's and Media-Installer's own checks and writes.
+cfg_before=no
+[[ -f "$ov_dest/scripts/gamepath.cfg" && -s "$ov_dest/scripts/gamepath.cfg" ]] && cfg_before=yes
+echo /Volumes/Games > "$ov_dest/scripts/gamepath.cfg"
+echo /Volumes/Media > "$ov_dest/scripts/media.cfg"
 rm "$ov_repo/scripts/assets/b.txt"
+# A restart empties TMPDIR.
+rm -rf "$ov_dest"
+mkdir -p "$ov_dest"
 build_overlay "$ov_repo" "$ov_dest"
-if [[ "$(cat "$ov_dest/logs/setup.log")" == log && "$(cat "$ov_dest/scripts/assets/patch.tar.gz")" == dl && -L "$ov_dest/scripts/assets/a.txt" && ! -e "$ov_dest/scripts/assets/b.txt" ]]; then
-    ok overlay-keeps-downloads
+if [[ "$cfg_before" == no && "$(cat "$ov_repo/scripts/assets/PS2Linux.tar.gz" 2>/dev/null)" == dl \
+    && "$(cat "$ov_dest/scripts/assets/PS2Linux.tar.gz" 2>/dev/null)" == dl \
+    && "$(cat "$ov_dest/scripts/assets/POPS-binaries-main/POPS.ELF" 2>/dev/null)" == elf \
+    && "$(cat "$ov_dest/scripts/assets/a.txt" 2>/dev/null)" == a && ! -e "$ov_dest/scripts/assets/b.txt" ]]; then
+    ok overlay-downloads-in-project
 else
-    bad "overlay-keeps-downloads $(ls -la "$ov_dest/scripts/assets" "$ov_dest/logs")"
+    bad "overlay-downloads-in-project cfg_before=$cfg_before $(ls -laR "$ov_repo/scripts/assets" "$ov_dest/scripts/assets" 2>&1 | head -30)"
+fi
+if [[ "$(cat "$ov_repo/scripts/gamepath.cfg" 2>/dev/null)" == /Volumes/Games && "$(cat "$ov_repo/scripts/media.cfg" 2>/dev/null)" == /Volumes/Media \
+    && "$(cat "$ov_dest/scripts/gamepath.cfg" 2>/dev/null)" == /Volumes/Games && "$(cat "$ov_dest/scripts/media.cfg" 2>/dev/null)" == /Volumes/Media ]]; then
+    ok overlay-chosen-folders-in-project
+else
+    bad "overlay-chosen-folders-in-project $(ls -la "$ov_repo/scripts" "$ov_dest/scripts" 2>&1)"
+fi
+rm -rf "$ov_repo" "$ov_dest"
+
+# An overlay from before this version kept its downloads and gamepath.cfg
+# in TMPDIR. They move to the project; a file the project has is kept.
+ov_repo=$(mktemp -d)
+mkdir -p "$ov_repo/scripts/assets/lang" "$ov_repo/scripts/helper/darwin-arm64" "$ov_repo/scripts/helper/aarch64"
+echo tracked > "$ov_repo/scripts/assets/a.txt"
+echo project > "$ov_repo/scripts/assets/old.tar.gz"
+ov_dest=$(mktemp -d)
+mkdir -p "$ov_dest/scripts/assets/extras/sub" "$ov_dest/scripts/assets/lang"
+ln -s "$ov_repo/scripts/assets/a.txt" "$ov_dest/scripts/assets/a.txt"
+echo dl > "$ov_dest/scripts/assets/PS2Linux.tar.gz"
+echo x > "$ov_dest/scripts/assets/extras/sub/x.bin"
+echo overlay > "$ov_dest/scripts/assets/old.tar.gz"
+echo /Volumes/Games > "$ov_dest/scripts/gamepath.cfg"
+status=0
+out=$( (set -euo pipefail; build_overlay "$ov_repo" "$ov_dest") 2>&1) || status=$?
+if [[ "$status" -eq 0 && -L "$ov_dest/scripts/assets" && "$(cat "$ov_repo/scripts/assets/PS2Linux.tar.gz" 2>/dev/null)" == dl \
+    && "$(cat "$ov_repo/scripts/assets/extras/sub/x.bin" 2>/dev/null)" == x && "$(cat "$ov_repo/scripts/assets/old.tar.gz")" == project \
+    && "$(cat "$ov_repo/scripts/assets/a.txt")" == tracked && "$(cat "$ov_repo/scripts/gamepath.cfg" 2>/dev/null)" == /Volumes/Games \
+    && -L "$ov_dest/scripts/gamepath.cfg" ]]; then
+    ok overlay-moves-old-downloads
+else
+    bad "overlay-moves-old-downloads status=$status out=[$out] $(ls -laR "$ov_repo/scripts" 2>&1 | head -30)"
 fi
 rm -rf "$ov_repo" "$ov_dest"
 
