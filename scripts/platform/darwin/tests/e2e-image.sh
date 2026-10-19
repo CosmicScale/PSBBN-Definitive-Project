@@ -96,6 +96,39 @@ for p in __linux.1 __linux.4 __linux.5 __linux.7; do
     if "$fsck" -fn "${mapper}${p}" >/dev/null 2>&1; then ok "e2fsck-after-tar $p"; else bad "e2fsck-after-tar $p: $("$fsck" -fn "${mapper}${p}" 2>&1 | grep -v '^Pass' | head -5)"; fi
 done
 
+# PSBBN's su, mount and bn_asap are setuid root, and __linux.4/cache is
+# sticky. Each member of an ext2 partition with one of those bits must
+# arrive with the archive's mode, owner and time.
+special=$(python3 -I - "$patch" "$dbg" "$mapper" << 'PY'
+import re, subprocess, sys, tarfile
+archive, dbg, mapper = sys.argv[1:4]
+want = {}
+with tarfile.open(archive, "r|*") as tf:
+    for member in tf:
+        name = member.name
+        while name.startswith("./"):
+            name = name[2:]
+        part, _, rel = name.partition("/")
+        if part.startswith("__linux.") and part != "__linux.8" and member.mode & 0o7000 and not member.issym():
+            want.setdefault(part, []).append((rel, "%04o %d:%d %d" % (member.mode & 0o7777, member.uid, member.gid, member.mtime)))
+bad, count = [], 0
+for part, rows in sorted(want.items()):
+    for rel, expect in rows:
+        count += 1
+        out = subprocess.run([dbg, "-R", 'stat "/%s"' % rel, mapper + part], capture_output=True, text=True, errors="replace").stdout
+        mode = re.search(r"Mode:\s+0*([0-7]+)", out)
+        owner = re.search(r"User:\s+(\d+)\s+Group:\s+(\d+)", out)
+        mtime = re.search(r"mtime: 0x([0-9a-f]+)", out)
+        got = "%04o %s:%s %d" % (int(mode.group(1), 8), owner.group(1), owner.group(2), int(mtime.group(1), 16)) if mode and owner and mtime else "missing"
+        if got != expect:
+            bad.append("%s/%s %s, archive %s" % (part, rel, got, expect))
+print("%d %d %s" % (count, len(bad), "; ".join(bad[:3])))
+PY
+)
+read -r special_n special_bad special_first <<< "$special"
+[[ "${special_n:-0}" -gt 0 && "$special_bad" == 0 ]] \
+    && ok "tar-patch-keeps-special-bits ($special_n setuid, setgid or sticky)" || bad "tar-patch-keeps-special-bits $special_bad of $special_n: $special_first"
+
 stamp "installer-style edits"
 cp -f "$repo/scripts/assets/kernel/vmlinux" "$storage/__system/p2lboot/vmlinux" || bad cp-vmlinux
 mkdir -p "$storage/__sysconf/osdmenu"

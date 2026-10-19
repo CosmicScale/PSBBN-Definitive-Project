@@ -1217,6 +1217,149 @@ else
     bad "tar-ext2-devices rc=$node_rc null=$(printf %q "$null_stat") sda=$(printf %q "$sda_stat") fifo=$(printf %q "$fifo_stat") upper=$(printf %q "$upper") lower=$(printf %q "$lower") sh=$(printf %q "$sh_stat") after=$(printf %q "$null_after") note=$(printf %q "$note") tar=$(printf %q "$(cat /tmp/psbbn-node-tar.out 2>/dev/null)") umount=$(printf %q "$(cat /tmp/psbbn-node-umount.out 2>/dev/null)")"
 fi
 
+# PS2 Linux's sudo, userhelper and Xwrapper are setuid root and its /tmp is
+# sticky, as are PSBBN's su and bn_asap. Without those bits sudo, halt and
+# startx stop with "must be setuid root". A reinstall over a partition an
+# extract without them wrote must put them back.
+suid_archive=$(mktemp)
+suid_plain=$(mktemp)
+python3 - "$suid_archive" "$suid_plain" << 'PY'
+import io, sys, tarfile
+rows = [
+    ("d", "__linux.3", 0o755, 0, 0),
+    ("d", "__linux.3/tmp", 0o1777, 0, 0),
+    ("d", "__linux.3/usr", 0o755, 0, 0),
+    ("d", "__linux.3/usr/doc", 0o2755, 0, 15),
+    ("d", "__linux.3/usr/bin", 0o755, 0, 0),
+    ("f", "__linux.3/usr/bin/sudo", 0o4111, 0, 0),
+    ("f", "__linux.3/usr/bin/man", 0o2755, 0, 15),
+    ("f", "__linux.3/usr/bin/procmail", 0o6755, 0, 12),
+    ("f", "__linux.3/usr/bin/emacs", 0o1755, 0, 0),
+    ("f", "__linux.3/usr/bin/sperl5.00503", 0o4711, 0, 0),
+    ("h", "__linux.3/usr/bin/suidperl", 0o4711, 0, 0),
+]
+def write(path, keep):
+    with tarfile.open(path, "w:gz") as tf:
+        for kind, name, mode, uid, gid in rows:
+            info = tarfile.TarInfo(name)
+            info.mode = mode & keep
+            info.uid, info.gid, info.mtime = uid, gid, 1700000000
+            data = None
+            if kind == "d":
+                info.type = tarfile.DIRTYPE
+            elif kind == "h":
+                info.type = tarfile.LNKTYPE
+                info.linkname = "__linux.3/usr/bin/sperl5.00503"
+            else:
+                data = name.encode() + b"\n"
+                info.size = len(data)
+            tf.addfile(info, io.BytesIO(data) if data else None)
+write(sys.argv[1], 0o7777)
+write(sys.argv[2], 0o777)
+PY
+# suid_modes SLICE -> "path mode uid:gid ..." for every path above
+suid_modes() {
+    local p out
+    for p in tmp usr/doc usr/bin/sudo usr/bin/man usr/bin/procmail usr/bin/emacs usr/bin/suidperl; do
+        out=$("$node_dbg" -R "stat $p" "$1" 2>/dev/null)
+        [[ "$out" =~ Mode:\ +0*([0-7]+) ]] && printf '%s %s' "$p" "${BASH_REMATCH[1]}"
+        [[ "$out" =~ User:\ +([0-9]+)\ +Group:\ +([0-9]+) ]] && printf ' %s:%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
+        printf ' '
+    done
+}
+# suid_extract SLICE ARCHIVE...: one mount, extract and unmount per archive
+suid_extract() {
+    local slice="$1" archive storage state rc=0
+    shift
+    for archive in "$@"; do
+        storage=$(mktemp -d)
+        state=$(mktemp -d)
+        mkdir -p "$storage/__linux.3"
+        PSBBN_MOUNT_STATE="$state" "$bin/mount" "$slice" "$storage/__linux.3" >>/tmp/psbbn-suid.out 2>&1 || rc=$?
+        [[ "$rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$state" "$bin/tar" zxpf "$archive" -C "$storage" >>/tmp/psbbn-suid.out 2>&1 || rc=$?; }
+        [[ "$rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$state" "$bin/umount" "$storage/__linux.3" >>/tmp/psbbn-suid.out 2>&1 || rc=$?; }
+        rm -rf "$storage" "$state"
+    done
+    return "$rc"
+}
+suid_want="tmp 1777 0:0 usr/doc 2755 0:15 usr/bin/sudo 4111 0:0 usr/bin/man 2755 0:15 usr/bin/procmail 6755 0:12 usr/bin/emacs 1755 0:0 usr/bin/suidperl 4711 0:0 "
+for suid_case in fresh reinstall; do
+    suid_slice=$(mktemp)
+    dd if=/dev/zero of="$suid_slice" bs=1048576 count=16 status=none
+    psbbn_format_ext2_file "$suid_slice" >/dev/null
+    printf 'device=%s\nstart=0\nsectors=32768\n' "$suid_slice" > "$suid_slice.meta"
+    : > /tmp/psbbn-suid.out
+    suid_rc=0
+    if [[ "$suid_case" == fresh ]]; then
+        suid_extract "$suid_slice" "$suid_archive" || suid_rc=$?
+    else
+        suid_extract "$suid_slice" "$suid_plain" "$suid_archive" || suid_rc=$?
+    fi
+    suid_got=$(suid_modes "$suid_slice")
+    if [[ "$suid_rc" -eq 0 && "$suid_got" == "$suid_want" ]]; then
+        ok "tar-ext2-keeps-special-bits ($suid_case)"
+    else
+        bad "tar-ext2-keeps-special-bits ($suid_case) rc=$suid_rc got=[$suid_got] want=[$suid_want] $(tail -n 3 /tmp/psbbn-suid.out)"
+    fi
+    rm -f "$suid_slice" "$suid_slice.meta"
+done
+rm -f "$suid_archive" "$suid_plain" /tmp/psbbn-suid.out
+
+# debugfs takes a bare number for a time as a date when it can: 1733062763
+# became 2005-09-08 and 938706242 2037-12-18. Times from the archive and
+# from files written through the mounted folder must arrive as they are.
+# PS2Linux.tar.gz starts with its top folder under an empty name; GNU tar
+# gives its mode and time to the folder it extracts into, the partition.
+time_slice=$(mktemp)
+dd if=/dev/zero of="$time_slice" bs=1048576 count=16 status=none
+psbbn_format_ext2_file "$time_slice" >/dev/null
+printf 'device=%s\nstart=0\nsectors=32768\n' "$time_slice" > "$time_slice.meta"
+time_storage=$(mktemp -d)
+time_state=$(mktemp -d)
+mkdir -p "$time_storage/__linux.3"
+time_archive=$(mktemp)
+python3 - "$time_archive" << 'PY'
+import io, sys, tarfile
+with tarfile.open(sys.argv[1], "w:gz") as tf:
+    for kind, name, mtime in [
+        ("d", "", 1733060310),
+        ("d", "etc", 1733060769),
+        ("f", "etc/killall", 938706242),
+        ("f", "etc/bash_profile", 1733062763),
+        ("l", "etc/K60atd", 1733060769),
+    ]:
+        info = tarfile.TarInfo(name)
+        info.mtime, info.uid, info.gid = mtime, 0, 0
+        data = None
+        if kind == "d":
+            info.type, info.mode = tarfile.DIRTYPE, 0o750 if not name else 0o755
+        elif kind == "l":
+            info.type, info.mode, info.linkname = tarfile.SYMTYPE, 0o777, "killall"
+        else:
+            data = b"x\n"
+            info.size, info.mode = len(data), 0o644
+        tf.addfile(info, io.BytesIO(data) if data else None)
+PY
+time_rc=0
+PSBBN_MOUNT_STATE="$time_state" "$bin/mount" "$time_slice" "$time_storage/__linux.3" >/tmp/psbbn-time.out 2>&1 || time_rc=$?
+[[ "$time_rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$time_state" "$bin/tar" zxpf "$time_archive" -C "$time_storage/__linux.3" >>/tmp/psbbn-time.out 2>&1 || time_rc=$?; }
+printf 'new\n' > "$time_storage/__linux.3/etc/written"
+python3 -c 'import os, sys; os.utime(sys.argv[1], (1733062923, 1733062923))' "$time_storage/__linux.3/etc/written"
+[[ "$time_rc" -eq 0 ]] && { PSBBN_MOUNT_STATE="$time_state" "$bin/umount" "$time_storage/__linux.3" >>/tmp/psbbn-time.out 2>&1 || time_rc=$?; }
+time_got=""
+for p in / etc etc/killall etc/bash_profile etc/K60atd etc/written; do
+    out=$("$node_dbg" -R "stat $p" "$time_slice" 2>/dev/null)
+    [[ "$out" =~ mtime:\ 0x([0-9a-f]+) ]] && time_got+="$p $((16#${BASH_REMATCH[1]})) "
+done
+[[ "$("$node_dbg" -R "stat /" "$time_slice" 2>/dev/null)" =~ Mode:\ +0*([0-7]+) ]] && time_got+="/ mode ${BASH_REMATCH[1]}"
+time_want="/ 1733060310 etc 1733060769 etc/killall 938706242 etc/bash_profile 1733062763 etc/K60atd 1733060769 etc/written 1733062923 / mode 750"
+if [[ "$time_rc" -eq 0 && "$time_got" == "$time_want" ]]; then
+    ok tar-ext2-keeps-times
+else
+    bad "tar-ext2-keeps-times rc=$time_rc got=[$time_got] want=[$time_want] $(tail -n 3 /tmp/psbbn-time.out)"
+fi
+rm -rf "$time_slice" "$time_slice.meta" "$time_storage" "$time_state" "$time_archive" /tmp/psbbn-time.out
+
 pfs_img="$stub/pfs.img"
 /usr/sbin/mkfile -n 512m "$pfs_img"
 pfs_bin="$root/../../helper/darwin-arm64/pfsshell"

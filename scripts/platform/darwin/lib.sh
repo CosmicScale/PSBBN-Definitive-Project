@@ -1295,7 +1295,7 @@ for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
         lines.append("set_inode_field %s mode 0%o" % (quoted, stat.S_IFREG | (info.st_mode & 0o7777)))
         lines.append("set_inode_field %s uid 0" % quoted)
         lines.append("set_inode_field %s gid 0" % quoted)
-        lines.append("set_inode_field %s mtime %d" % (quoted, int(info.st_mtime)))
+        lines.append("set_inode_field %s mtime @%d" % (quoted, int(info.st_mtime)))
 for key, count in nlinks.items():
     if count > 1:
         lines.append("set_inode_field %s links_count %d" % (quote(first[key]), count))
@@ -1410,12 +1410,14 @@ def ensure_dir(image, rel):
         made.add(key)
         cmds_for(image).append("mkdir %s" % q("/" + path))
 
+# A time goes to debugfs as @SECONDS. A bare number it reads as a date
+# when it can: 1733062763 became 2005-09-08.
 def meta(image, name, mode, uid, gid, mtime):
     cmds = cmds_for(image)
     cmds.append("set_inode_field %s mode 0%o" % (q(name), mode))
     cmds.append("set_inode_field %s uid %d" % (q(name), uid))
     cmds.append("set_inode_field %s gid %d" % (q(name), gid))
-    cmds.append("set_inode_field %s mtime %d" % (q(name), int(mtime)))
+    cmds.append("set_inode_field %s mtime @%d" % (q(name), int(mtime)))
 
 # data is the member's bytes already copied to a file, or None to read
 # them from the archive. The archive is a stream read once, so a member's
@@ -1456,13 +1458,15 @@ def host_member(name, member, tf, data=None):
     raise SystemExit(1)
 
 # Returns the file holding a regular member's bytes, for host_member.
+# The setuid, setgid and sticky bits go in with the rest of the mode: PS2
+# Linux's sudo, userhelper and Xwrapper refuse to run without setuid.
 def ext2_member(image, rel, member, tf):
     global seq
     perm = member.mode & 0o7777
     if member.isdir():
         ensure_dir(image, os.path.dirname(rel))
         ensure_dir(image, rel)
-        meta(image, ipath(rel), stat.S_IFDIR | (perm & 0o777), member.uid, member.gid, member.mtime)
+        meta(image, ipath(rel), stat.S_IFDIR | perm, member.uid, member.gid, member.mtime)
         return
     ensure_dir(image, os.path.dirname(rel))
     path = ipath(rel)
@@ -1494,7 +1498,7 @@ def ext2_member(image, rel, member, tf):
                 shutil.copyfileobj(src, out)
         cmds_for(image).append("rm %s" % q(path))
         cmds_for(image).append("write %s %s" % (q(host), q(path)))
-        meta(image, path, stat.S_IFREG | (perm & 0o777), member.uid, member.gid, member.mtime)
+        meta(image, path, stat.S_IFREG | perm, member.uid, member.gid, member.mtime)
         return host
     if member.ischr() or member.isblk() or member.isfifo():
         parent = os.path.dirname(rel)
@@ -1511,7 +1515,7 @@ def ext2_member(image, rel, member, tf):
         else:
             cmds.append("mknod %s p" % q(base))
             special = stat.S_IFIFO
-        meta(image, base, special | (perm & 0o777), member.uid, member.gid, member.mtime)
+        meta(image, base, special | perm, member.uid, member.gid, member.mtime)
         cmds.append("cd /")
         return
     sys.stderr.write("tar: unsupported member %s\n" % member.name)
@@ -1571,6 +1575,13 @@ def extract():
         for member in tf:
             name = clean(member.name)
             if not name:
+                # The archive's top folder. GNU tar gives its mode, owner
+                # and time to the folder it extracts into; a partition
+                # mounted there gets them on its root folder. A Mac
+                # folder is left as it is.
+                kind, image, rel = classify("")
+                if kind == "ext2" and member.isdir():
+                    ext2_member(image, rel, member, tf)
                 continue
             kind, image, rel = classify(name)
             if kind == "ext2" and member.islnk():
