@@ -768,7 +768,7 @@ cd PSBBN-Definitive-Project
 ./PSBBN-Definitive-Patch.sh
 ```
 **NOTE:**  
-- When installing [PSBBN and HOSDMenu](#install-psbbn-and-hosdmenu) or [HOSDMenu only](#install-hosdmenu-only), a warning window will appear with the message: “The disk you attached was not readable by this computer.” Click Ignore to dismiss the warning.
+- When installing [PSBBN and HOSDMenu](#install-psbbn-and-hosdmenu) or [HOSDMenu only](#install-hosdmenu-only), a warning window will appear with the message: “The disk you attached was not readable by this computer.” Click **Ignore** to dismiss the warning.
 - Always exit the **[PSBBN Definitive Project Main Menu](main-menu)** by pressing `q`. Before you unplug the drive, eject it from Finder.
 
 ## Installing on Windows
@@ -1270,9 +1270,9 @@ wsl --unregister PSBBN
 **If you are using [macOS](#installing-on-macos) and the script exits before the menu:**
 `/bin/bash` on macOS is too old for this script. Install Homebrew bash with `brew install bash` and run `./PSBBN-Definitive-Patch.sh` again. If a partition write fails, confirm `e2fsprogs` and `mtools` are installed and that the administrator prompt was approved. If this does not resolve the issue, continue with the steps below.
 
-**If you are using [Linux](#installing-on-linux) or [HOSDMenu only](#install-hosdmenu-only) and experience issues:**
+**If you are using [Linux](#installing-on-linux) or [macOS](#installing-on-macos) and experience issues:**
 1. Delete the `PSBBN-Definitive-Project` folder
-2. Reboot your computer
+2. Restart your computer
 3. Re-Clone the repository with the following command:
 ```
 git clone https://github.com/CosmicScale/PSBBN-Definitive-Project.git
