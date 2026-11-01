@@ -1,4 +1,1 @@
-• La Chaîne Jeux a été renommée Chaîne Internet, reflétant son orientation en ligne
-• Nouvelles chaînes en ligne ajoutées ! BANDAI CHANNEL, So-Net et BIGLOBE
-• Téléchargement de nouvelles bandes-annonces de jeux en haute qualité, avec miniatures
-• La prise en charge du français est désormais disponible pour PSBBN
+• PSBBN prend désormais en charge le téléchargement des mises à jour système directement sur la console PS2 via un serveur de mise à jour personnalisé.

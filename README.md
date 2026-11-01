@@ -63,6 +63,17 @@ Both installation options offer:
 
 # Changelog
 
+**November 01, 2026 - Online System Updates Restored!**
+<p></p>
+
+- PSBBN now supports downloading system updates directly to the PS2 console via a custom update server. This feature requires PSBBN Definitive Patch v4.3.0. Update using the [Update PS2 System Software](#update-ps2-system-software) option.
+
+**October 23, 2026 - macOS Support**
+- The PSBBN Definitive Project installer is now compatible with macOS. See [installing on macOS](#installing-on-macos) for details.
+
+**September 29, 2026 - Gentoo Linux Support**
+- The PSBBN Definitive Project installer is now compatible with Gentoo Linux. See [installing on Linux](#installing-on-linux) for details.
+
 **September 17, 2026 - Compressed Games, Widescreen Hacks, Improved Homebrew installer**
 <p></p>
 

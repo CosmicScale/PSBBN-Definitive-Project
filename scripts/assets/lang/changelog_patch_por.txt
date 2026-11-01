@@ -1,4 +1,1 @@
-• O Game Channel foi renomeado para Internet Channel, refletindo seu foco online
-• Novos canais online adicionados! BANDAI CHANNEL, So-Net e BIGLOBE
-• Baixe novos trailers de jogos em maior qualidade, com miniaturas
-• O suporte ao idioma francês já está disponível para o PSBBN
+• O PSBBN agora permite baixar atualizações do sistema diretamente para o console PS2 por meio de um servidor de atualização personalizado.
