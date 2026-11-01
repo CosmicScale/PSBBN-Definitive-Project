@@ -1214,6 +1214,8 @@ option_three() {
             CHANGE_LANGUAGE_8
             CHANGE_LANGUAGE_9
             CHANGE_LANGUAGE_10
+            CHANGE_LANGUAGE_18
+            CHANGE_LANGUAGE_19
         )
         center_menu
         printf "%*s%s\n\n" "$((padding - 3))" "" "${UI_TEXT[CHANGE_LANGUAGE_1]}"
@@ -1226,6 +1228,7 @@ option_three() {
         printf "%*s%s\n\n" "$padding" "7) " "${UI_TEXT[CHANGE_LANGUAGE_8]}"
         printf "%*s%s\n\n" "$padding" "8) " "${UI_TEXT[CHANGE_LANGUAGE_18]}"
         printf "%*s%s\n\n" "$padding" "9) " "${UI_TEXT[CHANGE_LANGUAGE_9]}"
+        printf "%*s%s\n\n" "$padding" "10) " "${UI_TEXT[CHANGE_LANGUAGE_19]}"
         printf "%*s%s\n\n" "$padding" "b) " "${UI_TEXT[MENU_BACK]}"
         printf "%*s%s " "$((padding - 3))" "" "${UI_TEXT[MENU_PROMPT]}"
         read -rp "" choice
@@ -1310,6 +1313,15 @@ option_three() {
                 WLE_LANG="spanish"
                 PLOAD_LANG="ES"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_9]}"
+                break
+                ;;
+            10)
+                lang="ukr"
+                OPL_LANG="English (internal)"
+                R3CONFIG_LANG="en"
+                WLE_LANG="english"
+                PLOAD_LANG="EN"
+                LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_19]}"
                 break
                 ;;
             b|B)
@@ -1533,6 +1545,7 @@ option_three() {
                 por) SIZE_NAME="Completo" ;;
                 hun) SIZE_NAME="Teljes" ;;
                 rus) SIZE_NAME="Весь экран" ;;
+                ukr) SIZE_NAME="Повний екран" ;;
             esac
         elif [[ "$SCREEN" == "16:9" ]]; then
             SIZE_NAME="16:9"
@@ -1656,6 +1669,7 @@ option_four() {
                     por) SIZE_NAME="Completo" ;;
                     hun) SIZE_NAME="Teljes" ;;
                     rus) SIZE_NAME="Весь экран" ;;
+                    ukr) SIZE_NAME="Повний екран" ;;
                 esac
                 break
                 ;;
