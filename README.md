@@ -66,6 +66,8 @@ Both installation options offer:
 **November 01, 2026 - Online System Updates Restored!**
 <p></p>
 
+[![PSBBN Update: Online System Updates Restored!](https://github.com/user-attachments/assets/f783552d-b7ba-4e5d-a516-cf998b26a353)](https://youtu.be/GNqpk_AuRhk)
+
 - PSBBN now supports downloading system updates directly to the PS2 console via a custom update server. This feature requires PSBBN Definitive Patch v4.3.0. Update using the [Update PS2 System Software](#update-ps2-system-software) option.
 
 **October 23, 2026 - macOS Support**
