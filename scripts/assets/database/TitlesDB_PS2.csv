@@ -1462,8 +1462,8 @@ SLUS_211.03|Commandos: Strike Force|Pyro Studios|
 SLES_524.51|Conan||
 SLPM_660.00|Conflict Delta II: Wangan Sensou 1991||コンフリクトデルタＩＩ　湾岸戦争１９９１
 SLPM_654.60|Conflict Delta: Wangan Sensou 1991||コンフリクト デルタ　湾岸戦争１９９１
-SLES_502.21|Conflict Zone|MathématiquesAppliquéesS.A.|
-SLUS_202.40|Conflict Zone: Modern War Strategy|MathématiquesAppliquéesS.A.|
+SLES_502.21|Conflict Zone|MASA Group|
+SLUS_202.40|Conflict Zone: Modern War Strategy|MASA Group|
 SLES_509.01|Conflict: Desert Storm|PivotalGamesLtd.|
 SLES_509.02|Conflict: Desert Storm|PivotalGamesLtd.|
 SLUS_205.49|Conflict: Desert Storm|PivotalGamesLtd.|
@@ -2888,10 +2888,10 @@ SLED_541.03|FIFA World Cup Germany 2006 (Demo)|Electronic Arts|
 SLUS_291.89|FIFA World Cup Germany 2006 (Demo)|Electronic Arts|
 SLPM_627.70|FIVB Volleyball World Cup: Venus Evolution||バレーボールワールドカップ　ヴィーナス　エボリューション
 SLPS_205.05|FIVB Volleyball World Cup: Venus Evolution||バレーボールワールドカップ　ヴィーナス　エボリューション
-SLES_535.39|Fahrenheit|Atari|
-SLES_535.40|Fahrenheit|Atari|
-SLPM_661.93|Fahrenheit|Atari|ファーレンハイト
-SLED_535.91|Fahrenheit (Demo)||
+SLES_535.39|Fahrenheit|Quantic Dream|
+SLES_535.40|Fahrenheit|Quantic Dream|
+SLPM_661.93|Fahrenheit|Quantic Dream|ファーレンハイト
+SLED_535.91|Fahrenheit (Demo)|Quantic Dream|
 SLES_547.95|Falling Stars|Ivolgamus|
 SLUS_217.34|Falling Stars|Ivolgamus|
 SLES_515.25|Fallout: Brotherhood of Steel|Virgin Interactive|
@@ -3952,10 +3952,10 @@ SLPM_652.19|Happy Breeding: Cheerful Party (Shokai Genteiban)||はっぴーぶ�
 SLES_544.21|Happy Feet|A2M|
 SLUS_214.55|Happy Feet|A2M|
 SLPS_200.50|Happy! Happy!! Boarders in Hokkaido Rusutsu Resort||ハッピー！　ハッピー！！　ボーダーズ　ｉｎ　Ｈｏｋｋａｉｄｏ　ルスツ　リゾート
-SLPS_200.98|Hard Hitter|Magical Company|ハードヒッター
+SLPS_200.98|Magical Sports Hard Hitter|Magical Company|マジカルスポーツ　ハードヒッター
 SLES_510.57|Hard Hitter 2|Magical Company|
-SLPS_201.73|Hard Hitter 2|Magical Company|ハードヒッター２
-SLPS_202.70|Hard Hitter 2|Magical Company|ハードヒッター２
+SLPS_201.73|Magical Sports Hard Hitter 2|Magical Company|マジカルスポーツ　ハードヒッター２
+SLPS_202.70|Magical Sports Hard Hitter 2|Magical Company|マジカルスポーツ　ハードヒッター２
 SLUS_205.68|Hard Hitter Tennis|Magical Company|
 SLES_545.90|Hard Knock High|Opus|
 SLPM_656.95|Hard Luck: Return of the Heroes||ＨＡＲＤ　ＬＵＣＫ　～ハード　ラック～
@@ -4016,7 +4016,7 @@ SLES_517.87|Harry Potter: Quidditch World Cup|Electronic Arts|
 SLKA_150.16|Harry Potter: Quidditch World Cup|Electronic Arts|
 SLPM_624.08|Harry Potter: Quidditch World Cup|Electronic Arts|ハリー・ポッター クィディッチ ワールドカップ
 SLUS_207.69|Harry Potter: Quidditch World Cup|Electronic Arts|
-SLPM_663.18|Haru no Ashioto: Step of Spring: Deliver Spring to Your Heart ... as Soon!|Alchemist|はるのあしおと Ｓｔｅｐ ｏｆ Ｓｐｒｉｎｇ・Ｄｅｌｉｖｅｒ Ｓｐｒｉｎｇ ｔｏ ｙｏｕｒ ｈｅａｒｔ ．．． ａｓ ｓｏｏｎ！
+SLPM_663.18|Haru no Ashioto: Step of Spring|Alchemist|はるのあしおと －Ｓｔｅｐ ｏｆ Ｓｐｒｉｎｇ－
 SLPM_650.91|Harukanaru Toki no Naka de 2|Ruby Party|遙かなる時空の中で２
 SLPM_650.92|Harukanaru Toki no Naka de 2|Ruby Party|遙かなる時空の中で２
 SLPM_658.33|Harukanaru Toki no Naka de 2|Ruby Party|遙かなる時空の中で２
@@ -4355,8 +4355,8 @@ SLES_508.39|Indiana Jones e la Tomba dell'Imperatore|LucasArts|
 SLES_508.37|Indiana Jones et le Tombeau de l'Empereur|LucasArts|
 SLES_508.38|Indiana Jones und die Legende der Kaisergruft|LucasArts|
 SLES_508.40|Indiana Jones y la Tumba del Emperador|LucasArts|
-SLKA_253.09|Indigo Prophecy|Atari|
-SLUS_211.96|Indigo Prophecy|Quantic Dreams.|
+SLKA_253.09|Indigo Prophecy|Quantic Dream|
+SLUS_211.96|Indigo Prophecy|Quantic Dream|
 SLES_513.97|IndyCar Series|Brain In A Jar|
 SLES_522.98|IndyCar Series 2005|Codemasters|
 SLUS_206.41|IndyCar Series featuring the Indianapolis 500|Brain In A Jar|
@@ -4817,7 +4817,7 @@ SLPS_255.97|Kawa no Nushi Tsuri: Wonderful Journey||川のぬし釣り　ワン�
 SLPS_250.33|Kaze no Klonoa 2: Sekai ga Nozonda Wasuremono||風のクロノア２ 　～世界が望んだ忘れもの～
 SLPS_734.04|Kaze no Klonoa 2: Sekai ga Nozonda Wasuremono||風のクロノア２ 　～世界が望んだ忘れもの～
 SLPM_601.38|Kaze no Klonoa 2: Sekai ga Nozonda Wasuremono (Taikenban)||風のクロノア２ 　～世界が望んだ忘れもの～（体験版）
-SLPM_551.67|Kaze-iro Surf|Russel|風色サーフ
+SLPM_551.67|Kazeiro Surf|Russel|風色サーフ
 SLPM_658.89|Kazoku Keikaku: Kokoro no Kizuna||家族計画　～心の絆～
 SLPM_623.46|Keiei Simulation: Jurassic Park||経営シミュレーション　ジュラシック・パーク
 SLPM_625.12|Keiei Simulation: Jurassic Park||経営シミュレーション　ジュラシック・パーク
@@ -4827,14 +4827,14 @@ SLUS_203.34|Kelly Slater's Pro Surfer|Treyarch|
 SLPM_654.18|Kelly Slater's Pro Surfer 2003|Treyarch|ケリー・スレーター プロサーファー ２００３
 SLES_501.14|Kengo: Master of Bushido|Light Weight|
 SLUS_200.21|Kengo: Master of Bushido|Light Weight|
-SLPS_200.58|Kengou|Light Weight|剣豪
-SLPS_730.02|Kengou|Light Weight|剣豪
-SLPM_744.12|Kengou 2||剣豪２
-SLPS_251.07|Kengou 2||剣豪２
-SLPM_601.77|Kengou 2 (Taikenban)||剣豪２（体験版）
-SLPM_657.00|Kengou 3|Genki|剣豪３
-SLPM_742.20|Kengou 3|Genki|剣豪３
-SLPM_610.86|Kengou 3 (Taikenban)||剣豪３（体験版）
+SLPS_200.58|Kengo|Light Weight|剣豪
+SLPS_730.02|Kengo|Light Weight|剣豪
+SLPM_744.12|Kengo 2||剣豪２
+SLPS_251.07|Kengo 2||剣豪２
+SLPM_601.77|Kengo 2 (Taikenban)||剣豪２（体験版）
+SLPM_657.00|Kengo 3|Genki|剣豪３
+SLPM_742.20|Kengo 3|Genki|剣豪３
+SLPM_610.86|Kengo 3 (Taikenban)||剣豪３（体験版）
 SLPM_660.35|Kenka Banchou|YSK|喧嘩番長
 SLPM_742.21|Kenka Banchou|YSK|喧嘩番長
 SLPM_659.74|Kenka Banchou (Shokai Seisanban)|YSK|喧嘩番長
@@ -5881,28 +5881,28 @@ SLUS_212.93|Metal Saga|Crea-tech|
 SLUS_280.59|Metal Saga (Trade Demo)||
 SLPM_658.68|Metal Saga: Sajin no Kusari||メタルサーガ　砂塵の鎖
 SLPM_742.26|Metal Saga: Sajin no Kusari||メタルサーガ　砂塵の鎖
-SLPS_256.50|Metal Slug|SNK|メタルスラッグ
-SLPS_257.88|Metal Slug|SNK|メタルスラッグ
-SLES_525.99|Metal Slug 3|SNK|
-SLKA_250.49|Metal Slug 3|SNK|
-SLPS_252.09|Metal Slug 3|SNK|メタルスラッグ３
-SLPS_254.28|Metal Slug 3|SNK|メタルスラッグ３
+SLPS_256.50|Metal Slug|SNK Playmore|メタルスラッグ
+SLPS_257.88|Metal Slug|SNK Playmore|メタルスラッグ
+SLES_525.99|Metal Slug 3|SNK Playmore|
+SLKA_250.49|Metal Slug 3|SNK Playmore|
+SLPS_252.09|Metal Slug 3|SNK Playmore|メタルスラッグ３
+SLPS_254.28|Metal Slug 3|SNK Playmore|メタルスラッグ３
 SLES_533.80|Metal Slug 4|Ignition Entertainment|
-SLKA_252.87|Metal Slug 4|Ignition Entertainment|
-SLPS_253.76|Metal Slug 4|Ignition Entertainment|メタルスラッグ４
-SLPS_255.71|Metal Slug 4|Ignition Entertainment|メタルスラッグ４
-SLUS_209.71|Metal Slug 4|Ignition Entertainment|
-SLES_533.83|Metal Slug 5|Nobilis|
-SLKA_252.88|Metal Slug 5|Nobilis|
-SLPS_254.95|Metal Slug 5|Nobilis|メタルスラッグ５
-SLPS_256.34|Metal Slug 5|Nobilis|メタルスラッグ５
-SLUS_209.90|Metal Slug 5|Nobilis|
-SLPS_256.74|Metal Slug 6||メタルスラッグ６
-SLKA_253.93|Metal Slug 6||
+SLKA_252.87|Metal Slug 4|SNK Playmore|
+SLPS_253.76|Metal Slug 4|SNK Playmore|メタルスラッグ４
+SLPS_255.71|Metal Slug 4|SNK Playmore|メタルスラッグ４
+SLUS_209.71|Metal Slug 4|SNK Playmore|
+SLES_533.83|Metal Slug 5|NIgnition Entertainment|
+SLKA_252.88|Metal Slug 5|SNK Playmore|
+SLPS_254.95|Metal Slug 5|SNK Playmore|メタルスラッグ５
+SLPS_256.34|Metal Slug 5|SNK Playmore|メタルスラッグ５
+SLUS_209.90|Metal Slug 5|SNK Playmore|
+SLPS_256.74|Metal Slug 6|SNK Playmore|メタルスラッグ６
+SLKA_253.93|Metal Slug 6|SNK Playmore|
 SLES_546.77|Metal Slug Anthology|Ignition Entertainment|
-SLUS_215.50|Metal Slug Anthology|Ignition Entertainment|
-SLPS_257.62|Metal Slug Complete|Ignition Entertainment|メタルスラッグ　コンプリート
-SLPS_259.37|Metal Slug Complete|Ignition Entertainment|メタルスラッグ　コンプリート
+SLUS_215.50|Metal Slug Anthology|SNK Playmore|
+SLPS_257.62|Metal Slug Complete|SNK Playmore|メタルスラッグ　コンプリート
+SLPS_259.37|Metal Slug Complete|SNK Playmore|メタルスラッグ　コンプリート
 SLPM_655.52|Metal Wolf REV (Shokai Genteiban)||メタルウルフＲＥＶ
 SLES_511.62|Metropolismania|Natsume|
 SLUS_203.77|Metropolismania|Natsume|
@@ -11498,7 +11498,7 @@ SLPM_665.88|White Princess the Second: Yappari Ichizu ni Ittemo Soujanakutemo OK
 SLES_545.50|White Van Racer||
 SLES_514.51|Whiteout|Vicarious Visions|
 SLUS_205.99|Whiteout|Vicarious Visions|
-SLES_504.95|Who Wants to Be a Millionaire: 2nd Edition||
+SLES_504.95|Who Wants To Be A Millionaire?: 2nd Edition||
 SCUS_972.03|Wild Arms 3|Sony Computer Entertainment|
 SLES_513.07|Wild Arms 3|Sony Computer Entertainment|
 SCUS_972.24|Wild Arms 3 (Demo)|Sony Computer Entertainment|
@@ -11953,8 +11953,8 @@ SLES_525.33|Zoo Puzzle|Buddiez Inc.|
 SLES_541.74|ZooCube||
 SLPM_656.63|Zwei!!|Taito|ツヴァイ！！
 SLPM_661.02|Zwei!!|Taito|ツヴァイ！！
-SLPM_664.60|_summer Double Sharp (Shokai Genteiban)|Hook Software Creations|アンダーバーサマーダブルシャープ
-SLPM_668.77|_summer Double Sharp (Shokai Genteiban)|Hook Software Creations|アンダーバーサマーダブルシャープ
+SLPM_664.60|_summer## (Shokai Genteiban)|Hook Software Creations|アンダーバーサマーダブルシャープ
+SLPM_668.77|_summer## (Shokai Genteiban)|Hook Software Creations|アンダーバーサマーダブルシャープ
 SLES_509.33|eJay Clubworld: The Music Making Experience|Focus|
 SLUS_205.25|eJay Clubworld: The Music Making Experience|Focus|
 SLPM_552.41|ef: A Fairy Tale of the Two.|Comfort|
@@ -11968,11 +11968,10 @@ SLPS_256.17|Étude Prologue: Yureugoku Kokoro no Katachi||エチュード　プ�
 SCKA_200.95|Okami|Capcom|
 SLES_544.39|Okami|Capcom|
 SLUS_211.15|Okami|Capcom|
-SLES_541.99|Who Wants to Be a Millionaire: Party Edition|Eidos Interactive|
+SLES_541.99|Who Wants To Be A Millionaire?: Party Edition|Eidos Interactive|
 GHCE_000.01|Guitar Hero II Deluxe||
 GHCE_000.02|Guitar Hero II Deluxe||
 GHCE_000.03|Guitar Hero 80's Deluxe||
-SCUS_974.52|Official U.S. PlayStation Magazine Demo Disc 100||
 SLUS_774.48|Anime Hero II||
 SCED_516.09|Sports Extremes (Demo)||
 SLES_505.57|Polaroid Pete||
