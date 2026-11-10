@@ -1037,7 +1037,7 @@ function setupRepository {
       `|`| echo clone-error
   }
 
-  if ($output -eq "pull-error" || $output -eq "clone-error" ) {
+  if (($output -eq "pull-error") -or ($output -eq "clone-error")) {
     Write-Host "
     ❌ $(T 'error_03')
     $(T 'error_04')
