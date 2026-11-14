@@ -10,7 +10,7 @@ param(
 )
 
 # the version of this script itself, useful to know if a user is running the latest version
-$version = "1.3.0"
+$version = "1.3.1"
 
 # the label of the WSL machine. Still based on Debian, but this label makes sure we get the
 # machine created by this script and not some pre-existing Debian the user had.
@@ -553,26 +553,8 @@ function main {
     " -ForegroundColor Red
     Exit
   }
-  
-  # if a folder with the previous name of the git repository exists,
-  # rename it and move the git remote origin to the new url
-  wsl -d $wslLabel --cd "~" -- [ -d ./PSBBN-Definitive-English-Patch ] `
-    `&`& `( `
-      mv ./PSBBN-Definitive-English-Patch ./PSBBN-Definitive-Project `
-      `&`& cd PSBBN-Definitive-Project/ `
-      `&`& git remote set-url origin https://github.com/CosmicScale/PSBBN-Definitive-Project.git `
-    `)
 
-  # clone the PSBBN repo into ~, or pull if it's already there
-  Write-Host
-  wsl -d $wslLabel --cd "~" -- [ -d PSBBN-Definitive-Project/.git ] `
-    `&`& `( `
-      cd PSBBN-Definitive-Project/ `
-      `&`& git fetch origin $gitBranch `
-      `&`& git checkout $gitBranch `
-      `&`& git pull --ff-only `
-    `) `
-    `|`| git clone -b $gitBranch https://github.com/CosmicScale/PSBBN-Definitive-Project.git
+  setupRepository
 
   if (-Not ($isWslInstalled)) {
     Write-Host "------- Linux magic finishes ---------`n"
@@ -1017,6 +999,52 @@ function preventsPickingWslPath ($path) {
     $(T 'warn_08')
     $(T 'warn_09')
     " -ForegroundColor Yellow
+    Exit
+  }
+}
+
+# set up the PSBBN-Definitive-Project git repository in the WSL machine
+function setupRepository {
+  # if a folder with the previous name of the git repository exists,
+  # rename it and move the git remote origin to the new url
+  wsl -d $wslLabel --cd "~" -- [ -d ./PSBBN-Definitive-English-Patch ] `
+    `&`& `( `
+      mv ./PSBBN-Definitive-English-Patch ./PSBBN-Definitive-Project `
+      `&`& cd PSBBN-Definitive-Project/ `
+      `&`& git remote set-url origin https://github.com/CosmicScale/PSBBN-Definitive-Project.git `
+    `)
+
+  # clone the PSBBN repo into ~, or pull if it's already there
+  Write-Host
+  $dirExists = wsl -d $wslLabel --cd "~" -- `
+    [ -d PSBBN-Definitive-Project/.git ] `
+    `&`& echo True `
+    `|`| echo False
+
+  if ([System.Convert]::ToBoolean($dirExists)) {
+    Write-Host "Pulling latest repo commit..."
+    $output = wsl -d $wslLabel --cd "~/PSBBN-Definitive-Project" -- `
+      git fetch origin $gitBranch `
+      `&`& git checkout $gitBranch `
+      `&`& git clean -dfq `
+      `&`& git pull --ff-only `
+      `|`| echo pull-error
+  }
+  else {
+    Write-Host "Cloning repo..."
+    $output = wsl -d $wslLabel --cd "~" -- `
+      git clone -b $gitBranch https://github.com/CosmicScale/PSBBN-Definitive-Project.git `
+      `|`| echo clone-error
+  }
+
+  if (($output -eq "pull-error") -or ($output -eq "clone-error")) {
+    Write-Host "
+    ❌ $(T 'error_03')
+    $(T 'error_04')
+    $(T 'error_05')
+    $(T 'error_06')
+    $(T 'error_07')
+    " -ForegroundColor Red
     Exit
   }
 }
