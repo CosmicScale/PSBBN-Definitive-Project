@@ -610,6 +610,6 @@ JELLYFINPS2|Jellyfin PS2|APP|APP_JELLYFIN|github.com/jimmyBizMobile|jellyfin-ps2
 PS2NBDEE|Fastnet|APP|APP_FASTNET|PoyrazDereli|ps2nbd_ee.elf
 500CARDGAMEPS2501B|500 Card Game|GME|GME_500CARDG|github.com/khant735|500_Card_Game_PS2_501B.ELF
 500CARDGAME|500 Card Game|GME|GME_500CARDG|github.com/khant735|500_CARD_GAME.ELF
-GEOMETRYDASHPS2|GME|GME_GEOMETRY|Geometry Dash|OptiProjects|GeometryDashPS2.elf
-LAUNCHSTATION|APP|APP_LAUNCHST|Launchstation|github.com/NathanNeurotic|LAUNCHSTATION.ELF
-LAUNCHSTATIONDS|APP|APP_LAUNCHST|Launchstation (DualShock)|github.com/NathanNeurotic|LAUNCHSTATION-DS.ELF
+GEOMETRYDASHPS2|Geometry Dash|GME|GME_GEOMETRY|OptiProjects|GeometryDashPS2.elf
+LAUNCHSTATION|Launchstation|APP|APP_LAUNCHST|github.com/NathanNeurotic|LAUNCHSTATION.ELF
+LAUNCHSTATIONDS|Launchstation (DualShock)|APP|APP_LAUNCHST|github.com/NathanNeurotic|LAUNCHSTATION-DS.ELF
