@@ -17,6 +17,7 @@ CHANGE_LANGUAGE_7=Italienisch
 CHANGE_LANGUAGE_8=Portugiesisch (Brasilien)
 CHANGE_LANGUAGE_9=Spanisch
 CHANGE_LANGUAGE_18=Russisch
+CHANGE_LANGUAGE_19=Ukrainisch
 CHANGE_LANGUAGE_10=Prüfe auf die neueste Version des Sprachpakets
 CHANGE_LANGUAGE_11=Sprachpaket
 CHANGE_LANGUAGE_12=Sprachpaket wird installiert...

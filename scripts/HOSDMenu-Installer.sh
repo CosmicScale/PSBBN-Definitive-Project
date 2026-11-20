@@ -546,6 +546,9 @@ case "$LANG_FILE" in
     rus)
         lang="rus"
         ;;
+    ukr)
+        lang="ukr"
+        ;;
     *)
         echo
         echo "Unsupported language. Defaulting to English." >> "${LOG_FILE}"

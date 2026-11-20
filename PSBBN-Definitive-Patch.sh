@@ -136,6 +136,9 @@ case "$SYS_LANG" in
     hu*)
         LANG_FILE="hun"
        ;;
+    uk*)
+        LANG_FILE="ukr"
+        ;;
     #ru*)
     #    LANG_FILE="rus"
     #   ;;
@@ -931,7 +934,7 @@ else
 
     lang=$(awk -F' *= *' '$1=="LANG"{print $2}' "${OPL}/version.txt")
 
-    if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" && "$lang" != "rus" ]]; then
+    if [[ "$lang" != "jpn" && "$lang" != "ger" && "$lang" != "ita" && "$lang" != "por" && "$lang" != "spa" && "$lang" != "fre" && "$lang" != "hun" && "$lang" != "rus" && "$lang" != "ukr" ]]; then
         lang="eng"
     fi
 

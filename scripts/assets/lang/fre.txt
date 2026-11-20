@@ -17,6 +17,7 @@ CHANGE_LANGUAGE_7=Italien
 CHANGE_LANGUAGE_8=Portugais (Brésil)
 CHANGE_LANGUAGE_9=Espagnol
 CHANGE_LANGUAGE_18=Russe
+CHANGE_LANGUAGE_19=Ukrainien
 CHANGE_LANGUAGE_10=Vérification de la dernière version du pack de langue
 CHANGE_LANGUAGE_11=pack de langue
 CHANGE_LANGUAGE_12=Installation du pack de langue...

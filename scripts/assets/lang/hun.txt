@@ -17,6 +17,7 @@ CHANGE_LANGUAGE_7=Olasz
 CHANGE_LANGUAGE_8=Portugál (Brazília)
 CHANGE_LANGUAGE_9=Spanyol
 CHANGE_LANGUAGE_18=Orosz
+CHANGE_LANGUAGE_19=Ukrán
 CHANGE_LANGUAGE_10=A legfrissebb nyelvi csomag verziójának ellenőrzése
 CHANGE_LANGUAGE_11=nyelvi csomag
 CHANGE_LANGUAGE_12=Nyelvi csomag telepítése...

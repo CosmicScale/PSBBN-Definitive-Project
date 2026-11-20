@@ -3939,6 +3939,12 @@ case "$lang" in
         WLE_LANG="english"
         PLOAD_LANG="EN"
         ;;
+    ukr)
+        OPL_LANG="English (internal)"
+        R3CONFIG_LANG="en"
+        WLE_LANG="english"
+        PLOAD_LANG="EN"
+        ;;
     *)
         OPL_LANG="English (internal)"
         R3CONFIG_LANG="en"
