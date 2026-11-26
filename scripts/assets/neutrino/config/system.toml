@@ -39,7 +39,7 @@ func = "UDNL" # used by EECORE durion IOP reboot
 env = ["EE"]
 [[module]]
 file = "fakemod.irx"
-func = "FAKEMOD" # loaded last, so we don't fake our own modules
+load_order = 30
 env = ["EE"]
 
 #[[module]]

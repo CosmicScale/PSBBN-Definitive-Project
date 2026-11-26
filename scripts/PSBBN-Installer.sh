@@ -1806,7 +1806,7 @@ if [ "$MODE" = "update" ]; then
 fi
 
 if [ "$MODE" = "install" ]; then
-    mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl} 2>>"${LOG_FILE}" || {
+    mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl,Ember/games} 2>>"${LOG_FILE}" || {
         echo "[X] Error: Failed to create OPL folders." >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_OPL_FOLDER]}"
     }

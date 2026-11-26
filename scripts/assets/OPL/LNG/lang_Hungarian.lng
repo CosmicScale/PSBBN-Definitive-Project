@@ -144,7 +144,7 @@ Szín szelekció
 Újracsatlakozás
 Hagyja üresen a megosztások listázásához
 ETH előtag elérési út
-Backspace
+Visszatörlés
 Szóköz
 Enter
 Mód
@@ -152,7 +152,7 @@ VMC foglalat 1
 VMC foglalat 2
 Játék ID
 DMA mód
-V-Sync
+Függőleges szinkron
 Mód 1
 Mód 2
 Mód 3
@@ -166,7 +166,7 @@ Ethernet kapcsolat módja
 10Mbit full-duplex
 10Mbit half-duplex
 GSM beállítások
-GSM Selector
+GSM választó
 KI vagy BE kapcsolja a GSM-et
 Kényszerített testreszabott megjelenítési mód
 Vízszintes-pozíció
@@ -178,7 +178,7 @@ Overscan beállítása
 FMV átugrása
 Átugorja a Full Motion videókat
 Csalás beállítások
-PS2RD Cheat Engine
+PS2RD csalómotor
 Engedi a PS2RD csalásmotornak, hogy patch-elje a játékokat.
 PS2RD csalásmotor mód
 Auto-kiválaszt vagy játékcsalások kiválasztása
@@ -203,7 +203,7 @@ PS2 logó
 Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
 PADEMU konfigurálása
 Pad Emulator beállítások
-Pad Emulator
+Kontroller emulátor
 Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
 Pad Emulátor mód
 Válassza ki a PadEmulátor módját.
@@ -211,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Port beállítások:
 Válassza ki a PadEmulátor portot a beállításokhoz.
-Emulation
+Emuláció
 Be/ki kapcsolja a PadEmulátor-t a kiválasztott porthoz.
-Vibration
+Rezgés
 Be/ki kapcsolja a rezgést a PadEmulátor kiválasztott portjához.
 USB bluetooth adapter mac címe:
 DS kontroller a következő MAC címhez párosítva:
@@ -231,12 +231,12 @@ Igen
 Nem
 A Bluetooth adapternek teljes mértékben kompatibilisnek kell lennie a DS3/DS4 kontrollerekkel.
 A Bluetooth adapter nem biztos, hogy megfelelően fog működni DS3/DS4 kontrollerekkel.
-Multitap Emulation
+Multitap emuláció
 Ki/be kapcsolja a Multitap emulációt a kiválasztott játékhoz.
 Multitap emuláció ezen a porton
 Válassza ki a portot a Multitap emulációhoz.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Hamis DS3 megoldás
+Néhány utángyártott DS3-nak kerülőmegoldás kell; ez a beállítás bekapcsolja.
 FIELD flipping emulálása
 Fix azon játékokhoz, melyek hibát produkálnak progresszív videó mód alatt.
 Gyerekzár beállítások
@@ -256,10 +256,10 @@ Boot effekt hangereje
 jóváhagyja a Videó mód változtatását?
 Játéklista cachelés (HDD)
 Értesítések
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Beállítás betöltve innen: %s
+Téma betöltve innen: %s
+Nyelv betöltve innen: %s
+A(z) %s partíció csatolva.
 Opciók
 Játékbeállítások elmentve.
 %s beállítások eltávolítva
@@ -275,7 +275,7 @@ Műfaj
 Kiadás
 Fejlesztő
 Leírás
-BDM Devices
+Blokkeszközök
 Kontrollerbeállítások
 A Block Device Manager ki/bekapcsolása.
 Ki/bekapcsolja a Block eszközöket (pl. USB).
@@ -285,12 +285,12 @@ MX4SIO játékok
 PADMACRO beállítása
 Padmakró beállítások
 Padmakrók
-Analog Slow-Down:
-Reduce the range of analog stick when button is pressed.
+Analóg lassítás:
+Az analóg kar tartományának csökkentése gombnyomásra
 Bal kar
 Jobb kar
-Analog Axis Invert:
-Inverts the axis of selected analog stick.
+Analóg tengely fordítása:
+Analóg kar tengelyének fordítása
 Turbo gomb sebessége
 Milyen gyorsan nyomkodja a gombot, ha a turbó aktív
 Amíg a gomb lenyomva van
@@ -309,20 +309,899 @@ HAGYOMÁNYOS KÍNAI
 EGYSZERŰSÍTETT KÍNAI
 OSD beállítások
 OSD nyelv
-Force a custom language configuration
+Egyéni nyelv kényszerítése
 Nyelv módosítása
-Screen Size
-Full Screen
-Video Mode
-System Default
+Képméret
+Teljes képernyő
+Videómód
+Rendszer alapértelmezés
 Háttérzene
 Háttérzene hangerő
 Téma alapértelmezett zenéje
-Set path to stream music for internal theme.
-High
-Low
-Analog X-Axis Sensitivity
-Analog Y-Axis Sensitivity
-Files found: %i
-Cheat Selection
-Only one HDD allowed, enabling locks APA or GPT.
+Adja meg a belső témához streamelt zene elérési útját.
+Magas
+Alacsony
+Analóg X-tengely érzékenysége
+Analóg Y-tengely érzékenysége
+Talált fájlok: %i
+Csalások kiválasztása
+Csak egy HDD engedélyezett; a bekapcsolás rögzíti az APA-t vagy a GPT-t.
+A beállítások mentése a(z) %s helyre sikertelen (hiba %d)
+PS2 lemez indítása
+Nincs PS2 lemez a meghajtóban.
+Anyagi támogatás
+Alapértelmezett
+Beállítások betöltése...
+Kész.
+Kedvencek
+Kedvencek indítási mód
+Kedvenc
+%s nem érhető el a Kedvencek menün keresztül.
+%s nem engedélyezett, amíg az elem kedvencként van jelölve.
+Speciális argumentumok
+Speciális
+Borítóbeállítások
+VCD BDMA alkalmazása indításkor
+BDMA mód
+BDMA-beállítások
+BDMA forrás
+Színek
+Kommunikációs beállítások
+Kontrolleremuláció
+Kontrollermakrók
+Betöltő mag
+Animáció sebessége
+Borítók száma
+Oldalsó borítók halványítása
+Középső méretezés
+Coverflow beállítások
+Alapértelmezett betöltő mag
+Kép
+PS2RD Cheat Image
+Borító .tar archívum
+Mappák böngészése a játéklistában
+Játékindítás
+Játéklista beállításai
+Játékforrások
+Be: indítás előtt automatikusan felteszi a memóriakártyára az elindított VCD megfelelő exFAT illesztőprogramját (ajánlott). Ki: kezelje kézzel az alábbi BDMA Source/Mode választókkal.
+exFAT blokkeszköz-illesztőprogram, amelyet a POPSTARTER betölt. A módosítás a modulokat a kártyára másolja; FAT32 = nincs (beépített illesztőprogram).
+Az az eszköz, amelynek POPS mappájában találhatók a BDMAssault illesztőprogram fájlok (usbd.irx.* / usbhdfsd.irx.*).
+Globális alapértelmezett mag azokhoz a játékokhoz, amelyeknél a játékonkénti Betöltő Mag Alapértelmezettre van állítva. Az <OPL> a natív mag; a Neutrino a külső neutrino.elf fájlt láncolja. A játékonkénti választás mindig felülírja ezt.
+Előre elkészített PS2RD .img javítás alkalmazása a játékra.
+A CD/DVD almappáit böngészhető elemekként mutatja; kiválasztás megnyit, mégse visszalép
+A rendszerkártya-váltás parancs a kiválasztott foglalat(ok)ra kerül elküldésre IGR-kor
+A KI beállítás javíthatja a teljesítményt, de MMCE időtúllépés esetén lefagyást okozhat
+Az alacsonyabb értékek javíthatják a teljesítményt, de instabilitást okozhatnak
+Csak Neutrino -- javítja az IOP puffertúlcsordulást okozó játékokat (-gc=7)
+Extra Neutrino jelzők, szóközzel elválasztva (pl. -mt=dvd). A globális minden játékra vonatkozik; a játékonkénti hozzáadódik. Egy jelző elé írj $ jelet a letiltásához törlés nélkül.
+Átadja a játék rendszerindító ELF-jét a Neutrinónak a játékonkénti beállítás kikereséséhez. Alapból be van kapcsolva; a kézzel beállított Boot ELF opció elsőbbséget élvez.
+A Neutrino blokkeszköz-fájlrendszerének kényszerítése (-bsdfs). Auto = eszközönkénti alapértelmezés. A hdl/bd szakértői beállítások; párosítsd őket egy megfelelő -dvd= értékkel az indítási argumentumokban, ha az automatikus útvonal alakja nem illik.
+A neutrino.elf fájlt tartalmazó eszköz (NEUTRINO/ vagy neutrino/ mappában). Az Auto először mc0-t, majd mc1-et keres.
+Mezőváltó javítás azokhoz a játékokhoz, amelyek remegnek vagy szakadoznak egy kényszerített Neutrino Videó mód alatt. Beállított Neutrino Videó módot igényel.
+A Neutrino GS kimeneti videómódjának kényszerítése (-gsm). Ki = a játék alapértelmezettje marad.
+A POPS/POPSTARTER.ELF fájlt tároló eszköz PS1 VCD indításához. Alapértelmezett = indító eszköz (cwd), majd a VCD saját eszköze. A Custom szabad szövegű útvonalmezőt jelenít meg.
+Hol van a POPSTARTER.ELF. Ha üresen marad, a RIPPS2 beírja azt, amelyet egy meghajtón talál; írd felül, ha mást akarsz, például usb:/POPS/POPSTARTER.ELF
+Optikai vonalkódot jelenít meg a Pixel FX / RetroGEM / PS2Digital számára PS1 VCD indításakor
+Beolvassa a POPSTARTER IPCONFIG.DAT és SMBCONFIG.DAT fájljait a csatlakoztatott SMB-megosztás POPS mappájából. Semmi sem íródik ki, amíg meg nem erősíted az OK gombbal.
+SMB-port a kiszolgálón -- az alapértelmezett a 445. Hagyd 0-n (vagy 445-ön) normál megosztáshoz; régebbi SMB1-kiszolgálókhoz használj 139-et.
+Rövid rezgés a kurzor mozgatásakor, megerősítéskor vagy visszalépéskor - DualShock szükséges analóg módban
+Az eszközlistákban csak egy több lemezes PS1 játék 1. lemezét mutatja (POPSLoader stílus). Elrejti a (Disc 2), (CD 2) stb. nevű fájlokat. Minden lemez a kártyán marad a játékon belüli cseréhez; a Kedvencek nincsenek szűrve.
+Csak kozmetikai -- elrejti a bevezető játék-azonosító előtagot (pl. SLUS_005.51.) a PS1/VCD listanevekből. Az azonosító nélküli nevek változatlanul jelennek meg. Nem változtatja meg az indítást, a borítót vagy a kedvenceket.
+Csak HDD -- PS1-játékként listázza a PP.<ID>.POPS.<name> nevű, egyetlen játékot tartalmazó partíciókat (pl. PP.SCES-01492.POPS.MEDIEVIL). Csak a listázás; az indítás nem változik. A többi PP.* partíció (alkalmazások, PS2-játékok) rejtve marad.
+Indítás e nyílás VMC-je nélkül, miközben a kártyája konfigurálva marad. Csak Neutrino indításnál; a játék ekkor az adott nyílásban lévő valódi kártyát használja.
+Kezelőfelület
+Hálózat
+MMCE
+IGR rendszerkártya foglalat(ok)
+MMCE indítási mód
+MMCE előtag elérési út
+MMCE foglalat
+Időtúllépési riasztások használata
+Várakozási ciklusok /ACK alacsony után
+7. mód
+ATA0 kép (-ata0)
+ATA0 azonosító (-ata0id)
+ATA1 kép (-ata1)
+Auto: -bsd -dvd -gc -gsm -mc -dbc -logo
+Konfiguráció (-cfg)
+Munkakönyvtár (-cwd)
+Hibakereső színek (-dbc)
+Rendszertöltő ELF (-elf)
+Extra argumentumok
+PS2 logó (-logo)
+Gyors indítás (-qb)
+Hálózati protokoll
+Neutrino indítási argumentumok
+A Neutrino argumentumai hosszabbak, mint ami menthető. Mentés előtt rövidíts meg egy mezőt.
+A Neutrino indítási argumentumai túllépik a biztonságos határt. Rövidítsd a globális vagy a játék argumentumait.
+Automatikus Boot ELF (-elf)
+Neutrino fájlrendszer
+Neutrino alapértékek
+Neutrino eszköz
+Neutrino GSM kompatibilitás
+Neutrino videó
+OSD alapértékek
+Útvonal-előtagok
+Útvonalbeállítások
+Plazma keverési szín
+PS-emulációs beállítások
+POPSTARTER.ELF eszköz
+POPSTARTER.ELF elérési út
+RetroGEM Game ID
+POPSTARTER hálózati beállítások
+Be (mind)
+Be (csak POPSTARTER)
+Be (csak PS2)
+Ki
+Importálás az SMB POPS mappából
+Nem található meglévő POPStarter SMB-konfiguráció. Add meg a helyes hálózati beállításokat, mielőtt létrehozol egyet.
+POPStarter SMB-hálózat
+Kontroller rezgése a menükben
+Biztonság
+Tárhely és gyorsítótár
+Eszközök
+Csak első lemez (több lemezes PS1)
+PS1 játék-azonosító elrejtése (VCD lista)
+PP.<ID>.POPS partíciók játékainak megjelenítése (HDD)
+exFAT
+fat32
+Nem exFAT USB-eszközökhöz a fat32 ajánlott.
+USB-mód fat32 vagy exFAT?
+USB VCD-mód
+VMC 1 letiltása (kártya megtartása)
+VMC 2 letiltása (kártya megtartása)
+Egyik sem
+Kicsi
+Nagy
+Normál
+Kontroller
+Hang
+A Neutrino nem tud indulni erről az eszközről -- indítás megszakítva.
+A Neutrino hálózati konfigurációja (bsd toml) hiányzik vagy nem írható -- az indítás megszakítva, ellenőrizd a neutrino mappát.
+A játékonkénti VMC fájl nem található -- indítás nélküle (a játék a valódi kártyáját használja).
+Játék eszköze
+A Neutrino nem támogatja ezt a fájlformátumot, indítás <OPL> maggal
+A Neutrino ELF nem található, indítás <OPL> maggal
+Túl töredezett a Neutrinóhoz (%d töredék, korlát %d a VMC-kkel együtt) -- helyette az OPL mag megpróbálása.
+A BDMA modulfájlok nem találhatók a forráseszközön.
+Nincs elegendő hely a memóriakártyán a BDMA modulokhoz.
+Hiba a BDMA modulok memóriakártyára írása közben.
+Az UDPBD statikus PS2 IP-t igényel. Állítsd be a Beállítások > Hálózat menüben (a DHCP jelenleg be van kapcsolva).
+Indítsa újra az OPL-t a hálózati indítási protokoll módosításának alkalmazásához.
+UDPFS bekapcsolva -- nyisd meg az új UDPFS fület, és nyomd meg a Megerősítést a csatlakozáshoz. A PC oldalon az udpfsd -fsroot <games folder> fut.
+A hálózati blokkeszköz bekapcsolva -- a füle megjelenik, amint a PC-szerver válaszol (udpfsd -bdpath az UDPFS Image-hez, udpbd-server az UDPBD-hez).
+Túl töredezett a Neutrinóhoz (%d töredék, korlát %d a VMC-kkel együtt) -- töredezettségmentesítsd a PC-n; az indítás megszakítva.
+UDPFS játékok
+A hálózati (UDP) játékok csak a Neutrino magon keresztül indíthatók. Ellenőrizze, hogy a neutrino.elf megvan-e és a formátum támogatott-e.
+A PS1 (.VCD) játékok nem indíthatók hálózati eszközről.
+Az MX4SIO és a kontroller-emuláció közös SIO2 buszt használ, így a játék nem biztos, hogy elindul.
+Az MMCE-kártyaváltás nincs megerősítve -- indítás mindenképp
+UDPFSBD játékok
+UDPBD Games
+Tárolóillesztők betöltése...
+USB tárolóillesztő betöltése...
+Hiányzó POPSTARTER.ELF
+Hiányzó POPSTARTER SMB követelmények
+Az SMB-játékokat a Neutrino nem támogatja -- indítás az OPL magjával.
+A Neutrino nem tud VMC-t használni APA HDD-n (nincs pfs-támogatás) -- indítás nélküle.
+PS1
+PS1 játékok megjelenítése
+Lemezes játékok megjelenítése
+USB / kártya / hálózati meghajtók keresése...
+Hálózat indítása...
+HDD keresése...
+USB
+MX4SIO
+MMCE
+Belső HDD
+USB (FAT32)
+USB (exFAT)
+MX4SIO (exFAT)
+MMCE (exFAT)
+HDD (exFAT)
+Betöltve innen: %s
+Nem sikerült a POPSTARTER hálózati konfigurációt a memóriakártyára írni.
+A POPSTARTER hálózati konfigurációja érvénytelen. Javítsd a POPSTARTER hálózati beállításokban.
+A POPSTARTER SMB-je statikus hálózati konfigurációt igényel. Előbb állítsd be a POPSTARTER hálózati beállításait.
+Lecseréled a POPSTARTER konfigurációt?
+Már létezik POPSTARTER hálózati konfiguráció. Lecseréled ezekre a beállításokra?
+Meglévő megtartása
+Csere
+Ez a beállítás nem használható a Neutrino maggal.
+Összes letiltása
+Témahangok betöltése...
+Menü felépítése...
+FIGYELEM -- az 1080p kikényszerítése kísérleti és nem ellenőrzött. Előfordulhat, hogy nincs kép, vagy bizonyos hardvereken megterheli a konzolt. Saját felelősségre folytasd.
+Kikényszeríted az 1080p-t ehhez a játékhoz?
+Biztos vagy benne? A kísérleti 1080p mód lesz alkalmazva erre a játékra.
+Egyéni beállítási útvonal
+A beállításokat az általad választott mappába menti, pl. mass0:/OPL. Hagyd üresen, hogy az OPL indítási mappáját használja. Az eszköz igény szerint töltődik be, így gépeléskor nem kell csatolva lennie.
+Játékonként + globális
+GSM alapértékek (minden játék)
+Az eszköz foglalt: a beállítások írása el sem kezdődött. Próbáld újra, ha a betöltés befejeződött.
+Nincs memóriakártya - a beállítások nem menthetők. Az OPL hálózati eszközről indult, amelynek beállításait helyi kártyán kell tárolni.
+A PS1-illesztőprogram előkészítése a memóriakártyán...
+USB BDMA-illesztőprogram
+Csak az USB-eszközről indított PS1 (VCD) játékokra vonatkozik. A PS2 nem tudja megállapítani, hogy az eszköz fat32 vagy exFAT, ezért a POPSTARTER illesztőprogramját ki kell választani. A Kérdez beállításnál a program minden indításkor rákérdez, az exFAT vagy a fat32 viszont rögzíti a választ, és kihagyja a kérdést.
+Kérdez
+A HDD-beállítások a biztonságos tartalék helyet használták: %s
+Általános beállítások
+Eszközbeállítások
+MMCE Games
+Speciális
+MMCE beállítások
+Szemafor sorba állítási módszer zárolása
+A THFIFO javíthatja a kompatibilitást, de ronthatja a teljesítményt
+POPSTARTER hálózati konfiguráció írása
+Az IP + SMB megosztási értékek mentése a POPSTARTER saját IPCONFIG.DAT / SMBCONFIG.DAT fájljaiba a memóriakártyán (SMB-n keresztüli VCD-hez).
+Neutrino ELF elérési út
+Hol van a neutrino.elf? <nincs beállítva> = a játék eszköze -> mc0/mc1. A saját teljes útvonal kerül először kipróbálásra. Példák: mass0:/neutrino/neutrino.elf | ata:/neutrino/neutrino.elf | mmce0:/neutrino/neutrino.elf | mc0:/neutrino/neutrino.elf | pfs0:/neutrino/neutrino.elf
+Memóriakártyák vizsgálata...
+MMCE játék-azonosító élesítése...
+UDPFS-hozzáférés
+MMCE GameID nem alkalmazva -- a neutrino.elf ezen a kártyán van (a váltás kikapcsolná a Neutrinót).
+A belső APA és exFAT HDD egyszerre volt bekapcsolva -- az egyik automatikusan kikapcsolt (lásd az Eszközbeállításokat).
+VCD beállítások
+BEÁLLÍTÁSOK MENTÉSE?
+A módosításaid jelenleg aktívak.
+Elmented őket a későbbi indításokhoz?
+Beállítások mentése
+Kilépés mentés nélkül
+Szerkesztés folytatása
+Beállítás
+%d: A merevlemez nem érhető el.
+%d: A merevlemez PFS-támogatása nem érhető el.
+POPSTARTER-beállítások betöltése...
+Az SMB nincs csatlakoztatva.
+Nem található POPSTARTER-beállítás az SMB POPS mappájában.
+A +OPL partíció nem található.
+A __common partíció nem található.
+Indítsd újra a RiptOPL-t a kiválasztott OPL-partíció alkalmazásához.
+A HDD OPL-partíciójának ellenőrzése...
+A HDD foglalt. Próbáld újra, ha a betöltés befejeződött.
+Általános és rendszer
+Hiányzik az ember.elf
+Hiányzik a bios.bin az ember.elf mellől
+Az Ember nem tudja használni ezt a mappanevet (nem lehet benne perjel, kettőspont vagy visszaperjel, és nem kezdődhet ponttal).
+Nincs PS1 lemezkép ebben az Ember játékmappában.
+Alkalmazások megjelenítve
+Ember képmód
+Az a kimeneti mód, amelyet az Ember a PS1-játékokhoz használ. A 240p vagy 480p az indított eszköz EMBER mappájában lévő settings.txt fájlba íródik. Az Alapértelmezett eltávolítja ezt a beállítást, és a fájlt is, ha semmi más nem volt benne.
+iLink
+iLink
+PS2/PS1 játékok megjelenítése
+Az Összes együtt listázza a PS2 és PS1 játékokat, az L3 pedig vált az Összes, PS1, PS2 között. A PS2 vagy PS1 csak azt a típust mutatja, és kikapcsolja az L3-at. Az APPS és a Kedvenc játékok saját megjelenítési szabályokat használnak.
+PS2 + PS1 játékok láthatók
+PS1 ELF alkalmazások láthatók
+Alkalmazások megjelenítése
+Az Összes minden ELF-et egyetlen APPS listában mutat, kikapcsolt L3-mal. Az Alkalmazások / PS1ELF a [PS1]-et tartalmazó címeket egy második L3 oldalra teszi; az indítás nem változik.
+Nézet
+Kedvenc PS2 játékok láthatók
+Kedvenc PS1 játékok láthatók
+Kedvenc ELF-ek láthatók
+Minden kedvenc játék látható
+A VMC elkészült, de töredezett. A memóriakártya-emulációhoz egyetlen összefüggő fájl kell, ezért ez a VMC indításkor kimarad, és a valódi kártya lesz használva. Szabadíts fel helyet, és készítsd el újra, vagy másold át egy másik eszközről.
+Kurzor mozgatása
+Játékcímek színe
+RetroAchievements támogatás ellenőrzése
+RetroAchievements PC-kapcsolat tesztelése
+A kép ellenőrzése, ez néhány másodpercig tart...
+Már fut egy képellenőrzés
+A PC-s kliens keresése...
+Az UL/USBExtreme játékok még nem ellenőrizhetők
+Csak a DVD/ vagy CD/ mappában lévő sima .iso képek támogatottak
+A RetroAchievements nem ismeri ezt a képet
+A PC még azonosítja a képet
+Próbáld újra néhány másodperc múlva
+A konzol nem tudott hálózati socketet nyitni
+Indítsd újra a konzolt, vagy ellenőrizd az ETH eszközt a beállításokban
+Ellenőrizd a kábelt és az ETH-t a beállításokban; ha a hálózat működik, indítsd újra a konzolt
+A PC-s kliens nem válaszolt
+Ellenőrizd, hogy fut-e a xeRAbora, vagy próbáld ki a PC-kapcsolat tesztet
+A RetroAchievements támogatja
+Indítsd el a játékot a teljesítmények követéséhez
+%d teljesítmény
+%d teljesítmény -- %d feloldva, %d nem támogatott
+A kép hash-e nem számítható ki
+Az okát lásd a játékok melletti RA/hashes.txt fájlban
+A hálózatot egy UDP átvitel használja
+Az RA-nak SMB veremre van szüksége -- válts protokollt, vagy készítsd el a .wl fájlt a PC-n
+A hash az RA/hashes.txt fájlban van -- a xeRAbora el tudja készíteni belőle a .wl fájlt
+A konzolnak nincs IP-címe
+Ellenőrizd a DHCP-t vagy a statikus címet a Hálózati beállításokban
+3 másodpercen belül egyetlen PC-s kliens sem válaszolt
+Konzol%s. Ellenőrizd, hogy fut-e a xeRAbora, és nyitva van-e az UDP 18194
+PC-s kliens megtalálva%s%s %s
+Válasz %u ms alatt, konzol%s
+Az RA-követéshez az <OPL> mag kell -- a Neutrinós indítások sosem töltik be az ee_core-t
+Az RA-követés UDPFS-en nem érhető el -- a játékok a Neutrinón keresztül indulnak
+Az RA-követés PS1 játékoknál nem érhető el
+HDLoader games have no image file to hash
+Build the .wl in xeRAbora and place it in RA/ on the share
+RetroAchievements telemetria
+RetroAchievements jelvények
+HTTP játékok
+HTTP szerver
+HTTP port
+HTTP alapútvonal
+HTTP szerver tesztelése
+A szerver rendben -- a játékok listázva
+A katalógus üres -- érvényes, de a bájttartományokról semmit sem bizonyít
+A katalógusban nincs támogatott kép, amelyen bájttartomány tesztelhető lenne
+A HTTP szerver nem érhető el
+A games.csv hiányzik, nem olvasható vagy túl nagy
+A szerver nem pontosan a kért bájtokat küldte vissza
+A HTTP-s indítás még nincs megvalósítva -- a katalógus csak böngészhető
+A tömörített képek (.zso) HTTP-n még nem támogatottak
+Virtuális memóriakártya HTTP-n nem érhető el -- használj fizikai kártyát
+A HTTP a szerveredről olvassa a games.csv fájlt. Állítsd be a címet, a portot és az alapútvonalat a Hálózati beállításokban, aztán használd a Tesztet.
+RA: lemeztámogatás ellenőrzése
+RA: lemez indítása
+A lemez ellenőrzése a RetroAchievementshez
+A lemez hash-e nem számítható ki -- nézd meg az RA/hashes.txt fájlt a beállítási mappában
+A beállítási útvonal nem használható lemezek figyelési listáihoz
+Előbb kapcsold be a RetroAchievements telemetriát a RetroAchievements beállításokban
+Ehhez a lemezhez nincs figyelési lista -- előbb használd az RA: lemeztámogatás ellenőrzése opciót
+%d: HDD található, de az APA partíciós táblája nem olvasható. Ne formázd -- a játékaid talán még menthetők.
+%d: Egy meghajtó nem lett csatolva, mert a szektorai nem 512 bájtosak (pl. 4K szektoros meghajtó). Az OPL csak 512 bájtos szektorokat tud olvasni.
+Ez a cím egy önálló APA partíció, és az OPL sosem szerkeszti a partíciós táblát. Nevezd át PC-n.
+A POPSTARTER beállításai nem olvashatók -- a memóriakártya foglalt vagy olvashatatlan. Próbáld újra, amikor a betöltés befejeződött.
+Globális PS emulációs beállítások
+A hálózat nem érhető el -- most RetroAchievements nélkül indul.
+Az IGR útvonal USB-n van, de a(z) %s helyről hiányzik az USBD.IRX és az USBHDFSD.IRX, amelyekre a konzolnak szüksége van, hogy egy In-Game Reset után elérje az USB-t. Nélkülük az IGR a PS2 böngészőbe esik vissza. Átmásolod most oda a RiptOPL illesztőprogramjait? Az FMCB, az OpenTuna és más exploitok is betöltik ezeket a fájlokat, és másképp viselkedhetnek velük. A meglévő fájlok sosem cserélődnek le. Csak FAT32 USB.
+Az USB illesztőprogramokat nem sikerült ide másolni: %s (a kártya megtelt vagy nem írható). Az IGR a PS2 böngészőbe esik vissza.
+Hivatalos OPL beállítások betöltve innen: %s
+Tartsd lenyomva a megtartáshoz
+A CD vagy DVD mappa nem nyitható meg itt: %s (hiba: %d), így ez az eszköz nem listáz PS2 játékokat. Az újrapróbáláshoz nyomd meg a SELECT-et az oldalán.
+A Neutrino fájlrendszere bd-re van állítva, de ez az eszköz sosem jelentette az eszközszámát, így a Neutrino nem irányítható rá. Állítsd ennek a játéknak a Neutrino fájlrendszerét Auto-ra vagy exfat-ra.
+Visszaállítás %d mp múlva
+Ember színkeverés
+Ember színkeverés (Be vagy Ki), az indított eszköz EMBER/settings.txt fájljába írva. A játékonkénti érték elsőbbséget élvez.
+Ember árnyalás
+Ember színmélység: 15 bites vagy 24 bites (kísérleti). Az indított eszköz EMBER/settings.txt fájljába írva. A játékonkénti érték elsőbbséget élvez.
+Ember kontroller
+Ember kontroller mód: Automatikus, Analóg vagy D2A. Általában a legjobb játékonként beállítani (Háromszög > Ember játékbeállítások), ami elsőbbséget élvez.
+Az Ember 480p módban kompozit kábelen nem ad képet. Használod a 480p-t?
+24 bites (kísérleti)
+Ember játékbeállítások
+Csak ez a játék. Nyomd meg az OK-t, hogy indítás előtt kiíródjon az EMBER/games/<név>/settings.txt. Az érintetlen Alapértelmezett megtartja a fájlban lévő értéket; ha egy értéket visszaállítasz Alapértelmezettre, az felülírása megszűnik.
+Ember időzítés
+Ember videóidőzítés: az Automatikus a lemez régióját követi, az NTSC 60 Hz-et, a PAL 50 Hz-et kényszerít. Az indított eszköz EMBER/settings.txt fájljába írva.
+A VMC méretének módosítása törölné a rajta lévő mentéseket. Készíts biztonsági másolatot a meglévő VMC-ről, és használd a Törlést, mielőtt új méretet hozol létre.
+A VMC-t nem sikerült létrehozni. Ellenőrizd az eszközt, a kapcsolatot és az írási jogot. A meglévő mentések nem lettek lecserélve.
+Ezek az Ember beállítások minden PS1 játékra vonatkoznak, és néhány játék összeomlik tőlük. Ha csak egy játékot akarsz módosítani, használd azon a játékon a Háromszög > Ember játékbeállítások menüt.
+A PS1 mentések az Embertől vagy a POPSTARTER-től függenek; a PS2 VMC beállítások nem érvényesek.
+A hálózatodon egy másik eszköz használja ennek a PS2-nek az IP-címét, így az UDPFS szerver válaszai oda mennek. Állíts be másik PS2 IP-t a Hálózati beállításokban.
+Mentés a Kedvenc játékok közé...
+Elmentve a Kedvenc játékok közé
+Nem sikerült menteni a Kedvenc játékok közé
+Eltávolítva a Kedvenc játékok közül
+Nem sikerült eltávolítani a Kedvenc játékok közül
+POPS UDPFS hálózati beállítások
+mc?:/SYS-CONF/ | 0.0.0.0 = felderítés
+Nem sikerült beolvasni a POPS UDPFS hálózati beállításokat a memóriakártyáról.
+A PS2 statikus IP-je, amelyet a POPS UDPFS illesztőprogram az IOP-alaphelyzetbe állítás után használ.
+ (érvénytelen)
+ (hiányos)
+Name each game's save folder after its disc ID, e.g. POPS/SLUS_123.45/. Copy its SLOT0/SLOT1.VMC there first.
+One save folder for all discs of a game, from POPS/DISCS_DIR.TXT on the server. Copy its SLOT0/SLOT1.VMC there first.
+Read CHEATS_WS.TXT instead of CHEATS.TXT when the game folder has one.
+Couldn't write mc?:/POPSTARTER/PATHMAP.INI (needs a POPSTARTER folder, at most 512 bytes).
+A POPS UDPFS-hez a memóriakártyára telepített .udpfs illesztőprogram-pár kell. Tedd fel kézzel, vagy kapcsold be a BDMA Alkalmazás indításkor opciót.
+VMC létrehozása első indításkor
+With no card assigned to slot 1, create an 8 MB card on the game's device and assign it. Existing cards are preserved. Not available for HTTP or internal HDD games under Neutrino.
+A játék VMC-jének létrehozása...
+A játék VMC-jét nem sikerült létrehozni. A játék VMC nélkül indul.
+VMC creation did not finish. Launch cancelled.
+CFG címek mutatása a játéklistákban
+A fájlnév helyett minden játék CFG-jéből a Címet mutatja, és aszerint rendez. Lista frissítésekor minden CFG-t beolvas, így a listák lassabban töltenek be. Csak megjelenítés.
+This game's existing VMC cannot be used by this loader. It was preserved. Choose a card in Game Settings.
+VMC creation is still running. Stay in the menu and wait before retrying.
+Logóképek
+Megmutatja a játék logóját (<ID>_LGO), ha a téma használja. Kikapcsolva az alapértelmezett képét is elrejti, de a borítókat, lemezképeket és háttereket megtartja.
+Szülői zár
+A játék indításához kérje a szülői zár jelszavát.
+Állíts be szülői zár jelszót, különben ez a játék nem lesz zárolva.
+[PS1]/[PS2] címkék mutatása
+DVR launches require the PSX-mode reset. Remove active -qb options.
+The DVR Neutrino companion is incomplete. Required file missing or path too long
+VMC %s in slot %d is outside the native core's supported disk range. Continue without this card?
+The disk layout of VMC %s in slot %d could not be verified. Continue without this card?
+VMC %s in slot %d exceeds the native core's PFS block-map limit. Continue without this card?
+VMC created, but the HDD stored it in more pieces than the native core can map, so it will be skipped at launch and the real card used instead. Free up space on the OPL partition and make it again.
+Mode 8
+Slow Reads -- Accurate Reads capped at CD speed (~900KB/s) for DVD games whose audio breaks under Mode 1
+The device's POPS folder has old BDMA drivers -- copy this release's POPS folder there.
+Game and VMC files use %d/%d fragments, exceeding Neutrino's shared limit. Skip VMC %s and use the physical Memory Card in slot %d?
+Rebuild
+Copies this card into one unbroken file the native core can use. Needs free space for one copy while it runs.
+Too fragmented for the native core
+Rebuild this VMC? Its saves are copied into a new file in one piece and checked byte by byte before it replaces the card. No backup file is made.
+VMC rebuilt in one piece.
+Not enough unbroken free space to rebuild this VMC. Nothing was changed. Free up space on the device and try again.
+The VMC could not be rebuilt. Nothing was changed.
+Rebuild cancelled. Nothing was changed.
+The VMC was copied but could not be swapped in. Your saves are in the .new file in the VMC folder -- if the card does not come back, rename that file to .bin on a PC.
+The VMC was rebuilt, but the HDD could not confirm the change was saved. Check the card's saves before relying on it.
+Select starting disc
+Disc %d: %s
+Could not read discs.txt. Use one CUE filename per line (up to 16), with all discs in the game folder.
+The selected disc's launch argument is too long. Shorten the game folder or CUE filename.
+Saves
+The saves on this card. Copy them to a folder on the drive, copy saves back in, or delete one.
+On the card
+Pick a save on the card with Up and Down, then Copy out or Delete.
+Free
+In the folder
+Pick a save folder or .psu file with Up and Down, then Copy in.
+Folder
+Copy out
+Copies the picked save into the folder, as a save folder of its own. The card is not changed.
+Copy in
+Copies the picked save folder or .psu file onto the card.
+Deletes the picked save from the card.
+%s was copied to %s.
+%s was copied onto the card.
+Delete %s from this card? This cannot be undone.
+This file is not a PS2 memory card image this can read.
+This card image has ECC data (a PCSX2 card). Its saves can be copied out, but it cannot be changed here.
+There is not enough free space on the card for this save.
+A save with that name is already there.
+This save is too big for a memory card, has more than 64 files, or has a name longer than 32 characters.
+The save could not be written. Is the drive full or write-protected?
+The card image could not be read, or its tables are damaged.
+Font Size
+Size of standard menu text. Theme fonts with other point sizes keep their original size.
+Button Glyphs
+The button pictures in hints. Theme uses the theme's own (or its glyph_set key); the others replace them on every theme.
+Built-in
+Standard
+White
+RA mark in game list
+Prefix
+Suffix
+Prefix puts "RA " before the name. Suffix puts " [RA]" after it. Both keep alphabetical order.
+3D mentésikonok
+A kiválasztott játék mentésikonját forogva mutatja ott, ahol a téma helyet ad neki. Előbb a játék saját VMC-jét olvassa, aztán a memóriakártyákat.
+A hálózati protokoll újraindítás után változik. Mented a beállításokat, és most újraindítod az OPL-t?
+Melyik hálózati szolgáltatást használja a RiptOPL: SMB megosztás, UDPFS, UDPBD vagy HTTP. Ugyanaz a beállítás, mint a Játékforrásokban. Egy már futóról váltáshoz újraindítás kell.
+Csak UDPFS. A Fájlok a szerver játékmappájából olvas különálló ISO-kat; az IMG egy lemezképet meghajtóként olvas. Az SMB és a HTTP mindig Fájlokat, az UDPBD mindig IMG-t használ.
+Melyik SMB verzióval beszéljen a PC megosztásával.
+Szerkeszthetővé teszi az Ethernet kapcsolati módot és az SMB portot.
+Kényszeríti a hálózati kapcsolat sebességét és duplex módját. Hagyd Automatikuson, hacsak a kapcsolat nem szakad meg folyton.
+A Statikus az alábbi címet használja; a DHCP a routertől kér. Az UDPFS és az UDPBD mindig Statikust használ.
+A PS2 saját IP-címe. Válassz olyat, amelyet más eszköz nem használ, a PC-ddel azonos tartományban.
+Alhálózati maszk, általában 255.255.255.0.
+A routered címe, általában ugyanazzal az első három számmal, .1-re végződve.
+A DNS szerver címe. Általában ugyanaz, mint az átjáró.
+A PC elérése az IP-címével vagy a NetBIOS (számítógép-) nevével.
+A játékaidat megosztó PC: az IP-címe, vagy a számítógép neve, ha a Címtípus NetBIOS.
+The PC's SMB port. Windows, Samba and a NAS use 445. PS2 Servers: the port its card shows. Select it, then press Triangle to type the number.
+SMB felhasználónév. A legtöbb megosztásnál a guest működik.
+A HTTP játékszerver IP-címe.
+A port, amelyen a HTTP játékszerver figyel.
+A HTTP szerver azon mappája, amely a games.csv fájlt tartalmazza. A / a szerver gyökere.
+Kipróbálja a HTTP szervert a fenti értékekkel, és jelenti, mit talált.
+A RetroAchievements főkapcsolója. Kikapcsolva a játékok hálózati verem és pillanatképek nélkül indulnak, ugyanúgy, mint egy normál buildben.
+Megjelöli a listában a teljesítményekkel rendelkező játékokat. Amíg a telemetria ki van kapcsolva, sötét marad.
+Szerkeszti a POPSTARTER saját hálózati fájljait (IPCONFIG.DAT, SMBCONFIG.DAT), amelyekre az SMB-n futó PS1 játékoknak szükségük van.
+Hogyan kap címet a PS2, amíg egy PS1 játék SMB-n fut: Statikus vagy DHCP.
+A PS2 IP-címe, amíg egy PS1 játék SMB-n fut.
+A PS1 játékaidat megosztó PC IP-címe.
+Annak a megosztásnak a neve azon a PC-n, amelyik a POPS mappát tartalmazza.
+A legutóbb indított játéknál kezd.
+A menü nyelve. Továbbiakat lang_*.lng fájlok LNG mappába tételével adhatsz hozzá.
+Videómód-javítások, amelyeket minden játék megkap, hacsak nincs saját GSM beállítása.
+Az oldal, amelyet a RiptOPL indításkor megnyit.
+SD2PSX-en vagy MemCard PRO2-n lévő játékok. Az Automatikus indításkor, a Kézi az oldal megnyitásakor indul, a Ki elrejti.
+Foglalat, IGR bootcard, GameID és időzítési beállítások az MMCE-hez.
+Betölti az USB tároló illesztőprogramját.
+Betölti az MX4SIO SD kártya adapter illesztőprogramját.
+Betölti az iLink (FireWire) tároló illesztőprogramját.
+Elindítja a hálózatot: Automatikus indításkor, Kézi az oldala megnyitásakor. A Ki nem nyúl a hálózati adapterhez.
+Az Alkalmazások oldal. Az Automatikus indításkor, a Kézi megnyitáskor indul, a Ki elrejti.
+A Kedvenc játékok oldal. Az Automatikus indításkor, a Kézi megnyitáskor indul, a Ki elrejti.
+Melyik exFAT illesztőprogramot használja a POPSTARTER az USB-n, MX4SIO-n, MMCE-n, HDD-n vagy iLinken lévő PS1 játékokhoz.
+Hogyan listázódnak a PS1 játékok: játékazonosítók elrejtése, csak az 1. lemez mutatása, a HDD PP partícióinak mutatása.
+Melyik memóriakártya-foglalatban van az MMCE eszköz. Az Automatikus megtalálja.
+Megmondja az MMCE eszköznek, melyik játék indul, hogy átválthasson annak a játéknak a memóriakártyájára.
+Időzítési beállítások az MMCE kapcsolathoz. Csak akkor módosítsd, ha a játékok lefagynak vagy lassan töltenek.
+Hol vannak a játékmappák az MMCE kártyán.
+Az MMCE kártya azon almappája, amely a CD, DVD és a többi OPL mappát tartalmazza. Üresen a kártya gyökerét használja.
+Minden játéknév elé [PS1] vagy [PS2] jelölést tesz. Csak megjelenítés.
+A menü videókimenete. A játékok ehelyett GSM-et használnak. Új mód megtartásához tartsd lenyomva az Elfogadást.
+A menü kinézete. A témák minden eszköz THM mappájából olvasódnak be.
+Borítók száma, mérete, animációja és sötétítése a Coverflow témához.
+Mely képek töltődnek be: borítók, lemezképek, hátterek és mentésikonok.
+Szöveg, kiemelés, párbeszédablak és háttér színei.
+Rövid értesítések beállítás-, téma- vagy nyelvfájl betöltésekor.
+A játéklistákat A-tól Z-ig rendezi. Kikapcsolva megtartja a megtalálás sorrendjét.
+Kézi frissítés nélkül hozzáadja az újonnan csatlakoztatott eszközök játékait.
+Borítókat tölt be az ART mappából.
+Lemezképet mutat (<ID>_ICO). Kikapcsolva elrejti a lemezt, de a borítókat és háttereket megtartja.
+Megmutatja a játék hátterét (<ID>_BG), ha a téma használ hátteret.
+Az ART/art.tar fájlba csomagolt képeket is beolvassa.
+Mennyi ideig áll a kurzor egy játékon, mielőtt a képei betöltődnek. A nagyobb érték gyors görgetéskor kihagyja a képeket.
+A normál menüszöveg színe.
+A kiemelt elem színe.
+A párbeszédablakok háttérárnyalata.
+A játékcímek színe a listában.
+A menü háttérszíne.
+A mozgó háttérbe kevert szín.
+A RiptOPL beépített színeit állítja vissza, nem a témáét.
+16:9-es tévéhez rajzolja a menüt.
+Balra vagy jobbra mozgatja a menüt a képernyőn. Minden videómódhoz külön megmarad.
+Fel vagy le mozgatja a menüt a képernyőn. Minden videómódhoz külön megmarad.
+Befelé zsugorítja a menüt, ha a tévé levágja a széleit. Minden videómódhoz külön megmarad.
+Játékindításkor vonalkódot mutat, hogy a Pixel FX, RetroGEM és PS2Digital eszközök profilt váltsanak.
+A Neutrino útvonala, videómódja és argumentumai minden játékhoz.
+A játékoknak átadott konzolnyelv, képernyőméret és videómód.
+Engedélyezi a játékok átnevezését és törlését, valamint VMC-k létrehozását. A HDD partíciós táblájához sosem nyúl.
+Fejlesztői segítség: színes képernyők a játék indulása közben, és képbetöltési számlálók a menüben.
+Az USB, MX4SIO, iLink és exFAT meghajtók azon almappája, amely a játékmappákat tartalmazza. Üresen a meghajtó gyökerét használja.
+Az SMB megosztás azon almappája, amely a játékmappákat tartalmazza. Üresen a megosztás gyökerét használja.
+Megjegyzi az APA HDD játéklistáját a későbbi beolvasások gyorsításához.
+Előreolvasó gyorsítótár USB-hez és más BDM meghajtókhoz játék közben. A nagyobb simábbá teheti az adatfolyamot, de több memóriát használ.
+Előreolvasó gyorsítótár a belső HDD-hez játék közben.
+Előreolvasó gyorsítótár az SMB-hez játék közben.
+A játék magja ott, ahol mindkettő támogatott. Az SMB/HTTP csak <OPL>. Az alapértelmezett a Játékindítást követi. UDPFS/UDPBD esetén az alapértelmezett a Neutrino.
+A belső HDD átviteli módja ehhez a játékhoz. Csökkentsd, ha a játék akad vagy lefagy.
+Lemezazonosító DNAS online játékokhoz. A Betöltés lemezről az eredeti lemezről olvassa be.
+A DNAS azonosítót a meghajtóban lévő eredeti lemezről olvassa be.
+Ezt az ELF-et indítja a lemezképről a SYSTEM.CNF által megnevezett helyett.
+A foglalat virtuális memóriakártyájának kiválasztása, létrehozása vagy átméretezése.
+Az Általános használata közös kártyát ad ennek a foglalatnak; az Alaphelyzet törli a választást.
+A kártyafájl neve, a VMC mappában tárolva.
+Létrehozza a kártyát, vagy új méretet alkalmaz rá.
+Törli ezt a kártyafájlt.
+A Globális a közös beállításokat használja; a Játékonként csak ennek a játéknak tartja meg őket.
+A Gomb lenyomása közben csak addig lassítja a kart, amíg tartod a gombot; a Gombbal váltva be- és kikapcsolja.
+A menü hangeffektusai.
+Hangot játszik le a RiptOPL indulásakor.
+A téma zenéjét vagy az Alapértelmezett témazene fájlodat játssza le.
+A menü hangeffektusainak hangereje.
+Az indítóhang hangereje.
+A háttérzene hangereje.
+Milyen gyorsan görögnek a listák, amikor nyomva tartasz egy irányt.
+Melyik gomb fogad el: X vagy Kör.
+Milyen könnyen mozgatja a bal kar a kurzort balra és jobbra. Kikapcsolva figyelmen kívül hagyja.
+Milyen könnyen mozgatja a bal kar a kurzort fel és le. Kikapcsolva figyelmen kívül hagyja.
+DualShock 3/4 USB-n vagy Bluetoothon, és multitap, minden játékhoz.
+Karlassítás, tengelyfordítás és turbó minden játékhoz.
+Hány borítót mutat a RIPFLOW a kiválasztott mindkét oldalán.
+Mekkorának rajzolja a RIPFLOW a kiválasztott borítót a többihez képest.
+Milyen gyorsan siklanak a borítók, amikor a folyamban mozogsz.
+Elsötétíti az oldalsó borítókat.
+Quick Boot: átugorja a Neutrino saját kezdőképernyőjét. Itt bekapcsolva minden játékhoz elküldi; kikapcsolva a RIPPS2 akkor is magától elküldi az USB-s, iLinkes és hálózati játékoknál, ahol szükség van rá.
+Hibakereső színek: a Neutrino minden betöltési lépésnél egy színnel tölti ki a képernyőt, így egy fénykép megmutatja, hol akad el a játék.
+A játék előtt megmutatja a PS2 logót (egy második IOP-újraindítás, amelyre néhány iLink meghajtónak szüksége van). Itt kikapcsolva a RIPPS2 a Játékindítás > PS2 logó beállítást követi, és MMCE-s vagy hálózati játékoknál sosem küldi el.
+A mappa, amelyet a játék a sajátjának tekint. Üres: a Neutrino alapértéke.
+Saját Neutrino beállításfájl (-cfg). Üres: a Neutrinóé.
+Ezt az ELF-et indítja a lemez által megnevezett rendszerindító fájl helyett. Üres: a játék sajátja.
+Egy HDD-kép, amelyet a Neutrino a konzol belső HDD-jeként csatol, a HDD-t használó játékokhoz (-ata0).
+Az ahhoz a HDD-képhez tartozó azonosítófájl (-ata0id).
+Egy második HDD-kép (-ata1).
+Átadja a játéknak az alábbi beállításokat. Kikapcsolva a konzol saját beállításait használja.
+A játéknak átadott tévéforma.
+A játéknak átadott videómód.
+DNAS azonosító
+Indítási argumentumok mutatása
+Minden Neutrinós indítás előtt megmutatja az összes argumentumot, amelyet a Neutrino kap, és megkérdezi, folytatod-e. A Vissza indítás nélkül visszatér a menübe.
+A Neutrino ezekkel az argumentumokkal indul. Elindítod?
+További Neutrino kapcsolók szóközzel elválasztva, a fentiek után elküldve. A RIPPS2 mindig hozzáadja a -bsd és -dvd kapcsolót a játék meghajtójához és ISO-jához, a -mc0 és -mc1 kapcsolót a VMC-ihez, a -gsm-et a videómódjához, valamint a játék saját kompatibilitási módjait. A fenti saját sorral rendelkező kapcsoló (például -logo) mentéskor abba a sorba kerül, és továbbra is elküldésre kerül.
+A csaláslista nem menthető a Neutrino mappájába, így a Neutrino nem tudja használni. Csalások nélkül indítod?
+A korai japán PS2-k PC CARD CompactFlash-e. Csak natív PS2 játékok; a CF-nek kizárólagos PC CARD hozzáférés kell. A felszabadításhoz indítsd újra.
+PC CARD CF játékok
+A CF nem érhető el: korai japán PC CARD-os PS2, kompatibilis kártya és aktív DEV9/HDD/hálózati illesztőprogram hiánya kell hozzá.
+A CF jelenleg csak natív PS2 játékokat támogat. A CF-es VMC, a PS1 betöltés és a hálózati teljesítmények nem érhetők el.
+Kísérleti DESR DVR ISO felderítés. Bekapcsolt HDD forrás kell hozzá; a játékindításhoz külső, DVR-képes Neutrino kell.
+DVR launch selects its own backend. Remove -bsd= and -bsdfs= from global and per-game Neutrino arguments.
+A kontroller-emuláció Neutrinóval nem érhető el. Használj PS2 kontrollert vagy olyan forrást, amely támogatja az <OPL> magot.
+RA mód
+Válaszd ki a PC-s klienst. Alapértelmezés a Xerabora; a Caduceus előbb a bejelentkezett munkamenetét ellenőrzi.
+RA segédprogram IP-je (0.0.0.0 = automatikus)
+Opcionális, kizárólag RetroAchievementshez használt PC IPv4 címe. A régi SMB/HTTP tartalék úthoz vagy a Xerabora felderítéséhez használj 0.0.0.0-t. A játékszerver beállításait nem változtatja meg.
+Nyisd meg egyszer az UDPFS oldalt, hogy betöltődjön a hálózati modulja, aztán próbáld újra.
+A figyelési listát nem sikerült menteni. Győződj meg róla, hogy a játék eszköze vagy megosztása írható, aztán ellenőrizd újra.
+A Caduceus nem kész. Most teljesítmények nélkül indul.
+A Caduceus RA munkamenete offline.
+Jelentkezz be a RetroAchievementsbe a Caduceusban, aztán próbáld újra.
+Kísérleti kártyák
+Kísérleti, játékon belüli teljesítménykártyák PS2-n. Villoghatnak vagy lefagyaszthatják a játékot. Kikapcsolva az arany pulzálást használja. A következő játékindításkor lép életbe.
+Caduceus teljesítmények
+Teljesítmények megtekintése
+Vissza
+A Vissza az OPL-be tér vissza. A Select frissíti ezt az oldalt.
+A Caduceus nem kérdezhető le. Ellenőrizd a kapcsolatot, aztán nyomd meg a Select gombot az újrapróbáláshoz.
+Megszerzett
+Egyetlen teljesítmény sem felel meg ennek a szűrőnek.
+Ebben a fiókban nincs előrehaladással rendelkező játék.
+Összes
+%d játék a fiókban
+L1/R1: oldal   Négyzet: szűrő   Select: frissítés
+%d / %d teljesítmény  |  %d hardcore
+Hardcore
+Ennek a formátumnak a hash-e nem számítható ki. Böngészd inkább a fiók könyvtárát.
+TELJESÍTMÉNYEK
+RetroAchievements fiókkönyvtár
+L1/R1: oldal   Elfogadás: megnyitás   Select: frissítés
+Teljesítmények betöltése...
+Zárolt
+%d játék a fiókban
+Jelentkezz be a Caduceusba, és párosítsd az ART/CADUCEUS.KEY fájlt az SMB megosztásodon.
+A Caduceus nem érhető el. Párosítsd az ART/CADUCEUS.KEY fájlt a PS2-Servers által megosztott mappában, és állítsd be az RA segédprogram IP-jét.
+%d pont  |  %s
+%d / %d megszerezve  |  %s
+A Caduceus böngészőnek SMB vagy UDPFS Fájlok kell: az UDPFS IMG-nek nincs megosztott mappája a kulcsához.
+Ez a játék nincs a Caduceus katalógusában. Frissítsd a katalógust a PC-n.
+Ezt a játékot a főmenü Caduceus teljesítmények pontjában böngészd.
+RetroAchievements könyvtár (xeRAbora)
+A lista nem olvasható a xeRAborától. Nyomd meg a Select gombot az újrapróbáláshoz.
+Még nincs a RetroAchievements könyvtáradban. Játssz vele egyszer teljesítményekkel, aztán nyomd meg a Select gombot.
+A xeRAbora nem érhető el. Kapcsold be az OPEN TO THE NETWORK opciót a beállításaiban, ellenőrizd az RA segédprogram IP-jét és a PC tűzfalát.
+A xeRAbora nem ismeri ezt a képet. Előbb futtasd az RA játéktámogatás-ellenőrzést.
+Ezt a játékot a főmenü RetroAchievements könyvtárában böngészd.
+Még nincs a RetroAchievements könyvtáradban. Állítsd be a konzol óráját a rendszerbeállításokban, hogy lásd a teljes listáját, vagy játssz vele egyszer teljesítményekkel.
+A Neutrino RA ennél az indításnál nem érhető el. Ellenőrizd az RA futtatókörnyezetet, a segédprogram IP-jét és a mentett figyelési listát. Teljesítmények nélkül indul.
+A PS1 teljesítményekhez USB-s VCD kell a POPStarteren keresztül
+Az előző PS1 teljesítménymodul nem távolítható el
+A PS1 teljesítmények nem készíthetők elő. Őrizd meg vagy helyezd át a POPS/MODULE_9.IRX fájlt, és ellenőrizd az eszköz írási jogát.
+Nem használt RiptOPL RA modul: POPS/MODULE_9.IRX. Törlöd a tiszta indításhoz?
+A nem használt RA modul nem törölhető.
+Így is folytatod? Egy ottmaradt RA modul elavult telemetriát futtathat. A Nem megszakítja az indítást.
+The MMCE is getting this game's memory card ready (%d s). The game starts when it is done; START starts it now.
+POPSTARTER needs Sony's POPS files and these are missing: %s (in %s%s). Without them the game shows a black screen. Launch anyway?
+A to Z
+Last played
+Showing recently played
+Random Game
+No games on this page to pick from.
+All Games
+All Games List
+One page lists the games of every started device, PS2, PS1 and apps together. Device tabs step aside once their games are on it. A game on two devices shows each device's name. L3 cycles All, PS2, PS1, Apps, Favorites and Recent.
+Showing all games
+Showing favorites
+Hide Game
+Show Game Again
+Hide %s? It leaves every list, All Games and Favorites too. Settings > Game Sources > Show Hidden Games lists it again.
+Hidden: %s
+Shown again: %s
+The hidden list could not be written to the game's device. Is it write-protected?
+This device cannot keep a hidden list.
+Show Hidden Games
+Lists the games hidden with Hide Game, so one can be shown again from its menu. Each device keeps its own hidden.txt.
+Delete %s? Goes: %d game file(s), %d settings file(s), %d art image(s) and %d cheat file(s). Kept: its VMC saves.
+Another copy of this game is on this device, so its settings, art and cheats stay.
+Last check: %s is deleted for good and cannot be brought back. Delete it?
+Deleted: %s
+Deleted %s, but some of its settings, art or cheat files could not be removed.
+%s could not be deleted. Is the device write-protected?
+Sony's POPS files are in %s. Copy %s to %s%s and launch?
+Copying %s...
+%s could not be copied to %s%s. Is the drive full or write-protected?
+Drive Status
+Looking at the drives...
+%s free of %s (%s, %s clusters)
+internal HDD (exFAT)
+a drive of unknown kind
+Internal HDD (APA): %s free of %s
+Memory card %d: %d KB free
+No drive is started yet. Start one from its page, or set it to Auto in Settings.
+Settings: %s
+Save Diagnostics
+Writes what RiptOPL noted about the pads, the drives, MMCE cards and the last launches to DIAG.TXT in the settings folder. Send it with a bug report.
+The diagnostics are in %s.
+The diagnostics could not be written to %s. Is the device write-protected?
+Hogyan jeleníti meg a téma a játékaidat: List, Coverflow, PSBBN Flow vagy Grid. Váltáshoz tartsd lenyomva az L3-at a főoldalon. Az ilyen nézet nélküli témák az alapértelmezett nézetüket használják.
+Téma nézete
+VMC %s is in %d fragments. Continue with Memory Card in slot %d?
+Back up the VMC to a PC, remove it from the device, then copy it back. If it is still fragmented, free space and retry. Never delete your only copy.
+Mindkettő
+Ez az UDPBD/UDPFS szerver csak olvasható, ezért VMC nem használható rajta. A játék a valódi memóriakártyára ment.
+In-Game Menu (Beta)
+The IGR combo pauses the game under a menu: Resume, Cheats, Exit Game, Power Off. OPL core games on a real PS2 only; where it cannot draw, the combo leaves the game as before.
+IGR Combo
+The buttons that leave a game (OPL core games). Press to record your own: hold at least 3 buttons for 3 seconds. With your own combo, the usual combos are left to the game, and only the IGR Power-Off Combo (if set) or the power button powers off.
+IGR Power-Off Combo
+Off by default. Press to record buttons that power the console off from a game (OPL core games): hold at least 3 buttons for 3 seconds. It must differ from the IGR Combo.
+Hold the buttons for your power-off combo (at least 3) for 3 seconds. Hold Triangle alone for 5 seconds to turn it off. Hold Circle alone for 5 seconds to cancel.
+The IGR Combo and the IGR Power-Off Combo must use different buttons. Nothing was changed.
+Hold the buttons for your IGR combo (at least 3) for 3 seconds. Hold Triangle alone for 5 seconds to go back to the usual combo (L1+L2+R1+R2+Start+Select). Hold Circle alone for 5 seconds to cancel.
+Back to the usual combo
+Turn off
+Grid Layout
+Covers per page in the Grid view: the theme's own, or a preset. A 16:9 picture fits more columns, and each preset shows the shape it has on the picture now. Grid (7x2) keeps its own shape.
+Compact
+Library
+Pages
+Pages gives every device its own tab. All Games List puts the games of every started device, PS2, PS1 and apps, on one page. Same setting as All Games List under Game Sources.
+Copy out as PSU
+Copies the picked save into the folder as one .psu file, the save file uLaunchELF, EMS and Apollo use. The card is not changed.
+This .psu file is cut short or is not a PS2 save.
+File Manager
+Drives
+.. (up one folder)
+Page %d of %d, %d entries
+This folder is empty.
+%s could not be opened.
+Clipboard: %d to copy
+Clipboard: %d to move
+%d marked
+Paste here
+New folder
+Open
+Copy
+Cut
+Mark
+Unmark
+Paste as PSU
+Nothing on the clipboard is a save folder (a folder with an icon.sys).
+Unpack PSU here
+Cross opens a folder, or shows what can be done with a file. Square marks it. Triangle shows what can be done with it. L1/R1 turn the page, Circle goes up a folder.
+Copies or moves what is on the clipboard into this folder. A name already here is never replaced: it is skipped and named. A save folder pasted onto a memory card goes in the card's root, and a .psu pasted onto one unpacks into its save.
+Makes a folder here, with a name you type.
+Puts the marked entries, or this one if none are marked, on the clipboard. Paste here copies them.
+Puts the marked entries, or this one if none are marked, on the clipboard. Paste here moves them; each one leaves its old place only once it is whole in the new one.
+Gives this entry a new name, typed on the keyboard.
+Deletes the marked entries, or this one if none are marked, folders with everything in them. You are asked first.
+Makes one .psu file here from each save folder on the clipboard (a folder with an icon.sys): the save file uLaunchELF, EMS and Apollo use. The saves themselves are not changed.
+Unpacks this .psu into its save folder here. On a memory card the save goes in the card's root, where games look for it.
+Opens this folder.
+Starts this ELF, the way an app on the Apps page starts.
+Marks this entry, so Copy, Cut and Delete act on every marked one. Square on a row does the same.
+Delete %s? This cannot be undone.
+Delete the %d marked entries? This cannot be undone.
+Copying %s... %d%%
+Deleting %s...
+%s: %s
+Something with that name is already there.
+A folder cannot go inside itself.
+That name cannot be used here.
+It could not be read.
+It could not be written. Is the drive full or write-protected?
+It could not be removed.
+Its folders go too deep.
+There is not enough memory.
+Turn on Write Operations in Settings to change files.
+An ELF on the internal HDD starts from the Apps page.
+Alternate Background
+Shows the theme's alternate background (alt= in its conf_theme.cfg) instead of its default one. Themes without one are not changed.
+Series card: the games in this series use this name by default, so saves on it can carry over between them.
+Game card: named after this game's ID.
+Generic card: shared by every game set to the same generic card.
+This Neutrino has no SMB support -- launching with the OPL core.
+Neutrino reaches SMB on port 445 only -- launching with the OPL core.
+This server does not offer SMB 3.0, which Neutrino needs -- launching with the OPL core.
+Neutrino cannot write a VMC on the SMB share -- launching with the OPL core.
+These SMB settings are beyond Neutrino's limits -- launching with the OPL core.
+The game list changed while this was open, so nothing was done. Please try again.
+Boot Theme Wait
+Seconds the start-up screen waits for your saved theme while its drive starts up. 0 = Off: the menu opens right away and your theme appears as soon as it is found.
+PS1 Duplicates
+A PS1 game that is both a POPSTARTER VCD and an Ember image. Both: two rows. Ember: the Ember one only. POPSTARTER: the VCD only. The same title, ignoring case and a leading disc ID, is the same game. Display only.
+Both
+List Title and Description
+The Title and Description from a game's CFG that a theme shows beside the game list. Theme: as the theme sets them. On: shown even if the theme turns them off. Off: hidden. The info page shows them either way.
+App Handoff Path
+Legacy: BDM apps receive massN:/...; other devices keep their normal launch paths. Typed: supported BDM apps receive usbN:/..., ataN:/..., ilinkN:/... or mx4sioN:/... when identified, otherwise massN:. Only the path passed to the app changes; ELF loading is unchanged. Per-app cfg: HANDOFFPATH=LEGACY or TYPED.
+Legacy (mass)
+Typed (usb0:, ata0:)
+Console i.LINK ID
+Native OPL core only; Neutrino ignores it. Enter 16 hexadecimal digits in byte order. Empty or all zeros uses this console's ID. This does not change i.LINK storage hardware.
+Console i.LINK ID must be empty or exactly 16 hexadecimal digits (0-9, A-F). Settings were not saved.
+The stored Console i.LINK ID is invalid and was ignored. This game will use the real console ID.
+%d: The SMB2 driver did not load. Browsing with SMBv1 instead until the next start.
+Protocol
+Access
+SMB Version
+BDM Devices Start Mode
+      Internal HDD (exFAT)
+      USB
+      MX4SIO
+      PC CARD CF (experimental)
+      DESR DVR (experimental)
+      iLink
+Network Connectivity
+      Protocol
+Applications Page Start Mode
+Favorites Page Start Mode
+VCD Games List Settings
+Send GameID on Launch
+Disc Artwork
+Background Art
+Art Delay
+Show GameID Barcode (Pixel FX)
+Neutrino Advanced Arguments
+HDD Spindown
+BDM Cache
+HDD Cache
+SMB Cache
+Selection: Colored
+Draws the selected row in the Selected Color. Off draws it in the same color as the other rows.
+Selection: Cursor
+Draws the small bar at the left edge of the selected row. Themes that underline the row have no cursor.
+Selection: Highlight
+Draws the bar behind the selected row, or the line under it in themes that use one.
+Show Legend
+Shows the button legend at the bottom of the menu and the info page. Off hides it in every theme; the buttons still work.
+User Wallpaper
+Draws wallpaper.png from the folder your settings are saved in behind the menu pages, in any theme. 512x512 at most, 8-bit (256 colour) palette.
+Ambient Effects
+Shows the seamless crystal light scene, plus a short convergence when launching. Off keeps static backgrounds and the original launch fade.
+User Wallpaper: no wallpaper.png in the settings folder. The theme's background is shown.
+User Wallpaper: wallpaper.png must be 512x512 at most with an 8-bit (256 colour) palette. The theme's background is shown.
+      MMCE beállítások
+POPSTARTER connects with SMBv1 for this game. The server in POPSTARTER Network Settings must accept SMBv1.
+Exit To
+PS2 Browser: opens the Browser, keeping the card's menu program (FMCB, OSDMenu) whenever it allows. OSDSYS (Skip Update): the console menu without the card's menu program. OSDSYS (With Update): the console's own exit. BOOT choices: run the named ELF from mc0:/BOOT, then mc1:/BOOT if needed.
+OSDSYS (With Update)
+PS2 Browser
+OSDSYS (Skip Update)
+Exit RiptOPL?
+Check for Updates
+Checking for updates...
+You have the newest build (%d).
+Download it again anyway?
+Build %d is available (you have %d). Download and install it?
+Downloading the update... %d KB
+Updated to build %d. It starts the next time you open RiptOPL.
+Could not identify the running ELF for a safe update. Start it from a memory card, MMCE, USB/exFAT or a full APA partition path.
+This build has no build number to compare with the release. Download the release from GitHub instead.
+The network is in use by UDPBD or UDPFS. Choose SMB, HTTP or Off as the network protocol, restart RiptOPL, then try again.
+No network. Check the cable and the network settings.
+Set the console's clock from Date and Time in the main menu. Secure connections need it.
+GitHub secure connection failed (error %d).
+Could not write the update. Is the device full? RiptOPL was not changed.
+The download did not match the release's checksum. RiptOPL was not changed.
+Could not replace the ELF. If RiptOPL does not start, copy it to the device again.
+Could not replace the ELF or put it back. The old one is %s.BAK beside it. Rename it back with a file manager.
+Date and Time
+Sets the console's clock, in the time zone chosen in the console's System Configuration.
+Date
+Time
+The clock was not set. Check the date and try again.
+Set from Internet
+Sets the console's clock from the Internet. The Time Zone row decides how it is shown.
+Getting the time from the Internet...
+The clock was set from the Internet.
+No time server answered. Check the cable and the network settings, then try again.
+- NFS Server -
+NFS Export
+The export on the NFS server, for example /srv/ps2, or / for the whole server. RiptOPL speaks NFS version 4.0 on port 2049.
+NFS Writes
+Off: RiptOPL only reads the export, whatever the server allows, keeps game settings next to its own and uses no VMC there. On: renaming, deleting, saving and VMCs on the export, where the server allows it.
+%d: Cannot connect to NFS server. It must offer NFS version 4.0 on port 2049.
+%d: The NFS server refused this PS2.
+%d: Cannot open the NFS export. Check NFS Export and the server address.
+This Neutrino has no NFS support -- launching with the OPL core.
+Neutrino cannot write a VMC on the NFS export -- launching with the OPL core.
+These NFS settings are beyond Neutrino's limits -- launching with the OPL core.
+NFS Writes is Off, so no VMC can be used on the export. The game saves to the real memory card.
+POPSTARTER cannot launch over NFS. Use Ember, or SMB, for this game.
+NFS Writes is Off, so Ember cannot keep memory card saves in this game's folder.
+mc?:/BOOT/BOOT2.ELF
+mc?:/BOOT/BOOT.ELF
+POPStarter uses MMCE Slot 1 while it is connected. Remove that card to launch this game from Slot 2.
+View/Filter
+Hold for Theme
+Tap for Filter
+Check for Updates needs the PS2 clock. Open Date and Time now?
+Could not connect to GitHub (error %d). Check the network's DNS and internet access.
+Could not verify GitHub's certificate (error %d). Check Date and Time in the main menu.
+GitHub returned an unusable update response (error %d).
+The GitHub update request timed out (error %d).
+Theme Settings
+Layout Settings
+Adjust Coverflow size, animation and dimming, or choose a Grid layout.
+Launch it now?
+The update is installed. Open RiptOPL again from your launcher.
+The ELF was installed, but version.txt could not be written (error %d). Check for Updates to retry only that file.
+Writing version.txt...
+Project Home:
+Time Zone
+Console follows the time zone and summer time set in the console's System Configuration. Pick another to show the clock in that zone instead.
+Console
+Summer Time
+Adds one hour to the chosen time zone.
+RetroAchievements Off
+Launch this game without RetroAchievements. The game starts as it does with RetroAchievements switched off. Other games keep it.

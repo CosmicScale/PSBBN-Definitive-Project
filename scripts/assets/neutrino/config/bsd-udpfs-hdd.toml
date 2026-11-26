@@ -1,0 +1,44 @@
+# Name of loaded config, to show to user
+name = "UDPFS driver with HDD support"
+
+# Drivers this driver depends on (config file must exist)
+depends = ["i_dev9_ns"]
+
+# Modules to load
+[[module]]
+file = "iomanX.irx"
+env = ["LE"]
+[[module]]
+file = "fileXio.irx"
+env = ["LE"]
+[[module]]
+file = "smap.irx"
+env = ["LE", "EE"]
+[[module]]
+file = "ministack.irx"
+args = ["ip=192.168.1.10"]
+env = ["LE", "EE"]
+[[module]]
+file = "udpfs_ioman.irx"
+env = ["LE"]
+[[module]]
+file = "udpfs_fhi.irx"
+env = ["EE"]
+
+# Faking strategy
+# ---------------
+# To allow games to use hdd:
+# - dev9 (no-shutdown) is resident, and can be used by hdd modules
+# - all networking modules are faked (we hope they are not used)
+[[fake]]
+file = "ENT_SMAP.IRX"
+name = "ent_smap"
+version = 0x021f
+loadrv = 0 # 0=ok, -xxx=error code (module not loaded)
+startrv = 2 # 0=RESIDENT_END, 1=NO_RESIDENT_END, 2=REMOVABLE_END
+[[fake]]
+file = "SMAP.IRX"
+name = "INET_SMAP_driver"
+version = 0x0219
+loadrv = 0 # 0=ok, -xxx=error code (module not loaded)
+startrv = 2 # 0=RESIDENT_END, 1=NO_RESIDENT_END, 2=REMOVABLE_END

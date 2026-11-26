@@ -17,6 +17,7 @@ games/APPS/*.elf
 games/APPS/*.ELF
 scripts/tmp
 scripts/assets/Hugopocked POPStarter Fixes (2023-08-11)/
+scripts/assets/dep/
 logs/
 *.log
 *.gz
@@ -71,3 +72,4 @@ media.cfg
 bnupdate.tar.gz
 path.cfg
 __pycache__/
+scripts/assets/OPL/user_id

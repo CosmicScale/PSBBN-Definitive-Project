@@ -1,1 +1,3 @@
-• PSBBN now supports downloading system updates directly to the PS2 console via a custom update server.
+• The PSBBN Game Collection now loads significantly faster. In tests using an SSD with approximately 200 games, loading previously took around 12 seconds. It is now virtually instantaneous!
+
+• The games list is now cached and only checked for changes when necessary. The first time the Game Collection is launched, or after games are installed or removed, loading will take longer.

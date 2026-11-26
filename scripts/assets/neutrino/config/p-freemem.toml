@@ -5,5 +5,6 @@ name = "Patch Max Free Memory 1M"
 # Load patch module that returns a limited amount of free IOP memory
 [[module]]
 file = "patch_freemem.irx"
+load_order = 31
 args = ["1024"] # 1MiB max free memory
 env = ["EE"]

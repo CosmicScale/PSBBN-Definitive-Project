@@ -1,1 +1,3 @@
-• PSBBN now allows you to download system updates directly to your PS2 console via a custom update server.
+• La Colección de juegos de PSBBN ahora se carga mucho más rápido. En las pruebas realizadas con un SSD que contenía aproximadamente 200 juegos, la carga tardaba antes unos 12 segundos. ¡Ahora es prácticamente instantánea!
+
+• La lista de juegos ahora se almacena en caché y solo se comprueba si hay cambios cuando es necesario. La primera vez que se inicia la Colección de juegos, o después de instalar o eliminar juegos, la carga tardará más tiempo.

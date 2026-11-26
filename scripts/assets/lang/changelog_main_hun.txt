@@ -1,15 +1,26 @@
-• Új lehetőség került hozzáadásra a PS2 ISO fájlok tömörítésére játékok telepítésekor. Engedélyezze ezt a lehetőséget a tárhely megtakarításához és ahhoz, hogy több játék férjen el a meghajtón.
+• Válasszon betöltőmotort (loadert) a PS2-játékokhoz játékindító helyett. Az OPL és a Neutrino közül választhat.
+• A külső eszközökön, például USB-meghajtókon vagy MMCE-n tárolt PS1-játékok mostantól megjeleníthetők a Játékgyűjteményben és a Browserben.
+• A több lemezes PS1-játékokból mostantól csak az első lemez jelenik meg a Játékgyűjteményben, a Browserben és a RiptOPL-ben.
+• További grafikák, köztük borítók, hátterek, logók és képernyőképek töltődnek le az OPL Manager Art Database adatbázisából, hogy megjelenhessenek a különböző játékbetöltőkben.
+• A CFG-fájlok teljes körűen ki lesznek töltve a játékok címeivel, leírásaival, videómódjaival, értékeléseivel és egyéb adataival, így részletesebb információkat nyújtanak a játékbetöltőben történő böngészés során.
 
-• Új lehetőség került hozzáadásra a PS2-játékok szélesvásznú javításainak telepítésére, amely a kompatibilis játékokban valódi 16:9-es szélesvásznú támogatást és nagyobb látómezőt biztosít.
+Ember – Az új PS1-emulátor a POPS és a POPStarter helyébe lép:
+• Támogatja a `bin/cue` formátumú játékokat. Többé nincs szükség a játékok `.vcd` formátumba konvertálására!
+• A játékon belüli menü megkönnyíti a lemezek cseréjét a több lemezes játékokban.
+• Többé nincs szükség az egyes játékokhoz külön kompatibilitási javításokra. A kompatibilitás jelentősen javult a POPStarterhez képest, így sok korábban játszhatatlan játék is működik.
+• Nem szükséges többé telepíteni az ATA BDM Assault Driver illesztőprogramot a PS2 memóriakártyájára.
+• A meglévő PS1-játékok telepítései automatikusan átkerülnek a POPS-ból az Emberbe, a mentési fájlokkal együtt.
 
-• Javult a homebrew alkalmazások telepítője. Az alkalmazásadatbázis kibővült, és már több mint 500 alkalmazás adatait tartalmazza, beleértve a nevüket, fejlesztőjüket, azonosítójukat és kategóriájukat.
+RiptOPL – A végleges Frankenstein PS2-betöltő az OPL, az NHDDL és a POPSLoader helyébe lép:
+• Háttérmotorként szolgál a PS2-játékok Játékgyűjteményből és Browserből történő indításához.
+• Támogatja mind a PS1-, mind a PS2-játékok indítását.
+• RetroAchievements-integráció a támogatott PS2-játékokhoz, az achievementek feloldásával és a haladás nyomon követésével.
+• Játékon belüli menü az achievementek megtekintéséhez, valamint a konzol újraindításához vagy kikapcsolásához.
+• Támogatja a játékok indítását az OPL, a Neutrino és az Ember core-ok használatával.
+• A betöltőmotor játékonként külön is kiválasztható.
 
-• A Játékválasztó mostantól a következő kategóriákba sorolja a homebrew alkalmazásokat: Emulátorok, Játékok, Demoscene, Alkalmazások, PS1 Alkalmazások, Rendszeralkalmazások, Diagnosztikai Eszközök, Hibakereső Alkalmazások és Futtatókörnyezetek. A kategóriák szabadon átrendezhetők az igényeinek megfelelően.
+A Neutrino frissült a v1.8.0-61-g7be8de2 verzióra:
+• Csalások (cheatek) támogatásának hozzáadása.
+• A szélesvásznú javítások mostantól azok számára is elérhetők, akik a Neutrinót választják betöltőmotorként.
 
-• Több mint 500 alkalmazásikon került hozzáadásra a HDD-OSD Ikonadatbázishoz. A telepítő mostantól letölti ezeket az ikonokat, hogy megjelenjenek a HOSDMenu Böngészőjében.
-
-• A Böngészőben található alkalmazások mostantól megjelenítik a kategóriájukat.
-
-• A R3CONFIGURATOR mostantól egy indítógombhoz van hozzárendelve, és a SELECT gomb nyomva tartásával indítható rendszerindításkor.
-
-• A kizárólag HOSDMenu-t használó felhasználók mostantól használhatják a „Kereszt és Kör gombok felcserélése” opciót az Opcionális Extrák menüben.
+A frissítéshez válassza az „Játékok és alkalmazások telepítése” lehetőséget a főmenüben.

@@ -26,21 +26,21 @@ body:
 
         **If you receive the "Failed to create games list" error:**
 
-        The `ISO`, `ZSO`, or `VCD` file being processed is likely invalid or corrupted. Remove the file from both the local folder on your PC and your PS2 drive, then try again.
+        The `ISO`, `ZSO`, or `BIN` file being processed is likely invalid or corrupted. Remove the file from both the local folder on your PC and your PS2 drive, then try again.
 
         To avoid this issue, make sure your game image is a verified good dump. Check the MD5 or SHA-1 checksum of your `ISO` or `BIN` file and confirm that it matches the corresponding entry on [redump.org](http://redump.org).
 
-        **If you are using [Windows](#installing-on-windows) and experience issues:**
+        **If you are using Windows and experience issues:**
 
         If the PSBBN Definitive Project menu displays squares instead of text, or the Game Selector menu does not render correctly, change the PowerShell font. Right-click the PowerShell title bar, open **Properties**, and select **Cascadia Mono** (Windows 11) or **MS Gothic** (Windows 10).
-        
+
         For other issues, continue with the troubleshooting steps below:
 
         1. Open PowerShell as an administrator and run the following command:
         ```
         wsl --unregister PSBBN
         ```
-        2. Download the latest version of the `PSBBN-Launcher-For-Windows.ps1` script [here](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
+        2. Download the latest version of the `PSBBN-Launcher-For-Windows.ps1` script [here](https://github.com/CosmicScale/PSBBN-Definitive-Project/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
         3. Ensure you have an active internet connection. If you are using a VPN, try disabling it
         4. Run the `PSBBN-Launcher-For-Windows.ps1` script again
 
@@ -61,7 +61,7 @@ body:
         3. If you still have issues, try a different drive
 
         ## Problems Launching PSBBN and HOSDMenu
-        When you connect the drive to your PS2 console and power it on, PSBBN or HOSDMenu should automatically launch.
+        When you connect the drive to your PS2 console and power it on, **PSBBN or HOSDMenu** should automatically launch.
 
         If your console boots to the regular OSD, freezes, or displays an error, you should try the following:
         1. Remove all PS2 Memory Cards from your console
@@ -70,46 +70,59 @@ body:
         4. Ensure the network or HDD adapter and drive are securely connected to the console
         5. If using a SATA mod, make sure it has been installed correctly
         6. Use a different drive and reinstall PSBBN or HOSDMenu
-        7. If your console has an IDE converter or SATA mod installed, try using a different converter or mod.
+        7. If your console has an IDE converter or SATA mod installed, try using a different converter or mod
         8. Use a different official Sony Network Adapter or third-party HDD adapter
         9. Use a different PS2 console
 
         ## Games Not Working
         Some games may fail to launch or exhibit compatibility issues. First, make sure your game image is a verified good dump. Check the MD5 or SHA-1 checksum of your `ISO` or `BIN` file and confirm that it matches the corresponding entry on [redump.org](http://redump.org).
 
-        If you selected OPL as your game launcher, try disabling cheats:
-        1. Launch OPL, highlight the game you are having issues with in the games list, and press △
+        For PS2 games, try disabling cheats and RetroAchievements in RiptOPL.
+
+        To disable cheat:
+        1. Highlight the game you are having issues with in the games list, and press △
         2. Select "Cheat Settings" and turn off "PS2RD Cheat Engine"
-        3. Save the changes and launch the game
-        
-        If you still experience problems with specific PS2 games, if you selected OPL as your game launcher, you can check for existing issues or report a new one [here](https://github.com/ps2homebrew/Open-PS2-Loader/issues). If you selected NHDDL, you can do so [here](https://github.com/rickgaiser/neutrino/issues).
+        3. Save the changes
+
+        To disable RetroAchievements:
+        1. Press *START* to access the menu and select "Settings"
+        2. Select "Network" and turn off "RetroAchievements telemetry"
+        3. Save the changes
+
+        If you still experience problems with specific PS2 games, if you selected **OPL** as your loader core, you can check for existing issues or report a new one [here](https://github.com/NathanNeurotic/RiptOPL/issues). If you selected [Neutrino](#neutrino), you can do so [here](https://github.com/rickgaiser/neutrino/issues).
+
+        If you experience problems with specific PS1 games, you can check for existing issues or report a new one [here](https://github.com/Gageformer/Ember/issues).
 
         If all PS1 or PS2 games fail to launch, follow the steps below:
 
         If games fail to launch from the Game Collection or Browser, try the following:
         1. If you have a mod chip, disable it
-        2. If you're having issues launching PS1 games, make sure you have correctly installed the **ATA BDM Assault drivers** on a PS2 Memory Card and that the card is inserted into your console. Installation instructions can be found [here](#https://github.com/CosmicScale/PSBBN-Definitive-Project#installing-ata-bdm-assault)
-        3. If you're having trouble launching PS2 games, remove all PS2 Memory Cards from your console and try again. If this resolves the issue, delete any `Your System Configuration` save files from the memory cards, as corrupted configuration data can prevent games from launching.
+        2. Remove all PS2 Memory Cards from your console and try again. If this resolves the issue, delete any `Your System Configuration` save files from the memory cards, as corrupted configuration data can prevent games from launching
         4. Check that the connectors on the console and Network or HDD Adapter are clean and free of dust or debris
         5. Ensure the Network or HDD adapter and drive are securely connected to the console
         6. If using a SATA mod, make sure it has been installed correctly
 
-        If games still fail to launch, try loading PS2 games using OPL or NHDDL, and PS1 games using POPSLoader.
+        If games still fail to launch, try loading games using RiptOPL.
 
-        If OPL freezes at startup, delete any existing OPL configuration files from your PS2 Memory Cards or connected USB devices. You can also hold `START` while OPL launches to bypass reading the configuration file.
+        If RiptOPL freezes at startup, delete any existing RiptOPL configuration files from your PS2 Memory Cards or connected USB devices. You can also hold `START` while RiptOPL launches to bypass reading the configuration file.
 
-        To display the games list in OPL, adjust the following settings:
+        To display the games list in RiptOPL, adjust the following settings:
         1. Settings > HDD (APA) Start Mode: Off
         2. Settings > BDM Start Mode: Auto
         3. Settings > BDM Devices > HDD (GPT/MBR): On
         4. Settings > Save Changes
 
-        If PS2 games do not appear in the games list in NHDDL or OPL (after modifying the OPL settings as described above), or PS1 games do not appear in POPSLoader, try the following:
+        If games do not appear in the games list in RiptOPL (after modifying the settings as described above), try the following:
         1. Connect the PS2 drive directly to your PC using an internal SATA connection or a different SATA-to-USB adapter, then reinstall PSBBN or HOSDMenu
         2. Use a different drive and reinstall PSBBN or HOSDMenu
         3. If your console has an IDE converter or SATA mod installed, try using a different converter or mod
         4. Use a different official Sony Network Adapter or third-party HDD adapter
         5. Use a different PS2 console
+
+        ## Problems with RetroAchievements
+        Not all PS2 games are compatible with RetroAchievements, and some may crash when it is enabled. If you experience issues with a particular game, try disabling RetroAchievements or closing the xeRAbora app while playing.
+
+        You can find more troubleshooting advice on the xeRAbora website [here](https://github.com/hacan359/xerabora/blob/main/docs/TROUBLESHOOTING.md).
 
         ## Known Issues
         - PSBBN will freeze at the "PlayStation 2" logo when booting, if a third-party, unofficial HDD adapter is used. **An official Sony Network Adapter is required**.
@@ -134,6 +147,9 @@ body:
         - `PSBBN-installer.log`
         - `hosdmenu.log`
         - `game-installer.log`
+        - `ps2-id.log`
+        - `ember-id.log`
+        - `pfs-pops-id.log`
         - `extras.log`
         - `media.log`
 

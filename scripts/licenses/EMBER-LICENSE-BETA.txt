@@ -1,0 +1,135 @@
+EMBER — PUBLIC BETA TESTING LICENCE
+Version 1.0
+
+Copyright (c) 2026 Gageformer. All rights reserved.
+
+Ember is a PlayStation 1 emulator for the PlayStation 2, created by Gageformer.
+This licence governs the pre-release ("beta") binary builds of Ember that are
+distributed under it. It does not grant any rights to Ember's source code,
+which is not published at this time.
+
+
+1. GRANT
+
+Permission is granted, free of charge, to any person obtaining a copy of an
+Ember beta build, to:
+
+  (a) download and retain copies of the build for personal use;
+  (b) install and run the build on hardware they own or are authorised to use;
+  (c) evaluate and test the build, and publicly discuss, review, stream, record
+      and publish screenshots or video of it, including for monetised channels;
+  (d) report bugs, compatibility results and feedback to the author.
+
+
+2. BUNDLING AND REDISTRIBUTION
+
+You MAY include an unmodified Ember build in a front-end, launcher, homebrew
+collection or similar project, and distribute it as part of that project,
+provided that ALL of the following are true:
+
+  (a) the build is included unmodified, complete, and with this licence file;
+  (b) Ember is clearly credited to Gageformer, by name, somewhere a user will
+      see it -- a readme, an about screen or a credits list is fine;
+  (c) a link to the official Ember release page is included with that credit;
+  (d) you do not charge money for your project, or for anything of which Ember
+      forms a part, and you do not solicit payment in exchange for supplying it;
+  (e) you do not present Ember, or any part of it, as your own work, and you do
+      not imply that your project is Ember itself or an official version of it.
+
+Building a launcher or front-end for Ember is actively encouraged, and needs no
+permission at all. Linking to the official release page is always welcome.
+
+If you want to do something this section does not allow -- including anything
+commercial -- just ask. Permission is usually granted.
+
+
+3. RESTRICTIONS
+
+Except as permitted in Sections 1 and 2, and without prior written permission
+from the author, you may NOT:
+
+  (a) sell, rent, lease, sublicense or otherwise commercially exploit the
+      build, or charge any fee for supplying it, including on preloaded
+      storage devices;
+  (b) monetise the distribution of Ember itself, whether directly or by
+      placing it behind paywalls, subscriptions, ad-gates or link lockers;
+  (c) modify, patch, translate, repackage or create derivative works of the
+      build;
+  (d) reverse engineer, decompile or disassemble the build, except to the
+      extent such restriction is prohibited by applicable law;
+  (e) remove, obscure or alter any copyright, licence or attribution notice;
+  (f) represent the build, or any part of it, as your own work, or present a
+      modified version as being the original Ember.
+
+For the avoidance of doubt: making videos, streams or written coverage of
+Ember is NOT "commercially exploiting the build", and remains permitted under
+Section 1 even on monetised channels.
+
+
+4. NO BIOS OR GAME CONTENT
+
+Ember contains no PlayStation BIOS image and no game data, and never will.
+Users must supply their own BIOS dump and their own disc images, obtained from
+hardware and media they lawfully own. Nothing in this licence authorises the
+copying or distribution of any third-party copyrighted work.
+
+
+5. PRE-RELEASE SOFTWARE
+
+Ember beta builds are unfinished software provided for testing. They may
+contain defects, may behave incorrectly, and may fail to preserve save data.
+Keep backups of anything you care about, including memory card files.
+
+
+6. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+7. SCOPE AND FUTURE RELEASES
+
+This licence applies to the Ember beta build it is distributed with, and
+continues to apply to that build permanently. It is not withdrawn or replaced
+by any later release.
+
+The author may release future versions of Ember, including source code, under
+different terms. Doing so does not alter the terms governing builds already
+released under this licence, and does not grant any additional rights in them.
+
+
+8. TRADEMARKS
+
+"PlayStation", "PlayStation 2", "PS1" and "PS2" are trademarks of Sony
+Interactive Entertainment Inc. Ember is an independent project and is not
+affiliated with, endorsed by, or sponsored by Sony Interactive Entertainment.
+
+
+9. ACKNOWLEDGEMENTS
+
+Ember is an independent emulator, written from scratch for the PlayStation 2.
+Its recompiler, memory model, geometry pipeline and graphics translation are
+original work.
+
+Where the PlayStation's hardware behaviour is subtle, the open-source emulator
+DuckStation (https://github.com/stenzek/duckstation) was consulted as a
+correctness reference -- a known-good implementation to compare measured
+behaviour against. In a small number of components, individual routines are
+currently derived from it, and those places are identified in Ember's source.
+The intent is to replace them with original implementations over time.
+
+Ember is not a fork or port of DuckStation, and is not affiliated with or
+endorsed by it. Credit is given here in recognition of the value that project
+has to everyone working in this space.
+
+
+10. CONTACT
+
+For permission to do anything this licence does not allow -- most likely a
+commercial use, since non-commercial bundling is already permitted under
+Section 2 -- please contact the author. Such requests are welcome, and the
+answer is usually yes.

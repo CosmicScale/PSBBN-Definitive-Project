@@ -12,4 +12,5 @@ env = ["LE"]
 # Modules to load in emulation environment
 [[module]]
 file = "fhi_bd.irx"
+load_order = 10
 env = ["EE"]

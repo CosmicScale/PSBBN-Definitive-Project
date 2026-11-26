@@ -1,15 +1,26 @@
-• Se ha añadido una opción para comprimir archivos ISO de PS2 al instalar juegos. Active esta opción para ahorrar espacio y almacenar más juegos en su unidad.
+• Selecciona un núcleo de carga para los juegos de PS2 en lugar de un lanzador de juegos. Puedes elegir entre OPL y Neutrino.
+• Los juegos de PS1 almacenados en dispositivos externos, como unidades USB o MMCE, ahora se pueden mostrar en la Colección de juegos y en el Navegador.
+• Los juegos de PS1 multidisco ahora muestran únicamente el primer disco en la Colección de juegos, el Navegador y RiptOPL.
+• Se descargan ilustraciones adicionales, como carátulas, fondos, logotipos y capturas de pantalla, desde la base de datos de ilustraciones de OPL Manager para mostrarlas en los distintos cargadores de juegos.
+• Los archivos CFG se completan con los títulos de los juegos, descripciones, modos de vídeo, valoraciones y mucho más, proporcionando información más detallada al explorar los juegos desde un cargador.
 
-• Se ha añadido una opción para instalar parches panorámicos para juegos de PS2, habilitando compatibilidad real con formato 16:9 y un campo de visión más amplio en los juegos compatibles.
+Ember - El nuevo emulador de PS1 sustituye a POPS y POPStarter:
+• Compatible con juegos en formato `bin/cue`. ¡Ya no es necesario convertir los juegos a `.vcd`!
+• Un menú dentro del juego facilita el cambio de disco en los juegos multidisco.
+• Ya no se necesitan parches de compatibilidad específicos para cada juego. La compatibilidad ha mejorado considerablemente con respecto a POPStarter, y muchos juegos que antes no se podían ejecutar ahora funcionan.
+• Ya no es necesario instalar el ATA BDM Assault Driver en la tarjeta de memoria de PS2.
+• Las instalaciones existentes de juegos de PS1 se migran automáticamente de POPS a Ember, incluidos sus archivos de guardado.
 
-• Se ha mejorado el instalador de aplicaciones homebrew. La base de datos de aplicaciones se ha ampliado y ahora contiene información de más de 500 aplicaciones, incluyendo su título, desarrollador, ID de título y categoría.
+RiptOPL - El definitivo cargador Frankenstein de PS2 sustituye a OPL, NHDDL y POPSLoader:
+• Actúa como backend para iniciar juegos de PS2 desde la Colección de juegos y el Navegador.
+• Permite iniciar tanto juegos de PS1 como de PS2.
+• Integración con RetroAchievements para los juegos de PS2 compatibles, con desbloqueo de logros y seguimiento del progreso.
+• Un menú dentro del juego permite consultar los logros y reiniciar o apagar la consola.
+• Permite iniciar juegos utilizando los núcleos OPL, Neutrino y Ember.
+• Permite elegir el núcleo de carga de forma individual para cada juego.
 
-• El Selector de Juegos ahora divide las aplicaciones homebrew en las siguientes categorías: Emuladores, Juegos, Demoscene, Aplicaciones, Aplicaciones de PS1, Aplicaciones del Sistema, Herramientas de Diagnóstico, Aplicaciones de Depuración y Entornos de Ejecución. Puede reorganizar libremente las categorías según sus preferencias.
+Neutrino actualizado a la versión v1.8.0-61-g7be8de2:
+• Se añade compatibilidad con trucos.
+• Los parches de pantalla panorámica ahora también están disponibles para los usuarios que seleccionen Neutrino como núcleo de carga.
 
-• Se han añadido más de 500 iconos de navegador para aplicaciones a la Base de Datos de Iconos HDD-OSD. El instalador ahora descarga estos iconos para mostrarlos en el Navegador de HOSDMenu.
-
-• Las aplicaciones del Navegador ahora muestran la categoría a la que pertenecen.
-
-• R3CONFIGURATOR ahora está asignado a una tecla de arranque y puede iniciarse durante el arranque manteniendo pulsado el botón SELECT.
-
-• Los usuarios que utilicen únicamente HOSDMenu ahora pueden usar la opción «Reasignar los botones Cruz y Círculo» en el menú Extras Opcionales.
+Para actualizar, selecciona «Instalar juegos y aplicaciones» en el menú principal.

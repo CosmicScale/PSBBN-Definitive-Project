@@ -1,15 +1,26 @@
-• Ajout d’une option permettant de compresser les fichiers ISO PS2 lors de l’installation des jeux. Activez cette option pour économiser de l’espace et stocker davantage de jeux sur votre disque.
+• Sélectionnez un cœur de chargement pour les jeux PS2 au lieu d'un lanceur de jeux. Choisissez entre OPL et Neutrino.
+• Les jeux PS1 stockés sur des périphériques externes, tels que les clés USB ou les MMCE, peuvent désormais être affichés dans la Bibliothèque de Jeux et le Navigateur.
+• Les jeux PS1 à plusieurs disques n'affichent désormais que le premier disque dans la Bibliothèque de Jeux, le Navigateur et RiptOPL.
+• Des illustrations supplémentaires, notamment des jaquettes, des arrière-plans, des logos et des captures d'écran, sont téléchargées depuis la base de données d'illustrations d'OPL Manager afin d'être affichées dans différents chargeurs de jeux.
+• Les fichiers CFG sont désormais entièrement renseignés avec les titres des jeux, les descriptions, les modes vidéo, les notes et bien plus encore, offrant ainsi des informations plus détaillées lors de la navigation dans les jeux depuis un chargeur.
 
-• Ajout d’une option permettant d’installer des correctifs écran large pour les jeux PS2, offrant une véritable prise en charge du format 16:9 avec un champ de vision élargi dans les jeux compatibles.
+Ember - Le nouvel émulateur PS1 qui remplace POPS et POPStarter :
+• Prend en charge les jeux au format `bin/cue`. Plus besoin de convertir les jeux en `.vcd` !
+• Un menu en jeu facilite le changement de disque dans les jeux à plusieurs disques.
+• Plus besoin de correctifs de compatibilité spécifiques à chaque jeu. La compatibilité est considérablement améliorée par rapport à POPStarter, et de nombreux jeux auparavant injouables fonctionnent désormais.
+• Plus besoin d'installer le pilote ATA BDM Assault Driver sur la carte mémoire de votre PS2.
+• Les installations existantes de jeux PS1 sont automatiquement migrées de POPS vers Ember, y compris leurs fichiers de sauvegarde.
 
-• Amélioration de l’installateur des applications homebrew. La base de données des applications a été enrichie et contient désormais des informations sur plus de 500 applications, notamment leur titre, développeur, identifiant de titre et catégorie.
+RiptOPL - Le chargeur PS2 Frankenstein ultime qui remplace OPL, NHDDL et POPSLoader :
+• Sert de moteur d'exécution pour lancer les jeux PS2 depuis la Bibliothèque de Jeux et le Navigateur.
+• Prend en charge le lancement des jeux PS1 et PS2.
+• Intégration de RetroAchievements pour les jeux PS2 compatibles, avec déblocage des succès et suivi de la progression.
+• Un menu en jeu permet de consulter les succès et de réinitialiser ou d'éteindre la console.
+• Prend en charge le lancement des jeux à l'aide des cœurs OPL, Neutrino et Ember.
+• Possibilité de choisir le cœur de chargement individuellement pour chaque jeu.
 
-• Le Sélecteur de Jeux répartit désormais les applications homebrew dans les catégories suivantes : Émulateurs, Jeux, Demoscene, Applications, Applications PS1, Applications système, Outils de diagnostic, Applications de débogage et Environnements d’exécution. Vous pouvez réorganiser librement les catégories selon vos préférences.
+Neutrino mis à jour vers la version v1.8.0-61-g7be8de2 :
+• Ajout de la prise en charge des codes de triche.
+• Les correctifs grand écran sont désormais disponibles pour les utilisateurs ayant choisi Neutrino comme cœur de chargement.
 
-• Plus de 500 icônes de navigateur pour les applications ont été ajoutées à la base de données d’icônes HDD-OSD. L’installateur télécharge désormais ces icônes afin qu’elles soient affichées dans le Navigateur de HOSDMenu.
-
-• Les applications affichées dans le Navigateur indiquent désormais la catégorie à laquelle elles appartiennent.
-
-• R3CONFIGURATOR est désormais associé à une touche de démarrage et peut être lancé au démarrage en maintenant le bouton SELECT enfoncé.
-
-• Les utilisateurs de HOSDMenu uniquement peuvent désormais utiliser l’option « Réaffecter les boutons Croix et Rond » dans le menu Extras optionnels.
+Pour effectuer la mise à jour, sélectionnez « Installer jeux et applications » dans le menu principal.

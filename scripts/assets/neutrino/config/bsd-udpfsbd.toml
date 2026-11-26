@@ -1,0 +1,26 @@
+# RiptOPL-supplied Neutrino backing-store config for UDPFS (the UDPRDMA block-device transport).
+#
+# Neutrino ships udpfs_bd.irx but has no built-in -bsd token for it (it's only a commented
+# alternative inside the stock bsd-udpbd.toml). RiptOPL launches UDPFS games with -bsd=udpfsbd,
+# so copy THIS file into your Neutrino install's config/ folder, e.g.:
+#     mc?:/neutrino/config/bsd-udpfsbd.toml
+# It mirrors Neutrino's stock bsd-udpbd.toml but loads udpfs_bd.irx (UDPRDMA) instead of
+# udpbd.irx (SUDPBDv2). Edit the ip= line below to your PS2's static IP if needed.
+
+# Name of loaded config, to show to user
+name = "UDPFS BDM driver (UDPRDMA)"
+
+# Drivers this driver depends on (config file must exist)
+depends = ["i_bdm", "i_dev9_hidden"]
+
+# Modules to load
+[[module]]
+file = "smap.irx"
+env = ["LE", "EE"]
+[[module]]
+file = "ministack.irx"
+args = ["ip=192.168.1.10"]
+env = ["LE", "EE"]
+[[module]]
+file = "udpfs_bd.irx"
+env = ["LE", "EE"]

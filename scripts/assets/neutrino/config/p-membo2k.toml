@@ -5,5 +5,6 @@ name = "Patch memory buffer overrun - 2048 bytes"
 # Load patch module that fixes this game bug
 [[module]]
 file = "patch_membo.irx"
-args = ["3"] # 0=256 (default), 1=512, 2=1K, 3=2K ... 9=128K
+load_order = 31
+args = ["8"] # number of 256 byte blocks of guard band to add after each IOP memory allocation (0-9, default 1)
 env = ["EE"]

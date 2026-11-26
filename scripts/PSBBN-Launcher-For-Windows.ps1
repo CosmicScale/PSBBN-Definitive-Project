@@ -10,7 +10,7 @@ param(
 )
 
 # the version of this script itself, useful to know if a user is running the latest version
-$version = "1.3.1"
+$version = "1.3.2"
 
 # the label of the WSL machine. Still based on Debian, but this label makes sure we get the
 # machine created by this script and not some pre-existing Debian the user had.
@@ -21,7 +21,7 @@ $wslLabel = "PSBBN"
 $oplVolumeName = "OPL"
 
 # a list of subfolders to be created in the main folder if missing
-$defaultFolders = @('DVD', 'CD', 'POPS', 'APPS', 'music', 'movie', 'photo')
+$defaultFolders = @('DVD', 'CD', 'Ember', 'POPS', 'APPS', 'music', 'movie', 'photo')
 
 # the specific git branch to be checked out
 $gitBranch = "main"
@@ -886,8 +886,8 @@ function getTargetPath {
   Write-Host "
     📀 PS2 DVD → /DVD (.iso, .zso)
     💿 PS2 CD → /CD (.bin+.cue, .iso, .zso)
-    💿 PS1 → /POPS (.bin+.cue, .VCD)
-    🎮 POPStarter → /POPS (SB.*.ELF)
+    💿 PS1 → /Ember (.bin+.cue, .VCD)
+    🎮 POPSTARTER.ELF → /POPS (SB.*.ELF XX.*.ELF)
     🛠️ Homebrew → /APPS (.elf, SAS .psu)
     🎵 Music → /music (.mp3, .m4a, .flac, .ogg)
     🎬 Video → /movie (.mp4, .m4v, .mkv, .vob, .mpg, ...)

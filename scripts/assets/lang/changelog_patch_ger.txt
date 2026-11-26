@@ -1,1 +1,3 @@
-• PSBBN unterstützt jetzt das Herunterladen von Systemupdates direkt auf die PS2-Konsole über einen benutzerdefinierten Update-Server.
+• Die PSBBN-Spielesammlung lädt jetzt deutlich schneller. Bei Tests mit einer SSD und etwa 200 Spielen dauerte das Laden zuvor ungefähr 12 Sekunden. Jetzt erfolgt es praktisch sofort!
+
+• Die Spielliste wird jetzt zwischengespeichert und nur bei Bedarf auf Änderungen überprüft. Beim ersten Start der Spielesammlung sowie nach der Installation oder dem Entfernen von Spielen dauert das Laden länger.

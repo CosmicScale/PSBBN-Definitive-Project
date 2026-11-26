@@ -1,0 +1,5 @@
+RiptOPL ORBIT RA handoff v1
+NULD (formerly ORBIT) Neutrino RA runtime by Daniel (danielnuld), based on Neutrino by Maximus32
+and xeRAbora's protocol by hacan359. AFL-3.0; see LICENSE.
+Source: https://github.com/danielnuld/nuld/tree/dd27a63006030ce07b31327b5cdeaedc09865d2b/third_party/neutrino-igr
+Pinned release and archive SHA-256: see ORBIT-RA.json.

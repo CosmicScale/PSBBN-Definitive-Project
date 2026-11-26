@@ -354,7 +354,7 @@ hdd_osd_files_present() {
     )
 
     for file in "${files[@]}"; do
-        if [[ ! -f "${ASSETS_DIR}/extras/$file" ]]; then
+        if [[ ! -f "${ASSETS_DIR}/dep/$file" ]]; then
             return 1  # false
         fi
     done
@@ -367,20 +367,20 @@ download_files() {
     if hdd_osd_files_present; then
         echo "All required files are present. Skipping download" >> "${LOG_FILE}"
     else
-        echo "Required files are missing in ${ASSETS_DIR}/extras." >> "${LOG_FILE}"
-        # Check if extras.zip exists
-        if [[ -f "${ASSETS_DIR}/extras.zip" && ! -f "${ASSETS_DIR}/extras.zip.st" ]]; then
-            echo "extras.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-            bsdtar -xf "${ASSETS_DIR}/extras.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+        echo "Required files are missing in ${ASSETS_DIR}/dep." >> "${LOG_FILE}"
+        # Check if dep.zip exists
+        if [[ -f "${ASSETS_DIR}/dep.zip" && ! -f "${ASSETS_DIR}/dep.zip.st" ]]; then
+            echo "dep.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
+            bsdtar -xf "${ASSETS_DIR}/dep.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
         else
             echo "Downloading..." >> "${LOG_FILE}"
-            echo -n "${UI_TEXT[DOWNLOAD_LATEST_FILE_2]}..."
-            wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/extras.zip" https://archive.org/download/psbbn-definitive-english-patch-v2/extras.zip
+            echo -n "${UI_TEXT[DOWNLOAD_LATEST_FILE_2]} dep.zip"
+            wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/dep.zip" https://archive.org/download/psbbn-definitive-project-dependencies/dep.zip
             echo
-            if [[ -s "${ASSETS_DIR}/extras.zip" ]]; then
-                bsdtar -xf "${ASSETS_DIR}/extras.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+            if [[ -s "${ASSETS_DIR}/dep.zip" ]]; then
+                bsdtar -xf "${ASSETS_DIR}/dep.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
             else
-                rm "${ASSETS_DIR}/extras.zip"
+                rm "${ASSETS_DIR}/dep.zip"
                 echo "[X] Error: Download failed for HDD-OSD." >> "${LOG_FILE}" 2>&1
                 error_msg "${UI_TEXT[ERROR_LATEST_FILE_1]} HDD-OSD." "${UI_TEXT[GET_LATEST_FILE_3]}"
             fi
@@ -699,7 +699,7 @@ cp "${ASSETS_DIR}/osdmenu/hosdmenu.elf" "${STORAGE_DIR}/__system/osdmenu/" 2>> "
     echo "[X] Error: Failed to copy hosdmenu.elf." 2>> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_COPY]} hosdmenu.elf."
 }
-cp "${ASSETS_DIR}/extras"/{OSDSYS_A.XLF,FNTOSD,ICOIMAGE,JISUCS,SKBIMAGE,SNDIMAGE,TEXIMAGE} "${STORAGE_DIR}/__system/osd100/" 2>> "${LOG_FILE}" || {
+cp "${ASSETS_DIR}/dep"/{OSDSYS_A.XLF,FNTOSD,ICOIMAGE,JISUCS,SKBIMAGE,SNDIMAGE,TEXIMAGE} "${STORAGE_DIR}/__system/osd100/" 2>> "${LOG_FILE}" || {
     echo "[X] Error: Failed to copy HDD-OSD." 2>> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_COPY]} HDD-OSD."
 }
@@ -812,7 +812,7 @@ sudo umount -l "${STORAGE_DIR}/recovery" 2>> "${LOG_FILE}"
 CHECK_PARTITIONS
 MOUNT_OPL
 
-if ! mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl}; then
+if ! mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl,Ember/games}; then
     echo "[X] Error: Failed to create OPL folders." >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_OPL_FOLDER]}"
 fi

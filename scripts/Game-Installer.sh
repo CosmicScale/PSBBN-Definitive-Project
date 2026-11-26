@@ -41,10 +41,9 @@ SCRIPTS_DIR="${TOOLKIT_PATH}/scripts"
 HELPER_DIR="${SCRIPTS_DIR}/helper"
 ASSETS_DIR="${SCRIPTS_DIR}/assets"
 LANG_DIR="${ASSETS_DIR}/lang"
-POPSTARTER="${ASSETS_DIR}/POPStarter/POPSTARTER.ELF"
 POPS_DIR="${SCRIPTS_DIR}/tmp/POPS"
-POP_FIXES="${ASSETS_DIR}/Hugopocked POPStarter Fixes (2023-08-11)/POPS Game Fixes"
 NEUTRINO_DIR="${ASSETS_DIR}/neutrino"
+DATABASE_DIR="${ASSETS_DIR}/database"
 LOGS_DIR="${TOOLKIT_PATH}/logs"
 LOG_FILE="${LOGS_DIR}/game-installer.log"
 MISSING_ART="${LOGS_DIR}/missing-art.log"
@@ -60,12 +59,12 @@ if [[ "$(uname -s)" == Darwin ]]; then
 fi
 OPL="${SCRIPTS_DIR}/OPL"
 PFS_POPS_LIST="${SCRIPTS_DIR}/tmp/pfs-pops.list"
-ATA_POPS_LIST="${SCRIPTS_DIR}/tmp/ata-pops.list"
+EMBER_LIST="${SCRIPTS_DIR}/tmp/ember.list"
 PS1_LIST="${SCRIPTS_DIR}/tmp/ps1.list"
 PS1_JPN_LIST="${SCRIPTS_DIR}/tmp/ps1-jpn.list"
 PS2_LIST="${SCRIPTS_DIR}/tmp/ps2.list"
 PS2_JPN_LIST="${SCRIPTS_DIR}/tmp/ps2-jpn.list"
-SMB_POPS_LIST="${SCRIPTS_DIR}/tmp/smb-pops.list"
+EXT_POPS_LIST="${SCRIPTS_DIR}/tmp/ext-pops.list"
 POPS_JPN_LIST="${SCRIPTS_DIR}/tmp/pops-jpn.list"
 TMP_LIST="${SCRIPTS_DIR}/tmp/tmp.list"
 ALL_TITLES="${SCRIPTS_DIR}/tmp/titles.list"
@@ -74,12 +73,13 @@ APPS_LIST="${SCRIPTS_DIR}/tmp/app.list"
 PS1_DATABASE="${ASSETS_DIR}/database/TitlesDB_PS1.csv"
 OSDMENU_CNF="${SCRIPTS_DIR}/tmp/OSDMENU.CNF"
 OSDMBR_CNF="${SCRIPTS_DIR}/tmp/OSDMBR.CNF"
+OPLMS='https://oplmanager.com/API/V6/OplManagerService.asmx'
 
 arch="$(uname -m)"
 
 if [[ "$arch" = "x86_64" ]]; then
     # x86-64
-    CUE2POPS="${HELPER_DIR}/cue2pops"
+    POPS2CUE="${HELPER_DIR}/pops2cue"
     HDL_DUMP="${HELPER_DIR}/HDL Dump.elf"
     MKFS_EXFAT="${HELPER_DIR}/mkfs.exfat"
     PFS_FUSE="${HELPER_DIR}/PFS Fuse.elf"
@@ -89,7 +89,7 @@ if [[ "$arch" = "x86_64" ]]; then
     SQLITE="${HELPER_DIR}/sqlite"
 elif [[ "$arch" = "aarch64" ]]; then
     # ARM64
-    CUE2POPS="${HELPER_DIR}/aarch64/cue2pops"
+    POPS2CUE="${HELPER_DIR}/aarch64/pops2cue"
     HDL_DUMP="${HELPER_DIR}/aarch64/HDL Dump.elf"
     MKFS_EXFAT="${HELPER_DIR}/aarch64/mkfs.exfat"
     PFS_FUSE="${HELPER_DIR}/aarch64/PFS Fuse.elf"
@@ -329,7 +329,7 @@ exit_script() {
     
     clean_up
     if [[ -n "$path_arg" ]]; then
-        cp "${LOG_FILE}" "${path_arg}" > /dev/null 2>&1
+        cp "${LOG_FILE}" "${LOGS_DIR}/ps2-id.log" "${LOGS_DIR}/ember-id.log" "${LOGS_DIR}/pfs-pops-id.log" "${path_arg}" > /dev/null 2>&1
     fi
 }
 
@@ -352,6 +352,26 @@ show_progress() {
 
     printf "\r%3d%%|%s| %d/%d" \
         "$percent" "$bar" "$current" "$total"
+}
+
+download_files() {
+    # Check if dep.zip exists
+    if [[ -f "${ASSETS_DIR}/dep.zip" && ! -f "${ASSETS_DIR}/dep.zip.st" ]]; then
+        echo "dep.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
+        bsdtar -xf "${ASSETS_DIR}/dep.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+    else
+        echo "Downloading..." >> "${LOG_FILE}"
+        echo -n "${UI_TEXT[DOWNLOAD_LATEST_FILE_2]} dep.zip"
+        wget --quiet --timeout=10 --tries=3 -O "${ASSETS_DIR}/dep.zip" https://archive.org/download/psbbn-definitive-project-dependencies/dep.zip
+        echo
+        if [[ -s "${ASSETS_DIR}/dep.zip" ]]; then
+            bsdtar -xf "${ASSETS_DIR}/dep.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1
+        else
+            rm "${ASSETS_DIR}/dep.zip"
+            echo "[X] Warning: Download failed for PS1 BIOS." >> "${LOG_FILE}" 2>&1
+            error_msg "Warning" "${UI_TEXT[ERROR_LATEST_FILE_1]} PS1 BIOS." "${UI_TEXT[GET_LATEST_FILE_3]}"
+        fi
+    fi
 }
 
 UNMOUNT_OPL() {
@@ -383,7 +403,7 @@ MOUNT_OPL() {
     fi
 
     # Create necessary folders if they don't exist
-    mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl} 2>>"${LOG_FILE}" || {
+    mkdir -p "${OPL}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,nhddl,Ember/games} 2>>"${LOG_FILE}" || {
         echo "[X] Error: Failed to create OPL folders." >> "${LOG_FILE}"
         error_msg "Error" "${UI_TEXT[ERROR_OPL_FOLDER]}"
     }
@@ -475,37 +495,27 @@ process_psu_files() {
     fi
 }
 
-POPS_PATCH_DL() {
-    wget -O "$ASSETS_DIR/Hugopocked_POPStarter_Fixes.rar" "$(
-        wget -qO- 'https://www.mediafire.com/file/rznkr05pci45w5p/Hugopocked_POPStarter_Fixes_%25282023-08-11%2529.rar/file' \
-        | grep -o 'https://download[^"]*Hugopocked+POPStarter+Fixes+%282023-08-11%29.rar' | head -n1)"
-
-    bsdtar -xf "${ASSETS_DIR}/Hugopocked_POPStarter_Fixes.rar" -C "$ASSETS_DIR"
-}
-
 CREATE_PS1_VMC() {
-
+    local games_dir="${OPL}/Ember/games"
+    local folder file extension
+    local -a cue_files
     declare -A disc_groups
-    declare -A first_disc_folder
     declare -A vmc_groups_by_id
+    declare -A processed_disc_groups
+    declare -A removed_folders
     current_group=""
-    vmc_count="0"
 
     SPLASH
     echo >> "${LOG_FILE}"
-    echo "Creating VMCs for PS1 games and applying Hugopocked POPStarter fixes..." >> "${LOG_FILE}"
-    echo "${UI_TEXT[CREATE_PS1_VMC]}"
-    if ! mkdir -p "${POPS_DIR}"; then
-        echo "[X] Error: Failed to create VMC folder." >> "${LOG_FILE}"
-        error_msg "Error" "${UI_TEXT[ERROR_CREATE_PS1_VMC]}"
-    fi
+    echo "Creating VMCs for PS1 games..." >> "${LOG_FILE}"
+    echo -n "${UI_TEXT[CREATE_PS1_VMC]}"
 
     # First pass: Group file names by base title
-    exec 3< "${ATA_POPS_LIST}"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
+    exec 3< "${EMBER_LIST}"
+    while IFS='|' read -r title game_id publisher disc_type folder_name jpn_title partition_label <&3; do
         base_title="${title%%(Disc*}"
         base_title="${base_title%" "}"  # Remove trailing space
-        disc_groups["$base_title"]+="$title|$file_name"$'\n'
+        disc_groups["$base_title"]+="$title|$folder_name"$'\n'
     done
     exec 3<&-
 
@@ -523,91 +533,191 @@ CREATE_PS1_VMC() {
     done
     exec 3<&-
 
-    # Second pass: Create folders, DISCS.TXT, and VMCDIR.TXT
-    exec 3< "$ATA_POPS_LIST"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
-        folder_name="${file_name%.*}"
+    # Process multi-disc games
+    exec 3< "$EMBER_LIST"
+    while IFS='|' read -r title game_id publisher disc_type folder_name jpn_title partition_label <&3; do
         base_title="${title%%(Disc*}"
         base_title="${base_title%" "}"
-        mkdir -p "${POPS_DIR}/$folder_name"
-        cd "${POPS_DIR}/$folder_name"
 
-        if [ -d "$ASSETS_DIR/Hugopocked POPStarter Fixes (2023-08-11)" ]; then
-            patch_path=""
-        
-            while IFS= read -r line; do
-                if [[ "$line" == /* ]]; then
-                    patch_folder="${line#/}"
-                    patch_path="$POP_FIXES/$patch_folder"
-                elif [[ "$line" == "$game_id" ]]; then
-                    echo "Applying patches for $game_id from $patch_folder" >> "${LOG_FILE}"
-                    cp -nv "$patch_path"/*.BIN . >> "${LOG_FILE}" 2>&1
-                    break
+        # Process each multi-disc group only once
+        [[ ${processed_disc_groups[$base_title]+yes} ]] && continue
+        processed_disc_groups["$base_title"]=1
+
+        # Split the group into individual entries
+        entries=()
+        mapfile -t entries <<< "${disc_groups[$base_title]}"
+
+        ((${#entries[@]} > 1)) || continue
+
+        # Identify the entry with the lowest disc number
+        first_entry=""
+        lowest_disc=""
+
+        for entry in "${entries[@]}"; do
+            entry_title="${entry%%|*}"
+
+            if [[ "$entry_title" =~ \(Disc[[:space:]]*([0-9]+)\) ]]; then
+                disc_number="${BASH_REMATCH[1]}"
+
+                if [[ -z "$lowest_disc" ]] || (( disc_number < lowest_disc )); then
+                    lowest_disc="$disc_number"
+                    first_entry="$entry"
                 fi
-            done < ${ASSETS_DIR}/database/POP-game-fixes.list
-        else
-            echo
-            echo "[X] Warning: Hugopocked POPStarter Fixes not present." >> "${LOG_FILE}"
-        fi
+            fi
+        done
 
-        # Prepare disc list for DISCS.TXT
-        IFS=$'\n' read -rd '' -a entries <<< "${disc_groups[$base_title]}"
-        if ((${#entries[@]} > 1)); then
-            # Determine first disc folder
-            first_entry="${entries[0]}"
-            first_file_name="${first_entry##*|}"
-            first_folder="${first_file_name%.*}"
+        # Skip if no valid disc number was found
+        [[ -n "$first_entry" ]] || continue
 
-            # Prepare up to 4 lines for DISCS.TXT
-            disc_list=()
-            for ((i = 0; i < ${#entries[@]} && i < 4; i++)); do
-                disc_list+=("${entries[i]##*|}")
-            done
+        first_folder="${first_entry##*|}"
+        first_path="${OPL}/Ember/games/${first_folder}"
 
-            # Write DISCS.TXT in the first 4 folders only
-            for ((i = 0; i < ${#disc_list[@]}; i++)); do
-                disc_file_name="${entries[i]##*|}"
-                disc_folder="${disc_file_name%.*}"
-                mkdir -p "${POPS_DIR}/$disc_folder"
-                printf "%s\n" "${disc_list[@]}" > "${POPS_DIR}/$disc_folder/DISCS.TXT"
-            done
+        [[ -d "$first_path" ]] || continue
 
-            # Write VMCDIR.TXT in all folders
-            for disc_entry in "${entries[@]}"; do
-                disc_file_name="${disc_entry##*|}"
-                disc_folder="${disc_file_name%.*}"
-                mkdir -p "${POPS_DIR}/$disc_folder"
-                printf "%s" "$first_folder" > "${POPS_DIR}/$disc_folder/VMCDIR.TXT"
-            done
+        # First pass: collect every disc's CUE filename
+        disc_list=()
 
-            # Overwrite VMCDIR.TXT in all discs with the group ID if it exists and create group VMC
-            if [[ -n "${vmc_groups_by_id[$game_id]}" ]]; then
-                VMC_GROUP_FOLDER="${vmc_groups_by_id[$game_id]}"
-                mkdir -p "${POPS_DIR}/$VMC_GROUP_FOLDER"
-                #cd "${POPS_DIR}/$VMC_GROUP_FOLDER"
-                for disc_entry in "${entries[@]}"; do
-                    disc_file_name="${disc_entry##*|}"
-                    disc_folder="${disc_file_name%.*}"
-                    mkdir -p "${POPS_DIR}/$disc_folder"
-                    printf "%s" "${vmc_groups_by_id[$game_id]}" > "${POPS_DIR}/$disc_folder/VMCDIR.TXT"
+        for ((i = 0; i < ${#entries[@]}; i++)); do
+            disc_entry="${entries[i]}"
+            disc_folder="${disc_entry##*|}"
+            disc_path="${OPL}/Ember/games/${disc_folder}"
+
+            cue_file=""
+
+            if [[ -d "$disc_path" ]]; then
+                for file in "$disc_path"/*; do
+                    [[ -f "$file" ]] || continue
+
+                    extension="${file##*.}"
+                    if [[ "${extension,,}" == "cue" ]]; then
+                        cue_file="${file##*/}"
+                        break
+                    fi
                 done
             fi
-        else
-            # Check if game ID exists in VMC group mapping and make group VMC if necessary
-            if [[ -n "${vmc_groups_by_id[$game_id]}" ]]; then
-                VMC_GROUP_FOLDER="${vmc_groups_by_id[$game_id]}"
-                mkdir -p "${POPS_DIR}/$VMC_GROUP_FOLDER"
-                #cd "${POPS_DIR}/$VMC_GROUP_FOLDER"
-                printf "%s" "${vmc_groups_by_id[$game_id]}" > "${POPS_DIR}/$folder_name/VMCDIR.TXT"
+
+            if [[ -n "$cue_file" ]]; then
+                disc_list+=("$cue_file")
+            else
+                echo "WARNING: No CUE file found for '$disc_folder'" \
+                    >> "${LOG_FILE}"
             fi
-        fi
-        vmc_count=$((vmc_count + 1))
-        show_progress "$vmc_count" "$ata_pops_count"
+        done
+
+        # Second pass: move BIN and CUE files from discs 2+
+        for ((i = 1; i < ${#entries[@]}; i++)); do
+            disc_entry="${entries[i]}"
+            disc_folder="${disc_entry##*|}"
+            disc_path="${OPL}/Ember/games/${disc_folder}"
+
+            [[ -d "$disc_path" ]] || continue
+
+            moved_any=0
+
+            for file in "$disc_path"/*; do
+                [[ -f "$file" ]] || continue
+
+                extension="${file##*.}"
+
+                case "${extension,,}" in
+                    bin|cue)
+                        if mv "$file" "$first_path/" 2>/dev/null; then
+                            moved_any=1
+                            mv "${GAMES_PATH}/Ember/${disc_folder}/${file##*/}" "${GAMES_PATH}/Ember/${first_folder}/" >/dev/null 2>&1
+                        else
+                            echo "ERROR: Failed to move file: $file" >> "${LOG_FILE}"
+                        fi
+                        ;;
+                esac
+            done
+
+            # Check whether any BIN or CUE files remain
+            remaining=0
+
+            for file in "$disc_path"/*; do
+                [[ -f "$file" ]] || continue
+
+                extension="${file##*.}"
+                case "${extension,,}" in
+                    bin|cue)
+                        remaining=1
+                        break
+                        ;;
+                esac
+            done
+
+            # Remove the folder and its EMBER_LIST entry if all
+            # BIN/CUE files were moved successfully
+            if ((moved_any && !remaining)); then
+                removed_folders["$disc_folder"]=1
+                rmdir "$disc_path" 2>/dev/null
+                rmdir "${GAMES_PATH}/Ember/${disc_folder}" 2>/dev/null
+            fi
+        done
     done
-    cd "${TOOLKIT_PATH}"
     exec 3<&-
 
-    cp -rf "${POPS_DIR}/${VMC_FOLDER}/"* "${OPL}/POPS"
+    # Remove successfully consolidated disc entries from EMBER_LIST
+    if ((${#removed_folders[@]} > 0)); then
+        temp_list="${EMBER_LIST}.tmp.$$"
+
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            IFS='|' read -r title game_id publisher disc_type folder_name jpn_title partition_label \
+                <<< "$line"
+
+            if [[ -n "${removed_folders[$folder_name]+yes}" ]]; then
+                continue
+            fi
+
+            printf '%s\n' "$line"
+        done < "$EMBER_LIST" > "$temp_list"
+
+        if mv "$temp_list" "$EMBER_LIST"; then
+            :
+        else
+            echo "ERROR: Failed to update $EMBER_LIST" >> "${LOG_FILE}"
+            rm -f "$temp_list"
+        fi
+    fi
+
+    for folder in "$games_dir"/*/; do
+        [[ -d "$folder" ]] || continue
+
+        cue_files=()
+
+        # Find all CUE files in this folder
+        for file in "$folder"/*; do
+            [[ -f "$file" ]] || continue
+
+            extension="${file##*.}"
+            [[ "${extension,,}" == "cue" ]] || continue
+
+            cue_files+=("${file##*/}")
+        done
+
+        # Only create DISCS.TXT when there is more than one CUE
+        ((${#cue_files[@]} > 1)) || continue
+
+        # Sort filenames alphabetically
+        mapfile -t cue_files < <(
+            printf '%s\n' "${cue_files[@]}" | LC_ALL=C sort
+        )
+
+        # Write the list
+        printf '%s\n' "${cue_files[@]}" > "${folder}DISCS.TXT"
+    done
+
+    exec 3< "$EMBER_LIST"
+    while IFS='|' read -r title game_id publisher disc_type folder_name jpn_title partition_label <&3; do
+    # Check if game ID exists in VMC group mapping and make group VMC if necessary
+        if [[ -n "${vmc_groups_by_id[$game_id]}" ]]; then
+            VMC_GROUP_FOLDER="${vmc_groups_by_id[$game_id]}"
+            mkdir -p "${OPL}/Ember/games/${VMC_GROUP_FOLDER}"
+            printf "%s" "${vmc_groups_by_id[$game_id]}" > "${OPL}/Ember/games/$folder_name/SharedMC.txt"
+        fi
+    done
+    exec 3<&-
+    echo
 }
 
 CREATE_PS2_VMC() {
@@ -629,7 +739,6 @@ CREATE_PS2_VMC() {
         if ! gcc -std=gnu99 -o "${HELPER_DIR}/genvmc" "${HELPER_DIR}/genvmc.c" >> "${LOG_FILE}" 2>&1; then
             echo "[X] Error: Failed to compile genvmc." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_CREATE_PS2_VMC]}"
-            return 1
         fi
     fi
 
@@ -659,7 +768,7 @@ CREATE_PS2_VMC() {
 
     # Process each PS2 game
     exec 3< "${PS2_LIST}"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
+    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
 
         # Determine VMC name and size
         if [[ -n "${vmc_groups_by_id[$game_id]}" ]]; then
@@ -697,7 +806,7 @@ CREATE_PS2_VMC() {
         if [[ -f "$cfg_file" ]] && grep -q '^\$VMC_0=' "$cfg_file"; then
             : # VMC already configured
         else
-            printf '$VMC_0=%s\r\n' "${vmc_name}" >> "$cfg_file"
+            printf '$VMC_0=%s\n' "${vmc_name}" >> "$cfg_file"
         fi
 
         # Write NHDDL YAML for Neutrino
@@ -717,8 +826,11 @@ CREATE_PS2_VMC() {
 
 WIDESCREEN_CHEATS() {
     i="0"
+    SPLASH
+    echo "Applying widescreen cheats..." >> "${LOG_FILE}"
+    echo "${UI_TEXT[GAME_INSTALLER_88]}"
     exec 3< "${PS2_LIST}"
-        while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
+        while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
             cht_file="${OPL}/CHT/${game_id}.cht"
 
             if [[ -f "$cht_file" ]]; then
@@ -731,17 +843,31 @@ WIDESCREEN_CHEATS() {
                 if [[ -s "$cht_file" ]]; then
                     echo "[✓] Successfully downloaded widescreen cheat for $game_id" >> "${LOG_FILE}"
 
-                    if [[ -f "${OPL}/CFG/${game_id}.cfg" ]]; then
-                        sed -i \
-                            -e '/^\$CheatsSource=/d' \
-                            -e '/^\$EnableCheat=/d' \
-                            "${OPL}/CFG/${game_id}.cfg"
-                    fi
+                    cfg_file="${OPL}/CFG/${game_id}.cfg"
 
-cat >> "${OPL}/CFG/${game_id}.cfg" <<'EOL'
+                    if [[ -f "$cfg_file" ]]; then
+                        if ! grep -q '^\$CheatsSource=1$' "$cfg_file" ||
+                        ! grep -q '^\$EnableCheat=1$' "$cfg_file"; then
+
+                            sed -i \
+                                -e '/^\$CheatsSource=/d' \
+                                -e '/^\$EnableCheat=/d' \
+                                "$cfg_file"
+
+                            cat >> "$cfg_file" <<'EOL'
 $CheatsSource=1
 $EnableCheat=1
 EOL
+
+                        fi
+
+                    else
+                    cat > "$cfg_file" <<'EOL'
+$CheatsSource=1
+$EnableCheat=1
+EOL
+
+                    fi
                 else
                     # If wget fails
                     [[ -f "$cht_file" ]] && rm -f "$cht_file"
@@ -756,18 +882,18 @@ EOL
 DISABLE_PS2_VMC() {
     # Remove VMC entries from all CFG files
     for cfg_file in "${OPL}/CFG/"*.cfg; do
-        [[ -e "$cfg_file" ]] || continue
-
-        tmp="${cfg_file}.tmp"
-        sed '/^\$VMC_0/d' "$cfg_file" > "$tmp" && mv "$tmp" "$cfg_file"
+        if grep -q '^\$VMC_0' "$cfg_file" 2>/dev/null; then
+            tmp="${cfg_file}.tmp"
+            sed '/^\$VMC_0/d' "$cfg_file" > "$tmp" && mv "$tmp" "$cfg_file"
+        fi
     done
 
     # Remove mc0 entries from all NHDDL YAML files
     for yaml_file in "${OPL}/nhddl/"*.yaml; do
-        [[ -e "$yaml_file" ]] || continue
-
-        tmp="${yaml_file}.tmp"
-        sed '/^mc0:/d' "$yaml_file" > "$tmp" && mv "$tmp" "$yaml_file"
+        if grep -q '^mc0:' "$yaml_file" 2>/dev/null; then
+            tmp="${yaml_file}.tmp"
+            sed '/^mc0:/d' "$yaml_file" > "$tmp" && mv "$tmp" "$yaml_file"
+        fi
     done
 }
 
@@ -797,8 +923,8 @@ OPL_SIZE_CKECK() {
         available_mb=$((opl_freespace - 128))
         cd_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.iso' --include='[^.]*.ISO' --include='[^.]*.zso' --include='[^.]*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
         dvd_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.iso' --include='[^.]*.ISO' --include='[^.]*.zso' --include='[^.]*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/DVD/" "${OPL}/DVD/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
-        pops_size=$(rsync -dL --progress --ignore-existing --dry-run --out-format="%l" --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
-        needed_mb=$((cd_size + dvd_size + pops_size))
+        ember_size=$(rsync -rL --progress --ignore-existing --dry-run --out-format="%l" --exclude='*/.*' --include='*/' --include='*/*.[cC][uU][eE]' --include='*/*.[bB][iI][nN]' --exclude='*' "${GAMES_PATH}/Ember/" "${OPL}/Ember/games/" | awk '{s+=$1} END {printf "%.0f\n", s / (1024*1024)}')
+        needed_mb=$((cd_size + dvd_size + ember_size))
     fi
 
     if (( available_mb < needed_mb )); then
@@ -818,31 +944,37 @@ APA_SIZE_CHECK() {
     # Extract the "used" value, remove "MB" and any commas
     used=$(cat "$hdl_output" | awk '/used:/ {print $6}' | sed 's/,//; s/MB//')
 
+    if [[ ! "$used" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: Invalid used-space value extracted from HDL output" >> "${LOG_FILE}"
+        printf 'used=<%q>\n' "$used" >> "${LOG_FILE}"
+        error_msg "Error" "${UI_TEXT[ERROR_PS2_LINUX_4]}"
+    fi
+
     # Calculate available space (APA_SIZE - used)
     available=$((APA_SIZE - used))
     pp_max=$(((available / 8) - 1))
 }
 
 md5_check() {
-local FILE="$1"
-local TARGET_MD5="$2"
-delete_app="no"
+    local FILE="$1"
+    local TARGET_MD5="$2"
+    delete_app="no"
 
-# Check if file exists
-if [[ -f "$FILE" ]]; then
-    # Get md5 checksum
-    FILE_MD5=$(md5sum "$FILE" | awk '{print $1}')
+    # Check if file exists
+    if [[ -f "$FILE" ]]; then
+        # Get md5 checksum
+        FILE_MD5=$(md5sum "$FILE" | awk '{print $1}')
 
-    # Compare and delete if matches
-    if [[ "$FILE_MD5" == "$TARGET_MD5" ]]; then
-        echo "Deleted $FILE (MD5 matched)" >> "${LOG_FILE}"
-        delete_app="yes"
+        # Compare and delete if matches
+        if [[ "$FILE_MD5" == "$TARGET_MD5" ]]; then
+            echo "Deleted $FILE (MD5 matched)" >> "${LOG_FILE}"
+            delete_app="yes"
+        else
+            echo "MD5 does not match, file not deleted." >> "${LOG_FILE}"
+        fi
     else
-        echo "MD5 does not match, file not deleted." >> "${LOG_FILE}"
+        echo "File not found: $FILE" >> "${LOG_FILE}"
     fi
-else
-    echo "File not found: $FILE" >> "${LOG_FILE}"
-fi
 }
 
 app_success_check() {
@@ -892,7 +1024,7 @@ update_apps() {
 
     local needs_update=false
 
-    if [[ "$name" == "NHDDL" || "$name" == "OPL" || "$name" == "POPStarter" ]]; then
+    if [[ "$name" == "OPL" ]]; then
         mkdir -p "${STORAGE_DIR}/__system/launcher"
         if [ -f "$source" ] && [ -f "$destination" ]; then
             local src_hash
@@ -945,87 +1077,6 @@ update_apps() {
     fi
 }
 
-install_pops() {
-    if [ -d "${OPL}/POPS" ] && [ -f "${OPL}/POPS/POPS_IOX.PAK" ]; then
-        echo | tee -a "${LOG_FILE}"
-        echo "POPS binaries are already installed." >> "${LOG_FILE}"
-        echo "${UI_TEXT[INSTALL_POPS_1]}"
-    else
-        echo | tee -a "${LOG_FILE}"
-        echo "Checking for POPS binaries..." >> "${LOG_FILE}"
-        echo "${UI_TEXT[INSTALL_POPS_2]}"
-    
-    # Check POPS files exist
-        if [[ -f "${ASSETS_DIR}/POPS-binaries-main/POPS_IOX.PAK" ]]; then
-            echo | tee -a "${LOG_FILE}"
-            echo "POPS_IOX.PAK exist in ${ASSETS_DIR}." >> "${LOG_FILE}"
-            echo "Skipping download." >> "${LOG_FILE}"
-        else
-            echo "Checking if ${ASSETS_DIR}/POPS-binaries-main.zip exists..." >> "${LOG_FILE}"
-            # Check if POPS-binaries-main.zip exists
-            if [[ -f "${ASSETS_DIR}/POPS-binaries-main.zip" && ! -f "${ASSETS_DIR}/POPS-binaries-main.zip.st" ]]; then
-                echo | tee -a "${LOG_FILE}"
-                echo "POPS-binaries-main.zip found in ${ASSETS_DIR}. Extracting..." >> "${LOG_FILE}"
-                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
-                    echo "[!] Warning: Failed to extract POPS binaries." >> "${LOG_FILE}"
-                    error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_1]}"
-                fi
-            else
-                echo | tee -a "${LOG_FILE}"
-                echo "Downloading POPS binaries..." >> "${LOG_FILE}"
-                echo "${UI_TEXT[INSTALL_POPS_3]}"
-                if ! axel -a https://archive.org/download/pops-binaries-PS2/POPS-binaries-main.zip -o "${ASSETS_DIR}"; then
-                    echo "[!] Warning: Failed to download POPS binaries." >> "${LOG_FILE}"
-                    error_msg "Warning" "Failed to download POPS binaries."
-                fi
-                if ! bsdtar -xf "${ASSETS_DIR}/POPS-binaries-main.zip" -C "${ASSETS_DIR}" >> "${LOG_FILE}" 2>&1; then
-                    error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_2]}"
-                fi
-            fi
-            # Check if POPS_IOX.PAK exist after extraction
-            if [[ -f "${ASSETS_DIR}/POPS-binaries-main/POPS_IOX.PAK" ]]; then
-                echo | tee -a "${LOG_FILE}"
-                echo "[✓] POPS binaries successfully extracted." >> "${LOG_FILE}"
-            else
-                echo "[!] Warning: POPS binaries are missing. PS1 games will not be playable." >> "${LOG_FILE}"
-                error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_3]}"
-            fi
-        fi
-
-        echo | tee -a "${LOG_FILE}"
-        echo "Installing POPS binaries..." >> "${LOG_FILE}"
-
-        if cp "${ASSETS_DIR}/POPS-binaries-main/POPS_IOX.PAK" "${OPL}/POPS"; then
-            echo | tee -a "${LOG_FILE}"
-            echo "[✓] POPS binaries successfully installed." >> "${LOG_FILE}"
-            echo "[✓] ${UI_TEXT[INSTALL_POPS_4]}"
-        else
-            echo "[!] Warning: POPS binaries are missing. PS1 games will not be playable." >> "${LOG_FILE}"
-            error_msg "Warning" "${UI_TEXT[WARN_INSTALL_POPS_3]}"
-        fi
-    fi
-
-    if { [ ! -f "${OPL}/POPS/IGR_BG.TM2" ] || [ ! -f "${OPL}/POPS/IGR_YES.TM2" ] || [ ! -f "${OPL}/POPS/IGR_NO.TM2" ]; } && [[ "$lang" != "JPN" ]]; then
-        echo | tee -a "${LOG_FILE}"
-        echo "Copying POPS IRG files..." >> "${LOG_FILE}"
-        cp -f "${ASSETS_DIR}/POPStarter/$lang/"{IGR_BG.TM2,IGR_YES.TM2,IGR_NO.TM2} "${OPL}/POPS"  >> "${LOG_FILE}" 2>&1
-    else
-        echo "POPS IGR files already exist." >> "${LOG_FILE}"
-    fi
-
-    if [ ! -f "${OPL}/POPS/POPSTARTER.ELF" ]; then
-        echo | tee -a "${LOG_FILE}"
-        echo "Installing POPStarter..." >> "${LOG_FILE}"
-        echo "${UI_TEXT[INSTALL_POPS_5]}"
-        cp -f "${POPSTARTER}" "${OPL}/POPS/POPSTARTER.ELF" 2>>"${LOG_FILE}" || {
-            echo "[X] Error: Failed to copy POPSTARTER.ELF."  >> "${LOG_FILE}"
-            error_msg "Error" "${UI_TEXT[ERROR_INSTALL_POPS]}"
-        }
-    else
-        echo "POPStarter is already installed." >> "${LOG_FILE}"
-    fi
-}
-
 validate_title_cfg() {
     local cfg="$1"
 
@@ -1057,11 +1108,8 @@ install_elf() {
 
     local dir=$1
 
-    # Move all SB.* ELF files to POPS
-    find "${dir}/APPS" -maxdepth 1 -type f -iname 'SB.*.elf' -exec mv -t "${OPL}/POPS/" {} +
-
-    # Delete all XX.* ELF files
-    find "${dir}/APPS" -maxdepth 1 -type f -iname 'XX.*.elf' -delete
+    # Move all SB.* and XX.* ELF files to POPS
+    find "${dir}/APPS" -maxdepth 1 -type f \( -iname 'SB.*.elf' -o -iname 'XX.*.elf' \) -exec mv -t "${OPL}/POPS/" {} +
 
     # Relocate ELF files that lack a title.cfg, in non-SAS compliant folders, or are renamed POPSTARTER.ELF files
     find "${dir}/APPS" -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' dir; do
@@ -1163,7 +1211,7 @@ install_elf() {
             OPL*|OPNPS2LD*)
                 AppDB_check="OPNPS2LD"
                 ;;
-            SM64*)
+            SM64*|SUPERMARIO64*)
                 AppDB_check="SM64"
                 ;;
             PS2PSXE*)
@@ -1192,9 +1240,6 @@ install_elf() {
                 ;;
             ESR*)
                 AppDB_check="ESR"
-                ;;
-            SUPERMARIO64*)
-                AppDB_check="GME_SM64"
                 ;;
             *)
                 AppDB_check="$AppDB_check"
@@ -1305,11 +1350,80 @@ CfgVersion=8
 Developer=$developer
 Genre=Homebrew
 Title_ID=$title_id
+Players=
+Aspect=
+Scan=
+Vmode=
+Rating=
 EOL
             i=$((i + 1))
             show_progress "$i" "$elf_count"
         done
     fi
+}
+
+organise_bin(){
+    local dir=$1
+    SPLASH
+
+    echo "Organising BIN/CUE files..." >> "${LOG_FILE}"
+
+    while IFS= read -r -d '' cue; do
+
+        # Directory name = cue filename without extension
+        game_dir="${dir}/$(basename "${cue%.[cC][uU][eE]}")"
+
+        bin_count=0
+        missing=0
+        bin_list=()
+
+        # Read all FILE entries from the cue
+        while IFS= read -r binfile; do
+            ((bin_count++))
+
+            bin_path="$(dirname "$cue")/$binfile"
+
+            if [[ -f "$bin_path" ]]; then
+                bin_list+=("$bin_path")
+            else
+                echo "Missing BIN referenced by $(basename "$cue"): $binfile" >> "${LOG_FILE}"
+                missing=1
+            fi
+        done < <(
+            sed -n 's/^[[:space:]]*FILE "\(.*\)" .*/\1/pI' "$cue"
+        )
+
+        if (( missing )); then
+            echo "Skipping $(basename "$cue") because one or more referenced BIN files are missing." >> "${LOG_FILE}"
+            continue
+        fi
+
+        if (( bin_count == 0 )); then
+            echo "Skipping $(basename "$cue") because no BIN references could be read from the CUE file." >> "${LOG_FILE}"
+            continue
+        fi
+
+        # Create destination directory
+        mkdir -p "${game_dir}"
+
+        echo "Organising $(basename "$cue") into $(basename "$game_dir")/" >> "${LOG_FILE}"
+
+        # Move cue
+        mv -f "$cue" "${game_dir}/"
+
+        # Move all referenced BINs
+        for bin in "${bin_list[@]}"; do
+            mv -f "$bin" "${game_dir}/"
+        done
+
+    done < <(
+        find "${dir}/" \
+            -maxdepth 1 \
+            -type f \
+            ! -path '*/.*' \
+            -iname "*.cue" \
+            -print0
+    )
 }
 
 uncompress_zso() {
@@ -1333,12 +1447,7 @@ uncompress_zso() {
         search_dirs=("${GAMES_PATH}/CD" "${GAMES_PATH}/DVD" "${OPL}/CD" "${OPL}/DVD")
     fi
 
-    # Only run if .zso files exist
     if find "${search_dirs[@]}/" -type f ! -path '*/.*' -iname "*.zso" | grep -q .; then
-        SPLASH
-        printf '\033[1A'
-        echo "[!] Warning: Games in the compressed ZSO format have been found. NHDDL does not support compressed ZSO files." >> "${LOG_FILE}"
-        error_msg "Warning" "${UI_TEXT[WARM_CONVERT_ZSO_1]}" "${UI_TEXT[WARM_CONVERT_ZSO_2]}" " " "${UI_TEXT[WARM_CONVERT_ZSO_3]}"
         SPLASH
         echo "${UI_TEXT[UNCOMPRESS_ZSO]}"
         # Convert ZSO to ISO
@@ -1443,73 +1552,79 @@ convert_bin(){
     fi
 }
 
-convert_vcd(){
-    SPLASH
-    # Check if any .cue files exist
-    cue_count=$(find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f ! -path '*/.*' -iname "*.cue" | wc -l)
-    if [ "$cue_count" -gt 0 ]; then
-        # Loop over all .cue files in the folder
-        i="0"
-        echo "Converting BIN/CUE files to VCD..." >> "${LOG_FILE}"
-        echo "${UI_TEXT[CONVERT_VCD_1]}"
-        show_progress "$i" "$cue_count"
-        while IFS= read -r -d '' cue; do
-            base="${cue%.[cC][uU][eE]}"        # Full path minus .cue
-            vcd="${base}.VCD"
-            merged="$(basename "$cue" .cue)"
+remove_vcd() {
+    local dir=$1
+    local dir2=$2
 
-            if [[ -f "$vcd" ]] || [[ -f "${OPL}/POPS/$(basename "${cue%.*}").VCD" ]]; then
-                echo "Skipping. VCD already exists: '$(basename "$cue")'" >> "${LOG_FILE}"
-                i=$((i + 1))
-                show_progress "$i" "$cue_count"
-                continue
-            fi
+    # Remove all VCD files that have matching BIN/CUE files
+    find "${dir}" -maxdepth 1 -type f -iname '*.vcd' -print0 |
+    while IFS= read -r -d '' vcd; do
+        base="${vcd%.*}"
+        cue=$(find "${dir2}" -maxdepth 1 -type f \
+            -iname "$(basename "$base").cue" -print -quit)
 
-            # Count BINs referenced by the CUE and verify they exist
-            bin_count=0
-            missing=0
+        [[ -n "$cue" ]] || continue
 
-            while IFS= read -r binfile; do
-                ((bin_count++))
+        valid=true
 
-                if [[ ! -f "$(dirname "$cue")/$binfile" ]]; then
-                    echo "Missing BIN referenced by $(basename "$cue"): $binfile" >> "${LOG_FILE}"
-                    missing=1
-                fi
-            done < <(
-                sed -n 's/^[[:space:]]*FILE "\(.*\)" .*/\1/pI' "$cue"
-            )
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            [[ "$line" =~ ^[[:space:]]*FILE[[:space:]]+ ]] || continue
 
-            if (( missing )); then
-                echo "Skipping $(basename "$cue") because one or more referenced BIN files are missing." >> "${LOG_FILE}"
-                i=$((i + 1))
-                show_progress "$i" "$cue_count"
-                continue
-            fi
+            entry="${line#FILE}"
+            entry="${entry#file}"
+            entry="${entry#"${entry%%[![:space:]]*}"}"
 
-            if (( bin_count > 1 )); then
-                echo "Merging '$(basename "$cue")'..." >> "${LOG_FILE}"
-                python3 "${HELPER_DIR}/binmerge.py" "$cue" "${SCRIPTS_DIR}/tmp/$merged" >>"${LOG_FILE}" 2>&1
-
-                cd "${SCRIPTS_DIR}/tmp"
-                echo "Converting '$(basename "$cue")' to VCD..." >> "${LOG_FILE}"
-                "${CUE2POPS}" "${SCRIPTS_DIR}/tmp/$merged.cue" "${GAMES_PATH}/POPS/$merged.VCD" >> "${LOG_FILE}"
-                rm "${SCRIPTS_DIR}/tmp/${merged}.cue" "${SCRIPTS_DIR}/tmp/${merged}.bin"
+            if [[ "$entry" =~ ^\"([^\"]+)\"[[:space:]]+ ]]; then
+                bin="${BASH_REMATCH[1]}"
+            elif [[ "$entry" =~ ^([^[:space:]]+)[[:space:]]+ ]]; then
+                bin="${BASH_REMATCH[1]}"
             else
-                echo "No merge required. $(basename "$cue") has $bin_count BIN file(s)." >> "${LOG_FILE}"
-                cd "${GAMES_PATH}/POPS"
-                echo "Converting '$(basename "$cue")' to VCD..." >> "${LOG_FILE}"
-                "${CUE2POPS}" "$cue" "$vcd" >> "${LOG_FILE}" 2>&1
+                valid=false
+                break
+            fi
+
+            [[ -f "$(dirname "$cue")/$bin" ]] || {
+                valid=false
+                break
+            }
+        done < "$cue"
+
+        [[ "$valid" == true ]] && rm -- "$vcd"
+    done
+}
+
+move_vcd() {
+    local dir=$1
+    local ember_dir=$2
+    
+    # Loop over all .VCD, .BIN, and .CUE files in the folder
+    while IFS= read -r -d '' file; do
+        mv "${file}" "${ember_dir}"
+    done < <(find "${dir}" -maxdepth 1 -type f ! -path '*/.*' ! -iname "bios.bin" \( -iname "*.vcd" -o -iname "*.bin" -o -iname "*.cue" \) -print0)
+}
+
+convert_vcd(){
+    local dir=$1
+    SPLASH
+    # Check if any .VCD files exist
+    vcd_count=$(find "${dir}" -maxdepth 1 -type f ! -path '*/.*' -iname "*.vcd" | wc -l)
+    if [ "$vcd_count" -gt 0 ]; then
+        # Loop over all .VCD files in the folder
+        i="0"
+        echo "Converting VCD files to BIN/CUE..." >> "${LOG_FILE}"
+        echo "${UI_TEXT[CONVERT_VCD_1]}"
+        show_progress "$i" "$vcd_count"
+        while IFS= read -r -d '' vcd; do
+            if "${POPS2CUE}" "${vcd}" >> "${LOG_FILE}" 2>&1; then
+                rm "${vcd}"
+            else
+                echo "Warning: Failed to convert $vcd to BIN/CUE" >> "${LOG_FILE}"
             fi
 
             i=$((i + 1))
-            show_progress "$i" "$cue_count"
-            
-        done < <(find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f ! -path '*/.*' -iname "*.cue" -print0)
-    else
-        echo "No PS1 .cue files to convert in ${GAMES_PATH}/POPS." >> "${LOG_FILE}"
+            show_progress "$i" "$vcd_count"
+        done < <(find "${dir}" -maxdepth 1 -type f ! -path '*/.*' -iname "*.vcd" -print0)
     fi
-    cd "${TOOLKIT_PATH}"
 }
 
 create_info_sys() {
@@ -1610,6 +1725,168 @@ create_system_cnf() {
     fi
 }
 
+create_cfg() {
+    i="0"
+    SPLASH
+    echo >> "${LOG_FILE}"
+    echo "Creating CFG files for OPL..." >> "${LOG_FILE}"
+    echo "${UI_TEXT[GAME_INSTALLER_87]}"
+    echo "Starting Lang: $lang" >> "${LOG_FILE}"
+
+    exec 3< "${ALL_TITLES}"
+    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
+        if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "EMBER" ]]; then
+            cfg_file="${OPL}/CFG/${game_id}.cfg"
+
+            echo "Processing: $game_id" >> "${LOG_FILE}"
+            echo "Lang: $lang" >> "${LOG_FILE}"
+            if [[ ! -f "$cfg_file" ]] || ! grep -q '^Title=' "$cfg_file"; then
+                if [[ "$lang" == "jpn" && -n "$jpn_title" ]]; then
+                    title="$jpn_title"
+                fi
+
+                printf 'Title=%s\n' "$title" >> "$cfg_file"
+            fi
+
+            echo "Checking $cfg_file" >> "$LOG_FILE"
+            stat -c '%n | %y' "$cfg_file" >> "$LOG_FILE"
+
+            if grep -q '^Description=' "$cfg_file" &&
+                grep -q '^Developer=' "$cfg_file" &&
+                grep -q '^Genre=' "$cfg_file" &&
+                grep -q '^Players=' "$cfg_file" &&
+                grep -q '^Rating=' "$cfg_file" &&
+                grep -q '^Release=' "$cfg_file" &&
+                grep -q '^Vmode=' "$cfg_file" &&
+                grep -q '^Scan=' "$cfg_file" &&
+                grep -q '^Aspect=' "$cfg_file"; then
+
+                echo "All required entries found in CFG file for $game_id" >> "${LOG_FILE}"
+                i=$((i + 1))
+                show_progress "$i" "$collection_count"
+                echo "SKIPPING CFG: $cfg_file" >> "$LOG_FILE"
+                continue
+            else
+                echo "One or more required entries are missing in CFG file for $game_id" >> "${LOG_FILE}"
+            fi
+
+            if [[ $disc_type == "DVD" || $disc_type == "CD" ]]; then
+                xml_file="${DATABASE_DIR}/PS2DB.xml"
+            else
+                xml_file="${DATABASE_DIR}/PS1DB.xml"
+            fi
+
+            if [[ "$game_id" == LSP* ]]; then
+                id_lookup="${game_id//./}"
+                id_lookup="${id_lookup:0:3}-${id_lookup:3}"
+            else
+                id_lookup="${game_id/_/-}"
+                id_lookup="${id_lookup//./}"
+            fi
+
+            game_data=$(awk -v id="$id_lookup" '
+                /<game serial=/ {
+                    found = ($0 ~ "serial=\"" id "\"")
+                }
+
+                found {
+                    print
+                }
+
+                found && /<\/game>/ {
+                    exit
+                }
+            ' "$xml_file")
+
+            developer=$(echo "$game_data" | sed -n 's/.*<Developer>\(.*\)<\/Developer>.*/\1/p')
+            genre=$(echo "$game_data" | sed -n 's/.*<Genre>\(.*\)<\/Genre>.*/\1/p')
+            players=$(echo "$game_data" | sed -n 's/.*<Players>\(.*\)<\/Players>.*/\1/p')
+            scan=$(echo "$game_data" | sed -n 's/.*<Scan>\(.*\)<\/Scan>.*/\1/p')
+            aspect=$(echo "$game_data" | sed -n 's/.*<Aspect>\(.*\)<\/Aspect>.*/\1/p')
+            vmode=$(echo "$game_data" | sed -n 's/.*<Vmode>\(.*\)<\/Vmode>.*/\1/p')
+            rating=$(echo "$game_data" | sed -n 's/.*<Rating>\(.*\)<\/Rating>.*/\1/p')
+
+            for lang_pair in en:eng fr:fre de:ger es:spa it:ita pt:por; do
+                xml_lang="${lang_pair%%:*}"
+                suffix="${lang_pair##*:}"
+
+                description_var="description_$suffix"
+                release_var="release_$suffix"
+
+                IFS='|' read -r "$description_var" "$release_var" < <(
+                    echo "$game_data" | awk -v lang="$xml_lang" '
+                        $0 ~ "<Localization lang=\"" lang "\">" { found=1; next }
+                        found && /<\/Localization>/ { exit }
+
+                        found && /<Description>/ {
+                            sub(/.*<Description>/, "")
+                            sub(/<\/Description>.*/, "")
+                            description=$0
+                        }
+
+                        found && /<Release>/ {
+                            sub(/.*<Release>/, "")
+                            sub(/<\/Release>.*/, "")
+                            release=$0
+                        }
+
+                        END { printf "%s|%s\n", description, release }
+                    '
+                )
+            done
+
+            description_var="description_$lang"
+            release_var="release_$lang"
+
+            description="${!description_var}"
+            release="${!release_var}"
+
+            [[ -z "$description" ]] && description="$description_eng"
+            [[ -z "$release" ]] && release="$release_eng"
+
+            if ! grep -q '^Description=' "$cfg_file" && [[ -n "$description" ]]; then
+                printf 'Description=%s\n' "$description" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Release=' "$cfg_file" && [[ -n "$release" ]]; then
+                printf 'Release=%s\n' "$release" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Developer=' "$cfg_file" && [[ -n "$developer" ]]; then
+                printf 'Developer=%s\n' "$developer" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Genre=' "$cfg_file" && [[ -n "$genre" ]]; then
+                printf 'Genre=%s\n' "$genre" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Players=' "$cfg_file" && [[ -n "$players" ]]; then
+                printf 'Players=%s\n' "$players" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Rating=' "$cfg_file" && [[ -n "$rating" ]]; then
+                printf 'Rating=rating/%s\n' "$rating" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Vmode=' "$cfg_file" && [[ -n "$vmode" ]]; then
+                printf 'Vmode=%s\n' "$vmode" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Scan=' "$cfg_file" && [[ -n "$scan" ]]; then
+                printf 'Scan=scan/%s\n' "$scan" >> "$cfg_file"
+            fi
+
+            if ! grep -q '^Aspect=' "$cfg_file" && [[ -n "$aspect" ]]; then
+                printf 'Aspect=%s\n' "$aspect" >> "$cfg_file"
+            fi
+
+            i=$((i + 1))
+            show_progress "$i" "$collection_count"
+        fi
+    done
+    exec 3<&-
+}
+
 get_display_path() {
     if [[ "$GAMES_PATH" =~ ^/mnt/([a-zA-Z])(/.*)?$ ]]; then
         drive="${BASH_REMATCH[1]}"
@@ -1656,7 +1933,7 @@ mapper_probe() {
     done <<< "$dm_output"
 
     # 5) Export base mapper path
-    MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
+     MAPPER="$(platform_mapper_prefix "$DEVICE_CUT")"
 }
 
 mount_cfs() {
@@ -1832,15 +2109,195 @@ PY
     export partition_label
 }
 
+# Remove line breaks so Bash can match XML tags.
+flatten_xml() {
+    REPLY=${1//$'\n'/}
+    REPLY=${REPLY//$'\r'/}
+}
+
+opl_manager_id() {
+    if [[ -s "${ASSETS_DIR}/OPL/user_id" ]] &&
+    user_id=$(<"${ASSETS_DIR}/OPL/user_id") &&
+    [[ "$user_id" =~ ^.{13}$ ]]; then
+        echo "Valid user_id: $user_id" >> "${LOG_FILE}"
+    else
+        echo "Requesting API user ID..." >> "${LOG_FILE}"
+
+        status_xml=$(curl -fsS "$OPLMS" \
+            -H 'Content-Type: text/xml; charset=utf-8' \
+            -H 'SOAPAction: "http://oplmanager.no-ip.info/ServiceStatus"' \
+            -H 'User-Agent: OPL-Manager/24' \
+            --data '<?xml version="1.0" encoding="utf-8"?>
+        <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:op="http://oplmanager.no-ip.info/">
+        <soap:Body>
+            <op:ServiceStatus>
+            <op:userID>NEW</op:userID>
+            <op:versionid>37</op:versionid>
+            </op:ServiceStatus>
+        </soap:Body>
+        </soap:Envelope>')
+
+        flatten_xml "$status_xml"
+        status_xml=$REPLY
+
+        if [[ $status_xml =~ \<ServiceStatusResult\>.*\<userID\>([^\<]+)\</userID\> ]]; then
+            user_id=${BASH_REMATCH[1]}
+            echo "API user ID retrieved: $user_id" >> "${LOG_FILE}"
+            echo "$user_id" > "${ASSETS_DIR}/OPL/user_id"
+        else
+            echo "ERROR: Could not extract the API user ID." >> "${LOG_FILE}"
+            return 1
+        fi
+
+        if [[ -z $user_id || $user_id == NEW ]]; then
+            echo "ERROR: The API did not return a valid user ID." >> "${LOG_FILE}"
+            return 1
+        fi
+    fi
+}
+
+opl_game_art() {
+    local LIST="$1"
+
+    exec 3< "${LIST}"
+    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
+
+        if [[ "$LIST" == *"ps2.list" ]]; then
+            game_type="PS2"
+        elif [[ "$LIST" == *"ember.list" ]]; then
+            game_type="POPS"
+        fi
+
+        if [[ -s "${OPL}/ART/${game_id}_BG.png" &&
+              -s "${OPL}/ART/${game_id}_COV2.png" &&
+              -s "${OPL}/ART/${game_id}_COV.png" &&
+              -s "${OPL}/ART/${game_id}_ICO.png" &&
+              -s "${OPL}/ART/${game_id}_LAB.png" &&
+              -s "${OPL}/ART/${game_id}_LGO.png" &&
+              -s "${OPL}/ART/${game_id}_SCR.png" &&
+              -s "${OPL}/ART/${game_id}_SCR2.png" ]] &&
+           [[ $(identify -format '%wx%h' "${OPL}/ART/${game_id}_ICO.png" 2>/dev/null) == "128x128" ]]; then
+            i=$((i + 1))
+            show_progress "$i" "$ART_TOTAL"
+            continue
+        fi
+
+        local category url filename category_xml number limit
+        local -a urls
+
+        echo "Requesting artwork for $game_id..." >> "${LOG_FILE}"
+
+        art_xml=$(curl -fsS "$OPLMS" \
+            -H 'Content-Type: text/xml; charset=utf-8' \
+            -H 'SOAPAction: "http://oplmanager.no-ip.info/ArtSearchSingle"' \
+            -H 'User-Agent: OPL-Manager/24' \
+            --data "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+        <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:op=\"http://oplmanager.no-ip.info/\">
+        <soap:Body>
+            <op:ArtSearchSingle>
+            <op:type>$game_type</op:type>
+            <op:userID>$user_id</op:userID>
+            <op:gameId>$game_id</op:gameId>
+            </op:ArtSearchSingle>
+        </soap:Body>
+        </soap:Envelope>")
+
+        flatten_xml "$art_xml"
+        art_xml=$REPLY
+
+        if [[ $art_xml != *'<ArtSearchSingleResult>'* ]]; then
+            echo "Warning: No artwork found for $game_id" >> "${LOG_FILE}"
+            i=$((i + 1))
+            show_progress "$i" "$ART_TOTAL"
+            return 1
+        fi
+
+        downloaded=0
+
+        for category in COV COV2 ICO LGO LAB SCR BG; do
+            urls=()
+            limit=1
+
+            if [[ $category == SCR || $category == BG ]]; then
+                if [[ $category == SCR ]]; then
+                    limit=2
+                fi
+
+                if [[ $art_xml =~ \<${category}\>(.*)\</${category}\> ]]; then
+                    category_xml=${BASH_REMATCH[1]}
+
+                    while [[ $category_xml =~ \<string\>([^<]+)\</string\> ]]; do
+                        urls+=("${BASH_REMATCH[1]}")
+                        category_xml=${category_xml#*"</string>"}
+                    done
+                fi
+            elif [[ $art_xml =~ \<${category}\>([^<]+)\</${category}\> ]]; then
+                urls+=("${BASH_REMATCH[1]}")
+            fi
+
+            number=0
+
+            for url in "${urls[@]}"; do
+                [[ $url == http://* || $url == https://* ]] || continue
+
+                filename=${url##*/}
+                filename=${filename%%\?*}
+
+                if [[ $category == SCR ]]; then
+                    if (( number == 0 )); then
+                        filename=$(printf '%s_SCR.%s' \
+                            "$game_id" "${filename##*.}")
+                    else
+                        filename=$(printf '%s_SCR2.%s' \
+                            "$game_id" "${filename##*.}")
+                    fi
+                else
+                    filename="${game_id}_${category}.${filename##*.}"
+                fi
+
+                if [[ $category == ICO ]]; then
+                    if [[ -s "${OPL}/ART/$filename" ]] &&
+                       [[ $(identify -format '%wx%h' "${OPL}/ART/$filename" 2>/dev/null) == "128x128" ]]; then
+                        echo "ICO already exists at 128x128: $filename" >> "${LOG_FILE}"
+                        break
+                    fi
+                elif [[ -s "${OPL}/ART/$filename" ]]; then
+                    echo "Artwork already exists: $filename" >> "${LOG_FILE}"
+                    if [[ $category == SCR ]]; then
+                        number=$((number + 1))
+                        (( number >= limit )) && break
+                        continue
+                    else
+                        break
+                    fi
+                fi
+
+                if curl -fsS --retry 2 --retry-delay 1 \
+                    "$url" -o "${OPL}/ART/$filename"; then
+                    echo "Downloaded: $filename" >> "${LOG_FILE}"
+                else
+                    printf 'Warning: Download failed %s\n' "$url" >> "${LOG_FILE}"
+                    rm -f "${OPL}/ART/$filename"
+                fi
+
+                number=$((number + 1))
+                (( number >= limit )) && break
+            done
+        done
+        i=$((i + 1))
+        show_progress "$i" "$ART_TOTAL"
+    done
+    exec 3<&-
+}
+
 create_app_assets() {
-    local GAME_LIST=$1
     local i="0"
 
     SPLASH
     echo "Creating assets for apps..." >> "${LOG_FILE}"
     echo "${UI_TEXT[GAME_INSTALLER_41]}"
 
-    exec 3< "$GAME_LIST"
+    exec 3< "$SELECTED_LIST"
         while IFS='|' read -r title title_id publisher category file_name title_short pp_name <&3; do
             if [[ $category =~ ^(SYS|EMU|GME|DST|DBG|PS1|RTE|DEM|APP)$ ]]; then
 
@@ -1955,7 +2412,6 @@ create_app_assets() {
 }
 
 create_game_assets() {
-    local GAME_LIST=$1
     if [ "$OS" = "PSBBN" ]; then
         i="0"
         SPLASH
@@ -1964,9 +2420,9 @@ create_game_assets() {
         echo "${UI_TEXT[GAME_INSTALLER_46]}"
 
         # First loop: Run the art downloader script for each game_id if artwork doesn't already exist
-        exec 3< "$GAME_LIST"
-        while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
-            if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "POPS" || $disc_type == "__.POPS" || $disc_type == "SMB" ]]; then
+        exec 3< "$SELECTED_LIST"
+        while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
+            if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "EMBER" || $disc_type == "__.POPS" || $disc_type == "SMB" || $disc_type == "BDM" ]]; then
                 if [[ $game_id == "POPSTARTER" ]]; then
                     i=$((i + 1))
                     show_progress "$i" "$collection_count"
@@ -2046,9 +2502,9 @@ create_game_assets() {
     echo "${UI_TEXT[GAME_INSTALLER_47]}"
     i="0"
 
-    exec 3< "$GAME_LIST"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
-        if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "POPS" || $disc_type == "__.POPS" || $disc_type == "SMB" ]]; then
+    exec 3< "$SELECTED_LIST"
+    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
+        if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "EMBER" || $disc_type == "__.POPS" || $disc_type == "SMB" || $disc_type == "BDM" ]]; then
             ico_file="${ICONS_DIR}/ico/$game_id.ico"
             
             if [[ ! -s "$ico_file" ]]; then
@@ -2062,73 +2518,59 @@ create_game_assets() {
                     # If wget fails, run the art downloader
                     [[ -f "$ico_file" ]] && rm -f "$ico_file"
 
-                    png_file_cov="${TOOLKIT_PATH}/icons/ico/tmp/${game_id}_COV.png"
-                    png_file_cov2="${TOOLKIT_PATH}/icons/ico/tmp/${game_id}_COV2.png"
-                    png_file_lab="${TOOLKIT_PATH}/icons/ico/tmp/${game_id}_LAB.png"
+                    png_file_cov="${OPL}/ART/${game_id}_COV.png"
+                    png_file_cov2="${OPL}/ART/${game_id}_COV2.png"
+                    png_file_lab="${OPL}/ART/${game_id}_LAB.png"
 
-                    echo "Icon not found on database. Downloading icon assets for $game_id..." >> "${LOG_FILE}"
+                    icon_tmp="${ICONS_DIR}/ico/tmp"
 
-                    if [[ -s "${GAMES_PATH}/ART/${game_id}_COV.png" ]]; then
-                        cp "${GAMES_PATH}/ART/${game_id}_COV.png" "${png_file_cov}"
+                    if [[ ! -s "$png_file_cov" ]] || [[ ! -s "$png_file_cov2" ]]; then
+                        echo "Insufficient assets to create icon for $game_id." >> "${LOG_FILE}"
+                        i=$((i + 1))
+                        continue
                     fi
 
-                    if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
-                        wget --quiet --timeout=10 --tries=3 --output-document="${png_file_cov}" \
-                        "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV.png"
-                        if [[ -s "$png_file_cov" ]]; then
-                            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cov2" \
-                            "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV2.png"
-                            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_lab" \
-                            "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_LAB.png"
-                        fi
-                    elif [[ -s "$png_file_cov"  ]]; then
-                        wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cov2" \
-                        "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_COV2.png"
-                        wget --quiet --timeout=10 --tries=3 --output-document="$png_file_lab" \
-                        "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_LAB.png"
-                    fi
+                    cp "${png_file_cov}" "${png_file_cov2}" "${icon_tmp}"
 
                     if [[ ! -s "$png_file_lab" ]]; then
                         if [[ "${game_id:2:1}" == "E" ]]; then
-                            if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
-                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_PAL.png" "${png_file_lab}"
+                            if [[ "$disc_type" != "EMBER" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
+                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_PAL.png" "${icon_tmp}/${game_id}_LAB.png"
                             else
-                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_PAL.png" "${png_file_lab}"
+                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_PAL.png" "${icon_tmp}/${game_id}_LAB.png"
                             fi
                         elif [[ "${game_id:2:1}" == "U" || "${game_id:0:1}" == "L" ]]; then
-                            if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
-                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_USA.png" "${png_file_lab}"
+                            if [[ "$disc_type" != "EMBER" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
+                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_USA.png" "${icon_tmp}/${game_id}_LAB.png"
                         else
-                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_USA.png" "${png_file_lab}"
+                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_USA.png" "${icon_tmp}/${game_id}_LAB.png"
                             fi
                         else
-                            if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
-                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_JPN.png" "${png_file_lab}"
+                            if [[ "$disc_type" != "EMBER" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
+                                cp "${ASSETS_DIR}/Icon-templates/PS2_LAB_JPN.png" "${icon_tmp}/${game_id}_LAB.png"
                             else
-                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_JPN.png" "${png_file_lab}"
-                            fi
-                        fi
-                    fi
-
-                    if [[ -s "$png_file_cov" && -s "$png_file_cov2" && -s "$png_file_lab" ]]; then
-                        echo "Creating HDD-OSD icon for $game_id..." >> "${LOG_FILE}"
-                        if [[ "$disc_type" != "POPS" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
-                            if [[ "${game_id:2:1}" == "E" ]]; then
-                                "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 2
-                            else
-                                "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 1
-                            fi
-                        else
-                            if [[ "${game_id:2:1}" == "U" || "${game_id:0:1}" == "L" ]]; then
-                                "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 3
-                            elif [[ "${game_id:2:1}" == "E" ]]; then
-                                "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 6
-                            else
-                                "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 5
+                                cp "${ASSETS_DIR}/Icon-templates/PS1_LAB_JPN.png" "${icon_tmp}/${game_id}_LAB.png"
                             fi
                         fi
                     else
-                        echo "Insufficient assets to create icon for $game_id." >> "${LOG_FILE}"
+                        cp "${png_file_lab}" "${icon_tmp}"
+                    fi
+
+                    echo "Creating HDD-OSD icon for $game_id..." >> "${LOG_FILE}"
+                    if [[ "$disc_type" != "EMBER" && "$disc_type" != "__.POPS" && "$disc_type" != "SMB" ]]; then
+                        if [[ "${game_id:2:1}" == "E" ]]; then
+                            "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 2 >> "${LOG_FILE}" 2>&1
+                        else
+                            "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 1 >> "${LOG_FILE}" 2>&1
+                        fi
+                    else
+                        if [[ "${game_id:2:1}" == "U" || "${game_id:0:1}" == "L" ]]; then
+                            "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 3 >> "${LOG_FILE}" 2>&1
+                        elif [[ "${game_id:2:1}" == "E" ]]; then
+                            "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 6 >> "${LOG_FILE}" 2>&1
+                        else
+                            "${HELPER_DIR}/ps2iconmaker.sh" $game_id -t 5 >> "${LOG_FILE}" 2>&1
+                        fi
                     fi
                 fi
             else
@@ -2148,9 +2590,9 @@ create_game_assets() {
     echo "${UI_TEXT[GAME_INSTALLER_61]}"
     i="0"
 
-    exec 3< "$GAME_LIST"
+    exec 3< "$SELECTED_LIST"
     while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
-        if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "POPS" || $disc_type == "__.POPS" || $disc_type == "SMB" ]]; then
+        if [[ $disc_type == "DVD" || $disc_type == "CD" || $disc_type == "EMBER" || $disc_type == "__.POPS" || $disc_type == "SMB" || $disc_type == "BDM" ]]; then
             echo "Processing $title..." >> "${LOG_FILE}"
             # Create a sub-folder named after the game_id
             game_dir="${SCRIPTS_DIR}/tmp/$partition_label"
@@ -2170,6 +2612,8 @@ create_game_assets() {
             fi
 
             if [[ "$disc_type" == "SMB" ]]; then
+                ext="[${disc_type}] "
+            elif [[ "$disc_type" == "BDM" ]]; then
                 ext="[${disc_type}] "
             else
                 ext=""
@@ -2199,7 +2643,7 @@ create_game_assets() {
                     ;;
                 esac
 
-                if [[ "$disc_type" == "SMB" ]]; then
+                if [[ "$disc_type" == "SMB" || "$disc_type" == "BDM" ]]; then
                     if [ ${#game_title_icon} -gt 10 ]; then
                         game_title_icon="${game_title_icon:0:7}..."
                     fi
@@ -2214,7 +2658,7 @@ create_game_assets() {
                 fi
             else
                 game_title_icon="$title"
-                if [[ "$disc_type" == "SMB" ]]; then
+                if [[ "$disc_type" == "SMB" || "$disc_type" == "BDM" ]]; then
                     if [ ${#game_title_icon} -gt 42 ]; then
                         game_title_icon="${game_title_icon:0:39}..."
                     fi
@@ -2232,7 +2676,7 @@ create_game_assets() {
                 # Copy the matching .png file and rename it to jkt_001.png
                 png_file="${TOOLKIT_PATH}/icons/art/${game_id}.png"
                 if [[ -s "$png_file" ]]; then
-                    if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
+                    if [[ "$disc_type" == "EMBER" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" || "$disc_type" == "BDM" ]]; then
                         convert "${ASSETS_DIR}/Icon-templates/PS1-Template.png" \( "$png_file" -resize 197x197! \) -geometry +42+27 -composite "${game_dir}/jkt_001.png"
                     else
                         cp "$png_file" "${game_dir}/jkt_001.png" 2>> "${LOG_FILE}" || {
@@ -2243,7 +2687,7 @@ create_game_assets() {
                     echo "Created: $game_dir/jkt_001.png" >> "${LOG_FILE}"
                 else
                     echo "$game_id $title" >> "${MISSING_ART}"
-                    if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
+                    if [[ "$disc_type" == "EMBER" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" || "$disc_type" == "BDM" ]]; then
                         cp "${TOOLKIT_PATH}/icons/art/ps1.png" "${game_dir}/jkt_001.png" 2>> "${LOG_FILE}" || {
                             echo "[X] Error: Failed to create: $game_dir/jkt_001.png" >> "${LOG_FILE}"
                             error_msg "Error" "${UI_TEXT[ERROR_CREATE]} $game_dir/jkt_001.png"
@@ -2284,7 +2728,7 @@ create_game_assets() {
                     }
                     echo "Created: $game_dir/list.ico using default CD icon." >> "${LOG_FILE}"
                 ;;
-                POPS|__.POPS|SMB)
+                EMBER|__.POPS|SMB|BDM)
                     cp "${ICONS_DIR}/ico/ps1.ico" "${game_dir}/list.ico" 2>> "${LOG_FILE}" || {
                         echo "[X] Error: Failed to create: $game_dir/list.ico"  >> "${LOG_FILE}"
                         error_msg "Error" "${UI_TEXT[ERROR_CREATE]} $game_dir/list.ico."
@@ -2295,38 +2739,29 @@ create_game_assets() {
             fi
 
             # Generate the system.cnf files
-            # Determine the launcher value for this specific game
-            if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
-                launcher_value="$disc_type"
-            else
-                launcher_value="$LAUNCHER"
-            fi
-
-            if [ "$launcher_value" = "OPL" ]; then
+            if [[ "$disc_type" = "CD" || "$disc_type" = "DVD" ]]; then
                 cat > "${game_dir}/system.cnf" <<EOL
 BOOT2 = PATINFO
 HDDUNITPOWER = NICHDD
-path = hdd0:__system:pfs:/launcher/OPNPS2LD.ELF
+path = hdd0:__system:pfs:/launcher/RIPTOPL-RA-UNPAKT.ELF
 titleid = $game_id
 nohistory = 1
 arg = $file_name
 arg = $game_id
 arg = $disc_type
-arg = bdm
+arg = ata
 skip_argv0 = 0
 EOL
-            elif [ "$launcher_value" = "NEUTRINO" ]; then
-                cat > "${game_dir}/system.cnf" <<EOL
+            elif [ "$disc_type" = "EMBER" ]; then
+                    cat > "${game_dir}/system.cnf" <<EOL
 BOOT2 = PATINFO
 HDDUNITPOWER = NICHDD
-path = hdd0:__system:pfs:/launcher/nhddl.elf
+path = ata:/Ember/ember.elf
 titleid = $game_id
-arg = -mode=ata
-arg = -dvd=mass0:/$disc_type/$file_name
-arg = -noinit
-skip_argv0 = 0
+nohistory = 1
+arg = $file_name
 EOL
-            elif [ "$launcher_value" = "__.POPS" ]; then
+            elif [ "$disc_type" = "__.POPS" ]; then
                 elf_file="${file_name%.*}.ELF"
                 cat > "${game_dir}/system.cnf" <<EOL
 BOOT2 = PATINFO
@@ -2337,18 +2772,7 @@ nohistory = 1
 arg = bbnl:$elf_file
 skip_argv0 = 1
 EOL
-            elif [ "$launcher_value" = "POPS" ]; then
-                    elf_file="XX.${file_name%.*}.ELF"
-                    cat > "${game_dir}/system.cnf" <<EOL
-BOOT2 = PATINFO
-HDDUNITPOWER = NICHDD
-path = hdd0:__system:pfs:/launcher/POPSTARTER.ELF
-titleid = $game_id
-nohistory = 1
-arg = bbnl:$elf_file
-skip_argv0 = 1
-EOL
-            elif [ "$launcher_value" = "POPS_EXT" ]; then
+            elif [[ "$disc_type" = "SMB" || "$disc_type" = "BDM" ]]; then
                 cat > "${game_dir}/system.cnf" <<EOL
 BOOT2 = PATINFO
 HDDUNITPOWER = NICHDD
@@ -2367,11 +2791,10 @@ EOL
 }
 
 create_launcher_partitions() {
-    local GAME_LIST=$1
     i=0
 
     # Read all lines in reverse order
-    mapfile -t reversed_lines < <(tac "$GAME_LIST")
+    mapfile -t reversed_lines < <(tac "$SELECTED_LIST")
     
     # Reverse the lines of the file using tac and process each line
     for line in "${reversed_lines[@]}"; do
@@ -2399,7 +2822,7 @@ create_launcher_partitions() {
             COMMANDS+="put info.sys\n"
             COMMANDS+="put jkt_001.png\n"
 
-            if [[ "$disc_type" == "POPS" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" ]]; then
+            if [[ "$disc_type" == "__.POPS" || "$disc_type" == "SMB" || $disc_type == "BDM" ]]; then
                 COMMANDS+="lcd '${ASSETS_DIR}/POPStarter'\n"
                 COMMANDS+="put bg.png\n"
                 COMMANDS+="lcd '${ASSETS_DIR}/POPStarter/$lang'\n"
@@ -2549,6 +2972,12 @@ if [ "$POPS_PRESENT" = "1" ]; then
             echo "[X] Error: Failed to create PS1 games list for __.POPS." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_PS1_LIST]}"
         fi
+
+        if [[ ! -s "${PFS_POPS_LIST}" ]] && find "${STORAGE_DIR}/__.POPS" -maxdepth 1 -type f \( -iname "*.VCD" \) | grep -q .; then
+            echo "[X] Error: Failed to create Ember games list." >> "${LOG_FILE}"
+            error_msg "Error" "${UI_TEXT[ERROR_PS1_LIST]}"
+        fi
+
         unmount_apa
         sleep 3
     else
@@ -2581,6 +3010,14 @@ if [ "$OS" = "PSBBN" ]; then
 fi
 
 APA_SIZE=$(awk -F' *= *' '$1=="APA_SIZE"{print $2}' "${OPL}/version.txt")
+
+if [[ ! "$APA_SIZE" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: Invalid APA_SIZE in $OPL/version.txt:" >> "${LOG_FILE}"
+    printf 'APA_SIZE=%q\n' "$APA_SIZE" >> "${LOG_FILE}"
+    cat "$OPL/version.txt" >> "${LOG_FILE}"
+    error_msg "Error" "${UI_TEXT[ERROR_PS2_LINUX_4]}"
+fi
+
 lang=$(awk -F' *= *' '$1=="LANG"{print $2}' "${OPL}/version.txt")
 ENTER=$(awk -F' *= *' '$1=="ENTER"{print $2}' "${OPL}/version.txt")
 echo "Language: $lang" >> "${LOG_FILE}"
@@ -2605,14 +3042,15 @@ fi
 
 SPLASH
 
+# Choose game folder
 if [[ -z "$path_arg" ]]; then
     get_display_path
     echo "${UI_TEXT[GAME_INSTALLER_26]} ${display_path}:" | tee -a "${LOG_FILE}"
     echo
     echo "📀 PS2 DVD → /DVD (.iso, .zso)"
     echo "💿 PS2 CD → /CD (.bin+.cue, .iso, .zso)"
-    echo "💿 PS1 → /POPS (.bin+.cue, .VCD)"
-    echo "🎮 POPStarter → /POPS (SB.*.ELF)"
+    echo "💿 PS1 → /Ember (.bin+.cue, .VCD)"
+    echo "🎮 POPSTARTER.ELF → /POPS (SB.*.ELF XX.*.ELF)"
     echo "🔧 Homebrew → /APPS (.elf, SAS .psu)"
     echo
 
@@ -2669,13 +3107,10 @@ if [[ -z "$path_arg" ]]; then
 fi
 
 # Create necessary folders if they don't exist
-for folder in APPS ART CFG CHT THM VMC POPS CD DVD; do
-    dir="${GAMES_PATH}/${folder}"
-    [[ -d "$dir" ]] || mkdir -p "$dir" || { 
-        echo "[X] Error: Failed to create: $dir"
-        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} $dir"
-    }
-done
+mkdir -p "${GAMES_PATH}"/{APPS,ART,CFG,CHT,LNG,THM,VMC,CD,DVD,POPS,Ember} 2>>"${LOG_FILE}" || {
+    echo "[X] Error: Failed to create OPL folders." >> "${LOG_FILE}"
+    error_msg "Error" "${UI_TEXT[ERROR_OPL_FOLDER]}"
+}
 
 # Check if GAMES_PATH is custom
 if [[ "${GAMES_PATH}" != "${TOOLKIT_PATH}/games" ]]; then
@@ -2685,10 +3120,9 @@ else
     echo "Using default game path." >> "${LOG_FILE}"
 fi
 
-POPS_FOLDER="${GAMES_PATH}/POPS"
-
 SPLASH
 
+# Sync or add?
 echo "${UI_TEXT[GAME_INSTALLER_4]}"
 echo
 echo "1) ${UI_TEXT[GAME_INSTALLER_5]}"
@@ -2714,11 +3148,25 @@ while true; do
     esac
 done
 
+remove_vcd "${GAMES_PATH}/POPS" "${GAMES_PATH}/POPS"
+move_vcd "${GAMES_PATH}/POPS/" "${GAMES_PATH}/Ember/"
+
+if [ "$INSTALL_TYPE" = "sync" ]; then
+    find "${OPL}/POPS/" -maxdepth 1 -type f \( -iname '*.vcd' -o -iname '*.bin' -o -iname '*.cue' \) -delete
+    find "${OPL}/Ember/" -type f \( -iname '*.vcd' -o -iname '*.bin' -o -iname '*.cue' \) -delete
+fi
+
+if [ "$INSTALL_TYPE" = "copy" ]; then
+    remove_vcd "${OPL}/POPS" "${GAMES_PATH}/Ember"
+    move_vcd "${OPL}/POPS/" "${OPL}/Ember/games/"
+    move_vcd "${OPL}/Ember/" "${OPL}/Ember/games/"
+fi
+
 get_display_path
 
 if [ "$INSTALL_TYPE" = "sync" ] && \
-   ! find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
-   ! find "${GAMES_PATH}/CD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" -o -iname "*.cue" \) -print -quit | grep -q . && \
+   ! find "${GAMES_PATH}/Ember/" -type f \( -iname "*.vcd" -o -iname "*.bin" \) -print -quit | grep -q . && \
+   ! find "${GAMES_PATH}/CD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" \) -print -quit | grep -q . && \
    ! find "${GAMES_PATH}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) -print -quit | grep -q .; then
     echo
     echo "${UI_TEXT[GAME_INSTALLER_13]} ${display_path}"
@@ -2736,29 +3184,49 @@ fi
 
 SPLASH
 
+# Choose a loader core
 echo "${UI_TEXT[GAME_INSTALLER_15]}"
 echo
 echo "1) ${UI_TEXT[GAME_INSTALLER_16]}"
 echo
 echo "${UI_TEXT[GAME_INSTALLER_17]}"
-echo "https://github.com/ps2homebrew/Open-PS2-Loader"
+echo "${UI_TEXT[GAME_INSTALLER_90]}"
+echo "${UI_TEXT[GAME_INSTALLER_91]}"
+echo "${UI_TEXT[GAME_INSTALLER_92]}"
 echo
 echo "2) ${UI_TEXT[GAME_INSTALLER_19]}"
 echo
 echo "${UI_TEXT[GAME_INSTALLER_20]}"
-echo "https://github.com/pcm720/nhddl"
+echo "${UI_TEXT[GAME_INSTALLER_93]}"
+echo "${UI_TEXT[GAME_INSTALLER_94]}"
+echo "${UI_TEXT[GAME_INSTALLER_95]}"
+echo "${UI_TEXT[GAME_INSTALLER_96]}"
 echo
 
 while true; do
     read -rp "${UI_TEXT[CHOICE]} (1/2): " choice
     case "$choice" in
         1) LAUNCHER="OPL"; DESC2="Open PS2 Loader (OPL)"; break ;;
-        2) LAUNCHER="NEUTRINO"; DESC2="NHDDL"; break ;;
+        2) LAUNCHER="NEUTRINO"; DESC2="Neutrino"; break ;;
         *) echo; echo "${UI_TEXT[MENU_INVALID]}" ;;
     esac
 done
 
-if [ "$LAUNCHER" = "OPL" ] &&
+# Enable RetroAchievements?
+SPLASH
+echo "${UI_TEXT[GAME_INSTALLER_89]}"
+echo
+while true; do
+    read -rp "${UI_TEXT[CHOICE]} (y/n): " choice
+    case "$choice" in
+        [Yy]) RA="y"; break ;;
+        [Nn]) RA="n"; break ;;
+        *)echo; echo "${UI_TEXT[MENU_INVALID]}" ;;
+    esac
+done
+
+# Compress PS2 ISOs?
+if [ "$LAUNCHER" = "OPL" ] && [ "$RA" = "n" ] &&
     {
         { find "${GAMES_PATH}/DVD/" "${GAMES_PATH}/CD/" -maxdepth 1 -type f -iname "*.iso" | grep -q .; } ||
         { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/DVD/" "${OPL}/CD/" -maxdepth 1 -type f -iname "*.iso" | grep -q .; }
@@ -2779,26 +3247,67 @@ then
     done
 fi
 
+# Decompress PS2 games
+if { [ "$LAUNCHER" = "NEUTRINO" ] || [ "$RA" = "y" ]; } &&
+    {
+        { find "${GAMES_PATH}/DVD/" "${GAMES_PATH}/CD/" -maxdepth 1 -type f -iname "*.zso" | grep -q .; } ||
+        { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/DVD/" "${OPL}/CD/" -maxdepth 1 -type f -iname "*.zso" | grep -q .; }
+    }
+then
+    SPLASH
+    echo "${UI_TEXT[WARM_CONVERT_ZSO_1]}"
+
+    if [ "$LAUNCHER" = "NEUTRINO" ]; then
+        echo "${UI_TEXT[WARM_CONVERT_ZSO_2]}"
+    fi
+
+    if [ "$RA" = "y" ]; then
+        echo "${UI_TEXT[WARM_CONVERT_ZSO_5]}"
+    fi
+
+    echo
+    echo "${UI_TEXT[WARM_CONVERT_ZSO_3]}"
+    echo
+    echo "${UI_TEXT[WARM_CONVERT_ZSO_4]}"
+
+    if [ "$LAUNCHER" = "NEUTRINO" ]; then
+        echo "${UI_TEXT[WARM_CONVERT_ZSO_6]}"
+    fi
+
+    if [ "$RA" = "y" ]; then
+        echo "${UI_TEXT[WARM_CONVERT_ZSO_7]}"
+    fi
+
+    echo
+
+    while true; do
+        read -rp "${UI_TEXT[CHOICE]} (y/n): " choice
+        case "$choice" in
+            [Yy]) UNCOMPRESS="y"; break ;;
+            [Nn]) UNCOMPRESS="n"; break ;;
+            *)echo; echo "${UI_TEXT[MENU_INVALID]}" ;;
+        esac
+    done
+fi
+
 if { find "${GAMES_PATH}/CD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" -o -iname "*.bin" \) | grep -q .; } ||
    { find "${GAMES_PATH}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; } ||
    { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/CD/" "${OPL}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; }
 then
     # Ask about PS2 widescreen hacks and VMCs if PS2 games exist
-    if [ "$LAUNCHER" = "OPL" ]; then
-        SPLASH
-        echo "${UI_TEXT[GAME_INSTALLER_83]}"
-        echo
-        echo "${UI_TEXT[GAME_INSTALLER_84]}"
-        echo
-        while true; do
-            read -rp "${UI_TEXT[CHOICE]} (y/n): " choice
-            case "$choice" in
-                [Yy]) WIDE="y"; break ;;
-                [Nn]) WIDE="n"; break ;;
-                *)echo; echo "${UI_TEXT[MENU_INVALID]}" ;;
-            esac
-        done
-    fi
+    SPLASH
+    echo "${UI_TEXT[GAME_INSTALLER_83]}"
+    echo
+    echo "${UI_TEXT[GAME_INSTALLER_84]}"
+    echo
+    while true; do
+        read -rp "${UI_TEXT[CHOICE]} (y/n): " choice
+        case "$choice" in
+            [Yy]) WIDE="y"; break ;;
+            [Nn]) WIDE="n"; break ;;
+            *)echo; echo "${UI_TEXT[MENU_INVALID]}" ;;
+        esac
+    done
 
     SPLASH
     echo "${UI_TEXT[GAME_INSTALLER_24]}"
@@ -2815,10 +3324,15 @@ then
     done
 fi
 
-if { find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" \) | grep -q .; } ||
-   { [ "$INSTALL_TYPE" = "copy" ] && find "${OPL}/POPS/" -maxdepth 1 -type f -iname "*.vcd" | grep -q .; }
-then
-    ps1_games_found=true
+# HDTV Fix for PS1 games?
+if { find "${GAMES_PATH}/Ember/" -type f -iname "*.bin" -print -quit | grep -q . ||
+     find "${GAMES_PATH}/Ember/" -maxdepth 1 -type f -iname "*.vcd" -print -quit | grep -q .; } ||
+   { [ "$INSTALL_TYPE" = "copy" ] &&
+     { find "${OPL}/Ember/" -type f -iname "*.bin" -print -quit | grep -q . ||
+       find "${OPL}/Ember/" -maxdepth 1 -type f -iname "*.vcd" -print -quit | grep -q .; }; }; then
+    if [[ -f "${OPL}/Ember/settings.txt" ]]; then
+        sed -i '/^display:/d' "${OPL}/Ember/settings.txt"
+    fi
     SPLASH
     echo "${UI_TEXT[GAME_INSTALLER_22]}"
     echo
@@ -2828,11 +3342,10 @@ then
         read -rp "${UI_TEXT[CHOICE]} (y/n): " HDTVFIX
         case "$HDTVFIX" in
             [Yy])
-                cp "${ASSETS_DIR}/POPStarter/CHEATS.TXT" "${OPL}/POPS"
                 break
                 ;;
             [Nn])
-                rm -f "${OPL}/POPS/CHEATS.TXT"
+                echo "display: 240" >> "${OPL}/Ember/settings.txt"
                 break
                 ;;
             *)
@@ -2853,8 +3366,16 @@ echo "• ${UI_TEXT[GAME_INSTALLER_26]} $display_path"
 echo "Install Type: $DESC1" >> "${LOG_FILE}"
 echo "• ${UI_TEXT[GAME_INSTALLER_27]} $DESC1"
 
-echo "Game Launcher: $DESC2" >> "${LOG_FILE}"
+echo "Loader Core: $DESC2" >> "${LOG_FILE}"
 echo "• ${UI_TEXT[GAME_INSTALLER_28]} $DESC2"
+
+if [ "$RA" = "y" ]; then
+    echo "Enable RetroAchievements: Yes" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_97]} ${UI_TEXT[YES]}"
+elif [ "$RA" = "n" ]; then
+    echo "Enable RetroAchievements: No" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_97]} ${UI_TEXT[NO]}"
+fi
 
 if [ "$COMPRESS" = "y" ]; then
     echo "Compress PS2 Games: Yes" >> "${LOG_FILE}"
@@ -2864,12 +3385,12 @@ elif [ "$COMPRESS" = "n" ]; then
     echo "• ${UI_TEXT[GAME_INSTALLER_72]} ${UI_TEXT[NO]}"
 fi
 
-if [ "$WIDE" = "y" ]; then
-    echo "Widescreen Hacks: Yes" >> "${LOG_FILE}"
-    echo "• ${UI_TEXT[GAME_INSTALLER_85]} ${UI_TEXT[YES]}"
-elif [ "$WIDE" = "n" ]; then
-    echo "Widescreen Hacks: No" >> "${LOG_FILE}"
-    echo "• ${UI_TEXT[GAME_INSTALLER_85]} ${UI_TEXT[NO]}"
+if [ "$UNCOMPRESS" = "y" ]; then
+    echo "Uncompress PS2 Games: Yes" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_72]} ${UI_TEXT[YES]}"
+elif [ "$UNCOMPRESS" = "n" ]; then
+    echo "Uncompress PS2 Games: No" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_72]} ${UI_TEXT[NO]}"
 fi
 
 if [ "$PS2_VMC" = "y" ]; then
@@ -2878,6 +3399,14 @@ if [ "$PS2_VMC" = "y" ]; then
 elif [ "$PS2_VMC" = "n" ]; then
     echo "PS2 VMCs: No" >> "${LOG_FILE}"
     echo "• ${UI_TEXT[GAME_INSTALLER_30]} ${UI_TEXT[NO]}"
+fi
+
+if [ "$WIDE" = "y" ]; then
+    echo "Widescreen Hacks: Yes" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_85]} ${UI_TEXT[YES]}"
+elif [ "$WIDE" = "n" ]; then
+    echo "Widescreen Hacks: No" >> "${LOG_FILE}"
+    echo "• ${UI_TEXT[GAME_INSTALLER_85]} ${UI_TEXT[NO]}"
 fi
 
 if [ -n "$HDTVFIX" ]; then
@@ -2896,38 +3425,78 @@ prevent_sleep_start
 
 ################################### Prepare Game Files ###################################
 
-SPLASH
+# Remove VCD files if they already have a matching bin/cue
+for vcd in "${GAMES_PATH}"/POPS/*.VCD "${GAMES_PATH}"/POPS/*.vcd; do
+    base="${vcd%.*}"
 
-install_pops
-
-# Rename .vcd to .VCD
-for dir in "${GAMES_PATH}/POPS" "${OPL}/POPS"; do
-    for file in "$dir"/*.vcd; do
-        [ -e "$file" ] || continue  # skip if no match
-
-        tmpfile="${file%.vcd}.tmp"
-        newfile="${file%.vcd}.VCD"
-
-        mv -- "$file" "$tmpfile" &&
-        mv -- "$tmpfile" "$newfile" >> "$LOG_FILE" 2>&1 || error_msg "Error" "Failed to rename $file."
-    done
+    if [[ -f "$base.cue" && -f "$base.bin" ]] || \
+       [[ -f "$base.CUE" && -f "$base.BIN" ]] || \
+       [[ -f "$base.cue" && -f "$base.BIN" ]] || \
+       [[ -f "$base.CUE" && -f "$base.bin" ]]; then
+        rm -- "$vcd"
+    fi
 done
 
+# Move remaining VCD/BIN/CUE files to Ember folder
+find "${GAMES_PATH}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" -o -iname "*.bin" -o -iname "*.cue" \) -exec mv -n {} "${GAMES_PATH}/Ember/games" \;
+
+# Delete all folders that do not contain VMCs (SLOT0.VMC or SLOT1.VMC)
+find "${OPL}/POPS/" -mindepth 1 -maxdepth 1 -type d \
+    ! -exec test -f '{}/SLOT0.VMC' \; \
+    ! -exec test -f '{}/SLOT1.VMC' \; \
+    -exec rm -rf {} \;
+
+# Delete unecessary files from remaning folders
+find "${OPL}/POPS/" -mindepth 2 -type f ! -name "SLOT0.VMC" ! -name "SLOT1.VMC" -delete
+
+# Rename existing POPS VMCs
+find "${OPL}/POPS/" -mindepth 2 -type f \( -name "SLOT0.VMC" -o -name "SLOT1.VMC" \) \
+    -exec bash -c 'for f; do
+        [[ "${f##*/}" == "SLOT0.VMC" ]] && mv "$f" "${f%/*}/MC1.vmc"
+        [[ "${f##*/}" == "SLOT1.VMC" ]] && mv "$f" "${f%/*}/MC2.vmc"
+    done' _ {} +
+
+# Move existing POPS VMCs to Ember folder
+find "${OPL}/POPS/" -mindepth 1 -maxdepth 1 -type d \-exec mv -n {} "${OPL}/Ember/games/" \;
+
+# Move and convert VCD files for use with Ember
+convert_vcd "${GAMES_PATH}/Ember/"
+
+if [ "$INSTALL_TYPE" = "copy" ]; then
+    convert_vcd "${OPL}/Ember/games/"
+else
+    find "${OPL}/Ember/games/" -maxdepth 1 -type f -iname "*.vcd" -delete
+fi
+
+SPLASH
+
 echo  >> "${LOG_FILE}"
-echo "Contents of ${OPL}/POPS:" >> "${LOG_FILE}"
-ls -l "${OPL}/POPS/" >> "${LOG_FILE}"
+echo "Contents of ${OPL}/Ember/games:" >> "${LOG_FILE}"
+find "${OPL}/Ember/games/" -type f \( -iname '*.bin' -o -iname '*.cue' \) -printf '%P\n' >> "${LOG_FILE}" 2>&1
 echo >> "${LOG_FILE}"
 
-convert_vcd
-
-echo "Local POPS folder contents:" >> "${LOG_FILE}"
-ls -l "${GAMES_PATH}/POPS/" >> "${LOG_FILE}"
+echo "Local Ember folder contents:" >> "${LOG_FILE}"
+find "${GAMES_PATH}/Ember/" -type f \( -iname '*.bin' -o -iname '*.cue' \) -printf '%P\n' >> "${LOG_FILE}" 2>&1
 echo >> "${LOG_FILE}"
 
 if [ "$INSTALL_TYPE" = "sync" ]; then
-    ps1_update=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
+    organise_bin "${GAMES_PATH}/Ember"
+    ps1_update=$(rsync -rL --dry-run --delete --ignore-existing --itemize-changes --exclude='*/.*' --include='*/' --include='*/*.[cC][uU][eE]' --include='*/*.[bB][iI][nN]' --exclude='*' "${GAMES_PATH}/Ember/" "${OPL}/Ember/games/")
+
 elif [ "$INSTALL_TYPE" = "copy" ]; then
-    ps1_update=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
+    organise_bin "${GAMES_PATH}/Ember"
+    organise_bin "${OPL}/Ember/games"
+    ps1_update=$(rsync -rL --dry-run --ignore-existing --itemize-changes --exclude='*/.*' --include='*/' --include='*/*.[cC][uU][eE]' --include='*/*.[bB][iI][nN]' --exclude='*' "${GAMES_PATH}/Ember/" "${OPL}/Ember/games/")
+fi
+
+convert_bin
+
+if [[ "$UNCOMPRESS" = "y" ]]; then
+    uncompress_zso
+fi
+
+if [[ "$COMPRESS" = "y" ]]; then
+    compress_zso
 fi
 
 echo  >> "${LOG_FILE}"
@@ -2943,14 +3512,6 @@ echo >> "${LOG_FILE}"
 echo "PS2 DVD folder contents:" >> "${LOG_FILE}"
 ls -l "${OPL}/DVD/" >> "${LOG_FILE}"
 echo >> "${LOG_FILE}" 
-
-convert_bin
-
-if [[ "$LAUNCHER" = "NEUTRINO" ]]; then
-    uncompress_zso
-elif [[ "$LAUNCHER" = "OPL" && "$COMPRESS" = "y" ]]; then
-    compress_zso
-fi
 
 if [ "$INSTALL_TYPE" = "sync" ]; then
     cd=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='[^.]*.iso' --include='[^.]*.ISO' --include='[^.]*.zso' --include='[^.]*.ZSO' --exclude='.*' --exclude='*' "${GAMES_PATH}/CD/" "${OPL}/CD/")
@@ -2974,13 +3535,13 @@ echo | tee -a "${LOG_FILE}"
 
 if [ -n "$ps1_update" ]; then
     if [ "$INSTALL_TYPE" = "sync" ]; then
-        rsync -dL --progress --delete --ignore-existing --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+        rsync -rL --progress --delete --ignore-existing --exclude='*/.*' --include='*/' --include='*/*.[cC][uU][eE]' --include='*/*.[bB][iI][nN]' --exclude='*' "${GAMES_PATH}/Ember/" "${OPL}/Ember/games/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
         if [ "${PIPESTATUS[0]}" -ne 0 ]; then
             echo echo "[X] Error: Failed to sync PS1 games." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_PS1_SYNC]}"
         fi
     else
-        rsync -dL --progress --ignore-existing --include='[^.]*.VCD' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
+        rsync -rL --progress --ignore-existing --exclude='*/.*' --include='*/' --include='*/*.[cC][uU][eE]' --include='*/*.[bB][iI][nN]' --exclude='*' "${GAMES_PATH}/Ember/" "${OPL}/Ember/games/" 2>>"${LOG_FILE}" | tee -a "${LOG_FILE}"
         if [ "${PIPESTATUS[0]}" -ne 0 ]; then
             echo "[X] Error: Failed to copy PS1 games." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_PS1_COPY]}"
@@ -3015,57 +3576,85 @@ else
     echo "${UI_TEXT[GAME_INSTALLER_39]}"
 fi
 
-################################### Synchronize & Copy SMB POPStarter Games ###################################
+################################### Synchronize & Copy External POPStarter Games ###################################
 
 if [ "$INSTALL_TYPE" = "sync" ]; then
-    pops_ext=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='SB.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
+    pops_ext=$(rsync -dL --dry-run --delete --ignore-existing --itemize-changes --include='SB.*.ELF' --include='XX.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
 elif [ "$INSTALL_TYPE" = "copy" ]; then
-    pops_ext=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='SB.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
+    pops_ext=$(rsync -dL --dry-run --ignore-existing --itemize-changes --include='SB.*.ELF' --include='XX.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/")
 fi
 
 # Set flag if any changes
 if [ -n "$pops_ext" ]; then
     SPLASH
     if [ "$INSTALL_TYPE" = "sync" ]; then
-        echo "Syncing POPStarter SMB files..." >> "${LOG_FILE}"
-        rsync -dL --progress --delete --ignore-existing --include='SB.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" >>"${LOG_FILE}" 2>&1 | tee -a "${LOG_FILE}"
+        echo "Syncing POPStarter ELF files..." >> "${LOG_FILE}"
+        rsync -dL --progress --delete --ignore-existing --include='SB.*.ELF' --include='XX.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" >>"${LOG_FILE}" 2>&1 | tee -a "${LOG_FILE}"
         if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-            echo echo "[X] Error: Failed to sync POPStarter SMB files." >> "${LOG_FILE}"
+            echo echo "[X] Error: Failed to sync POPStarter ELF files." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_POPS_SYNC]}"
         fi
     else
         echo "Copying POPStarter ELF files..." >> "${LOG_FILE}"
-        rsync -dL --progress --ignore-existing --include='SB.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" >>"${LOG_FILE}" 2>&1 | tee -a "${LOG_FILE}"
+        rsync -dL --progress --ignore-existing --include='SB.*.ELF' --include='XX.*.ELF' --exclude='.*' --exclude='*' "${GAMES_PATH}/POPS/" "${OPL}/POPS/" >>"${LOG_FILE}" 2>&1 | tee -a "${LOG_FILE}"
         if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-            echo "[X] Error: Failed to copy POPStarter SMB files." >> "${LOG_FILE}"
+            echo "[X] Error: Failed to copy POPStarter ELF files." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_POPS_COPY]}"
         fi
     fi
 else
-    echo "POPStarter SMB files are already up-to-date." >> "${LOG_FILE}"
+    echo "POPStarter ELF files are already up-to-date." >> "${LOG_FILE}"
 fi
 
-################################### Create Games List ###################################
+################################### Create PS1 Games List, VMCs, and multi-discs ###################################
 
-# Create games list of PS1 games in ${OPL}/POPS
-if find "${OPL}/POPS/" -maxdepth 1 -type f \( -iname "*.vcd" \) | grep -q .; then
+# Create games list of PS1 games in ${OPL}/Ember/games
+if find "${OPL}/Ember/games" -type f -iname "*.bin" | grep -q .; then
     SPLASH
     echo "Creating PS1 games list..." >> "${LOG_FILE}"
     echo "${UI_TEXT[GAME_INSTALLER_37]}"
-    python3 -u "${HELPER_DIR}/list-builder.py" "${OPL}" "${ATA_POPS_LIST}"
+    python3 -u "${HELPER_DIR}/list-builder.py" "${OPL}" "${EMBER_LIST}"
     if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-        echo "[X] Error: Failed to create ATA PS1 games list." >> "${LOG_FILE}"
+        echo "[X] Error: Failed to create Ember PS1 games list." >> "${LOG_FILE}"
         error_msg "Error" "${UI_TEXT[ERROR_PS1_LIST]}"
     fi
 fi
 
-if [ -s "${ATA_POPS_LIST}" ]; then
-    cat "${ATA_POPS_LIST}" > "${PS1_LIST}"
+if [[ ! -s "${EMBER_LIST}" ]] && find "${OPL}/Ember/games/" -type f \( -iname "*.bin" \) | grep -q .; then
+    echo "[X] Error: Failed to create Ember games list." >> "${LOG_FILE}"
+    error_msg "Error" "${UI_TEXT[ERROR_PS1_LIST]}"
+fi
+
+if [ -s "${EMBER_LIST}" ]; then
+    CREATE_PS1_VMC
+
+    tmp_file=$(mktemp)
+
+    while IFS='|' read -r title game_id publisher disc_type folder_name jpn_title partition_label; do
+        # English title: remove disc text and normalize whitespace
+        title=$(sed -E \
+            -e 's/\(disc .\)//Ig' \
+            -e 's/ +/ /g' \
+            -e 's/^ +| +$//g' <<< "$title")
+
+        # Japanese title: remove disc text only
+        jpn_title=$(sed -E \
+            -e 's/（ディスク.）//g' <<< "$jpn_title")
+
+        printf '%s|%s|%s|%s|%s|%s|%s\n' \
+            "$title" "$game_id" "$publisher" "$disc_type" "$folder_name" "$jpn_title" "$partition_label"
+
+    done < "$EMBER_LIST" > "$tmp_file" 
+
+    mv "$tmp_file" "$EMBER_LIST"
+    cat "${EMBER_LIST}" > "${PS1_LIST}"
 fi
 
 if [ -s "${PFS_POPS_LIST}" ]; then
     cat "${PFS_POPS_LIST}" >> "${PS1_LIST}"
 fi
+
+ps1_count=$(grep -c '^[^[:space:]]' "${EMBER_LIST}" 2>/dev/null || echo 0)
 
 # Create games list of PS2 games in ${OPL}/CD/" and "${OPL}/DVD"
 if find "${OPL}/CD/" "${OPL}/DVD" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; then
@@ -3076,6 +3665,21 @@ if find "${OPL}/CD/" "${OPL}/DVD" -maxdepth 1 -type f \( -iname "*.iso" -o -inam
     if [ "${PIPESTATUS[0]}" -ne 0 ]; then
         echo "[X] Error: Failed to create PS2 games list." >> "${LOG_FILE}"
         error_msg "Error" "${UI_TEXT[ERROR_PS2_LIST]}"
+    fi
+fi
+
+ps2_count=$(grep -c '^[^[:space:]]' "${PS2_LIST}" 2>/dev/null || echo 0)
+
+if [ -s "${PS2_LIST}" ]; then
+    # Create PS2 VMCs if enabled
+    if [ "$PS2_VMC" = "y" ]; then
+        CREATE_PS2_VMC
+    else
+        DISABLE_PS2_VMC
+    fi
+
+    if [ "$WIDE" = "y" ]; then
+        WIDESCREEN_CHEATS
     fi
 fi
 
@@ -3116,24 +3720,15 @@ fi
 
 if [[ ! -s "${PS2_LIST}" ]] && find "${OPL}/CD/" "${OPL}/DVD/" -maxdepth 1 -type f \( -iname "*.iso" -o -iname "*.zso" \) | grep -q .; then
     echo "[X] Error: Failed to create games list." >> "${LOG_FILE}"
-    error_msg "Error" "${UI_TEXT[ERROR_GAME_LIST]}"
+    error_msg "Error" "${UI_TEXT[ERROR_PS2_LIST]}"
 fi
-
-if [[ ! -s "${PS1_LIST}" ]] && find "${OPL}/POPS/" -maxdepth 1 -type f \( -iname "*.VCD" \) | grep -q .; then
-    echo "[X] Error: Failed to create games list." >> "${LOG_FILE}"
-    error_msg "Error" "${UI_TEXT[ERROR_GAME_LIST]}"
-fi
-
-ata_pops_count=$(grep -c '^[^[:space:]]' "${ATA_POPS_LIST}")
-
-rm -f "${OPL}/ps1.list"
 
 # Create games list of PS1 External Games
 if files=( "${OPL}/POPS/"*.ELF ); then
     SPLASH
     pops_count=${#files[@]}
     i="0"
-    echo "Creating SMB games list..." >> "${LOG_FILE}"
+    echo "Creating POPS external games list..." >> "${LOG_FILE}"
     echo "${UI_TEXT[GAME_INSTALLER_62]}"
     for file in "${OPL}/POPS/"*.ELF; do
         filename=$(basename "$file")
@@ -3144,6 +3739,7 @@ if files=( "${OPL}/POPS/"*.ELF ); then
 
         case "$prefix" in
             "SB.") tag="SMB"; magic="SB" ;;
+            "XX.") tag="BDM"; magic="XX" ;;
             *) i=$((i + 1)); show_progress "$i" "$pops_count"; continue ;;
         esac
 
@@ -3248,21 +3844,21 @@ if files=( "${OPL}/POPS/"*.ELF ); then
             fi
         fi
             make_partition_label "$game_id" "$magic" "$title"
-            echo "$title|$game_id|$publisher|$tag|$filename|$jpn_title|$partition_label" >> "${SMB_POPS_LIST}"
+            echo "$title|$game_id|$publisher|$tag|$filename|$jpn_title|$partition_label" >> "${EXT_POPS_LIST}"
             i=$((i + 1))
             show_progress "$i" "$pops_count"
     done
 fi
 
-if [ -s "${SMB_POPS_LIST}" ]; then
+if [ -s "${EXT_POPS_LIST}" ]; then
 
     # Sort games list
     if [[ "$lang" == "jpn" ]]; then
-        sort_jpn "${SMB_POPS_LIST}" "${POPS_JPN_LIST}"
+        sort_jpn "${EXT_POPS_LIST}" "${POPS_JPN_LIST}"
     fi
 
-    if [ -s "${SMB_POPS_LIST}" ]; then
-        python3 "${HELPER_DIR}/list-sorter.py" "${SMB_POPS_LIST}" || {
+    if [ -s "${EXT_POPS_LIST}" ]; then
+        python3 "${HELPER_DIR}/list-sorter.py" "${EXT_POPS_LIST}" || {
             echo "[X] Error: Failed to sort the POPStarter SMB games list." >> "${LOG_FILE}"
             error_msg "Error" "${UI_TEXT[ERROR_PS1_SORT]}"
         }
@@ -3270,15 +3866,17 @@ if [ -s "${SMB_POPS_LIST}" ]; then
 
     if [ -s "${POPS_JPN_LIST}" ]; then
         cat "${POPS_JPN_LIST}" > "${TMP_LIST}"
-        cat "${SMB_POPS_LIST}" >> "${TMP_LIST}" 2> "${LOG_FILE}"
-        cat "${TMP_LIST}" > "${SMB_POPS_LIST}"
+        cat "${EXT_POPS_LIST}" >> "${TMP_LIST}" 2> "${LOG_FILE}"
+        cat "${TMP_LIST}" > "${EXT_POPS_LIST}"
     fi
 
-    echo "smb-pops.list:" >> "${LOG_FILE}"
-    cat "${SMB_POPS_LIST}" >> "${LOG_FILE}"
+    echo >> "${LOG_FILE}"
+    echo "ext-pops.list:" >> "${LOG_FILE}"
+    cat "${EXT_POPS_LIST}" >> "${LOG_FILE}"
+    echo >> "${LOG_FILE}"
 else
     echo | tee -a "${LOG_FILE}"
-    echo "No PS1 SMB games to process." >> "${LOG_FILE}"
+    echo "No POPS external games to process." >> "${LOG_FILE}"
     collection_count="0"
 fi
 
@@ -3292,6 +3890,12 @@ rm -rf "${OPL}/APPS/APP_WLE-ISR-"
 rm -rf "${OPL}/APPS/SYS_OSDMENU-CONFIGURATOR"
 rm -rf "${OPL}/APPS/PSBBN"
 
+md5_check "${OPL}/POPS/POPSLOADER.ELF" "a99c9bce7633363ec3973be352da7592"
+
+if [ "$delete_app" = "yes" ]; then
+    rm -f "${OPL}/POPS/POPSLOADER.ELF"
+fi
+
 md5_check "${GAMES_PATH}/APPS/BOOT.ELF" "20a5b2c1ffb86e742fb5705b5d9d7370"
 
 if [ "$delete_app" = "yes" ]; then
@@ -3304,8 +3908,19 @@ if [ "$delete_app" = "yes" ]; then
     rm -f "${GAMES_PATH}/APPS/APP_WLE-ISR-XF-MM.psu"
 fi
 
+if [ ! -f "${OPL}/Ember/bios.bin" ]; then
+    if [ ! -f "${ASSETS_DIR}/dep/bios.bin" ]; then
+        download_files
+    fi
+
+    if ! cp "${ASSETS_DIR}/dep/bios.bin" "${OPL}/Ember/bios.bin"; then
+        echo "Warning: The PS1 BIOS file is missing."  >> "${LOG_FILE}" 2>&1
+        error_msg "Warning" "${UI_TEXT[WARN_PS1_BIOS]}"
+    fi
+fi
+
+update_apps "Ember" "${ASSETS_DIR}/Ember/ember.elf" "${OPL}/Ember/ember.elf" "-ut --progress"
 update_apps "Neutrino" "${NEUTRINO_DIR}/" "${OPL}/neutrino/" "-rut --progress --delete --exclude='.*'"
-update_apps "POPSLoader" "${ASSETS_DIR}/POPStarter/POPSLOADER.ELF" "${OPL}/POPS/POPSLOADER.ELF" "-ut --progress"
 
 if [ "$INSTALL_TYPE" = "sync" ]; then
     echo >> "${LOG_FILE}"
@@ -3449,67 +4064,34 @@ echo "APPS on drive:" >> "${LOG_FILE}"
 find "${OPL}/APPS/" -type f -name '*.elf' -printf '%P\n' >> "${LOG_FILE}" 2>&1
 echo >> "${LOG_FILE}"
 
+APP_COUNT=$(grep -c '^[^[:space:]]' "${APPS_LIST}" 2>/dev/null || echo 0)
+
 ################################### OPL Artwork ###################################
 
-if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
+if [[ -s "$PS1_LIST" || -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
     SPLASH
+    ART_TOTAL=$((ps1_count + ps2_count + APP_COUNT))
     echo "Downloading artwork for OPL..."  >> "${LOG_FILE}"
     echo "${UI_TEXT[GAME_INSTALLER_43]}"
-    ps2_count=$(grep -c '^[^[:space:]]' "${PS2_LIST}" 2>/dev/null || echo 0)
-    APP_COUNT=$(grep -c '^[^[:space:]]' "${APPS_LIST}" 2>/dev/null || echo 0)
-    ART_TOTAL=$((ps2_count + APP_COUNT))
     i="0"
+    show_progress "$i" "$ART_TOTAL"
 
+    if opl_manager_id; then
+        if [ -s "${EMBER_LIST}" ]; then
+            opl_game_art "${EMBER_LIST}"
+        fi
 
-    if [ -s "${PS2_LIST}" ]; then
-        exec 3< "${PS2_LIST}"
-        while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
-            png_file_cover="${OPL}/ART/${game_id}_COV.png"
-            png_file_disc="${OPL}/ART/${game_id}_ICO.png"
-
-            if [[ -f "$png_file_cover" ]]; then
-                echo "OPL Artwork for $game_id already exists. Skipping download." >> "${LOG_FILE}"
-            else
-                echo "OPL Artwork not found locally for $game_id. Attempting to download from archive.org..." >> "${LOG_FILE}"
-                wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cover" \
-                "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_COV.png"
-                #wget --quiet --timeout=10 --tries=3 --output-document="$png_file_disc" \
-                #"https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS2/${game_id}/${game_id}_ICO.png"
-
-                missing_files=()
-
-                if [[ ! -s "$png_file_cover" ]]; then
-                    [[ -f "$png_file_cover" ]] && rm -f "$png_file_cover"
-                    missing_files+=("cover")
-                fi
-
-                if [[ ! -s "$png_file_disc" ]]; then
-                    [[ -f "$png_file_disc" ]] && rm -f "$png_file_disc"
-                    missing_files+=("disc")
-                fi
-
-                if [[ -f "$png_file_cover" || -f "$png_file_disc" ]]; then
-                    if [[ ${#missing_files[@]} -eq 0 ]]; then
-                        echo >> "${LOG_FILE}"
-                        echo "[✓] Successfully downloaded OPL artwork for $game_id" >> "${LOG_FILE}"
-                    else
-                        echo >> "${LOG_FILE}"
-                        echo "[✓] Successfully downloaded some OPL artwork for $game_id, but missing: ${missing_files[*]}" >> "${LOG_FILE}"
-                    fi
-                else
-                    echo >> "${LOG_FILE}"
-                    echo "Failed to download OPL artwork for $game_id" >> "${LOG_FILE}"
-                fi
-            fi
-            i=$((i + 1))
-            show_progress "$i" "$ART_TOTAL"
-        done
-        exec 3<&-
+        if [ -s "${PS2_LIST}" ]; then
+            opl_game_art "${PS2_LIST}"
+        fi
+    else
+        echo "Warning: Unable to retrieve the API user ID." >> "${LOG_FILE}"
+        error_msg "Warning" "${UI_TEXT[WARN_API]}"
     fi
 
     if [ -s "${APPS_LIST}" ]; then
         exec 3< "${APPS_LIST}"
-        while IFS='|' read -r title title_id publisher disc_type file_name jpn_title <&3; do
+        while IFS='|' read -r title title_id publisher disc_type file_name jpn_title partition_label <&3; do
             png_file="${ARTWORK_DIR}/${title_id}.png"
             elf=$(basename "$file_name")
 
@@ -3517,7 +4099,7 @@ if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
                 echo "Artwork not found locally for $title_id. Attempting to download from the PSBBN art database..." >> "${LOG_FILE}"
                 wget --quiet --timeout=10 --tries=3 --output-document="$png_file" \
                 "https://raw.githubusercontent.com/CosmicScale/psbbn-art-database/main/apps/${title_id}.png"
-                
+                    
                 if [[ -s "$png_file" ]]; then
                     echo "[✓] Successfully downloaded artwork for $title_id" >> "${LOG_FILE}"
                 else
@@ -3525,7 +4107,7 @@ if [[ -s "$PS2_LIST" || -s "$APPS_LIST" ]]; then
                     echo "$title_id,$title,$elf" >> "${MISSING_APP_ART}"
                 fi
             fi
-
+            
             if [[ -s "$png_file" ]]; then
                 cp "$png_file" "${OPL}/ART/${elf}_COV.png" 2>> "${LOG_FILE}" || {
                     echo "[X] Error: Failed to create ${OPL}/ART/${elf}_COV.png" >> "${LOG_FILE}"
@@ -3545,53 +4127,6 @@ else
     echo "No OPL artwork to download." >> "${LOG_FILE}"
 fi
 
-################################### POPSLoader Artwork ###################################
-
-if [ -s "${ATA_POPS_LIST}" ]; then
-    SPLASH
-    echo "Downloading artwork for POPSLoader..."  >> "${LOG_FILE}"
-    echo "${UI_TEXT[GAME_INSTALLER_44]}"
-    [ -d "${OPL}/POPS/ART" ] && rm -rf "${OPL}/POPS/ART"
-    i="0"
-    # First loop: Run the art downloader script for each game_id if artwork doesn't already exist
-    exec 3< "${ATA_POPS_LIST}"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
-        png_file_cover="${OPL}/ART/${file_name%.*}_COV.png"
-        if [[ -f "$png_file_cover" ]]; then
-            echo "POPSLoader Artwork for $filename already exists. Skipping download." >> "${LOG_FILE}"
-        else
-            # Attempt to download artwork using wget
-            echo "POPSLoader Artwork not found locally for $filename. Attempting to download from archive.org..." >> "${LOG_FILE}"
-            wget --quiet --timeout=10 --tries=3 --output-document="$png_file_cover" \
-            "https://archive.org/download/OPLM_ART_2024_09/OPLM_ART_2024_09.zip/PS1/${game_id}/${game_id}_COV.png"
-
-            missing_files=()
-
-            if [[ ! -s "$png_file_cover" ]]; then
-                [[ -f "$png_file_cover" ]] && rm -f "$png_file_cover"
-                missing_files+=("cover")
-            fi
-
-            if [[ -s "$png_file_cover" ]]; then
-                if [[ ${#missing_files[@]} -eq 0 ]]; then
-                    echo >> "${LOG_FILE}"
-                    echo "[✓] Successfully downloaded POPSLoader artwork for $file_name" >> "${LOG_FILE}"
-                fi
-            else
-                echo >> "${LOG_FILE}"
-                echo "Failed to download POPSLoader artwork for $file_name" >> "${LOG_FILE}"
-            fi
-        fi
-        i=$((i + 1))
-        show_progress "$i" "$ata_pops_count"
-    done
-    echo
-    exec 3<&-
-else
-    echo | tee -a "${LOG_FILE}"
-    echo "No POPSLoader artwork to download." >> "${LOG_FILE}"
-fi
-
 ################################### Assets for Included Apps ###################################
 
 SPLASH
@@ -3604,34 +4139,21 @@ icon_sys_filename="${SCRIPTS_DIR}/tmp/$pp_name/icon.sys"
 
 mkdir -p "${SCRIPTS_DIR}/tmp/$pp_name"
 
-if [ "$LAUNCHER" = "OPL" ]; then
-    title="Open PS2 Loader"
-    title_id="APP_OPL"
-    publisher="github.com/ps2homebrew"
-    elf="hdd0:__system:pfs:/launcher/OPNPS2LD.ELF"
-    icon="APP_OPL_LST.ico"
-    icon_del="APP_OPL_DEL.ico"
-    art="APP_OPL.png"
-else
-    title="NHDDL"
-    title_id="APP_NHDDL"
-    publisher="github.com/pcm720"
-    elf="hdd0:__system:pfs:/launcher/nhddl.elf"
-    icon="APP_NHDDL_LST.ico"
-    icon_del="APP_NHDDL_DEL.ico"
-    art="APP_NHDDL.png"
-fi
+title="Open PS2 Loader: RiptOPL"
+title_id="APP_RIPTOPL"
+publisher="github.com/NathanNeurotic"
+elf="hdd0:__system:pfs:/launcher/RIPTOPL-RA-UNPAKT.ELF"
 
-cp "${ICONS_DIR}/ico/$icon" "${SCRIPTS_DIR}/tmp/$pp_name/list.ico" 2>> "${LOG_FILE}" || {
+cp "${ICONS_DIR}/ico/APP_RIPTOPL_LST.ico" "${SCRIPTS_DIR}/tmp/$pp_name/list.ico" 2>> "${LOG_FILE}" || {
     echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/list.ico" >> "${LOG_FILE}"
     error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/list.ico"
 }
-cp "${ICONS_DIR}/ico/$icon_del" "${SCRIPTS_DIR}/tmp/$pp_name/del.ico" 2>> "${LOG_FILE}" || {
+cp "${ICONS_DIR}/ico/APP_RIPTOPL_DEL.ico" "${SCRIPTS_DIR}/tmp/$pp_name/del.ico" 2>> "${LOG_FILE}" || {
     echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/del.ico" >> "${LOG_FILE}"
     error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/del.ico"
 }
 
-cp "${ARTWORK_DIR}/$art" "${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" 2>> "${LOG_FILE}" || {
+cp "${ARTWORK_DIR}/APP_RIPTOPL.png" "${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" 2>> "${LOG_FILE}" || {
     echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" >> "${LOG_FILE}"
     error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png"
 }
@@ -3639,38 +4161,6 @@ cp "${ARTWORK_DIR}/$art" "${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" 2>> "${LOG_FI
 echo "$title|$title_id|$publisher|INC|$elf||$pp_name" >> "${ALL_TITLES}"\
 
 create_system_cnf "$elf" "$title_id"
-create_info_sys "[LCH] $title" "$title_id" "$publisher"
-create_icon_sys "$title" "Launcher"
-
-# POPSLoader
-title="POPSLoader"
-title_id="PS1_POPSLOAD"
-publisher="github.com/NathanNeurotic"
-elf="ata:/POPS/POPSLOADER.ELF"
-pp_name="PP.POPSLOADER"
-system_cnf="${SCRIPTS_DIR}/tmp/$pp_name/system.cnf"
-info_sys_filename="${SCRIPTS_DIR}/tmp/$pp_name/info.sys"
-icon_sys_filename="${SCRIPTS_DIR}/tmp/$pp_name/icon.sys"
-
-mkdir -p "${SCRIPTS_DIR}/tmp/$pp_name"
-
-cp "${ICONS_DIR}/ico/PS1_POPSLOAD_LST.ico" "${SCRIPTS_DIR}/tmp/$pp_name/list.ico" 2>> "${LOG_FILE}" || {
-        echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/list.ico" >> "${LOG_FILE}"
-        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/list.ico"
-    }
-cp "${ICONS_DIR}/ico/PS1_POPSLOAD_DEL.ico" "${SCRIPTS_DIR}/tmp/$pp_name/del.ico" 2>> "${LOG_FILE}" || {
-        echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/del.ico" >> "${LOG_FILE}"
-        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/del.ico"
-    }
-
-cp "${ARTWORK_DIR}/PS1_POPSLOAD.png" "${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" 2>> "${LOG_FILE}" || {
-        echo "[X] Error: Failed to create: ${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png" >> "${LOG_FILE}"
-        error_msg "Error" "${UI_TEXT[ERROR_CREATE]} ${SCRIPTS_DIR}/tmp/$pp_name/jkt_001.png"
-    }
-
-echo "$title|$title_id|$publisher|INC|$elf||$pp_name" >> "${ALL_TITLES}"
-
-create_system_cnf "$elf" "$title_id" "-page=ata"
 create_info_sys "[LCH] $title" "$title_id" "$publisher"
 create_icon_sys "$title" "Launcher"
 
@@ -3732,7 +4222,7 @@ fi
 
 ################################### Game Selector ###################################
 
-cat "${PS1_LIST}" "${SMB_POPS_LIST}" "${PS2_LIST}" "${APPS_LIST}" 2>/dev/null >> "${ALL_TITLES}"
+cat "${PS1_LIST}" "${EXT_POPS_LIST}" "${PS2_LIST}" "${APPS_LIST}" 2>/dev/null >> "${ALL_TITLES}"
 
 if [ -s "${ALL_TITLES}" ]; then
     # Set maximum number of items for the Game Channel
@@ -3787,7 +4277,7 @@ if [ -s "$SELECTED_LIST" ] &&
    collection_count=$(awk -F'|' '$4 ~ /^(SYS|EMU|GME|DST|DBG|PS1|RTE|DEM|APP)$/ { c++ } END { print c+0 }' "$SELECTED_LIST") &&
    [ "$collection_count" -gt 0 ]
 then
-    create_app_assets "$SELECTED_LIST"
+    create_app_assets
 else
     echo | tee -a "${LOG_FILE}"
     echo "No apps to process." >> "${LOG_FILE}"
@@ -3796,13 +4286,13 @@ fi
 # Assets for Games
 
 if [ -s "$SELECTED_LIST" ] &&
-   collection_count=$(awk -F'|' '$4 ~ /^(DVD|CD|POPS|__.POPS|SMB)$/ { c++ } END { print c+0 }' "$SELECTED_LIST") &&
+   collection_count=$(awk -F'|' '$4 ~ /^(DVD|CD|EMBER|__.POPS|SMB|BDM)$/ { c++ } END { print c+0 }' "$SELECTED_LIST") &&
    [ "$collection_count" -gt 0 ]
 then
-    create_game_assets "$SELECTED_LIST"
+    create_game_assets
 else
     echo | tee -a "${LOG_FILE}"
-    echo "No games to process." >> "${LOG_FILE}"
+    echo "Create Game Assets: No games to process." >> "${LOG_FILE}"
 fi
 
 # Copy OPL related files
@@ -3844,45 +4334,32 @@ if ! $files_exist; then
     echo "No OPL files to copy." >> "${LOG_FILE}"
 fi
 
-if [ -s "${ATA_POPS_LIST}" ]; then
-    if [ ! -d "$ASSETS_DIR/Hugopocked POPStarter Fixes (2023-08-11)" ]; then
-        echo | tee -a "${LOG_FILE}"
-        echo | tee -a "${LOG_FILE}"
-        echo "Downloading Hugopocked POPStarter Fixes..." >> "${LOG_FILE}"
-        echo -n "${UI_TEXT[GAME_INSTALLER_49]}"
-        POPS_PATCH_DL >> "${LOG_FILE}" 2>&1
-        echo | tee -a "${LOG_FILE}"
-    else
-        echo >> "${LOG_FILE}"
-        echo "Hugopocked POPStarter Fixes are present." >> "${LOG_FILE}"
-    fi
-    CREATE_PS1_VMC
+rm -f "${OPL}/CD/games.bin" "${OPL}/DVD/games.bin" &>/dev/null
+
+if [ -s "$ALL_TITLES" ] &&
+   collection_count=$(awk -F'|' '$4 ~ /^(DVD|CD|EMBER)$/ { c++ } END { print c+0 }' "$SELECTED_LIST") &&
+   [ "$collection_count" -gt 0 ]
+then
+    create_cfg
+else
+    echo | tee -a "${LOG_FILE}"
+    echo "Create CFG files: No games to process." >> "${LOG_FILE}"
 fi
 
-if [ -s "${PS2_LIST}" ]; then
-    # Create PS2 VMCs if enabled
-    if [ "$PS2_VMC" = "y" ]; then
-        CREATE_PS2_VMC
-    else
-        DISABLE_PS2_VMC
-    fi
-
-    if [ "$WIDE" = "y" ]; then
-        WIDESCREEN_CHEATS
-    fi
-fi
-
-# Enable Compatibility Mode 1 for all ZSO files in OPL game configs
+# Enable OPL Loader Core and Compatibility Mode 1 for all ZSO files in RiptOPL game configs
 if [[ -f "${PS2_LIST}" ]]; then
     exec 3< "${PS2_LIST}"
-    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title <&3; do
+    while IFS='|' read -r title game_id publisher disc_type file_name jpn_title partition_label <&3; do
         if [[ "$file_name" == *.zso || "$file_name" == *.ZSO ]]; then
             cfg_file="${OPL}/CFG/${game_id}.cfg"
             if [[ -f "$cfg_file" ]] && grep -q '^\$Compatibility=' "$cfg_file"; then
                 : # Compatibility modes already configured
             else
-                printf '$Compatibility=1\r\n' >> "$cfg_file"
+                printf '$Compatibility=1\n' >> "$cfg_file"
             fi
+
+            sed -i "/^\$CoreLoader/d" "$cfg_file"
+            printf '$CoreLoader=0\n' >> "$cfg_file"
         fi
     done
     exec 3<&-
@@ -3895,55 +4372,46 @@ case "$lang" in
         OPL_LANG="japanese"
         R3CONFIG_LANG="en"
         WLE_LANG="english"
-        PLOAD_LANG="EN"
         ;;
     fre)
         OPL_LANG="French"
         R3CONFIG_LANG="fr"
         WLE_LANG="french"
-        PLOAD_LANG="FR"
         ;;
     spa)
         OPL_LANG="Spanish"
         R3CONFIG_LANG="es"
         WLE_LANG="spanish"
-        PLOAD_LANG="ES"
         ;;
     ger)
         OPL_LANG="German"
         R3CONFIG_LANG="de"
         WLE_LANG="german"
-        PLOAD_LANG="DE"
         ;;
     ita)
         OPL_LANG="Italian"
         R3CONFIG_LANG="en"
         WLE_LANG="italian"
-        PLOAD_LANG="IT"
         ;;
     por)
         OPL_LANG="Portuguese_BR"
         R3CONFIG_LANG="pt"
         WLE_LANG="brazilian"
-        PLOAD_LANG="PT"
         ;;
     hun)
         OPL_LANG="Hungarian"
         R3CONFIG_LANG="en"
         WLE_LANG="hungarian"
-        PLOAD_LANG="HU"
        ;;
     rus)
         OPL_LANG="Russian"
         R3CONFIG_LANG="en"
         WLE_LANG="english"
-        PLOAD_LANG="EN"
         ;;
     *)
         OPL_LANG="English (internal)"
         R3CONFIG_LANG="en"
         WLE_LANG="english"
-        PLOAD_LANG="EN"
         ;;
 esac
 
@@ -3957,49 +4425,78 @@ else
     WLE_ENTER="1"
 fi
 
+if [ "$WIDE" = "y" ]; then
+    OPL_WIDE="1"
+else
+    OPL_WIDE="0"
+fi
+
+if [ "$LAUNCHER" = "OPL" ]; then
+    CORE="0"
+else
+    CORE="1"
+fi
+
 echo "OPL Language: $OPL_LANG" >> "${LOG_FILE}"
 cp "${ASSETS_DIR}/OPL/LNG"/* "${OPL}/LNG" >> "${LOG_FILE}" 2>&1
 
-if [[ -f "${OPL}/conf_opl.cfg" ]]; then
+if [[ ! -f "${OPL}/settings_riptopl.cfg" ]]; then
+    cat >> "${OPL}/settings_riptopl.cfg" <<EOL
+enable_notifications=1
+enable_coverart=1
+enable_discart=0
+enable_logoart=1
+enable_bgart=1
+ps2logo=0
+apply_gameid=1
+enable_rumble=0
+cfg_titles_in_lists=1
+igr_menu=1
+igr_alt_combo=0
+language_text=$OPL_LANG
+swap_select_btn=$OPL_ENTER
+EOL
+fi
+
+if [[ -f "${OPL}/settings_riptopl.cfg" ]]; then
     sed -i \
-        -e '/^enable_coverart=/d' \
         -e '/^default_device=/d' \
         -e '/^usb_mode=/d' \
         -e '/^app_mode=/d' \
         -e '/^enable_bdm_hdd=/d' \
-        -e '/^language_text=/d' \
-        -e '/^swap_select_btn=/d' \
-        "${OPL}/conf_opl.cfg"
+        -e '/^default_core=/d' \
+        -e '/^ra_telemetry=/d' \
+        -e '/^ra_badges=/d' \
+        -e '/^ra_badge_suffix=/d' \
+        -e '/^ra_mode=/d' \
+        -e '/^ra_experimental_cards=/d' \
+        "${OPL}/settings_riptopl.cfg"
 fi
 
-cat >> "${OPL}/conf_opl.cfg" <<EOL
-enable_coverart=1
+cat >> "${OPL}/settings_riptopl.cfg" <<EOL
 default_device=0
 usb_mode=2
 app_mode=2
 enable_bdm_hdd=1
-language_text=$OPL_LANG
-swap_select_btn=$OPL_ENTER
+default_core=$CORE
 EOL
 
-echo "R3CONFIGURATOR Language: $R3CONFIG_LANG" >> "${LOG_FILE}"
+if [ "$RA" = "y" ]; then
+    cat >> "${OPL}/settings_riptopl.cfg" <<EOL
+ra_telemetry=1
+ra_badges=1
+ra_badge_suffix=1
+ra_mode=0
+ra_experimental_cards=0
+EOL
+fi
+
 if [[ -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.elf" ]]; then
     R3CONFIG_INSTALLED="YES"
-    if [[ -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" ]]; then
-        sed -i \
-        -e '/^default_language[[:space:]]*=/d' \
-        -e '/^show_freemcboot[[:space:]]*=/d' \
-        -e '/^show_freehddboot[[:space:]]*=/d' \
-        -e '/^show_osdmenu[[:space:]]*=/d' \
-        -e '/^show_osdmenu_mbr[[:space:]]*=/d' \
-        -e '/^show_hosdmenu[[:space:]]*=/d' \
-        -e '/^show_ps2bbl[[:space:]]*=/d' \
-        -e '/^show_psxbbl[[:space:]]*=/d' \
-        -e '/^swap_buttons[[:space:]]*=/d' \
-        "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf"
-    fi
-
-    cat >> "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" <<EOL
+    if [[ ! -f "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" ]]; then
+        echo "R3CONFIGURATOR Language: $R3CONFIG_LANG" >> "${LOG_FILE}"
+        echo "R3CONFIGURATOR Button: $R3CONFIG_ENTER" >> "${LOG_FILE}"
+        cat >> "${OPL}/APPS/SYS_R3CONFIGURATOR/r3configurator.cnf" <<EOL
 default_language = $R3CONFIG_LANG
 show_freemcboot = 0
 show_freehddboot = 0
@@ -4010,35 +4507,19 @@ show_ps2bbl = 0
 show_psxbbl = 0
 swap_buttons = $R3CONFIG_ENTER
 EOL
+    fi
 fi
 
-echo "wLE Language: $WLE_LANG" >> "${LOG_FILE}"
 if [[ -f "${OPL}/APPS/APP_WLE-R3Z/WLE-R3Z.ELF" ]]; then
     WLE_INSTALLED="YES"
-    if [[ -f "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" ]]; then
-        sed -i \
-        -e '/^language[[:space:]]*=/d' \
-        -e '/^GUI_Swap_Keys[[:space:]]*=/d' \
-        "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF"
-    fi
-
-    cat >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" <<EOL
+    echo "wLE Language: $WLE_LANG" >> "${LOG_FILE}"
+    echo "wLE Button: $WLE_ENTER" >> "${LOG_FILE}"
+    if [[ ! -f "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" ]]; then
+        cat >> "${OPL}/APPS/APP_WLE-R3Z/LAUNCHELF.CNF" <<EOL
 language = $WLE_LANG
 GUI_Swap_Keys = $WLE_ENTER
 EOL
-fi
-
-echo "POPSLoader Language: $PLOAD_LANG" >> "${LOG_FILE}"
-if [[ -d "${OPL}/POPS" ]]; then
-    if [[ -f "${OPL}/POPS/.pldrs" ]]; then
-        sed -i \
-        -e '/^LANGUAGE=/d' \
-        "${OPL}/POPS/.pldrs"
     fi
-
-    cat >> "${OPL}/POPS/.pldrs" <<EOL
-LANGUAGE=$PLOAD_LANG
-EOL
 fi
 
 echo | tee -a "${LOG_FILE}"
@@ -4059,9 +4540,8 @@ if [ "$OS" = "PSBBN" ]; then
 fi
 
 SPLASH
-update_apps "OPL" "${ASSETS_DIR}/OPL/OPNPS2LD.ELF" "${STORAGE_DIR}/__system/launcher/OPNPS2LD.ELF" "-t --progress"
-update_apps "NHDDL" "${ASSETS_DIR}/NHDDL/nhddl.elf" "${STORAGE_DIR}/__system/launcher/nhddl.elf" "-t --progress"
-update_apps "POPStarter" "$POPSTARTER" "${STORAGE_DIR}/__system/launcher/POPSTARTER.ELF" "-t --progress"
+rm -f "${STORAGE_DIR}/__system/launcher/"{OPNPS2LD.ELF,nhddl.elf}
+update_apps "OPL" "${ASSETS_DIR}/OPL/RIPTOPL-RA-UNPAKT.ELF" "${STORAGE_DIR}/__system/launcher/RIPTOPL-RA-UNPAKT.ELF" "-t --progress"
 
 echo >> "${LOG_FILE}"
 if [ "$OS" = "PSBBN" ]; then
@@ -4081,6 +4561,7 @@ if [ "$OS" = "PSBBN" ]; then
         sudo sed -i '/PP\.APP_WLE-ISR-/d' "$TARGET" >> "${LOG_FILE}" 2>&1
         sudo sed -i '/PP\.APP_WLE-R3Z/d' "$TARGET" >> "${LOG_FILE}" 2>&1
         sudo sed -i '/PP\.HOSDMENU\.HIDDEN/d' "$TARGET" >> "${LOG_FILE}" 2>&1
+        sudo sed -i '/PP\.SYS_R3CONFIGURATOR/d' "$TARGET" >> "${LOG_FILE}" 2>&1
     fi
 
     # Count lines in TARGET (0 if doesn't exist)
@@ -4092,19 +4573,15 @@ if [ "$OS" = "PSBBN" ]; then
 
     # If TARGET has less than 4 rows
     if [ "$LINE_COUNT" -lt 4 ]; then
-        if [ "$LAUNCHER" = "OPL" ]; then
-            echo "Open%20PS2%20Loader file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.LAUNCHER" > "$TMP_FILE"
-        elif [ "$LAUNCHER" = "NEUTRINO" ]; then
-            echo "NHDDL file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.LAUNCHER" > "$TMP_FILE"
-        fi
+        echo "Open%20PS2%20Loader%3A%20RiptOPL file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.LAUNCHER" > "$TMP_FILE"
     fi
 
-    if [ $((LINE_COUNT + 1)) -lt 4 ]; then
-        echo "POPSLoader file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.POPSLOADER" >> "$TMP_FILE"
-    fi
-
-    if [ $((LINE_COUNT + 2)) -lt 4 ] && grep -qE '\|PP\.APP_WLE-R3Z$' "$SELECTED_LIST"; then
+    if [ $((LINE_COUNT + 1)) -lt 4 ] && grep -qE '\|PP\.APP_WLE-R3Z$' "$SELECTED_LIST"; then
         echo "wLaunchELF-R3Z file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.APP_WLE-R3Z" >> "$TMP_FILE"
+    fi
+
+    if [ $((LINE_COUNT + 2)) -lt 4 ] && grep -qE '\|PP\.SYS_R3CONFIGURATOR$' "$SELECTED_LIST"; then
+        echo "R3CONFIGURATOR file%3A%2Fopt0%2Fbn%2Fscript%2Fgame%2Fboot_game3.xml uri%3Dpfs%3A%2FPP.SYS_R3CONFIGURATOR" >> "$TMP_FILE"
     fi
 
     if [ $((LINE_COUNT + 3)) -lt 4 ]; then
@@ -4130,45 +4607,30 @@ sed -i '/^name_OSDSYS_ITEM/d; /^path/d; /^arg_OSDSYS/d;' "$OSDMENU_CNF"
 # Ensure the file ends with a newline
 [ -n "$(tail -c1 "$OSDMENU_CNF" | tr -d '\n')" ] && echo >> "$OSDMENU_CNF"
 
-if [ "$LAUNCHER" = "OPL" ]; then
-    {
-        echo "name_OSDSYS_ITEM_1 = Open PS2 Loader"
-        echo "path1_OSDSYS_ITEM_1 = hdd0:__system/launcher/OPNPS2LD.ELF"
-        echo "arg_OSDSYS_ITEM_1 = -titleid=OPNPS2LD"
-    } >> "$OSDMENU_CNF"
-elif [ "$LAUNCHER" = "NEUTRINO" ]; then
-    {
-        echo "name_OSDSYS_ITEM_1 = NHDDL"
-        echo "path1_OSDSYS_ITEM_1 = hdd0:__system/launcher/nhddl.elf"
-        echo "arg_OSDSYS_ITEM_1 = -mode=ata"
-        echo "arg_OSDSYS_ITEM_1 = -titleid=NHDDL"
-    } >> "$OSDMENU_CNF"
-fi
 
 {
-    echo "name_OSDSYS_ITEM_2 = POPSLoader"
-    echo "path1_OSDSYS_ITEM_2 = ata:/POPS/POPSLOADER.ELF"
-    echo "arg_OSDSYS_ITEM_2 = -page=ata"
-    echo "arg_OSDSYS_ITEM_2 = -titleid=POPSLOADER"
+    echo "name_OSDSYS_ITEM_1 = Open PS2 Loader: RiptOPL"
+    echo "path1_OSDSYS_ITEM_1 = hdd0:__system/launcher/RIPTOPL-RA-UNPAKT.ELF"
+    echo "arg_OSDSYS_ITEM_1 = -titleid=APP_RIPTOPL"
 } >> "$OSDMENU_CNF"
 
 
 if [ "$OS" = "PSBBN" ]; then
 {
-        echo "name_OSDSYS_ITEM_3 = BB Navigator"
-        echo "path1_OSDSYS_ITEM_3 = hdd0:__system/p2lboot/osdboot.elf"
-        echo "arg_OSDSYS_ITEM_3 = -titleid=SCPN-601.60"
+        echo "name_OSDSYS_ITEM_2 = BB Navigator"
+        echo "path1_OSDSYS_ITEM_2 = hdd0:__system/p2lboot/osdboot.elf"
+        echo "arg_OSDSYS_ITEM_2 = -titleid=SCPN-601.60"
 } >> "$OSDMENU_CNF"
-    item=4
-    max_items=197
-else
     item=3
     max_items=198
+else
+    item=2
+    max_items=199
 fi
 
 # Read each line from the file in $APPS_LIST
 exec 3< "${APPS_LIST}"
-while IFS='|' read -r title title_id publisher disc_type file_name jpn_title <&3; do
+while IFS='|' read -r title title_id publisher disc_type file_name jpn_title partition_label <&3; do
   # Skip empty lines
   [ -z "$title" ] && continue
 
@@ -4198,7 +4660,10 @@ cp "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF" "${OSDMBR_CNF}"
 
 # Remove any existing boot_ lines
 sed -i '/^boot_square/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
-sed -i '/^boot_triangle/d' "${OSDMBR_CNF}" 2>> "${LOG_FILE}"
+
+if grep -Fxq 'boot_triangle = ata:/POPS/POPSLOADER.ELF' "$OSDMBR_CNF" && grep -Fxq 'boot_triangle_arg1 = -page=ata' "$OSDMBR_CNF"; then
+    sed -i '/^boot_triangle/d' "$OSDMBR_CNF"
+fi
 
 if [ "$WLE_INSTALLED" = "YES" ]; then
     sed -i '/^boot_start/d' "$OSDMBR_CNF" 2>>"$LOG_FILE"
@@ -4211,13 +4676,8 @@ fi
 # Ensure the file ends with a new line
 [ -n "$(tail -c1 "$OSDMBR_CNF" | tr -d '\n')" ] && echo >> "$OSDMBR_CNF"
 {
-    if [ "$LAUNCHER" = "OPL" ]; then
-        echo 'boot_square = hdd0:__system:pfs:launcher/OPNPS2LD.ELF'
-    else
-        echo 'boot_square = hdd0:__system:pfs:launcher/nhddl.elf'
-        echo 'boot_square_arg1 = -mode=ata'
-    fi
-
+    echo 'boot_square = hdd0:__system:pfs:launcher/RIPTOPL-RA-UNPAKT.ELF'
+    
     if [ "$WLE_INSTALLED" = "YES" ]; then
         echo 'boot_start = ata:/APPS/APP_WLE-R3Z/WLE-R3Z.ELF'
     fi
@@ -4226,8 +4686,6 @@ fi
         echo 'boot_select = ata:/APPS/SYS_R3CONFIGURATOR/r3configurator.elf'
     fi
 
-    echo 'boot_triangle = ata:/POPS/POPSLOADER.ELF'
-    echo 'boot_triangle_arg1 = -page=ata'
 } >> "${OSDMBR_CNF}"
 
 cp -f "${OSDMBR_CNF}" "${STORAGE_DIR}/__sysconf/osdmenu/OSDMBR.CNF"
@@ -4288,7 +4746,7 @@ if [ -s "$SELECTED_LIST" ]; then
     echo "Creating Launcher Partitions..." >> "${LOG_FILE}"
     echo "${UI_TEXT[GAME_INSTALLER_56]}"
     collection_count=$(grep -c '^[^[:space:]]' "${SELECTED_LIST}")
-    create_launcher_partitions "$SELECTED_LIST"
+    create_launcher_partitions
 fi
 
 ################################### Submit missing artwork to the PSBBN Art Database ###################################
@@ -4350,15 +4808,6 @@ SPLASH
 echo "================================== [✓] Game Installer Completed Successfully =================================" >> "${LOG_FILE}"
 center_title "[✓] ${UI_TEXT[GAME_INSTALLER_60]}"
 echo
-if [ "$ps1_games_found" = true ]; then
-    center_title "${UI_TEXT[MUSIC_INSTALLER_5]}"
-    printf "\n"
-    printf "%*s%s\n\n" "$padding" "" "${UI_TEXT[GAME_INSTALLER_67]}"
-    printf "%*s%s\n\n" "$padding" "" "${UI_TEXT[GAME_INSTALLER_68]}"
-    printf "%*s%s\n\n" "$padding" "" "${UI_TEXT[BDMASSAULT_URL]}"
-    printf '%*s\n\n' 110 '' | tr ' ' '='
-fi
-
 center_text "${UI_TEXT[CONTINUE]}"
 read -n 1 -s -r -p "$text" </dev/tty
 echo

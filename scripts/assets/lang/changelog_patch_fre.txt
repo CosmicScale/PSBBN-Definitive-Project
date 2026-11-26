@@ -1,1 +1,3 @@
-• PSBBN prend désormais en charge le téléchargement des mises à jour système directement sur la console PS2 via un serveur de mise à jour personnalisé.
+• La Bibliothèque de Jeux de PSBBN se charge désormais beaucoup plus rapidement. Lors de tests effectués avec un SSD contenant environ 200 jeux, le chargement prenait auparavant environ 12 secondes. Il est désormais quasiment instantané !
+
+• La liste des jeux est maintenant mise en cache et n'est vérifiée qu'en cas de besoin pour détecter d'éventuelles modifications. Le premier lancement de la Bibliothèque de Jeux, ou après l'installation ou la suppression de jeux, le chargement prendra plus de temps.

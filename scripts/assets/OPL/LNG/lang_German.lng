@@ -256,10 +256,10 @@ Lautstärke des Startupsounds
 Videoeinstellungen bestätigen?
 Spieleliste-Cache (HDD)
 Benachrichtigungen
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Konfiguration geladen von %s
+Design geladen von %s
+Sprache geladen von %s
+Partition %s eingebunden.
 Optionen
 Spiel Einstellungen Gespeichert.
 %s Einstellungen Entfernt.
@@ -282,10 +282,10 @@ Block-Geräte ein/aus
 USB-Spiele
 iLink-Spiele
 MX4SIO-Spiele
-Configure PADMACRO
-Pad Macro Settings
-Pad macros
-Analog Slow-Down:
+PADMACRO konfigurieren
+Pad-Makro-Einstellungen
+Pad-Makros
+Analog-Verlangsamung:
 Reichweite des Analogsticks bei Tastendruck verringern
 Linker Stick
 Rechter Stick
@@ -309,20 +309,899 @@ TRADITIONELLES CHINESISCH
 VEREINFACHTES CHINESISCH
 OSD-Einstellungen
 OSD-Sprache
-Force a custom language configuration
+Eigene Sprachkonfiguration erzwingen
 Sprache ändern
-Screen Size
-Full Screen
-Video Mode
-System Default
+Bildschirmgröße
+Vollbild
+Videomodus
+Systemstandard
 Hintergrundmusik
 Hintergrundmusik-Lautstärke
 Standardmusik
 Pfad zum Streamen von Musik für das interne Thema festlegen.
-High
-Low
-Analog X-Axis Sensitivity
-Analog Y-Axis Sensitivity
-Files found: %i
-Cheat Selection
-Only one HDD allowed, enabling locks APA or GPT.
+Hoch
+Niedrig
+Analog-Empfindlichkeit X-Achse
+Analog-Empfindlichkeit Y-Achse
+Gefundene Dateien: %i
+Cheat-Auswahl
+Nur eine HDD erlaubt; Aktivieren sperrt APA oder GPT.
+Einstellungen konnten nicht auf %s geschrieben werden (Fehler %d)
+PS2 Disc starten
+Keine PS2 Disc im Laufwerk.
+Finanzielle Unterstützung
+Standard
+Einstellungen werden geladen...
+Bereit.
+Favoriten
+Favoriten-Startmodus
+Favorit
+%s ist über das Favoritenmenü nicht erlaubt.
+%s ist nicht erlaubt, solange das Element als Favorit markiert ist.
+Erweiterte Argumente
+Erweitert
+Cover-Einstellungen
+VCD BDMA beim Start anwenden
+BDMA Modus
+BDMA-Einstellungen
+BDMA Quelle
+Farben
+Verbindungseinstellungen
+Controller-Emulation
+Controller-Makros
+Loader Core
+Animationsgeschwindigkeit
+Cover-Anzahl
+Seitliche Cover abdunkeln
+Mittlere Skalierung
+Coverflow Einstellungen
+Standard-Loader-Core
+Anzeige
+PS2RD Cheat Image
+Cover-Art-.tar-Archiv
+Ordner in der Spieleliste durchsuchen
+Spielstart
+Spiellisten-Einstellungen
+Spielquellen
+Ein: rüstet vor dem Start automatisch den passenden exFAT-Treiber des gestarteten VCD auf die Memory Card (empfohlen). Aus: manuell über die BDMA-Quelle/Modus-Auswahl unten verwalten.
+exFAT Block-Gerätetreiber, den POPSTARTER lädt. Bei Änderung werden die Module auf die Karte kopiert; FAT32 = keiner (integrierter Treiber).
+Gerät, dessen POPS-Ordner die BDMAssault-Treiberdateien enthält (usbd.irx.* / usbhdfsd.irx.*).
+Globaler Standard-Core für Spiele, deren Loader-Core pro Spiel auf Default gesetzt ist. <OPL> ist der native Core; Neutrino verkettet die externe neutrino.elf. Eine Auswahl pro Spiel überschreibt dies immer.
+Einen vorgefertigten PS2RD .img Patch auf das Spiel anwenden.
+Unterordner der CD/DVD als durchsuchbare Einträge anzeigen; zum Öffnen bestätigen, zum Zurückgehen abbrechen
+Der Befehl zum Wechsel zur Bootcard wird beim IGR an die gewählten Slot(s) gesendet
+AUS kann die Leistung verbessern, aber MMCE-Timeouts können zu Einfrieren führen
+Niedrigere Werte können die Leistung verbessern, aber Instabilitäten verursachen
+Nur Neutrino -- behebt Spiele, die einen IOP-Puffer überschreiben (-gc=7)
+Zusätzliche Neutrino-Flags, durch Leerzeichen getrennt (z.B. -mt=dvd). Global gilt für alle Spiele; pro Spiel wird obendrauf addiert. Flag mit $ präfixieren, um es ohne Löschen zu deaktivieren.
+Übergibt die Boot-ELF des Spiels an Neutrino, um seine Konfiguration pro Titel zu finden. Standardmäßig an; eine von Hand gesetzte Boot-ELF-Option hat Vorrang.
+Erzwingt das Blockgerät-Dateisystem von Neutrino (-bsdfs). Auto = Standard je nach Gerät. hdl/bd sind Expertenoptionen; kombiniere sie mit einem passenden -dvd= in den Startargumenten, falls die automatische Pfadform nicht passt.
+Gerät, das neutrino.elf enthält (in einem NEUTRINO/- oder neutrino/-Ordner). Auto durchsucht zuerst mc0, dann mc1.
+Field-Flipping-Fix für Spiele, die unter einem erzwungenen Neutrino-Videomodus zittern oder reißen. Erfordert einen gesetzten Neutrino-Videomodus.
+Neutrinos GS-Ausgabe-Videomodus erzwingen (-gsm). Aus behält den Standard des Spiels.
+Gerät mit POPS/POPSTARTER.ELF für PS1-VCD-Starts. Standard = Boot-Gerät (cwd), dann das eigene Gerät des VCD. Benutzerdefiniert zeigt einen freien Pfad an.
+Wo POPSTARTER.ELF liegt. Leer gelassen trägt RIPPS2 eine ein, die es auf einem Laufwerk findet; überschreibe sie, um eine andere zu nutzen, etwa usb:/POPS/POPSTARTER.ELF
+Zeigt beim Start eines PS1-VCD einen optischen Barcode für Pixel FX / RetroGEM / PS2Digital
+Liest IPCONFIG.DAT und SMBCONFIG.DAT von POPSTARTER aus dem POPS-Ordner der verbundenen SMB-Freigabe. Es wird nichts geschrieben, bis du mit OK bestätigst.
+SMB-Port des Servers -- 445 ist Standard. Für eine normale Freigabe auf 0 (oder 445) lassen; 139 für ältere SMB1-Server.
+Kurze Vibration beim Bewegen des Cursors, Bestätigen oder Zurückgehen -- erfordert einen DualShock im Analogmodus
+Zeigt in den Gerätelisten nur Disc 1 eines PS1-Spiels mit mehreren Discs an (POPSLoader-Stil). Blendet Dateien mit Namen wie (Disc 2), (CD 2) usw. aus. Alle Discs bleiben zum Wechseln im Spiel auf der Karte; Favoriten werden nicht gefiltert.
+Nur kosmetisch -- blendet einen führenden Spiel-ID-Präfix (z. B. SLUS_005.51.) aus den PS1/VCD-Listennamen aus. Namen ohne ID werden unverändert angezeigt. Ändert weder Start, Cover-Art noch Favoriten.
+Nur HDD -- listet Einzelspiel-Partitionen mit dem Namen PP.<ID>.POPS.<name> (z. B. PP.SCES-01492.POPS.MEDIEVIL) als PS1-Spiele. Nur die Auflistung; der Start bleibt unverändert. Andere PP.*-Partitionen (Apps, PS2-Spiele) bleiben ausgeblendet.
+Startet ohne die VMC dieses Slots, behält dessen Karte aber konfiguriert. Nur Neutrino-Starts; das Spiel verwendet dann die echte Karte in diesem Slot.
+Oberfläche
+Netzwerk
+MMCE
+IGR Bootcard Slot(s)
+MMCE Startmodus
+MMCE Pfadpräfix
+MMCE Slot
+Timeout-Alarme verwenden
+Wartezyklen nach /ACK low
+Mode 7
+ATA0 Image (-ata0)
+ATA0 ID (-ata0id)
+ATA1 Image (-ata1)
+Auto: -bsd -dvd -gc -gsm -mc -dbc -logo
+Konfiguration (-cfg)
+Arbeitsverzeichnis (-cwd)
+Debug-Farben (-dbc)
+Start-ELF (-elf)
+Weitere Argumente
+PS2-Logo (-logo)
+Schnellstart (-qb)
+Netzwerkprotokoll
+Neutrino Startargumente
+Die Neutrino-Argumente sind länger als speicherbar. Kürze ein Feld vor dem Speichern.
+Die Neutrino-Startargumente überschreiten die sichere Grenze. Kürze die globalen oder die Spielargumente.
+Automatische Boot-ELF (-elf)
+Neutrino-Dateisystem
+Neutrino-Standardwerte
+Neutrino Gerät
+Neutrino-GSM-Kompatibilität
+Neutrino Video
+OSD-Standardwerte
+Pfad-Präfixe
+Pfad-Einstellungen
+Plasma-Mischfarbe
+PS-Emulationseinstellungen
+POPSTARTER.ELF-Gerät
+POPSTARTER.ELF Pfad
+RetroGEM Game ID
+POPSTARTER-Netzwerkeinstellungen
+An (alle)
+An (nur POPSTARTER)
+An (nur PS2)
+Aus
+Aus SMB-POPS-Ordner importieren
+Es wurde keine vorhandene POPStarter-SMB-Konfiguration gefunden. Gib die richtigen Netzwerkeinstellungen ein, bevor du eine erstellst.
+POPStarter-SMB-Netzwerk
+Controller-Vibration in den Menüs
+Sicherheit
+Speicher und Cache
+Werkzeuge
+Nur erste Disc (Multi-Disc-PS1)
+PS1-Spiel-ID ausblenden (VCD-Liste)
+Spiele auf PP.<ID>.POPS-Partitionen anzeigen (HDD)
+exFAT
+fat32
+fat32 wird für USB-Sticks ohne exFAT empfohlen.
+USB-Modus fat32 oder exFAT?
+USB-VCD-Modus
+VMC 1 deaktivieren (Karte behalten)
+VMC 2 deaktivieren (Karte behalten)
+Keine
+Klein
+Groß
+Normal
+Controller
+Audio
+Neutrino kann von diesem Gerät nicht starten -- Start abgebrochen.
+Neutrino-Netzwerkkonfiguration (bsd toml) fehlt oder ist nicht beschreibbar -- Start abgebrochen, prüfe den neutrino-Ordner.
+VMC-Datei pro Spiel nicht gefunden -- Start ohne sie (Spiel verwendet seine echte Karte).
+Spielgerät
+Neutrino unterstützt dieses Dateiformat nicht, Start mit <OPL> Core
+Neutrino ELF nicht gefunden, Start mit <OPL> Core
+Zu fragmentiert für Neutrino (%d Fragmente, Limit %d inkl. VMCs) -- versuche stattdessen den OPL-Core.
+BDMA-Moduldateien nicht auf dem Quellgerät gefunden.
+Nicht genügend Speicherplatz auf der Speicherkarte für die BDMA-Module.
+Fehler beim Schreiben der BDMA-Module auf die Speicherkarte.
+UDPBD benötigt eine statische PS2 IP. Unter Einstellungen > Netzwerk festlegen (DHCP ist aktiv).
+OPL neu starten, um die Änderung des Netzwerk-Boot-Protokolls anzuwenden.
+UDPFS aktiv -- öffne den neuen UDPFS-Tab und drücke Bestätigen, um zu verbinden. Auf PC-Seite läuft udpfsd -fsroot <games folder>.
+Netzwerk-Blockgerät aktiv -- sein Tab erscheint, sobald der PC-Server antwortet (udpfsd -bdpath für UDPFS-Image, udpbd-server für UDPBD).
+Zu fragmentiert für Neutrino (%d Fragmente, Limit %d inkl. VMCs) -- defragmentiere auf dem PC; Start abgebrochen.
+UDPFS-Spiele
+Netzwerkspiele (UDP) können nur über den Neutrino-Core starten. Prüfe, ob neutrino.elf vorhanden ist und das Format unterstützt wird.
+PS1-Spiele (.VCD) können nicht über das Netzwerkgerät gestartet werden.
+MX4SIO und Pad-Emulation teilen sich den SIO2-Bus, das Spiel startet möglicherweise nicht.
+MMCE-Kartenwechsel nicht bestätigt -- wird trotzdem gestartet
+UDPFSBD-Spiele
+UDPBD Games
+Speichertreiber werden geladen...
+USB-Speichertreiber wird geladen...
+POPSTARTER.ELF fehlt
+POPSTARTER SMB-Voraussetzungen fehlen
+SMB-Spiele werden von Neutrino nicht unterstützt -- Start mit dem OPL-Kern.
+Neutrino kann keine VMC auf einer APA-HDD verwenden (kein pfs-Support) -- Start ohne.
+PS1
+PS1-Spiele werden angezeigt
+Disc-Spiele werden angezeigt
+USB- / Karten- / Netzlaufwerke werden durchsucht...
+Netzwerk wird gestartet...
+HDD wird durchsucht...
+USB
+MX4SIO
+MMCE
+Interne HDD
+USB (FAT32)
+USB (exFAT)
+MX4SIO (exFAT)
+MMCE (exFAT)
+HDD (exFAT)
+Geladen von %s
+POPSTARTER-Netzwerkkonfiguration konnte nicht auf die Speicherkarte geschrieben werden.
+Die POPSTARTER-Netzwerkkonfiguration ist ungültig. Korrigiere sie in den POPSTARTER-Netzwerkeinstellungen.
+POPSTARTER-SMB benötigt eine statische Netzwerkkonfiguration. Richte zuerst die POPSTARTER-Netzwerkeinstellungen ein.
+POPSTARTER-Konfiguration ersetzen?
+Es existiert bereits eine POPSTARTER-Netzwerkkonfiguration. Durch diese Einstellungen ersetzen?
+Vorhandene behalten
+Ersetzen
+Diese Einstellung wird mit dem Neutrino Core nicht verwendet.
+Alle deaktivieren
+Theme-Sounds werden geladen...
+Menü wird erstellt...
+WARNUNG -- das Erzwingen von 1080p ist experimentell und ungeprüft. Es kann sein, dass kein Bild erscheint oder die Konsole auf mancher Hardware belastet wird. Nutzung auf eigene Gefahr.
+1080p für dieses Spiel erzwingen?
+Bist du sicher? Der experimentelle 1080p-Modus wird auf dieses Spiel angewendet.
+Eigener Einstellungspfad
+Speichert die Einstellungen in einem Ordner deiner Wahl, z. B. mass0:/OPL. Leer lassen, um den Startordner von OPL zu verwenden. Das Gerät wird bei Bedarf geladen und muss beim Eintippen nicht eingebunden sein.
+Pro Spiel + global
+GSM-Standardwerte (alle Spiele)
+Gerät belegt: Das Schreiben der Einstellungen hat nie begonnen. Versuche es erneut, sobald der Ladevorgang beendet ist.
+Keine Memory Card gefunden -- Einstellungen können nicht gespeichert werden. OPL wurde von einem Netzwerkgerät gestartet, dessen Einstellungen auf einer lokalen Karte liegen müssen.
+PS1-Treiber wird auf der Memory Card vorbereitet...
+USB-BDMA-Treiber
+Betrifft nur PS1-Starts (VCD) von einem USB-Stick. Die PS2 kann nicht erkennen, ob ein Stick fat32 oder exFAT ist, daher muss der Treiber von POPSTARTER gewählt werden. Mit der Option Fragen erscheint die Abfrage bei jedem USB-VCD-Start, während exFAT oder fat32 die Antwort festlegen und die Abfrage überspringen.
+Fragen
+HDD-Einstellungen nutzten den sicheren Ausweichort: %s
+Allgemeine Einstellungen
+Geräteeinstellungen
+MMCE Games
+Erweitert
+MMCE Einstellungen
+Sema-Einreihungsmethode sperren
+THFIFO kann die Kompatibilität verbessern, aber die Leistung verringern
+POPSTARTER Netzwerkkonfiguration schreiben
+Diese IP- und SMB-Freigabewerte auch in POPSTARTER's eigene IPCONFIG.DAT / SMBCONFIG.DAT auf der Speicherkarte schreiben (für VCD über SMB).
+Neutrino ELF Pfad
+Wo liegt neutrino.elf? <nicht gesetzt> = Spiellaufwerk -> mc0/mc1. Ein eigener vollständiger Pfad wird zuerst versucht. Beispiele: mass0:/neutrino/neutrino.elf | ata:/neutrino/neutrino.elf | mmce0:/neutrino/neutrino.elf | mc0:/neutrino/neutrino.elf | pfs0:/neutrino/neutrino.elf
+Speicherkarten werden durchsucht...
+MMCE-Spiel-ID wird aktiviert...
+UDPFS-Zugriff
+MMCE-GameID nicht angewendet -- neutrino.elf liegt auf dieser Karte (ein Wechsel würde Neutrino entladen).
+APA- und exFAT-Interne-HDD waren beide aktiviert -- eine wurde automatisch deaktiviert (siehe Geräteeinstellungen).
+VCD-Einstellungen
+EINSTELLUNGEN SPEICHERN?
+Deine Änderungen sind derzeit aktiv.
+Möchtest du sie für künftige Starts speichern?
+Einstellungen speichern
+Ohne Speichern beenden
+Weiter bearbeiten
+Konfigurieren
+%d: Festplatte nicht verfügbar.
+%d: PFS-Unterstützung der Festplatte nicht verfügbar.
+POPSTARTER-Einstellungen werden geladen...
+SMB ist nicht verbunden.
+Keine POPSTARTER-Einstellungen im SMB-POPS-Ordner gefunden.
+Partition +OPL nicht gefunden.
+Partition __common nicht gefunden.
+Starte RiptOPL neu, um die gewählte OPL-Partition zu übernehmen.
+HDD-OPL-Partition wird geprüft...
+Die HDD ist belegt. Versuche es erneut, sobald der Ladevorgang beendet ist.
+Allgemein und System
+ember.elf fehlt
+bios.bin fehlt neben ember.elf
+Ember kann diesen Ordnernamen nicht verwenden (kein Schrägstrich, Doppelpunkt oder Backslash und keine führenden Punkte).
+Kein PS1-Disc-Abbild in diesem Ember-Spielordner.
+Apps werden angezeigt
+Ember-Anzeigemodus
+Ausgabemodus, den Ember für PS1-Spiele verwendet. 240p oder 480p wird in die settings.txt im EMBER-Ordner des gestarteten Geräts geschrieben. Standard entfernt die Einstellung wieder -- und die Datei ebenfalls, wenn sie sonst nichts enthielt.
+iLink
+iLink
+Anzeige der PS2/PS1-Spiele
+Alle listet PS2- und PS1-Spiele zusammen, und L3 wechselt zwischen Alle, PS1 und PS2. PS2 oder PS1 zeigt nur diesen Typ und schaltet L3 ab. APPS und Lieblingsspiele haben eigene Anzeigeregeln.
+Zeige PS2- + PS1-Spiele
+Zeige PS1-ELF-Apps
+Anzeige der Anwendungen
+Alle zeigt jede ELF in einer APPS-Liste, L3 aus. Apps / PS1ELF legt Titel mit [PS1] auf eine zweite L3-Seite; der Start ändert sich nicht.
+Ansicht
+Zeige PS2-Lieblingsspiele
+Zeige PS1-Lieblingsspiele
+Zeige Lieblings-ELFs
+Zeige alle Lieblingsspiele
+VMC erstellt, aber fragmentiert. Die Speicherkartenemulation braucht eine zusammenhängende Datei, also wird diese VMC beim Start übersprungen und die echte Karte benutzt. Mach Platz frei und erstelle sie neu, oder kopiere eine von einem anderen Gerät.
+Cursor bewegen
+Farbe des Spieltitels
+RetroAchievements-Unterstützung prüfen
+RetroAchievements-PC-Verbindung testen
+Prüfe das Abbild, das dauert einige Sekunden...
+Eine Abbildprüfung läuft bereits
+Suche den PC-Client...
+UL/USBExtreme-Spiele können noch nicht geprüft werden
+Nur einfache .iso-Abbilder in DVD/ oder CD/ werden unterstützt
+RetroAchievements kennt dieses Abbild nicht
+Der PC identifiziert das Abbild noch
+Versuche es in einigen Sekunden erneut
+Die Konsole konnte keinen Netzwerk-Socket öffnen
+Starte die Konsole neu oder prüfe das ETH-Gerät in den Einstellungen
+Prüfe Kabel und ETH in den Einstellungen; läuft das Netzwerk, starte die Konsole neu
+Der PC-Client hat nicht geantwortet
+Prüfe, ob xeRAbora läuft, oder versuche den PC-Verbindungstest
+Von RetroAchievements unterstützt
+Starte das Spiel, um Erfolge zu verfolgen
+%d Erfolge
+%d Erfolge -- %d freigeschaltet, %d nicht unterstützt
+Der Hash des Abbilds konnte nicht berechnet werden
+Den Grund findest du in RA/hashes.txt neben den Spielen
+Das Netzwerk wird von einem UDP-Transport benutzt
+RA braucht den SMB-Stack -- wechsle das Protokoll oder erstelle die .wl auf dem PC
+Der Hash steht in RA/hashes.txt -- xeRAbora kann daraus die .wl erstellen
+Die Konsole hat keine IP-Adresse
+Prüfe DHCP oder die feste Adresse in den Netzwerkeinstellungen
+Kein PC-Client hat innerhalb von 3 Sekunden geantwortet
+Konsole%s. Prüfe, ob xeRAbora läuft und UDP 18194 offen ist
+PC-Client gefunden%s%s %s
+Antwort in %u ms, Konsole%s
+RA-Verfolgung braucht den <OPL>-Kern -- Neutrino-Starts laden nie ee_core
+RA-Verfolgung gibt es nicht über UDPFS -- Spiele starten dort über Neutrino
+RA-Verfolgung gibt es nicht für PS1-Spiele
+HDLoader games have no image file to hash
+Build the .wl in xeRAbora and place it in RA/ on the share
+RetroAchievements-Telemetrie
+RetroAchievements-Abzeichen
+HTTP-Spiele
+HTTP-Server
+HTTP-Port
+HTTP-Basispfad
+HTTP-Server testen
+Server OK -- Spiele gelistet
+Der Katalog ist leer -- gültig, aber das beweist nichts über Bytebereiche
+Der Katalog hat kein unterstütztes Abbild, um einen Bytebereich zu testen
+Der HTTP-Server ist nicht erreichbar
+games.csv fehlt, ist unlesbar oder zu groß
+Der Server lieferte nicht genau die angeforderten Bytes
+Der HTTP-Start ist noch nicht umgesetzt -- der Katalog lässt sich nur durchsuchen
+Komprimierte Abbilder (.zso) werden über HTTP noch nicht unterstützt
+Virtuelle Speicherkarten gibt es über HTTP nicht -- nutze eine echte Karte
+HTTP liest games.csv von deinem Server. Lege Adresse, Port und Basispfad in den Netzwerkeinstellungen fest und nutze dann Testen.
+RA: Disc-Unterstützung prüfen
+RA: Disc starten
+Prüfe die Disc für RetroAchievements
+Der Hash der Disc konnte nicht berechnet werden -- siehe RA/hashes.txt im Einstellungsordner
+Der Einstellungsordner kann nicht für Disc-Beobachtungslisten genutzt werden
+Schalte zuerst die RetroAchievements-Telemetrie in den RetroAchievements-Einstellungen ein
+Keine Beobachtungsliste für diese Disc -- nutze zuerst RA: Disc-Unterstützung prüfen
+%d: Festplatte gefunden, aber ihre APA-Partitionstabelle ist unlesbar. Nicht formatieren -- deine Spiele sind vielleicht zu retten.
+%d: Ein Laufwerk wurde nicht eingebunden, weil seine Sektoren nicht 512 Byte groß sind (z. B. ein Laufwerk mit 4K-Sektoren). OPL kann nur 512-Byte-Sektoren lesen.
+Dieser Titel ist eine eigene APA-Partition, und OPL ändert nie die Partitionstabelle. Benenne ihn am PC um.
+POPSTARTERs Einstellungen ließen sich nicht lesen -- die Speicherkarte ist beschäftigt oder unlesbar. Versuche es nach dem Laden erneut.
+Globale PS-Emulationseinstellungen
+Netzwerk nicht verfügbar -- diesmal ohne RetroAchievements gestartet.
+Der IGR-Pfad liegt auf USB, aber in %s fehlen USBD.IRX und USBHDFSD.IRX, die die Konsole braucht, um nach einem In-Game Reset USB zu erreichen. Ohne sie fällt das IGR in den PS2-Browser zurück. RiptOPLs Treiber jetzt dorthin kopieren? FMCB, OpenTuna und andere Exploits laden diese Dateien auch und können sich damit anders verhalten. Vorhandene Dateien werden nie ersetzt. Nur FAT32-USB.
+Die USB-Treiber konnten nicht nach %s kopiert werden (Karte voll oder nicht beschreibbar). Das IGR fällt in den PS2-Browser zurück.
+Offizielle OPL-Einstellungen geladen von %s
+Halten zum Behalten
+Der Ordner CD oder DVD in %s ließ sich nicht öffnen (Fehler %d), also listet dieses Laufwerk keine PS2-Spiele. Drücke auf seiner Seite SELECT, um es erneut zu versuchen.
+Das Neutrino-Dateisystem steht auf bd, aber dieses Laufwerk hat nie seine Gerätenummer gemeldet, also kann Neutrino nicht darauf zeigen. Stelle das Neutrino-Dateisystem dieses Spiels auf Auto oder exfat.
+Zurück in %d s
+Ember-Dithering
+Embers Dithering (an oder aus), geschrieben in EMBER/settings.txt des Startlaufwerks. Ein Wert pro Spiel hat Vorrang.
+Ember-Schattierung
+Embers Farbtiefe: 15 Bit oder 24 Bit (experimentell). Geschrieben in EMBER/settings.txt des Startlaufwerks. Ein Wert pro Spiel hat Vorrang.
+Ember-Controller
+Embers Controller-Modus: Auto, Analog oder D2A. Meist besser pro Spiel einstellen (Dreieck > Ember-Spieleinstellungen), was Vorrang hat.
+Ember in 480p zeigt über Composite kein Bild. 480p verwenden?
+24 Bit (experimentell)
+Ember-Spieleinstellungen
+Nur dieses Spiel. Drücke OK, um vor dem Start EMBER/games/<name>/settings.txt zu schreiben. Ein unberührter Standard behält einen vorhandenen Dateiwert; einen Wert auf Standard zurückzustellen entfernt seine Überschreibung.
+Ember-Timing
+Embers Video-Timing: Auto folgt der Region der Disc, NTSC erzwingt 60 Hz, PAL erzwingt 50 Hz. Geschrieben in EMBER/settings.txt des Startlaufwerks.
+Die VMC-Größe zu ändern würde ihre Spielstände löschen. Sichere die vorhandene VMC und nutze Löschen, bevor du eine neue Größe anlegst.
+Die VMC konnte nicht angelegt werden. Prüfe Laufwerk, Verbindung und Schreibzugriff. Vorhandene Spielstände wurden nicht ersetzt.
+Diese Ember-Einstellungen gelten für jedes PS1-Spiel, und manche Spiele stürzen damit ab. Um nur ein Spiel zu ändern, nutze Dreieck > Ember-Spieleinstellungen bei diesem Spiel.
+PS1-Spielstände hängen von Ember oder POPSTARTER ab; PS2-VMC-Einstellungen gelten nicht.
+Ein anderes Gerät in deinem Netzwerk nutzt die IP-Adresse dieser PS2, also gehen die Antworten des UDPFS-Servers dorthin. Stelle in den Netzwerkeinstellungen eine andere PS2-IP ein.
+Speichere in Lieblingsspiele...
+In Lieblingsspiele gespeichert
+Konnte nicht in Lieblingsspiele speichern
+Aus Lieblingsspielen entfernt
+Konnte nicht aus Lieblingsspielen entfernen
+UDPFS-Netzwerkeinstellungen für POPS
+mc?:/SYS-CONF/ | 0.0.0.0 = Erkennung
+Die Netzwerkeinstellungen für POPS UDPFS ließen sich nicht von der Speicherkarte lesen.
+Feste PS2-IP, die der UDPFS-Treiber von POPS nach seinem IOP-Reset nutzt.
+ (ungültig)
+ (unvollständig)
+Name each game's save folder after its disc ID, e.g. POPS/SLUS_123.45/. Copy its SLOT0/SLOT1.VMC there first.
+One save folder for all discs of a game, from POPS/DISCS_DIR.TXT on the server. Copy its SLOT0/SLOT1.VMC there first.
+Read CHEATS_WS.TXT instead of CHEATS.TXT when the game folder has one.
+Couldn't write mc?:/POPSTARTER/PATHMAP.INI (needs a POPSTARTER folder, at most 512 bytes).
+POPS-UDPFS braucht das .udpfs-Treiberpaar auf der Speicherkarte. Richte es von Hand ein oder schalte BDMA Beim Start anwenden ein.
+VMC beim ersten Start anlegen
+With no card assigned to slot 1, create an 8 MB card on the game's device and assign it. Existing cards are preserved. Not available for HTTP or internal HDD games under Neutrino.
+Lege die VMC dieses Spiels an...
+Die VMC dieses Spiels konnte nicht angelegt werden. Das Spiel startet ohne.
+VMC creation did not finish. Launch cancelled.
+CFG-Titel in Spielelisten anzeigen
+Zeigt statt des Dateinamens den Titel aus der CFG jedes Spiels an und sortiert danach. Liest bei jeder Listenaktualisierung sämtliche CFG-Dateien, wodurch das Laden länger dauert. Nur Anzeige.
+This game's existing VMC cannot be used by this loader. It was preserved. Choose a card in Game Settings.
+VMC creation is still running. Stay in the menu and wait before retrying.
+Spielelogos
+Zeigt das Spielelogo (<ID>_LGO), wenn das Theme es verwendet. Ausblendung entfernt auch das Standardbild; Cover, Disc-Art und Hintergründe bleiben erhalten.
+Kindersicherung
+Zum Starten dieses Spiels das Passwort der Kindersicherung verlangen.
+Lege ein Passwort für die Kindersicherung fest, sonst wird dieses Spiel nicht gesperrt.
+Beschriftungen [PS1]/[PS2] zeigen
+DVR launches require the PSX-mode reset. Remove active -qb options.
+The DVR Neutrino companion is incomplete. Required file missing or path too long
+VMC %s in slot %d is outside the native core's supported disk range. Continue without this card?
+The disk layout of VMC %s in slot %d could not be verified. Continue without this card?
+VMC %s in slot %d exceeds the native core's PFS block-map limit. Continue without this card?
+Die VMC wurde erstellt, aber auf der HDD in mehr Fragmenten gespeichert, als der native Core abbilden kann. Sie wird beim Start übersprungen und stattdessen die echte Karte verwendet. Schaffe Platz auf der OPL-Partition und erstelle die VMC neu.
+Mode 8
+Slow Reads -- Accurate Reads capped at CD speed (~900KB/s) for DVD games whose audio breaks under Mode 1
+The device's POPS folder has old BDMA drivers -- copy this release's POPS folder there.
+Spiel- und VMC-Dateien belegen %d/%d Fragmente und überschreiten Neutrinos gemeinsames Limit. VMC %s überspringen und die physische Memory Card in Steckplatz %d verwenden?
+Rebuild
+Copies this card into one unbroken file the native core can use. Needs free space for one copy while it runs.
+Too fragmented for the native core
+Rebuild this VMC? Its saves are copied into a new file in one piece and checked byte by byte before it replaces the card. No backup file is made.
+VMC rebuilt in one piece.
+Not enough unbroken free space to rebuild this VMC. Nothing was changed. Free up space on the device and try again.
+The VMC could not be rebuilt. Nothing was changed.
+Rebuild cancelled. Nothing was changed.
+The VMC was copied but could not be swapped in. Your saves are in the .new file in the VMC folder -- if the card does not come back, rename that file to .bin on a PC.
+The VMC was rebuilt, but the HDD could not confirm the change was saved. Check the card's saves before relying on it.
+Select starting disc
+Disc %d: %s
+Could not read discs.txt. Use one CUE filename per line (up to 16), with all discs in the game folder.
+The selected disc's launch argument is too long. Shorten the game folder or CUE filename.
+Saves
+The saves on this card. Copy them to a folder on the drive, copy saves back in, or delete one.
+On the card
+Pick a save on the card with Up and Down, then Copy out or Delete.
+Free
+In the folder
+Pick a save folder or .psu file with Up and Down, then Copy in.
+Folder
+Copy out
+Copies the picked save into the folder, as a save folder of its own. The card is not changed.
+Copy in
+Copies the picked save folder or .psu file onto the card.
+Deletes the picked save from the card.
+%s was copied to %s.
+%s was copied onto the card.
+Delete %s from this card? This cannot be undone.
+This file is not a PS2 memory card image this can read.
+This card image has ECC data (a PCSX2 card). Its saves can be copied out, but it cannot be changed here.
+There is not enough free space on the card for this save.
+A save with that name is already there.
+This save is too big for a memory card, has more than 64 files, or has a name longer than 32 characters.
+The save could not be written. Is the drive full or write-protected?
+The card image could not be read, or its tables are damaged.
+Font Size
+Size of standard menu text. Theme fonts with other point sizes keep their original size.
+Button Glyphs
+The button pictures in hints. Theme uses the theme's own (or its glyph_set key); the others replace them on every theme.
+Built-in
+Standard
+White
+RA mark in game list
+Prefix
+Suffix
+Prefix puts "RA " before the name. Suffix puts " [RA]" after it. Both keep alphabetical order.
+3D-Spielstandsymbole
+Zeigt das Spielstandsymbol des gewählten Spiels, sich drehend, wo das Design einen Platz dafür hat. Liest zuerst die VMC des Spiels, dann die Speicherkarten.
+Das Netzwerkprotokoll ändert sich nach einem Neustart. Einstellungen speichern und OPL jetzt neu starten?
+Welchen Netzwerkdienst RiptOPL nutzt: eine SMB-Freigabe, UDPFS, UDPBD oder HTTP. Dieselbe Einstellung wie unter Spielquellen. Von einem laufenden Dienst wegzuwechseln braucht einen Neustart.
+Nur UDPFS. Dateien liest einzelne ISOs aus dem Spieleordner des Servers; IMG liest ein Festplattenabbild als Laufwerk. SMB und HTTP nutzen immer Dateien, UDPBD immer IMG.
+Welche SMB-Version mit der PC-Freigabe gesprochen wird.
+Gibt Ethernet-Verbindungsmodus und SMB-Port zum Bearbeiten frei.
+Erzwingt Geschwindigkeit und Duplex der Netzwerkverbindung. Lass es auf Auto, außer die Verbindung bricht ständig ab.
+Fest nutzt die Adresse unten; DHCP fragt deinen Router. UDPFS und UDPBD nutzen immer Fest.
+Die eigene IP-Adresse der PS2. Wähle eine, die kein anderes Gerät nutzt, im selben Bereich wie dein PC.
+Subnetzmaske, meist 255.255.255.0.
+Die Adresse deines Routers, meist dieselben ersten drei Zahlen mit .1 am Ende.
+Adresse des DNS-Servers. Meist dieselbe wie das Gateway.
+Den PC über seine IP-Adresse oder seinen NetBIOS-Namen (Computernamen) erreichen.
+Der PC, der deine Spiele freigibt: seine IP-Adresse oder sein Computername, wenn der Adresstyp NetBIOS ist.
+The PC's SMB port. Windows, Samba and a NAS use 445. PS2 Servers: the port its card shows. Select it, then press Triangle to type the number.
+SMB-Benutzername. guest funktioniert für die meisten Freigaben.
+IP-Adresse des HTTP-Spieleservers.
+Port, auf dem der HTTP-Spieleserver lauscht.
+Ordner auf dem HTTP-Server mit games.csv. / ist das Server-Stammverzeichnis.
+Testet den HTTP-Server mit den Werten oben und meldet, was er fand.
+Hauptschalter für RetroAchievements. Aus startet Spiele ohne Netzwerkstack oder Snapshots, wie ein normaler Build.
+Markiert in der Liste Spiele mit Erfolgen. Bleibt dunkel, solange die Telemetrie aus ist.
+Bearbeitet POPSTARTERs eigene Netzwerkdateien (IPCONFIG.DAT, SMBCONFIG.DAT), die PS1-Spiele über SMB brauchen.
+Wie die PS2 ihre Adresse bekommt, während ein PS1-Spiel über SMB läuft: Fest oder DHCP.
+Die IP-Adresse der PS2, während ein PS1-Spiel über SMB läuft.
+IP-Adresse des PCs, der deine PS1-Spiele freigibt.
+Name der Freigabe auf diesem PC, die den POPS-Ordner enthält.
+Startet beim zuletzt gestarteten Spiel.
+Menüsprache. Füge weitere hinzu, indem du lang_*.lng-Dateien in einen LNG-Ordner legst.
+Videomodus-Korrekturen, die jedes Spiel bekommt, außer es hat eigene GSM-Einstellungen.
+Die Seite, auf der RiptOPL beim Start öffnet.
+Spiele auf einem SD2PSX oder MemCard PRO2. Auto startet beim Booten, Manuell beim Öffnen der Seite, Aus versteckt sie.
+Steckplatz, IGR-Bootcard, GameID und Timing-Optionen für MMCE.
+Lädt den USB-Speichertreiber.
+Lädt den Treiber des MX4SIO-SD-Kartenadapters.
+Lädt den iLink-Speichertreiber (FireWire).
+Startet das Netzwerk: Auto beim Booten, Manuell beim Öffnen seiner Seite. Aus lässt den Netzwerkadapter in Ruhe.
+Die Seite Anwendungen. Auto startet beim Booten, Manuell beim Öffnen, Aus versteckt sie.
+Die Seite Lieblingsspiele. Auto startet beim Booten, Manuell beim Öffnen, Aus versteckt sie.
+Welchen exFAT-Treiber POPSTARTER für PS1-Spiele auf USB, MX4SIO, MMCE, Festplatte oder iLink nutzt.
+Wie PS1-Spiele gelistet werden: Spiel-IDs verbergen, nur Disc 1 zeigen, PP-Partitionen der Festplatte zeigen.
+In welchem Speicherkartensteckplatz das MMCE-Gerät steckt. Auto findet ihn.
+Sagt dem MMCE-Gerät, welches Spiel startet, damit es zur Speicherkarte dieses Spiels wechselt.
+Timing-Optionen für die MMCE-Verbindung. Ändere sie nur, wenn Spiele einfrieren oder langsam laden.
+Wo auf der MMCE-Karte die Spieleordner liegen.
+Unterordner auf der MMCE-Karte mit CD, DVD und den anderen OPL-Ordnern. Leer nutzt das Stammverzeichnis der Karte.
+Setzt [PS1] oder [PS2] vor jeden Spielnamen. Nur Anzeige.
+Videoausgabe des Menüs. Spiele nutzen stattdessen GSM. Halte Bestätigen, um einen neuen Modus zu behalten.
+Das Aussehen des Menüs. Designs werden aus dem THM-Ordner jedes Geräts gelesen.
+Anzahl, Größe, Animation und Abdunkeln der Cover für das Coverflow-Design.
+Welche Bilder laden: Cover, Disc-Bilder, Hintergründe und Spielstandsymbole.
+Farben für Text, Hervorhebung, Dialoge und Hintergrund.
+Kurze Hinweise, wenn eine Konfigurations-, Design- oder Sprachdatei lädt.
+Sortiert Spielelisten von A bis Z. Aus behält die Reihenfolge, in der sie gefunden wurden.
+Fügt Spiele neu angeschlossener Geräte ohne manuelles Aktualisieren hinzu.
+Lädt Cover aus dem ART-Ordner.
+Zeigt das Disc-Bild (<ID>_ICO). Aus versteckt die Disc, behält aber Cover und Hintergründe.
+Zeigt den Hintergrund eines Spiels (<ID>_BG), wenn das Design einen nutzt.
+Liest auch Bilder, die in ART/art.tar gepackt sind.
+Wie lange der Cursor auf einem Spiel ruht, bevor seine Bilder laden. Höher überspringt Bilder beim schnellen Scrollen.
+Farbe des normalen Menütexts.
+Farbe des hervorgehobenen Eintrags.
+Hintergrundtönung der Dialogfenster.
+Farbe der Spieltitel in der Liste.
+Hintergrundfarbe des Menüs.
+Farbe, die in den animierten Hintergrund gemischt wird.
+Stellt RiptOPLs eingebaute Farben wieder her, nicht die des Designs.
+Zeichnet das Menü für einen 16:9-Fernseher.
+Verschiebt das Menü auf dem Bildschirm nach links oder rechts. Wird für jeden Videomodus gespeichert.
+Verschiebt das Menü auf dem Bildschirm nach oben oder unten. Wird für jeden Videomodus gespeichert.
+Verkleinert das Menü nach innen, wenn der Fernseher seine Ränder abschneidet. Wird für jeden Videomodus gespeichert.
+Zeigt beim Spielstart einen Barcode, damit Pixel-FX-, RetroGEM- und PS2Digital-Geräte das Profil wechseln.
+Neutrinos Pfad, Videomodus und Argumente für jedes Spiel.
+Konsolensprache, Bildschirmformat und Videomodus, die an Spiele übergeben werden.
+Erlaubt das Umbenennen und Löschen von Spielen und das Anlegen von VMCs. Berührt nie die Partitionstabelle der Festplatte.
+Entwicklerhilfe: farbige Bildschirme beim Spielstart und Zähler fürs Laden der Bilder im Menü.
+Unterordner auf USB-, MX4SIO-, iLink- und exFAT-Laufwerken mit den Spieleordnern. Leer nutzt das Stammverzeichnis des Laufwerks.
+Unterordner der SMB-Freigabe mit den Spieleordnern. Leer nutzt das Stammverzeichnis der Freigabe.
+Merkt sich die Spieleliste der APA-Festplatte, um spätere Suchen zu beschleunigen.
+Vorlese-Cache für USB und andere BDM-Laufwerke im Spiel. Größer kann das Streaming glätten, braucht aber mehr Speicher.
+Vorlese-Cache für die interne Festplatte im Spiel.
+Vorlese-Cache für SMB im Spiel.
+Der Kern für dieses Spiel, wo beide unterstützt werden. SMB/HTTP nur mit <OPL>. Standard folgt Spielstart. Bei UDPFS/UDPBD bedeutet Standard Neutrino.
+Übertragungsmodus der internen Festplatte für dieses Spiel. Senke ihn, wenn das Spiel ruckelt oder einfriert.
+Disc-ID für DNAS-Onlinespiele. Von Disc laden liest sie von der Originaldisc.
+Liest die DNAS-ID von der Originaldisc im Laufwerk.
+Bootet diese ELF aus dem Disc-Abbild statt der, die SYSTEM.CNF nennt.
+Die virtuelle Speicherkarte dieses Steckplatzes wählen, anlegen oder in der Größe ändern.
+Allgemeine nutzen gibt diesem Steckplatz eine geteilte Karte; Zurücksetzen löscht die Wahl.
+Name der Kartendatei, im VMC-Ordner aufbewahrt.
+Legt die Karte an oder gibt ihr eine neue Größe.
+Löscht diese Kartendatei.
+Global nutzt die gemeinsamen Einstellungen; Pro Spiel behält diese nur für dieses Spiel.
+Solange gedrückt verlangsamt den Stick nur, solange du die Taste hältst; Per Taste umschalten schaltet es an und aus.
+Soundeffekte im Menü.
+Spielt beim Start von RiptOPL einen Sound.
+Spielt die Musik des Designs oder deine Standard-Designmusikdatei.
+Lautstärke der Menü-Soundeffekte.
+Lautstärke des Startsounds.
+Lautstärke der Hintergrundmusik.
+Wie schnell Listen scrollen, wenn du eine Richtung hältst.
+Welche Taste bestätigt: Kreuz oder Kreis.
+Wie leicht der linke Stick den Cursor nach links und rechts bewegt. Aus ignoriert ihn.
+Wie leicht der linke Stick den Cursor nach oben und unten bewegt. Aus ignoriert ihn.
+DualShock 3/4 über USB oder Bluetooth und Multitap für jedes Spiel.
+Stick-Verlangsamung, Achsenumkehr und Turbo für jedes Spiel.
+Wie viele Cover RIPFLOW auf jeder Seite des gewählten zeigt.
+Wie groß RIPFLOW das gewählte Cover gegenüber den anderen zeichnet.
+Wie schnell die Cover gleiten, wenn du dich durch den Fluss bewegst.
+Dunkelt die seitlichen Cover ab.
+Quick Boot: überspringt Neutrinos eigenen Startbildschirm. Hier an, wird es für jedes Spiel gesendet; aus, sendet RIPPS2 es trotzdem selbst für USB-, iLink- und Netzwerkspiele, wo es nötig ist.
+Debug-Farben: Neutrino füllt den Bildschirm bei jedem Ladeschritt mit einer Farbe, damit ein Foto zeigt, wo ein Spiel hängen bleibt.
+Zeigt vor dem Spiel das PS2-Logo (ein zweiter IOP-Neustart, den manche iLink-Laufwerke brauchen). Hier aus, folgt RIPPS2 Spielstart > PS2-Logo und sendet es nie für MMCE- oder Netzwerkspiele.
+Der Ordner, den das Spiel als seinen eigenen sieht. Leer: Neutrinos Standard.
+Eine eigene Neutrino-Konfigurationsdatei (-cfg). Leer: die von Neutrino.
+Startet diese ELF statt der Bootdatei, die die Disc nennt. Leer: die des Spiels.
+Ein Festplattenabbild, das Neutrino als interne Festplatte der Konsole einbindet, für Spiele, die die Festplatte nutzen (-ata0).
+Die ID-Datei zu diesem Festplattenabbild (-ata0id).
+Ein zweites Festplattenabbild (-ata1).
+Übergibt die Einstellungen unten an das Spiel. Aus nutzt die der Konsole.
+Fernsehformat, das an das Spiel übergeben wird.
+Videomodus, der an das Spiel übergeben wird.
+DNAS-ID
+Startargumente zeigen
+Zeigt vor jedem Neutrino-Start alle Argumente, die Neutrino bekommt, und fragt, ob es weitergehen soll. Zurück kehrt ohne Start ins Menü zurück.
+Neutrino startet mit diesen Argumenten. Starten?
+Weitere Neutrino-Optionen, durch Leerzeichen getrennt, gesendet nach allem oben. RIPPS2 fügt immer -bsd und -dvd für Laufwerk und ISO des Spiels hinzu, -mc0 und -mc1 für seine VMCs, -gsm für seinen Videomodus und die eigenen Kompatibilitätsmodi des Spiels. Eine Option mit eigener Zeile oben (etwa -logo) wandert beim Speichern in diese Zeile und wird weiter gesendet.
+Die Cheatliste konnte nicht im Neutrino-Ordner gespeichert werden, also kann Neutrino sie nicht nutzen. Ohne Cheats starten?
+Experimentelle PC-CARD-CompactFlash-Unterstützung für frühe japanische PS2-Modelle. Nur native PS2-Spiele; CF benötigt exklusiven PC-CARD-Zugriff. Zum Freigeben neu starten.
+PC-CARD-CF-Spiele
+CF nicht verfügbar: Benötigt eine frühe japanische PS2 mit PC CARD, eine kompatible Karte und keine aktiven DEV9-/HDD-/Netzwerktreiber.
+CF unterstützt derzeit nur native PS2-Spiele. CF-VMC, PS1-Spiele und Netzwerk-Erfolge sind nicht verfügbar.
+Experimentelle ISO-Erkennung für DESR DVR. HDD-Quelle muss aktiviert sein; der Spielstart benötigt eine externe DVR-fähige Neutrino-Version.
+Der DVR-Start wählt sein eigenes Backend. Entferne -bsd= und -bsdfs= aus globalen und spielspezifischen Neutrino-Argumenten.
+Die Controller-Emulation gibt es mit Neutrino nicht. Nutze einen PS2-Controller oder eine Quelle, die den <OPL>-Kern unterstützt.
+RA-Modus
+Wähle den PC-Client. Xerabora ist Standard; Caduceus prüft zuerst seine angemeldete Sitzung.
+IP des RA-Begleiters (0.0.0.0 = automatisch)
+Optionale IPv4 eines eigenen RetroAchievements-PCs. Nutze 0.0.0.0 für den alten SMB/HTTP-Ersatz oder die Xerabora-Suche. Ändert die Spieleserver-Einstellungen nicht.
+Öffne einmal die UDPFS-Seite, damit ihr Netzwerkmodul lädt, und versuche es erneut.
+Die Beobachtungsliste ließ sich nicht speichern. Stelle sicher, dass Laufwerk oder Freigabe des Spiels beschreibbar ist, und prüfe erneut.
+Caduceus ist nicht bereit. Diesmal ohne Erfolge gestartet.
+Die RA-Sitzung von Caduceus ist offline.
+Melde dich in Caduceus bei RetroAchievements an und versuche es erneut.
+Experimentelle Karten
+Experimentelle PS2-Erfolgskarten im Spiel. Können flackern oder Spiele einfrieren. Aus nutzt den goldenen Puls. Wirkt beim nächsten Spielstart.
+Caduceus-Erfolge
+Erfolge ansehen
+Zurück
+Zurück kehrt zu OPL zurück. Select aktualisiert diese Seite.
+Caduceus lässt sich nicht abfragen. Prüfe die Verbindung und drücke Select für einen neuen Versuch.
+Erhalten
+Kein Erfolg passt zu diesem Filter.
+Keine Spiele mit Fortschritt in diesem Konto.
+Alle
+%d Spiele im Konto
+L1/R1: Seite   Quadrat: Filter   Select: aktualisieren
+%d / %d Erfolge  |  %d Hardcore
+Hardcore
+Für dieses Format gibt es keinen Hash. Durchsuche stattdessen die Kontobibliothek.
+ERFOLGE
+RetroAchievements-Kontobibliothek
+L1/R1: Seite   Bestätigen: öffnen   Select: aktualisieren
+Lade Erfolge...
+Gesperrt
+%d Spiel im Konto
+Melde dich bei Caduceus an und kopple ART/CADUCEUS.KEY auf deiner SMB-Freigabe.
+Caduceus ist nicht erreichbar. Kopple ART/CADUCEUS.KEY in dem Ordner, den PS2-Servers freigibt, und stelle die IP des RA-Begleiters ein.
+%d Pkt.  |  %s
+%d / %d erhalten  |  %s
+Der Caduceus-Browser braucht SMB oder UDPFS-Dateien: UDPFS-IMG hat keinen freigegebenen Ordner für seinen Schlüssel.
+Dieses Spiel ist nicht im Caduceus-Katalog. Aktualisiere den Katalog auf dem PC.
+Durchsuche dieses Spiel über die Caduceus-Erfolge im Hauptmenü.
+RetroAchievements-Bibliothek (xeRAbora)
+Die Liste von xeRAbora lässt sich nicht lesen. Drücke Select für einen neuen Versuch.
+Noch nicht in deiner RetroAchievements-Bibliothek. Spiele es einmal mit Erfolgen und drücke dann Select.
+xeRAbora ist nicht erreichbar. Schalte OPEN TO THE NETWORK in seinen Einstellungen ein, prüfe die IP des RA-Begleiters und die PC-Firewall.
+xeRAbora kennt dieses Abbild nicht. Führe zuerst die RA-Unterstützungsprüfung aus.
+Durchsuche dieses Spiel über die RetroAchievements-Bibliothek im Hauptmenü.
+Noch nicht in deiner RetroAchievements-Bibliothek. Stelle die Uhr der Konsole in den Systemeinstellungen, um seine ganze Liste zu sehen, oder spiele es einmal mit Erfolgen.
+Neutrino-RA ist für diesen Start nicht verfügbar. Prüfe das RA-Laufzeitmodul, die Begleiter-IP und die gespeicherte Beobachtungsliste. Ohne Erfolge gestartet.
+PS1-Erfolge brauchen eine VCD auf USB über POPStarter
+Das vorige PS1-Erfolgsmodul lässt sich nicht entfernen
+PS1-Erfolge lassen sich nicht vorbereiten. Behalte oder verschiebe POPS/MODULE_9.IRX und prüfe den Schreibzugriff des Laufwerks.
+Unbenutztes RiptOPL-RA-Modul: POPS/MODULE_9.IRX. Für einen sauberen Start löschen?
+Das unbenutzte RA-Modul lässt sich nicht löschen.
+Trotzdem weiter? Ein übrig gebliebenes RA-Modul kann veraltete Telemetrie senden. Nein bricht den Start ab.
+The MMCE is getting this game's memory card ready (%d s). The game starts when it is done; START starts it now.
+POPSTARTER needs Sony's POPS files and these are missing: %s (in %s%s). Without them the game shows a black screen. Launch anyway?
+A to Z
+Last played
+Showing recently played
+Random Game
+No games on this page to pick from.
+All Games
+All Games List
+One page lists the games of every started device, PS2, PS1 and apps together. Device tabs step aside once their games are on it. A game on two devices shows each device's name. L3 cycles All, PS2, PS1, Apps, Favorites and Recent.
+Showing all games
+Showing favorites
+Hide Game
+Show Game Again
+Hide %s? It leaves every list, All Games and Favorites too. Settings > Game Sources > Show Hidden Games lists it again.
+Hidden: %s
+Shown again: %s
+The hidden list could not be written to the game's device. Is it write-protected?
+This device cannot keep a hidden list.
+Show Hidden Games
+Lists the games hidden with Hide Game, so one can be shown again from its menu. Each device keeps its own hidden.txt.
+Delete %s? Goes: %d game file(s), %d settings file(s), %d art image(s) and %d cheat file(s). Kept: its VMC saves.
+Another copy of this game is on this device, so its settings, art and cheats stay.
+Last check: %s is deleted for good and cannot be brought back. Delete it?
+Deleted: %s
+Deleted %s, but some of its settings, art or cheat files could not be removed.
+%s could not be deleted. Is the device write-protected?
+Sony's POPS files are in %s. Copy %s to %s%s and launch?
+Copying %s...
+%s could not be copied to %s%s. Is the drive full or write-protected?
+Drive Status
+Looking at the drives...
+%s free of %s (%s, %s clusters)
+internal HDD (exFAT)
+a drive of unknown kind
+Internal HDD (APA): %s free of %s
+Memory card %d: %d KB free
+No drive is started yet. Start one from its page, or set it to Auto in Settings.
+Settings: %s
+Save Diagnostics
+Writes what RiptOPL noted about the pads, the drives, MMCE cards and the last launches to DIAG.TXT in the settings folder. Send it with a bug report.
+The diagnostics are in %s.
+The diagnostics could not be written to %s. Is the device write-protected?
+Wie das Theme deine Spiele zeigt: List, Coverflow, PSBBN Flow oder Grid. L3 auf der Hauptseite gedrückt halten zum Wechseln. Themes ohne diese Ansicht nutzen ihre Standardansicht.
+Theme-Ansicht
+VMC %s is in %d fragments. Continue with Memory Card in slot %d?
+Back up the VMC to a PC, remove it from the device, then copy it back. If it is still fragmented, free space and retry. Never delete your only copy.
+Beide
+Dieser UDPBD/UDPFS-Server ist schreibgeschützt, daher kann darauf keine VMC genutzt werden. Das Spiel speichert auf der echten Memory Card.
+In-Game Menu (Beta)
+The IGR combo pauses the game under a menu: Resume, Cheats, Exit Game, Power Off. OPL core games on a real PS2 only; where it cannot draw, the combo leaves the game as before.
+IGR Combo
+The buttons that leave a game (OPL core games). Press to record your own: hold at least 3 buttons for 3 seconds. With your own combo, the usual combos are left to the game, and only the IGR Power-Off Combo (if set) or the power button powers off.
+IGR Power-Off Combo
+Off by default. Press to record buttons that power the console off from a game (OPL core games): hold at least 3 buttons for 3 seconds. It must differ from the IGR Combo.
+Hold the buttons for your power-off combo (at least 3) for 3 seconds. Hold Triangle alone for 5 seconds to turn it off. Hold Circle alone for 5 seconds to cancel.
+The IGR Combo and the IGR Power-Off Combo must use different buttons. Nothing was changed.
+Hold the buttons for your IGR combo (at least 3) for 3 seconds. Hold Triangle alone for 5 seconds to go back to the usual combo (L1+L2+R1+R2+Start+Select). Hold Circle alone for 5 seconds to cancel.
+Back to the usual combo
+Turn off
+Grid Layout
+Covers per page in the Grid view: the theme's own, or a preset. A 16:9 picture fits more columns, and each preset shows the shape it has on the picture now. Grid (7x2) keeps its own shape.
+Compact
+Library
+Pages
+Pages gives every device its own tab. All Games List puts the games of every started device, PS2, PS1 and apps, on one page. Same setting as All Games List under Game Sources.
+Copy out as PSU
+Copies the picked save into the folder as one .psu file, the save file uLaunchELF, EMS and Apollo use. The card is not changed.
+This .psu file is cut short or is not a PS2 save.
+File Manager
+Drives
+.. (up one folder)
+Page %d of %d, %d entries
+This folder is empty.
+%s could not be opened.
+Clipboard: %d to copy
+Clipboard: %d to move
+%d marked
+Paste here
+New folder
+Open
+Copy
+Cut
+Mark
+Unmark
+Paste as PSU
+Nothing on the clipboard is a save folder (a folder with an icon.sys).
+Unpack PSU here
+Cross opens a folder, or shows what can be done with a file. Square marks it. Triangle shows what can be done with it. L1/R1 turn the page, Circle goes up a folder.
+Copies or moves what is on the clipboard into this folder. A name already here is never replaced: it is skipped and named. A save folder pasted onto a memory card goes in the card's root, and a .psu pasted onto one unpacks into its save.
+Makes a folder here, with a name you type.
+Puts the marked entries, or this one if none are marked, on the clipboard. Paste here copies them.
+Puts the marked entries, or this one if none are marked, on the clipboard. Paste here moves them; each one leaves its old place only once it is whole in the new one.
+Gives this entry a new name, typed on the keyboard.
+Deletes the marked entries, or this one if none are marked, folders with everything in them. You are asked first.
+Makes one .psu file here from each save folder on the clipboard (a folder with an icon.sys): the save file uLaunchELF, EMS and Apollo use. The saves themselves are not changed.
+Unpacks this .psu into its save folder here. On a memory card the save goes in the card's root, where games look for it.
+Opens this folder.
+Starts this ELF, the way an app on the Apps page starts.
+Marks this entry, so Copy, Cut and Delete act on every marked one. Square on a row does the same.
+Delete %s? This cannot be undone.
+Delete the %d marked entries? This cannot be undone.
+Copying %s... %d%%
+Deleting %s...
+%s: %s
+Something with that name is already there.
+A folder cannot go inside itself.
+That name cannot be used here.
+It could not be read.
+It could not be written. Is the drive full or write-protected?
+It could not be removed.
+Its folders go too deep.
+There is not enough memory.
+Turn on Write Operations in Settings to change files.
+An ELF on the internal HDD starts from the Apps page.
+Alternate Background
+Shows the theme's alternate background (alt= in its conf_theme.cfg) instead of its default one. Themes without one are not changed.
+Series card: the games in this series use this name by default, so saves on it can carry over between them.
+Game card: named after this game's ID.
+Generic card: shared by every game set to the same generic card.
+This Neutrino has no SMB support -- launching with the OPL core.
+Neutrino reaches SMB on port 445 only -- launching with the OPL core.
+This server does not offer SMB 3.0, which Neutrino needs -- launching with the OPL core.
+Neutrino cannot write a VMC on the SMB share -- launching with the OPL core.
+These SMB settings are beyond Neutrino's limits -- launching with the OPL core.
+The game list changed while this was open, so nothing was done. Please try again.
+Boot Theme Wait
+Seconds the start-up screen waits for your saved theme while its drive starts up. 0 = Off: the menu opens right away and your theme appears as soon as it is found.
+PS1 Duplicates
+A PS1 game that is both a POPSTARTER VCD and an Ember image. Both: two rows. Ember: the Ember one only. POPSTARTER: the VCD only. The same title, ignoring case and a leading disc ID, is the same game. Display only.
+Both
+List Title and Description
+The Title and Description from a game's CFG that a theme shows beside the game list. Theme: as the theme sets them. On: shown even if the theme turns them off. Off: hidden. The info page shows them either way.
+App Handoff Path
+Legacy: BDM apps receive massN:/...; other devices keep their normal launch paths. Typed: supported BDM apps receive usbN:/..., ataN:/..., ilinkN:/... or mx4sioN:/... when identified, otherwise massN:. Only the path passed to the app changes; ELF loading is unchanged. Per-app cfg: HANDOFFPATH=LEGACY or TYPED.
+Legacy (mass)
+Typed (usb0:, ata0:)
+Console i.LINK ID
+Native OPL core only; Neutrino ignores it. Enter 16 hexadecimal digits in byte order. Empty or all zeros uses this console's ID. This does not change i.LINK storage hardware.
+Console i.LINK ID must be empty or exactly 16 hexadecimal digits (0-9, A-F). Settings were not saved.
+The stored Console i.LINK ID is invalid and was ignored. This game will use the real console ID.
+%d: The SMB2 driver did not load. Browsing with SMBv1 instead until the next start.
+Protocol
+Access
+SMB Version
+BDM Devices Start Mode
+      Internal HDD (exFAT)
+      USB
+      MX4SIO
+      PC CARD CF (experimental)
+      DESR DVR (experimental)
+      iLink
+Network Connectivity
+      Protocol
+Applications Page Start Mode
+Favorites Page Start Mode
+VCD Games List Settings
+Send GameID on Launch
+Disc Artwork
+Background Art
+Art Delay
+Show GameID Barcode (Pixel FX)
+Neutrino Advanced Arguments
+HDD Spindown
+BDM Cache
+HDD Cache
+SMB Cache
+Selection: Colored
+Draws the selected row in the Selected Color. Off draws it in the same color as the other rows.
+Selection: Cursor
+Draws the small bar at the left edge of the selected row. Themes that underline the row have no cursor.
+Selection: Highlight
+Draws the bar behind the selected row, or the line under it in themes that use one.
+Show Legend
+Shows the button legend at the bottom of the menu and the info page. Off hides it in every theme; the buttons still work.
+User Wallpaper
+Draws wallpaper.png from the folder your settings are saved in behind the menu pages, in any theme. 512x512 at most, 8-bit (256 colour) palette.
+Ambient Effects
+Shows the seamless crystal light scene, plus a short convergence when launching. Off keeps static backgrounds and the original launch fade.
+User Wallpaper: no wallpaper.png in the settings folder. The theme's background is shown.
+User Wallpaper: wallpaper.png must be 512x512 at most with an 8-bit (256 colour) palette. The theme's background is shown.
+      MMCE Einstellungen
+POPSTARTER connects with SMBv1 for this game. The server in POPSTARTER Network Settings must accept SMBv1.
+Exit To
+PS2 Browser: opens the Browser, keeping the card's menu program (FMCB, OSDMenu) whenever it allows. OSDSYS (Skip Update): the console menu without the card's menu program. OSDSYS (With Update): the console's own exit. BOOT choices: run the named ELF from mc0:/BOOT, then mc1:/BOOT if needed.
+OSDSYS (With Update)
+PS2 Browser
+OSDSYS (Skip Update)
+Exit RiptOPL?
+Check for Updates
+Checking for updates...
+You have the newest build (%d).
+Download it again anyway?
+Build %d is available (you have %d). Download and install it?
+Downloading the update... %d KB
+Updated to build %d. It starts the next time you open RiptOPL.
+Could not identify the running ELF for a safe update. Start it from a memory card, MMCE, USB/exFAT or a full APA partition path.
+This build has no build number to compare with the release. Download the release from GitHub instead.
+The network is in use by UDPBD or UDPFS. Choose SMB, HTTP or Off as the network protocol, restart RiptOPL, then try again.
+No network. Check the cable and the network settings.
+Set the console's clock from Date and Time in the main menu. Secure connections need it.
+GitHub secure connection failed (error %d).
+Could not write the update. Is the device full? RiptOPL was not changed.
+The download did not match the release's checksum. RiptOPL was not changed.
+Could not replace the ELF. If RiptOPL does not start, copy it to the device again.
+Could not replace the ELF or put it back. The old one is %s.BAK beside it. Rename it back with a file manager.
+Date and Time
+Sets the console's clock, in the time zone chosen in the console's System Configuration.
+Date
+Time
+The clock was not set. Check the date and try again.
+Set from Internet
+Sets the console's clock from the Internet. The Time Zone row decides how it is shown.
+Getting the time from the Internet...
+The clock was set from the Internet.
+No time server answered. Check the cable and the network settings, then try again.
+- NFS Server -
+NFS Export
+The export on the NFS server, for example /srv/ps2, or / for the whole server. RiptOPL speaks NFS version 4.0 on port 2049.
+NFS Writes
+Off: RiptOPL only reads the export, whatever the server allows, keeps game settings next to its own and uses no VMC there. On: renaming, deleting, saving and VMCs on the export, where the server allows it.
+%d: Cannot connect to NFS server. It must offer NFS version 4.0 on port 2049.
+%d: The NFS server refused this PS2.
+%d: Cannot open the NFS export. Check NFS Export and the server address.
+This Neutrino has no NFS support -- launching with the OPL core.
+Neutrino cannot write a VMC on the NFS export -- launching with the OPL core.
+These NFS settings are beyond Neutrino's limits -- launching with the OPL core.
+NFS Writes is Off, so no VMC can be used on the export. The game saves to the real memory card.
+POPSTARTER cannot launch over NFS. Use Ember, or SMB, for this game.
+NFS Writes is Off, so Ember cannot keep memory card saves in this game's folder.
+mc?:/BOOT/BOOT2.ELF
+mc?:/BOOT/BOOT.ELF
+POPStarter uses MMCE Slot 1 while it is connected. Remove that card to launch this game from Slot 2.
+View/Filter
+Hold for Theme
+Tap for Filter
+Check for Updates needs the PS2 clock. Open Date and Time now?
+Could not connect to GitHub (error %d). Check the network's DNS and internet access.
+Could not verify GitHub's certificate (error %d). Check Date and Time in the main menu.
+GitHub returned an unusable update response (error %d).
+The GitHub update request timed out (error %d).
+Theme Settings
+Layout Settings
+Adjust Coverflow size, animation and dimming, or choose a Grid layout.
+Launch it now?
+The update is installed. Open RiptOPL again from your launcher.
+The ELF was installed, but version.txt could not be written (error %d). Check for Updates to retry only that file.
+Writing version.txt...
+Project Home:
+Time Zone
+Console follows the time zone and summer time set in the console's System Configuration. Pick another to show the clock in that zone instead.
+Console
+Summer Time
+Adds one hour to the chosen time zone.
+RetroAchievements Off
+Launch this game without RetroAchievements. The game starts as it does with RetroAchievements switched off. Other games keep it.

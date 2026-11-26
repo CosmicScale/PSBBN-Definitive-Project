@@ -1,1 +1,3 @@
-• IPSBBN ora supporta il download degli aggiornamenti di sistema direttamente sulla console PS2 tramite un server di aggiornamento personalizzato.
+• La Raccolta di Giochi di PSBBN ora si carica molto più velocemente. Nei test effettuati con un SSD contenente circa 200 giochi, il caricamento richiedeva in precedenza circa 12 secondi. Ora è praticamente istantaneo!
+
+• L'elenco dei giochi viene ora memorizzato nella cache e controllato per rilevare eventuali modifiche solo quando necessario. Al primo avvio della Raccolta di Giochi, oppure dopo l'installazione o la rimozione di giochi, il caricamento richiederà più tempo.

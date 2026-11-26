@@ -71,7 +71,7 @@ def fit_text(text: str, width: int) -> str:
 
 def parse(data, lang):
     ps1, ps2 = [], []
-    apps, launchers, smb, emu, gme, sys, dst, dbg, ps1app, rte, dem = [], [], [], [], [], [], [], [], [], [], []
+    apps, launchers, ext, emu, gme, sys, dst, dbg, ps1app, rte, dem = [], [], [], [], [], [], [], [], [], [], []
 
     for line in data.splitlines():
         parts = line.split("|")
@@ -88,7 +88,10 @@ def parse(data, lang):
 
         title = parts[5].strip() if using_jpn_title else fallback_title
 
-        display_title = f"{fit_text(title, 87)}{title_id}"
+        if media in ("SMB", "USB"):
+            display_title = f"[{media}] {fit_text(title, 81)}{title_id}"
+        else:
+            display_title = f"{fit_text(title, 87)}{title_id}"
 
         item = (display_title, line)
 
@@ -98,10 +101,10 @@ def parse(data, lang):
             apps.append(item)
         elif media in ("DVD", "CD"):
             ps2.append(item)
-        elif media in ("POPS", "__.POPS"):
+        elif media in ("EMBER", "__.POPS"):
             ps1.append(item)
-        elif media == "SMB":
-            smb.append(item)
+        elif media in ("SMB", "USB"):
+            ext.append(item)
         elif media == "EMU":
             emu.append(item)
         elif media == "GME":
@@ -119,7 +122,7 @@ def parse(data, lang):
         elif media == "DEM":
             dem.append(item)
 
-    return ps1, ps2, apps, launchers, smb, emu, gme, sys, dst, dbg, ps1app, rte, dem
+    return ps1, ps2, apps, launchers, ext, emu, gme, sys, dst, dbg, ps1app, rte, dem
 
 def load_exclusions(path):
     excluded = set()
@@ -359,7 +362,7 @@ class GameSelector(App):
             self.ps2,
             self.apps,
             self.launchers,
-            self.smb,
+            self.ext,
             self.emu,
             self.gme,
             self.sys,
@@ -375,7 +378,7 @@ class GameSelector(App):
         sections = {
             "ps2": (f"🎮 {self.tr('GAME_SELECTOR_7')}", self.ps2),
             "ps1": (f"🎮 {self.tr('GAME_SELECTOR_8')}", self.ps1),
-            "smb": (f"🔗 {self.tr('GAME_SELECTOR_9')}", self.smb),
+            "ext": (f"🔗 {self.tr('GAME_SELECTOR_9')}", self.ext),
             "launchers": (f"🚀 {self.tr('GAME_SELECTOR_10')}", self.launchers),
             "ps1app": (f"🗃️  {self.tr('GAME_SELECTOR_13')}", self.ps1app),
             "emu": (f"👾 {self.tr('GAME_SELECTOR_14')}", self.emu),

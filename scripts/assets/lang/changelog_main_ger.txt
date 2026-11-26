@@ -1,15 +1,26 @@
-• Es wurde eine Option hinzugefügt, um PS2-ISO-Dateien bei der Installation von Spielen zu komprimieren. Aktivieren Sie diese Option, um Speicherplatz zu sparen und mehr Spiele auf Ihrem Laufwerk unterzubringen.
+• Wählen Sie einen Loader-Core für PS2-Spiele anstelle eines Game-Launchers. Sie können zwischen OPL und Neutrino wählen.
+• PS1-Spiele, die auf externen Geräten wie USB-Laufwerken oder MMCE gespeichert sind, können jetzt in der Spielesammlung und im Browser angezeigt werden.
+• Bei PS1-Spielen mit mehreren Discs wird in der Spielesammlung, im Browser und in RiptOPL jetzt nur noch die erste Disc angezeigt.
+• Zusätzliche Grafiken, darunter Cover, Hintergründe, Logos und Screenshots, werden aus der OPL Manager Art Database heruntergeladen und in verschiedenen Game-Loadern angezeigt.
+• CFG-Dateien werden vollständig mit Spieletiteln, Beschreibungen, Videomodi, Bewertungen und weiteren Informationen ausgefüllt und bieten so beim Durchsuchen von Spielen in einem Game-Loader deutlich mehr Details.
 
-• Es wurde eine Option hinzugefügt, um Widescreen-Hacks für PS2-Spiele zu installieren, wodurch in kompatiblen Spielen echter 16:9-Breitbildsupport mit erweitertem Sichtfeld aktiviert wird.
+Ember – Der neue PS1-Emulator ersetzt POPS und POPStarter:
+• Unterstützt Spiele im `bin/cue`-Format. Keine Konvertierung der Spiele in `.vcd` mehr erforderlich!
+• Ein In-Game-Menü erleichtert den Disc-Wechsel bei Spielen mit mehreren Discs.
+• Keine Kompatibilitätspatches mehr für einzelne Spiele erforderlich. Die Kompatibilität wurde gegenüber POPStarter erheblich verbessert, sodass viele zuvor unspielbare Spiele jetzt funktionieren.
+• Der ATA BDM Assault Driver muss nicht mehr auf der PS2-Speicherkarte installiert werden.
+• Bestehende PS1-Spielinstallationen werden automatisch von POPS zu Ember migriert, einschließlich der Speicherstände.
 
-• Das Installationsprogramm für Homebrew-Anwendungen wurde verbessert. Die Anwendungsdatenbank wurde erweitert und enthält nun Details zu über 500 Anwendungen, darunter Titel, Entwickler, Titel-ID und Kategorie.
+RiptOPL – Der ultimative Frankenstein-PS2-Loader ersetzt OPL, NHDDL und POPSLoader:
+• Dient als Backend zum Starten von PS2-Spielen aus der Spielesammlung und dem Browser.
+• Unterstützt das Starten von PS1- und PS2-Spielen.
+• RetroAchievements-Integration für unterstützte PS2-Spiele mit dem Freischalten von Erfolgen und der Fortschrittsverfolgung.
+• Ein In-Game-Menü ermöglicht das Anzeigen von Erfolgen sowie das Zurücksetzen oder Ausschalten der Konsole.
+• Unterstützt das Starten von Spielen mit den Cores OPL, Neutrino und Ember.
+• Der Loader-Core kann für jedes Spiel individuell ausgewählt werden.
 
-• Der Spielauswahlbildschirm unterteilt Homebrew-Anwendungen nun in die folgenden Kategorien: Emulatoren, Spiele, Demoszene, Anwendungen, PS1-Anwendungen, Systemanwendungen, Diagnosetools, Debug-Anwendungen und Laufzeitumgebungen. Die Kategorien können frei nach Ihren Wünschen angeordnet werden.
+Neutrino aktualisiert auf Version v1.8.0-61-g7be8de2:
+• Unterstützung für Cheats hinzugefügt.
+• Widescreen-Patches sind jetzt auch für Benutzer verfügbar, die Neutrino als Loader-Core ausgewählt haben.
 
-• Über 500 Browser-Symbole für Anwendungen wurden der HDD-OSD-Symboldatenbank hinzugefügt. Das Installationsprogramm lädt diese Symbole nun herunter, damit sie im Browser von HOSDMenu angezeigt werden.
-
-• Anwendungen im Browser zeigen nun die Kategorie an, zu der sie gehören.
-
-• R3CONFIGURATOR ist nun einer Starttaste zugewiesen und kann beim Systemstart durch Gedrückthalten der SELECT-Taste gestartet werden.
-
-• Benutzer, die ausschließlich HOSDMenu verwenden, können nun die Option „Kreuz- und Kreis-Tasten neu zuweisen“ im Menü „Optionale Extras“ verwenden.
+Wählen Sie zum Aktualisieren im Hauptmenü „Spiele und Apps installieren“ aus.

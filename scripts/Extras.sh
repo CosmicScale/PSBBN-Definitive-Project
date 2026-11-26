@@ -612,6 +612,13 @@ AVAILABLE_SPACE(){
     # Extract the "used" value, remove "MB" and any commas
     used=$(cat "$hdl_output" | awk '/used:/ {print $6}' | sed 's/,//; s/MB//')
 
+    if [[ ! "$used" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: Invalid used-space value extracted from HDL output" >> "${LOG_FILE}"
+        printf 'used=<%q>\n' "$used" >> "${LOG_FILE}"
+        error_msg "Error" "${UI_TEXT[ERROR_PS2_LINUX_4]}"
+        return 1
+    fi
+
     # Calculate available space (APA_SIZE - used)
     available=$((APA_SIZE - used - 6400 - 128))
     free_space=$((available / 1024))
@@ -744,6 +751,15 @@ option_one() {
     
     psbbn_version=$(head -n 1 "$OPL/version.txt" 2>/dev/null)
     APA_SIZE=$(awk -F' *= *' '$1=="APA_SIZE"{print $2}' "${OPL}/version.txt")
+
+    if [[ ! "$APA_SIZE" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: Invalid APA_SIZE in $OPL/version.txt:" >> "${LOG_FILE}"
+        printf 'APA_SIZE=%q\n' "$APA_SIZE" >> "${LOG_FILE}"
+        cat "$OPL/version.txt" >> "${LOG_FILE}"
+        error_msg "Error" "${UI_TEXT[ERROR_PS2_LINUX_4]}"
+        UNMOUNT_OPL
+        return 1
+    fi
     
     UNMOUNT_OPL || return 1
 
@@ -1032,17 +1048,17 @@ option_two() {
         }
     fi
 
-    if grep -q '^swap_select_btn=' "${OPL}/conf_opl.cfg" 2>> "${LOG_FILE}"; then
-        sed -i "s/^swap_select_btn=.*/swap_select_btn=$OPL_ENTER/" "${OPL}/conf_opl.cfg" || {
-            echo "[X] Error: Failed to update button config in conf_opl.cfg." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
+    if grep -q '^swap_select_btn=' "${OPL}/settings_riptopl.cfg" 2>> "${LOG_FILE}"; then
+        sed -i "s/^swap_select_btn=.*/swap_select_btn=$OPL_ENTER/" "${OPL}/settings_riptopl.cfg" || {
+            echo "[X] Error: Failed to update button config in settings_riptopl.cfg." >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/settings_riptopl.cfg"
             UNMOUNT_OPL
             return 1
     }
     else
-        echo "swap_select_btn=$OPL_ENTER" >> "${OPL}/conf_opl.cfg" || {
-            echo "[X] Error: Failed to add button config to conf_opl.cfg." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
+        echo "swap_select_btn=$OPL_ENTER" >> "${OPL}/settings_riptopl.cfg" || {
+            echo "[X] Error: Failed to add button config to settings_riptopl.cfg." >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/settings_riptopl.cfg"
             UNMOUNT_OPL
             return 1
         }
@@ -1201,6 +1217,8 @@ option_three() {
         fi
     fi
 
+    current_lag="$lang"
+
     while :; do
         LANGUAGE_SPLASH
         MENU_KEYS=(
@@ -1236,7 +1254,6 @@ option_three() {
                 OPL_LANG="English (internal)"
                 R3CONFIG_LANG="en"
                 WLE_LANG="english"
-                PLOAD_LANG="EN"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_2]}"
                 break
                 ;;
@@ -1245,7 +1262,6 @@ option_three() {
                 OPL_LANG="japanese"
                 R3CONFIG_LANG="en"
                 WLE_LANG="english"
-                PLOAD_LANG="EN"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_3]}"
                 break
                 ;;
@@ -1254,7 +1270,6 @@ option_three() {
                 OPL_LANG="French"
                 R3CONFIG_LANG="fr"
                 WLE_LANG="french"
-                PLOAD_LANG="FR"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_4]}"
                 break
                 ;;
@@ -1263,7 +1278,6 @@ option_three() {
                 OPL_LANG="German"
                 R3CONFIG_LANG="de"
                 WLE_LANG="german"
-                PLOAD_LANG="DE"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_5]}"
                 break
                 ;;
@@ -1272,7 +1286,6 @@ option_three() {
                 OPL_LANG="Hungarian"
                 R3CONFIG_LANG="en"
                 WLE_LANG="hungarian"
-                PLOAD_LANG="HU"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_6]}"
                 break
                 ;;
@@ -1281,7 +1294,6 @@ option_three() {
                 OPL_LANG="Italian"
                 R3CONFIG_LANG="en"
                 WLE_LANG="italian"
-                PLOAD_LANG="IT"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_7]}"
                 break
                 ;;
@@ -1290,7 +1302,6 @@ option_three() {
                 OPL_LANG="Portuguese_BR"
                 R3CONFIG_LANG="pt"
                 WLE_LANG="brazilian"
-                PLOAD_LANG="PT"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_8]}"
                 break
                 ;;
@@ -1299,7 +1310,6 @@ option_three() {
                 OPL_LANG="Russian"
                 R3CONFIG_LANG="en"
                 WLE_LANG="english"
-                PLOAD_LANG="EN"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_18]}"
                 break
                 ;;
@@ -1308,7 +1318,6 @@ option_three() {
                 OPL_LANG="Spanish"
                 R3CONFIG_LANG="es"
                 WLE_LANG="spanish"
-                PLOAD_LANG="ES"
                 LANG_DISPLAY="${UI_TEXT[CHANGE_LANGUAGE_9]}"
                 break
                 ;;
@@ -1330,33 +1339,17 @@ option_three() {
 
     cp "${ASSETS_DIR}/OPL/LNG"/* "${OPL}/LNG" >> "${LOG_FILE}" 2>&1
 
-    if [[ "$lang" == "jpn" ]]; then
-        rm -f "${OPL}/POPS/"{IGR_BG.TM2,IGR_NO.TM2,IGR_YES.TM2} 2>> "${LOG_FILE}" || {
-            echo "[X] Error: Failed to update POPS IGR textures." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_9]}"
-            UNMOUNT_OPL
-            return 1
-    }
-    else
-        cp -f "${ASSETS_DIR}/POPStarter/$lang/"{IGR_BG.TM2,IGR_NO.TM2,IGR_YES.TM2} "${OPL}/POPS/" 2>> "${LOG_FILE}" || {
-            echo "[X] Error: Failed to update POPS IGR textures." >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_9]}"
-            UNMOUNT_OPL
-            return 1
-        }
-    fi
-
-    if grep -q '^^language_text=' "${OPL}/conf_opl.cfg" 2>> "${LOG_FILE}"; then
-    sed -i "s/^language_text=.*/language_text=$OPL_LANG/" "${OPL}/conf_opl.cfg" || {
-        echo "[X] Error: Failed to update language config in ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
-        error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
+    if grep -q '^^language_text=' "${OPL}/settings_riptopl.cfg" 2>> "${LOG_FILE}"; then
+    sed -i "s/^language_text=.*/language_text=$OPL_LANG/" "${OPL}/settings_riptopl.cfg" || {
+        echo "[X] Error: Failed to update language config in ${OPL}/settings_riptopl.cfg" >> "${LOG_FILE}"
+        error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/settings_riptopl.cfg"
         UNMOUNT_OPL
         return 1
     }
     else
-        echo "language_text=$OPL_LANG" >> "${OPL}/conf_opl.cfg" || {
-            echo "[X] Error: Failed to add language config to ${OPL}/conf_opl.cfg" >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/conf_opl.cfg"
+        echo "language_text=$OPL_LANG" >> "${OPL}/settings_riptopl.cfg" || {
+            echo "[X] Error: Failed to add language config to ${OPL}/settings_riptopl.cfg" >> "${LOG_FILE}"
+            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/settings_riptopl.cfg"
             UNMOUNT_OPL
             return 1
         }
@@ -1398,22 +1391,12 @@ option_three() {
         fi
     fi
 
-    if [[ -d "${OPL}/POPS" ]]; then
-        if grep -q '^LANGUAGE=' "${OPL}/POPS/.pldrs" 2>> "${LOG_FILE}"; then
-        sed -i "s/^LANGUAGE=.*/LANGUAGE=$PLOAD_LANG/" "${OPL}/POPS/.pldrs" || {
-            echo "[X] Error: Failed to update language config in ${OPL}/POPS/.pldrs" >> "${LOG_FILE}"
-            error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/POPS/.pldrs"
-            UNMOUNT_OPL
-            return 1
-        }
-        else
-            echo "LANGUAGE=$PLOAD_LANG" >> "${OPL}/POPS/.pldrs" || {
-                echo "[X] Error: Failed to add language config to ${OPL}/POPS/.pldrs" >> "${LOG_FILE}"
-                error_msg "${UI_TEXT[ERROR_CHANGE_LANGUAGE_3]}" "${OPL}/POPS/.pldrs"
-                UNMOUNT_OPL
-                return 1
-            }
-        fi
+    if [[ ( "$current_lang" == "jpn" && "$lang" != "jpn" ) || \
+      ( "$current_lang" != "jpn" && "$lang" == "jpn" ) ]]; then
+        for file in "$OPL"/CFG/*.cfg; do
+            [[ -f "$file" ]] || continue
+            sed -i '/^Title=/d' "$file"
+        done
     fi
 
     if [ "$OS" = "PSBBN" ]; then
@@ -1641,11 +1624,13 @@ option_four() {
             1)
                 SCREEN_SIZE="4:3"
                 SIZE_NAME="4:3"
+                OPL_WIDE="0"
                 break
                 ;;
             2)
                 SCREEN_SIZE="full"
                 SIZE_NAME="Full"
+                OPL_WIDE="0"
                 case "$lang" in
                     jpn) SIZE_NAME="フル" ;;
                     fre) SIZE_NAME="Plein écran" ;;
@@ -1662,6 +1647,7 @@ option_four() {
             3)
                 SCREEN_SIZE="16:9"
                 SIZE_NAME="16:9"
+                OPL_WIDE="1"
                 break
                 ;;
             b|B)
@@ -1691,6 +1677,12 @@ option_four() {
             error_msg "${UI_TEXT[ERROR_UPDATE_VER]}"
             return 1
         }
+    fi
+
+    if [[ -f "${OPL}/settings_riptopl.cfg" ]]; then
+        grep -q '^wide_screen=' "${OPL}/settings_riptopl.cfg" \
+        && sed -i "s/^wide_screen=.*/wide_screen=$OPL_WIDE/" "${OPL}/settings_riptopl.cfg" \
+        || echo "wide_screen=$OPL_WIDE" >> "${OPL}/settings_riptopl.cfg"
     fi
 
     LINUX_PARTITIONS=("__linux.4")
@@ -1784,11 +1776,9 @@ option_five() {
         -name "APP_WLER3Z.png" -o \
         -name "SYS_OSDMENU.png" -o \
         -name "SYS_R3CONFIG.png" -o \
-        -name "APP_NHDDL.png" -o \
-        -name "APP_OPL.png" -o \
+        -name "APP_RIPTOPL.png" -o \
         -name "ps1.png" -o \
-        -name "ps2.png" -o \
-        -name "PS1_POPSLOAD.png" \
+        -name "ps2.png" \
     \) -delete; then
     echo "[X] Error: Some files could not be deleted in $ARTWORK_DIR" >> "${LOG_FILE}"
     error_msg "${UI_TEXT[ERROR_CLEAR_CACHE]}"
@@ -1802,14 +1792,10 @@ option_five() {
         -name "ps1.ico" -o \
         -name "APP_DEFAULT_DEL.ico" -o \
         -name "APP_DEFAULT_LST.ico" -o \
-        -name "APP_NHDDL_DEL.ico" -o \
-        -name "APP_NHDDL_LST.ico" -o \
-        -name "APP_OPL_DEL.ico" -o \
-        -name "APP_OPL_LST.ico" -o \
+        -name "APP_RIPTOPL_DEL.ico" -o \
+        -name "APP_RIPTOPL_LST.ico" -o \
         -name "SYS_PSBBN_DEL.ico" -o \
-        -name "SYS_PSBBN_LST.ico" -o \
-        -name "PS1_POPSLOAD_LST.ico" -o \
-        -name "PS1_POPSLOAD_DEL.ico" \
+        -name "SYS_PSBBN_LST.ico" \
     \) -delete; then
         echo "[X] Error: Some files could not be deleted in $ICO_DIR" >> "${LOG_FILE}"
         error_msg "${UI_TEXT[ERROR_CLEAR_CACHE]}"

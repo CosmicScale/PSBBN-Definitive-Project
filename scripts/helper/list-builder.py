@@ -31,11 +31,15 @@ from struct import unpack
 from collections import defaultdict
 from tqdm import tqdm
 
+log_dir = os.path.join(os.getcwd(), "logs")
+
 total = 0
 count = 0
 
 ZISO_MAGIC = 0x4F53495A
 SECTOR_SIZE = 2048
+CD_SECTOR_SIZE = 2352
+MODE2_USER_DATA_OFFSET = 16
 
 pattern_1 = [b'\x01', b'\x0D']
 pattern_2 = [b'\x3B', b'\x31']
@@ -47,6 +51,10 @@ def hide_cursor():
 def show_cursor():
     sys.stdout.write("\033[?25h")
     sys.stdout.flush()
+
+def debug_log(message):
+    with open(log_path, "a", encoding="utf-8") as log:
+        log.write(message + "\n")
 
 # Function to count game files in the given folder
 def count_files(folder, extensions):
@@ -113,6 +121,30 @@ def read_iso_sector(fin, sector, num_sectors=1):
     fin.seek(sector * SECTOR_SIZE)
     return fin.read(num_sectors * SECTOR_SIZE)
 
+def read_bin_sector(fin, sector, num_sectors=1):
+    fin.seek(sector * CD_SECTOR_SIZE)
+    raw = fin.read(num_sectors * CD_SECTOR_SIZE)
+
+    data = bytearray()
+
+    for i in range(num_sectors):
+        sector_data = raw[
+            i * CD_SECTOR_SIZE:
+            (i + 1) * CD_SECTOR_SIZE
+        ]
+
+        user_data_offset = 24
+        user_data_size = 2048
+
+        user_data = sector_data[
+            user_data_offset:
+            user_data_offset + user_data_size
+        ]
+
+        data.extend(user_data)
+
+    return bytes(data)
+
 def parse_dir_entries(data):
     # Parse ISO9660 directory entries from a block of data
     entries = []
@@ -131,22 +163,30 @@ def parse_dir_entries(data):
         offset += length
     return entries
 
-def extract_game_id_from_disc(fin, sector_reader):
-    # Common logic to extract Game ID from SYSTEM.CNF (ISO or ZSO).
-    # Step 1: Read PVD (sector 16)
+def extract_game_id_from_disc(sector_reader):
+    # Common logic to extract Game ID from SYSTEM.CNF (ISO, ZSO, or PS1 BIN).
+    # Step 1: Read PVD
     pvd = sector_reader(16, 1)
 
     # Root dir record is at offset 0x9C inside PVD
     root_dir_record = pvd[156:156+34]
     root_lba = int.from_bytes(root_dir_record[2:6], "little")
     root_size = int.from_bytes(root_dir_record[10:14], "little")
+    debug_log(f"PVD signature: {pvd[1:6]}")
+    debug_log(f"root_lba={root_lba}")
+    debug_log(f"root_size={root_size}")
 
     # Step 2: Read root directory
     num_sectors = (root_size + SECTOR_SIZE - 1) // SECTOR_SIZE
     root_data = sector_reader(root_lba, num_sectors)
 
+    debug_log(f"ROOT DATA length={len(root_data)}")
+    debug_log(f"ROOT DATA first 64 bytes={root_data[:64]!r}")
+
     # Step 3: Parse entries
     entries = parse_dir_entries(root_data)
+    debug_log(f"ROOT ENTRIES: {entries}")
+    
     for name, lba, size in entries:
         if name.upper().startswith("SYSTEM.CNF"):
             num_sectors = (size + SECTOR_SIZE - 1) // SECTOR_SIZE
@@ -154,9 +194,45 @@ def extract_game_id_from_disc(fin, sector_reader):
             cnf_text = system_cnf.decode("utf-8", errors="ignore")
 
             for line in cnf_text.splitlines():
-                if line.strip().upper().startswith("BOOT2"):
-                    return line.split("\\")[-1].split(";")[0].upper().replace('-', '_')
+                if line.strip().upper().startswith(("BOOT2", "BOOT")):
+                    boot_value = line.split("=", 1)[-1].strip()
+
+                    # Remove CDROM:/CDROM0: prefix
+                    boot_value = re.sub(r"^CDROM(?:0)?:", "", boot_value, flags=re.IGNORECASE)
+
+                    # Remove path separators if present
+                    boot_value = boot_value.replace("\\", "/")
+
+                    # Take the final component
+                    boot_value = boot_value.split("/")[-1]
+
+                    # Remove ISO version suffix
+                    boot_value = boot_value.split(";", 1)[0]
+
+                    return boot_value
     return None
+
+def normalize_game_id(game_id):
+    if not game_id:
+        return ""
+
+    game_id = game_id.upper()
+
+    # If it starts with SLUSP, remove the trailing P.
+    if game_id.startswith("SLUSP"):
+        game_id = "SLUS" + game_id[5:]
+
+    # Remove any existing separators.
+    cleaned = game_id.replace("_", "").replace(".", "").replace("-", "")
+
+    # Special rule for IDs beginning with LSP.
+    if cleaned.startswith("LSP"):
+        return cleaned[:8] + "." + cleaned[8:]
+
+    # Rebuild with underscore at index 4 and dot at index 8.
+    game_id = cleaned[:4] + "_" + cleaned[4:7] + "." + cleaned[7:]
+
+    return game_id
 
 def clean_name_from_filename(name, game_id):
     base_name = os.path.splitext(name)[0]
@@ -233,21 +309,28 @@ def process_files(all_targets):
         game_image = image
 
         file_path = os.path.join(game_path, folder, image)
-
-        # Extract Game ID from filename if it meets the condition
-        file_name_without_ext = os.path.splitext(image)[0]
-        if len(file_name_without_ext) >= 11 and file_name_without_ext[4] == '_' and file_name_without_ext[8] == '.':
-            game_id = file_name_without_ext[:11].upper()
+        debug_log("")
+        debug_log("=" * 80)
+        debug_log(f"FILE: {file_path}")
 
         # ISO
         if image.lower().endswith('.iso') and not game_id:
+            debug_log("ISO extraction: ATTEMPTING")
+
             with open(file_path, "rb") as fin:
                 def iso_reader(sector, num_sectors=1):
                     return read_iso_sector(fin, sector, num_sectors)
-                game_id = extract_game_id_from_disc(fin, iso_reader) or ""
+                game_id = extract_game_id_from_disc(iso_reader) or ""
+
+            if game_id:
+                debug_log(f"ISO extraction: SUCCESS -> {game_id}")
+            else:
+                debug_log("ISO extraction: FAILED")
 
         # ZSO
         if image.lower().endswith('.zso') and not game_id:
+            debug_log("ZSO extraction: ATTEMPTING")
+
             with open(file_path, "rb") as fin:
                 magic, header_size, total_bytes, block_size, ver, align = read_zso_header(fin)
                 if magic == ZISO_MAGIC:
@@ -257,10 +340,36 @@ def process_files(all_targets):
                     def zso_reader(sector, num_sectors=1):
                         return decompress_zso_sector(fin, index_buf, block_size, align, sector, num_sectors)
 
-                    game_id = extract_game_id_from_disc(fin, zso_reader) or ""
+                    game_id = extract_game_id_from_disc(zso_reader) or ""
+
+            if game_id:
+                debug_log(f"ZSO extraction: SUCCESS -> {game_id}")
+            else:
+                debug_log("ZSO extraction: FAILED")
+
+        # BIN (PS1 MODE2/2352)
+        if image.lower().endswith('.bin') and not game_id:
+            debug_log("BIN MODE2/2352 extraction: ATTEMPTING")
+
+            with open(file_path, "rb") as fin:
+                def bin_reader(sector, num_sectors=1):
+                    return read_bin_sector(
+                        fin,
+                        sector,
+                        num_sectors
+                    )
+
+                game_id = extract_game_id_from_disc(bin_reader) or ""
+
+            if game_id:
+                debug_log(f"BIN MODE2/2352 extraction: SUCCESS -> {game_id}")
+            else:
+                debug_log("BIN MODE2/2352 extraction: FAILED")
 
         # VCD
         if image.lower().endswith('.vcd') and not game_id:
+            debug_log("VCD extraction: ATTEMPTING")
+
             with open(os.path.join(game_path, folder, image), "rb") as file:
                 for raw_line in file:
                     line = raw_line.strip()
@@ -273,21 +382,17 @@ def process_files(all_targets):
                         raw_bytes = segment.split(b'\\')[-1]
                         game_id = raw_bytes.decode('utf-8', errors='ignore').upper()
 
-                        if len(game_id) == 11:
-                            # If it starts with SLUSP, remove the trailing 'P'
-                            if game_id.startswith("SLUSP"):
-                                game_id = "SLUS" + game_id[5:]
-                                
-                            # Only fix if underscore or dot are in the wrong positions
-                            if game_id[4] != '_' or game_id[8] != '.':
-                                # Remove any existing underscore or dot
-                                cleaned = game_id.replace('_', '').replace('.', '').replace('-', '')
-                                # Rebuild with underscore at index 4 and dot at index 8
-                                game_id = cleaned[:4] + '_' + cleaned[4:7] + '.' + cleaned[7:]
                         break
-        
-        # Fallback for ISO and VCD
-        if (len(game_id) < 11 or len(game_id) > 12) and (image.lower().endswith('.iso') or image.lower().endswith('.vcd')):
+
+            if game_id:
+                debug_log(f"VCD extraction: SUCCESS -> {game_id}")
+            else:
+                debug_log("VCD extraction: FAILED")
+            
+        # Fallback for ISO, VCD, and BIN
+        if (len(game_id) < 11 or len(game_id) > 12) and (image.lower().endswith('.iso') or image.lower().endswith('.vcd') or image.lower().endswith('.bin')):
+            debug_log("Raw fallback scan: ATTEMPTING")
+
             with open(file_path, "rb") as f:
                 data_to_scan = f.read()  # Scan the entire file
 
@@ -334,22 +439,52 @@ def process_files(all_targets):
                         game_id = ""
                         index = 0
 
-        # If no Game ID is found, generate one from filename
-        if not game_id:
-            # Remove spaces from filename and convert to uppercase
-            base_name = os.path.splitext(image)[0]  # Strip the file extension
-            game_id = re.sub(r'[^A-Z0-9]', '', base_name.upper())  # Keep only A-Z and 0-9
+            if game_id:
+                debug_log(f"Raw fallback scan: SUCCESS -> {game_id}")
+            else:
+                debug_log("Raw fallback scan: FAILED")
 
-            # Trim the game_id to 9 characters or pad with zeros
-            game_id = game_id[:9].ljust(9, '0')
+        game_id = normalize_game_id(game_id)
+        debug_log(f"Game ID after normalization: {game_id}")
 
-            # Insert the underscore at position 5 and the full stop at position 9
-            game_id = game_id[:4] + '_' + game_id[4:7] + '.' + game_id[7:]
+        valid_id = (
+            (
+                len(game_id) == 11
+                and game_id[4] == "_"
+                and game_id[8] == "."
+            )
+            or
+            (
+                len(game_id) == 12
+                and game_id.startswith("LSP")
+                and game_id[8] == "."
+            )
+        )
 
-            # Ensure the game_id is exactly 11 characters long
-            game_id = game_id[:11]
+        # If Game ID is not valid, generate one from filename
+        if not valid_id:
+            # Extract Game ID from filename if it meets the condition
+            file_name_without_ext = os.path.splitext(image)[0]
+            if len(file_name_without_ext) >= 11 and file_name_without_ext[4] == '_' and file_name_without_ext[8] == '.':
+                game_id = file_name_without_ext[:11].upper()
+                debug_log(f"Filename extraction: SUCCESS -> {game_id}")
+            else:
+                debug_log("Filename extraction: NOT USED")
 
-        game_id = game_id.upper()
+                # Remove spaces from filename and convert to uppercase
+                base_name = os.path.splitext(image)[0]  # Strip the file extension
+                game_id = re.sub(r'[^A-Z0-9]', '', base_name.upper())  # Keep only A-Z and 0-9
+
+                # Trim the game_id to 9 characters or pad with zeros
+                game_id = game_id[:9].ljust(9, '0')
+
+                # Insert the underscore at position 5 and the full stop at position 9
+                game_id = game_id[:4] + '_' + game_id[4:7] + '.' + game_id[7:]
+
+                # Ensure the game_id is exactly 11 characters long
+                game_id = game_id[:11]
+
+                debug_log(f"Filename-generated ID: {game_id}")
 
         # Determine game name and publisher
         entry = game_names.get(game_id)
@@ -366,6 +501,14 @@ def process_files(all_targets):
 
         # 1st pass (store + count only)
         game_type = folder.lstrip("/")
+
+        if games_list_path.endswith("ember.list"):
+            game_type = "EMBER"
+
+        if image.lower().endswith(".bin"):
+            game_image = os.path.basename(os.path.normpath(folder))
+        else:
+            game_image = image
 
         game_id_counts[game_id] += 1
 
@@ -412,6 +555,123 @@ def process_files(all_targets):
             for entry in game_list_entries:
                 output.write(f"{entry}\n")
 
+def process_ember_targets():
+    # Find Track 01 BIN files in: <game_path>/Ember/games/<game folder>/
+
+    all_targets = []
+
+    games_root = os.path.join(game_path, "Ember", "games")
+
+    if not os.path.isdir(games_root):
+        print(f'{games_root} not found')
+        sys.exit(1)
+
+    for game_folder in sorted(os.listdir(games_root)):
+        if game_folder.startswith('.'):
+            continue
+
+        full_folder_path = os.path.join(games_root, game_folder)
+
+        if not os.path.isdir(full_folder_path):
+            continue
+
+        # Find the alphabetically first CUE file.
+        cue_files = sorted(
+            filename
+            for filename in os.listdir(full_folder_path)
+            if filename.lower().endswith(".cue")
+        )
+
+        if not cue_files:
+            debug_log(f"No CUE file found in {full_folder_path}")
+            continue
+
+        cue_file = cue_files[0]
+        cue_path = os.path.join(full_folder_path, cue_file)
+
+        # Find the BIN referenced by TRACK 01.
+        track01_bin = None
+
+        try:
+            with open(
+                cue_path,
+                "r",
+                encoding="utf-8",
+                errors="ignore"
+            ) as cue:
+                lines = cue.readlines()
+
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+
+                # Look for TRACK 01.
+                if re.match(
+                    r'^TRACK\s+01\b',
+                    stripped,
+                    re.IGNORECASE
+                ):
+                    # Find the FILE declaration immediately preceding TRACK 01.
+                    for previous_line in reversed(lines[:i]):
+                        previous_line = previous_line.strip()
+
+                        match = re.match(
+                            r'^FILE\s+"([^"]+)"',
+                            previous_line,
+                            re.IGNORECASE
+                        )
+
+                        if not match:
+                            match = re.match(
+                                r'^FILE\s+(\S+)',
+                                previous_line,
+                                re.IGNORECASE
+                            )
+
+                        if match:
+                            track01_bin = match.group(1)
+                            break
+
+                    break
+
+        except OSError as e:
+            print(f'Could not read CUE file {cue_path}: {e}')
+            continue
+
+        if not track01_bin:
+            print(f'No Track 01 BIN found in {cue_path}')
+            continue
+
+        # Handle Windows-style paths in CUE files.
+        track01_bin = track01_bin.replace("\\", os.sep)
+
+        bin_path = os.path.normpath(
+            os.path.join(
+                full_folder_path,
+                track01_bin
+            )
+        )
+
+        if not os.path.isfile(bin_path):
+            print(f'Track 01 BIN not found: {bin_path}')
+            continue
+
+        # process_files() expects paths relative to game_path.
+        relative_folder = os.path.relpath(
+            full_folder_path,
+            game_path
+        )
+
+        relative_image = os.path.relpath(
+            bin_path,
+            full_folder_path
+        )
+
+        all_targets.append(
+            (relative_folder, relative_image)
+        )
+
+    return all_targets
+
 def main(arg1, arg2):
     if arg1 and arg2:
         global game_path
@@ -419,6 +679,22 @@ def main(arg1, arg2):
         global gameid_file_path
         game_path = arg1
         games_list_path = arg2
+        global log_path
+        
+        os.makedirs(log_dir, exist_ok=True)
+
+        list_name = os.path.splitext(
+            os.path.basename(games_list_path)
+        )[0]
+
+        log_path = os.path.join(
+            log_dir,
+            f"{list_name}-id.log"
+        )
+        
+        with open(log_path, "w", encoding="utf-8") as log:
+            log.write("Game ID extraction debug log\n")
+            log.write("=" * 80 + "\n")
 
         # Set correct TitlesDB path based on output list name
         if games_list_path.endswith("ps2.list"):
@@ -427,32 +703,36 @@ def main(arg1, arg2):
         elif games_list_path.endswith("pfs-pops.list"):
             gameid_file_path = "./scripts/assets/database/TitlesDB_PS1.csv"
             folders_to_scan = [('/__.POPS', ['.vcd', '.VCD'])]
-        elif games_list_path.endswith("ata-pops.list"):
+        elif games_list_path.endswith("ember.list"):
             gameid_file_path = "./scripts/assets/database/TitlesDB_PS1.csv"
-            folders_to_scan = [('/POPS', ['.vcd', '.VCD'])]
+            folders_to_scan = []
         else:
-            print("Error: Output list must end with either 'ps2.list', 'ata-pops.list', or `pfs-pops.list`.")
+            print("Error: Output list must end with either 'ps2.list', 'ember.list', or `pfs-pops.list`.")
             sys.exit(1)
 
         # Remove any existing game list file
         if os.path.isfile(games_list_path):
             os.remove(games_list_path)
 
-        # Count files
-        all_targets = []
+        # Build list of files to process
+        if games_list_path.endswith("ember.list"):
+            all_targets = process_ember_targets()
 
-        for folder, extensions in folders_to_scan:
-            full_path = os.path.join(game_path, folder.strip("/"))
+        else:
+            all_targets = []
 
-            if not os.path.isdir(full_path):
-                print(f'{folder} not found at {game_path}')
-                sys.exit(1)
+            for folder, extensions in folders_to_scan:
+                full_path = os.path.join(game_path, folder.strip("/"))
 
-            for image in os.listdir(full_path):
-                if image.startswith('.'):
-                    continue
-                if any(image.lower().endswith(ext) for ext in extensions):
-                    all_targets.append((folder.strip("/"), image))
+                if not os.path.isdir(full_path):
+                    print(f'{folder} not found at {game_path}')
+                    sys.exit(1)
+
+                for image in os.listdir(full_path):
+                    if image.startswith('.'):
+                        continue
+                    if any(image.lower().endswith(ext) for ext in extensions):
+                        all_targets.append((folder.strip("/"), image))
 
         process_files(all_targets)
 

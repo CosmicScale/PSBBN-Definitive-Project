@@ -1,15 +1,26 @@
-• Added an option to compress PS2 ISO files when installing games. Enable this option to save space and fit more games on your drive.
+• Select a loader core for PS2 games instead of a game launcher. Choose between OPL and Neutrino.
+• PS1 games stored on external devices, such as USB or MMCE, can now be displayed in the Game Collection and Browser.
+• PS1 multi-disc games now display only the first disc in the Game Collection, Browser, and RiptOPL.
+• Additional artwork, including covers, backgrounds, logos, and screenshots, are downloaded from the OPL Manager Art Database for display in various game loaders.
+• CFG files are fully populated with game titles, descriptions, video modes, ratings, and more, providing richer information when browsing games in a game loader.
 
-• Added an option to install widescreen hacks for PS2 games, enabling true 16:9 widescreen support with a wider field of view in compatible games.
+Ember - The new PS1 emulator replaces POPS and POPStarter:
+• Supports games in `bin/cue` format. No more converting games to `.vcd`!
+• An in-game menu makes swapping discs in multi-disc games easy.
+• No more compatibility patches for individual games. Compatibility is significantly improved over POPStarter, with many previously unplayable games now working.
+• No need to install ATA BDM Assault Driver on your PS2 Memory Card.
+• Existing PS1 game installations are automatically migrated from POPS to Ember, including their save files.
 
-• Improved the installer for homebrew apps. The application database has been expanded to contain details of over 500 applications, including their title, developer, title ID, and category.
+RiptOPL - The Definitive Frankenstein PS2 Loader replaces OPL, NHDDL, and POPSLoader:
+• Serves as the backend for launching PS2 games from the Game Collection and Browser.
+• Supports launching both PS1 and PS2 games.
+• RetroAchievements integration for supported PS2 games, with achievement unlocking and progress tracking.
+• An in-game menu to view achievements and reset or power off the console.
+• Supports launching games using the OPL, Neutrino, and Ember cores.
+• Choose the loader core on a per-game basis.
 
-• The Game Selector now splits homebrew apps into the following categories: Emulators, Games, Demoscene, Applications, PS1 Applications, System Applications, Diagnostic Tools, Debug Applications, and Runtime Environments. You can freely rearrange the categories to suit your preferences.
+Neutrino updated to version v1.8.0-61-g7be8de2:
+• Adds support for cheats.
+• Widescreen patches are now available to users who select Neutrino as their loader core.
 
-• Over 500 Browser icons for applications have been added to the HDD-OSD Icon Database. The installer now downloads these icons for display in the HOSDMenu's Browser.
-
-• Applications in the Browser now display the category to which they belong.
-
-• R3CONFIGURATOR is now assigned to a boot key and can be launched at boot by holding the SELECT button.
-
-• HOSDMenu-only users can now use the "Reassign Cross and Circle Buttons" option in the Optional Extras menu.
+To update, select "Install Games and Apps" from the main menu.

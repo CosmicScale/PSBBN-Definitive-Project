@@ -1,1 +1,3 @@
-• A PSBBN mostantól támogatja a rendszerfrissítések közvetlenül a PS2 konzolra történő letöltését egy egyedi frissítési szerveren keresztül.
+• A PSBBN Játékgyűjtemény mostantól jelentősen gyorsabban töltődik be. Egy körülbelül 200 játékot tartalmazó SSD-vel végzett teszt során a betöltés korábban nagyjából 12 másodpercet vett igénybe. Most már gyakorlatilag azonnal betöltődik!
+
+• A játéklista mostantól gyorsítótárazva van, és csak szükség esetén ellenőrzi a rendszer, hogy történt-e változás. A Játékgyűjtemény első indításakor, illetve játékok telepítése vagy eltávolítása után a betöltés hosszabb időt vesz igénybe.

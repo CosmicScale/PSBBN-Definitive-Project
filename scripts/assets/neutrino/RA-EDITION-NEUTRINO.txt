@@ -1,0 +1,11 @@
+THIS neutrino/ FOLDER BELONGS TO THE RIPTOPL RETROACHIEVEMENTS EDITION.
+
+It is NULD's (formerly ORBIT) RA-Neutrino v1.2.14: Neutrino v1.8.0 with the achievement agent
+(raagent.irx). Only modules/iLinkman.irx and modules/IEEE1394_bd_mini.irx are replaced,
+by RiptOPL's i.LINK pair, as in the standard kit. It is NOT the standard RiptOPL Neutrino:
+keep this folder with the RA loader (APPS/APP_RIPTOPL-RA) and the standard one with the standard loader.
+
+Every Neutrino launch in the RA edition uses this runtime, so upstream changes made
+after Neutrino v1.8.0 (including Neutrino cheats) are not available here.
+
+NULD (formerly ORBIT) Neutrino RA runtime v1.2.14: https://github.com/danielnuld/nuld/releases/tag/v1.2.14

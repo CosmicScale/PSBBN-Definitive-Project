@@ -7,4 +7,5 @@ name = "Patch for Ratchet & Clank 3 / Up Your Arsenal - ONLINE!"
 # Load patch module that fixes a game bug
 [[module]]
 file = "patch_rc_uya.irx"
+load_order = 31
 env = ["EE"]
