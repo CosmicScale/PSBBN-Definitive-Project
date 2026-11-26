@@ -2477,11 +2477,11 @@ create_game_assets() {
                     if [[ $width -eq $height ]]; then
                         # Square: Resize without cropping
                         echo "Resizing square image $file" >> "${LOG_FILE}"
-                        convert "$file" -resize 256x256! -depth 8 -alpha off "$output"
+                        convert "$file" -resize 256x256! -depth 8 -alpha off "$output" 2>/dev/null
                     else
                         # Not square: Resize and crop
                         echo "Resizing and cropping $file" >> "${LOG_FILE}"
-                        convert "$file" -resize 256x256^ -crop 256x256+0+44 -depth 8 -alpha off "$output"
+                        convert "$file" -resize 256x256^ -crop 256x256+0+44 -depth 8 -alpha off "$output" 2>/dev/null
                     fi
                     rm -f "$file"
                 else
@@ -2677,7 +2677,7 @@ create_game_assets() {
                 png_file="${TOOLKIT_PATH}/icons/art/${game_id}.png"
                 if [[ -s "$png_file" ]]; then
                     if [[ "$disc_type" == "EMBER" || "$disc_type" == "__.POPS" || "$disc_type" == "SMB" || "$disc_type" == "BDM" ]]; then
-                        convert "${ASSETS_DIR}/Icon-templates/PS1-Template.png" \( "$png_file" -resize 197x197! \) -geometry +42+27 -composite "${game_dir}/jkt_001.png"
+                        convert "${ASSETS_DIR}/Icon-templates/PS1-Template.png" \( "$png_file" -resize 197x197! \) -geometry +42+27 -composite "${game_dir}/jkt_001.png" 2>/dev/null
                     else
                         cp "$png_file" "${game_dir}/jkt_001.png" 2>> "${LOG_FILE}" || {
                             echo "[X] Error: Failed to create: $game_dir/jkt_001.png" >> "${LOG_FILE}"
@@ -2788,6 +2788,7 @@ EOL
         fi
     done
     exec 3<&-
+    sleep 10
 }
 
 create_launcher_partitions() {
