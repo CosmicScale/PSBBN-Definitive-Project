@@ -66,7 +66,10 @@ Both installation options offer:
 # Changelog
 
 **November 26th, 2026 - Goodbye POPStarter! Hello Ember, RetroAchievements, RiptOPL & More!**
+
 <p></p>
+
+[![PSBBN Update: Goodbye POPStarter! Hello Ember, RetroAchievements, RiptOPL & More!](https://github.com/user-attachments/assets/86e29cca-9ee2-4f86-9309-84eacb4e0df9)](https://youtu.be/GaJn694D9LA)
 
 **New Features:**
 
