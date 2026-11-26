@@ -1,0 +1,302 @@
+EMBER LICENCE
+Version 1.0
+
+Copyright (c) 2026 Gageformer. All rights reserved.
+
+Ember is a PlayStation 1 emulator for the PlayStation 2, created by Gageformer.
+This licence governs the binary builds of Ember that are distributed under it,
+beginning with Ember 0.8. It does not grant any rights to Ember's source code,
+which is not published at this time.
+
+
+1. GRANT
+
+Permission is granted, free of charge, to any person obtaining a copy of an
+Ember build, to:
+
+  (a) download and retain copies of the build for personal use;
+  (b) install and run the build on hardware they own or are authorised to use;
+  (c) evaluate and test the build, and publicly discuss, review, stream, record
+      and publish screenshots or video of it, including for monetised channels;
+  (d) report bugs, compatibility results and feedback to the author.
+
+
+2. BUNDLING AND REDISTRIBUTION
+
+You MAY include an unmodified Ember build in a front-end, launcher, homebrew
+collection or similar project, and distribute it as part of that project,
+provided that ALL of the following are true:
+
+  (a) the build is included unmodified, complete, and with this licence file;
+  (b) Ember is clearly credited to Gageformer, by name, somewhere a user will
+      see it -- a readme, an about screen or a credits list is fine;
+  (c) a link to the official Ember release page is included with that credit;
+  (d) you do not charge money for your project, or for anything of which Ember
+      forms a part, and you do not solicit payment in exchange for supplying it;
+  (e) you do not present Ember, or any part of it, as your own work, and you do
+      not imply that your project is Ember itself or an official version of it.
+
+Building a launcher or front-end for Ember is actively encouraged, and needs no
+permission at all. Linking to the official release page is always welcome.
+
+If you want to do something this section does not allow -- including anything
+commercial -- just ask. Permission is usually granted.
+
+
+3. RESTRICTIONS
+
+Except as permitted in Sections 1 and 2, and without prior written permission
+from the author, you may NOT:
+
+  (a) sell, rent, lease, sublicense or otherwise commercially exploit the
+      build, or charge any fee for supplying it, including on preloaded
+      storage devices;
+  (b) monetise the distribution of Ember itself, whether directly or by
+      placing it behind paywalls, subscriptions, ad-gates or link lockers;
+  (c) modify, patch, translate, repackage or create derivative works of the
+      build;
+  (d) reverse engineer, decompile or disassemble the build, except to the
+      extent such restriction is prohibited by applicable law;
+  (e) remove, obscure or alter any copyright, licence or attribution notice;
+  (f) represent the build, or any part of it, as your own work, or present a
+      modified version as being the original Ember.
+
+For the avoidance of doubt: making videos, streams or written coverage of
+Ember is NOT "commercially exploiting the build", and remains permitted under
+Section 1 even on monetised channels.
+
+These restrictions apply to Ember's own work. They do not restrict the
+third-party components listed in Section 10, which remain under their own
+licences.
+
+
+4. NO BIOS OR GAME CONTENT
+
+Ember contains no PlayStation BIOS image and no game data, and never will.
+Users must supply their own BIOS dump and their own disc images, obtained from
+hardware and media they lawfully own. Nothing in this licence authorises the
+copying or distribution of any third-party copyrighted work.
+
+
+5. SOFTWARE UNDER ACTIVE DEVELOPMENT
+
+Ember is under active development. A build may contain defects, may behave
+incorrectly with some games, and may fail to preserve save data. Keep backups
+of anything you care about, including memory card files.
+
+
+6. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+7. SCOPE AND FUTURE RELEASES
+
+This licence applies to the Ember build it is distributed with, and continues
+to apply to that build permanently. It is not withdrawn or replaced by any
+later release. Earlier builds distributed under the Ember Public Beta Testing
+Licence remain under that licence.
+
+The author may release future versions of Ember, including source code, under
+different terms. Doing so does not alter the terms governing builds already
+released under this licence, and does not grant any additional rights in them.
+
+
+8. TRADEMARKS
+
+"PlayStation", "PlayStation 2", "PS1" and "PS2" are trademarks of Sony
+Interactive Entertainment Inc. Ember is an independent project and is not
+affiliated with, endorsed by, or sponsored by Sony Interactive Entertainment.
+
+
+9. ORIGINAL WORK
+
+Ember is an independent emulator, written from scratch for the PlayStation 2.
+Its recompiler, memory model, geometry pipeline, audio and graphics
+translation are original work.
+
+
+10. THIRD-PARTY COMPONENTS
+
+An Ember build is linked with the following libraries, which are not Ember's
+work and are distributed under their own licences:
+
+  - PS2SDK (https://github.com/ps2dev/ps2sdk), licensed under the Academic
+    Free License version 2.0. The portions of PS2SDK contained in the build
+    are distributed under, and subject to, the terms of that licence.
+
+  - newlib (https://github.com/ps2dev/newlib), the C library. The notices
+    its licences require are reproduced in the THIRD-PARTY NOTICES at the end
+    of this file.
+
+
+11. CONTACT
+
+For permission to do anything this licence does not allow -- most likely a
+commercial use, since non-commercial bundling is already permitted under
+Section 2 -- please contact the author. Such requests are welcome, and the
+answer is usually yes.
+
+
+==============================================================================
+THIRD-PARTY NOTICES
+==============================================================================
+
+Portions of this build are from newlib. Those portions are covered by the
+following notices.
+
+------------------------------------------------------------------------------
+University of California, Berkeley
+------------------------------------------------------------------------------
+
+This product includes software developed by the University of California,
+Berkeley and its contributors.
+
+Copyright (c) 1981-2000 The Regents of the University of California.
+Copyright (c) 1983, 1987, 1989, 1990, 1991, 1993, 2007
+The Regents of the University of California.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. Neither the name of the University nor the names of its contributors
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Some of these files carry the earlier University notice instead:
+
+  Copyright (c) 1990 The Regents of the University of California.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms are permitted provided
+  that the above copyright notice and this paragraph are duplicated in all
+  such forms and that any documentation, and/or other materials related to
+  such distribution and use acknowledge that the software was developed by
+  the University of California, Berkeley. The name of the University may not
+  be used to endorse or promote products derived from this software without
+  specific prior written permission. THIS SOFTWARE IS PROVIDED ``AS IS'' AND
+  WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.
+
+Parts of the locale code:
+  Copyright (c) 1996 - 2002 FreeBSD Project
+  Copyright (c) 1991, 1993 The Regents of the University of California.
+  This code is derived from software contributed to Berkeley by Paul Borman
+  at Krystal Technologies. Distributed under the University licence above.
+
+Parts of the environment code may have been modified by DJ Delorie;
+such modifications are Copyright (C) 1991 DJ Delorie.
+
+------------------------------------------------------------------------------
+Red Hat
+------------------------------------------------------------------------------
+
+Copyright (c) 1994-2009 Red Hat, Inc. All rights reserved.
+Copyright (c) 1995, 1996, 2002 Red Hat Incorporated. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+
+  Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+  The name of Red Hat Incorporated may not be used to endorse or promote
+  products derived from this software without specific prior written
+  permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL RED HAT INCORPORATED BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------------------------------------------------------------------
+Imagination Technologies (MIPS string routines)
+------------------------------------------------------------------------------
+
+Copyright (c) 2014 Imagination Technologies Limited.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. Neither the name of the MIPS Technologies, Inc., nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY IMAGINATION TECHNOLOGIES LIMITED ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL IMAGINATION TECHNOLOGIES LIMITED BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+------------------------------------------------------------------------------
+David M. Gay (number conversion)
+------------------------------------------------------------------------------
+
+The author of this software is David M. Gay.
+
+Copyright (c) 1991 by AT&T.
+
+Permission to use, copy, modify, and distribute this software for any
+purpose without fee is hereby granted, provided that this entire notice is
+included in all copies of any software which is or includes a copy or
+modification of this software and in all copies of the supporting
+documentation for such software.
+
+THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTY. IN PARTICULAR, NEITHER THE AUTHOR NOR AT&T MAKES ANY
+REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF
+THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+
+------------------------------------------------------------------------------
+Sun Microsystems (maths routine)
+------------------------------------------------------------------------------
+
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this software is freely
+granted, provided that this notice is preserved.
