@@ -1008,7 +1008,7 @@ When installing applications in the `ELF` format, the file is matched against a 
 
 ### Launching PS1 Games from SMB and External Devices
 PS1 games in the `.VCD` format stored on an SMB network share, or an external device such as USB or MMCE, can be launched from the [Game Collection](#game-collection) and [Browser](#hosdmenu). Before running the Game Installer:
-1. Install your PS1 games and the required support files to your external device. Instructions can be found [here](https://nathanneurotic.github.io/POPSTARTERINFO/
+1. Install your PS1 games and the required support files to your external device. Instructions can be found [here](https://nathanneurotic.github.io/POPSTARTERINFO/)
 2. Place the renamed `POPSTARTER.ELF` files with the `SB.` prefix for SMB, or the `XX.` prefix for other external devices in the `POPS` folder, either on your PC or directly on your PS2's drive
 
 ### Game Selector

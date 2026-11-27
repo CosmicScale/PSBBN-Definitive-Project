@@ -38,18 +38,20 @@ Ambas opciones de instalación ofrecen:
 - Sistema de archivos PFS usado para software del sistema y soporte heredado
 - [HOSDMenu](#hosdmenu): una versión parcheada del software HDD-OSD de Sony que ofrece [muchas ventajas](#hosdmenu) sobre FreeHDBoot
 - Vea, explore e inicie sus juegos y aplicaciones directamente desde el [Navegador](#hosdmenu), representado por [iconos 3D](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
+- Soporte para iniciar juegos con los núcleos de carga OPL, [Neutrino](#neutrino) y [Ember](#ember)
+- Integración de [RetroAchievements](#retroachievements) para juegos de PS2 compatibles, con desbloqueo de logros y seguimiento del progreso
 - Compatibilidad con [Game ID](#id-del-juego) para **Pixel FX Retro GEM**, **MemCard Pro** y **SD2PSX**: funciona con juegos y aplicaciones instalados, así como con discos físicos de juegos.
 - [MechaPwn](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2) admite parches automáticos del logotipo de PS2, lo que permite iniciar importaciones y discos de respaldo. También ajusta el modo de vídeo del controlador de PlayStation para discos de juegos de PS1 importados.
-- Incluye las aplicaciones [wLaunchELF-R3Z](#lanzamientoelf-r3z), [R3CONFIGURATOR](#configurador-r3) y [POPSLoader](#cargador-de-cop), con la opción de [OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl) para el iniciador de tu juego.
+- Incluye las aplicaciones [wLaunchELF-R3Z](#lanzamientoelf-r3z), [R3CONFIGURATOR](#configurador-r3) y [RiptOPL](#riptopl)
 - Un [Instalador de Juegos y Aplicaciones](#instalar-juegos-y-aplicaciones) que automatiza completamente la instalación de juegos de PS1 y PS2, así como de aplicaciones caseras:
-  - Crea recursos y descarga ilustraciones e íconos para todos tus juegos y aplicaciones
-  - Ofrece una opción para instalar hacks de pantalla panorámica para juegos de PS2 que permiten la compatibilidad con pantalla panorámica 16:9 en juegos compatibles.
+  - Crea activos y descarga ilustraciones e íconos para todos tus juegos y aplicaciones
+  - Completa completamente los archivos `CFG` con títulos de juegos, descripciones, modos de video, clasificaciones y más, brindando información más rica al explorar juegos
+  - Ofrece una opción para instalar hacks de pantalla ancha para juegos de PS2, lo que permite compatibilidad con pantalla ancha 16:9 en juegos compatibles
   - Ofrece una opción para crear [Tarjetas de Memoria Virtuales](#tarjetas-de-memoria-virtuales) (VMC) para juegos de PS2, con soporte para [Grupos de VMC](#tarjetas-de-memoria-virtuales) para juegos de PS1 y PS2.
   - Configura juegos de PS1 multidisco para permitir el intercambio de discos
-  - Instala automáticamente [correcciones de HugoPocked POPSarter](#iniciador-pop)
-  - Convierte archivos `.bin`/`.cue` a `.VCD` (PS1) o `.ISO` (PS2)
+  - Convierte archivos `.VCD` a `.bin`/`.cue` (PS1), o `.bin`/`.cue` a `.ISO` (PS2)
   - Ofrece la opción de comprimir archivos `ISO`
-  - Configura los ajustes de compatibilidad OPL para juegos
+  - Configura los ajustes de compatibilidad de OPL para juegos
   - Agrega aplicaciones instaladas al menú del sistema [HOSDMenu](#hosdmenu)
 
 **Exclusivo para Instalaciones PSBBN:**
@@ -63,8 +65,73 @@ Ambas opciones de instalación ofrecen:
 
 # Registro de Cambios
 
-**17 de Septiembre de 2026: Juegos Comprimidos, Trucos de Pantalla Ancha, Instalador Homebrew Mejorado**
-<p><p>
+**26 de Noviembre de 2026: ¡Adiós POPStarter! ¡Hola Ember, RetroAchievements, RiptOPL y Más!**
+
+<p></p>
+
+[![Actualización PSBBN: ¡Adiós POPSarter! ¡Hola Ember, RetroAchievements, RiptOPL y Más!](https://github.com/user-attachments/assets/86e29cca-9ee2-4f86-9309-84eacb4e0df9)](https://youtu.be/GaJn694D9LA)
+
+**Nuevas Características:**
+
+**[Instalador del Juego](#instalar-juegos-y-aplicaciones):**
+- Ahora selecciona un [núcleo del cargador](#núcleos-de-cargador) para juegos de PS2 en lugar de un iniciador de juegos. Elija entre [OPL](#opl) y [Neutrino](#neutrino).
+- Los juegos de PS1 almacenados en [dispositivos externos](#lanzamiento-de-juegos-de-ps1-desde-smb-y-dispositivos-externos), como USB o MMCE, ahora se pueden mostrar en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
+- Los juegos multidisco de PS1 ahora muestran solo el primer disco de la [Colección de juegos](#colección-de-juegos), [Navegador](#hosdmenu) y [RiptOPL](#riptopl).
+- Las ilustraciones adicionales, incluidas portadas, fondos, logotipos y capturas de pantalla, se descargan desde OPL Manager Art Database para mostrarlas en varios cargadores de juegos.
+- Los archivos CFG están completamente llenos de títulos de juegos, descripciones, modos de video, clasificaciones y más, lo que proporciona información más rica al explorar juegos en un cargador de juegos. Para los usuarios japoneses, los títulos de los juegos se muestran en japonés.
+
+**[Ember](#ember) - el Nuevo Emulador de PS1 Reemplaza a POPS y POPSarter:**
+- Admite juegos en formato `bin/cue`. ¡No más convertir juegos a `.vcd`!
+- Un menú dentro del juego facilita el intercambio de discos en juegos multidisco.
+- No más parches de compatibilidad para juegos individuales. La compatibilidad ha mejorado significativamente con respecto a POPSarter, y ahora funcionan muchos juegos que antes no se podían reproducir.
+- No es necesario instalar el controlador ATA BDM Assault en su tarjeta de memoria PS2.
+- Las instalaciones de juegos de PS1 existentes se migran automáticamente de POPS a [Ember](#ember), incluidos sus archivos guardados.
+
+**[RiptOPL](#riptopl) - el Cargador Definitivo de Frankenstein para PS2 Reemplaza a OPL, NHDDL y POPSLoader:**
+- Sirve como backend para iniciar juegos de PS2 desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu)
+- Reduce los tiempos de carga hasta en 12 segundos al iniciar juegos de PS2 desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu) (con [RetroAchievements](#retroachievements) deshabilitado)
+- Admite el lanzamiento de juegos de PS1 y PS2.
+- Integración de [RetroAchievements](#retroachievements) para juegos de PS2 compatibles, con desbloqueo de logros y seguimiento del progreso.
+- Un menú dentro del juego para ver logros y reiniciar o apagar la consola.
+- Admite el inicio de juegos utilizando los núcleos [OPL](#opl), [Neutrino](#neutrino) y [Ember](#ember).
+- Elija el [núcleo del cargador] (#núcleos-de-cargador) por juego.
+
+**[Neutrino](#neutrino) Actualizado a la Versión V1.8.0-61-G7be8de2:**
+- Agrega soporte para trampas.
+- Los parches de pantalla ancha ahora están disponibles para los usuarios que seleccionan [Neutrino](#neutrino) como su [núcleo del cargador](#núcleos-de-cargador).
+
+**[WLaunchELF_R3Z](#lanzamientoelf-r3z) Actualizado a la Versión V4.80:**
+- Las notas de la versión se pueden encontrar [aquí](https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/4.80)
+
+**[PSBBN Definitive Patch V5.0.0](#psbbn) - PSBBN Descompilado:**
+- La [Colección de juegos] PSBBN (#colección-de-juegos) ahora se carga significativamente más rápido. En las pruebas que utilizaron un SSD con aproximadamente 200 juegos, la carga anteriormente demoraba alrededor de 12 segundos. ¡Ahora es prácticamente instantáneo!
+- La lista de juegos ahora se almacena en caché y solo se verifican cambios cuando es necesario. La primera vez que se inicia la [Colección de juegos](#colección-de-juegos), o después de instalar o eliminar juegos, la carga tardará más.
+
+<details>
+<summary><b>01 de noviembre de 2026: ¡actualizaciones del sistema en línea restauradas!</summary></b>
+
+<p></p>
+
+[![Actualización PSBBN: ¡Actualizaciones del Sistema en Línea Restauradas!](https://github.com/user-attachments/assets/f783552d-b7ba-4e5d-a516-cf998b26a353)](https://youtu.be/GNqpk_AuRhk)
+
+- PSBBN ahora admite la descarga de actualizaciones del sistema directamente a la consola PS2 a través de un servidor de actualizaciones personalizado. Esta característica requiere PSBBN Definitive Patch v4.3.0. Actualice usando la opción [Actualizar software del sistema PS2](#actualizar-el-software-del-sistema-ps2).
+</details>
+
+<details>
+<summary><b>23 de octubre de 2026: compatibilidad con macOS</summary></b>
+
+- El instalador PSBBN Definitive Project ahora es compatible con macOS. Consulte [instalación en macOS](#instalación-en-macos) para obtener más detalles.
+</details>
+
+<details>
+<summary><b>29 de septiembre de 2026: soporte de Gentoo Linux</summary></b>
+
+- El instalador PSBBN Definitive Project ahora es compatible con Gentoo Linux. Consulte [instalación en Linux](#instalación-en-linux) para obtener más detalles.
+</details>
+
+<details>
+<summary><b>17 de septiembre de 2026: juegos comprimidos, trucos en pantalla ancha, instalador Homebrew mejorado</summary></b>
+<p></p>
 
 [![Actualización PSBBN: Compresión de Juegos, Trucos de Pantalla Ancha, Instalador Homebrew Mejorado y Más.](https://github.com/user-attachments/assets/4dfe26c8-7349-4f14-97d1-e88e616ea599)](https://youtu.be/ImmUr69x57Y)
 
@@ -80,7 +147,7 @@ Ambas opciones de instalación ofrecen:
 - [R3CONFIGURATOR](#configurador-r3) ahora está asignado a una [clave de inicio](#opciones-de-arranque) y se puede iniciar en el inicio manteniendo presionado el botón *SELECT*.
 
 **[Extras Opcionales](#extras-opcionales):**
-- Los usuarios exclusivos de HOSDMenu ahora pueden usar la opción [Reasignar botones en cruz y círculo](#reassign-X-and-Círculo-buttons) en el [menú Extras opcionales](#extras-opcionales). Esto intercambia las funciones de los botones × y ○ en [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3).
+- Los usuarios exclusivos de HOSDMenu ahora pueden usar la opción [Reasignar botones en cruz y círculo](#reassign-X-and-Círculo-buttons) en el [menú Extras opcionales](#extras-opcionales). Esto intercambia las funciones de los botones × y ○ en OPL, [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3).
 
 **Mejoras y Correcciones de Errores:**
 - Títulos mejorados generados automáticamente para aplicaciones `ELF` cuando no se encuentra ninguna coincidencia en la base de datos.
@@ -94,15 +161,16 @@ Ambas opciones de instalación ofrecen:
 - Comprobaciones mejoradas para [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3) antes de crear accesos directos a ellos.
 - Solo elimine las aplicaciones existentes asignadas a la clave de inicio *START* si [wLaunchELF-R3Z](#lanzamientoelf-r3z) está instalado.
 - Se eliminó el paso de copia del kernel innecesario al cambiar de idioma.
-- Sólo monte `__linux.9` cuando el idioma se cambie a japonés.
+- Solo monte `__linux.9` cuando el idioma se cambie a japonés.
 - Se agregó ruso a la selección de idioma en preparación para la próxima localización al ruso.
 - El instalador ahora envía una lista de todos los archivos `ELF` instalados y sus carpetas principales al registro.
 - Se corrigió la variable de idioma enviada al registro.
 - Se corrigió el mensaje de la interfaz de usuario "Procesando archivos ELF".
-- Se eliminaron los scripts redundantes `txt_to_icon_sys.py` y `icon_sys_to_txt.py` y sus comprobaciones asociadas.
+- Se eliminaron los scripts `txt_to_icon_sys.py` y `icon_sys_to_txt.py` redundantes y sus comprobaciones asociadas.
+</details>
 
 <details>
-<summary>13 de agosto de 2026: localización húngara, paquetes de idiomas, actualizaciones de R3CONFIGURATOR y wLaunchELF_R3Z</summary>
+<summary><b>13 de agosto de 2026: localización húngara, paquetes de idiomas, actualizaciones de R3CONFIGURATOR y wLaunchELF_R3Z</summary></b>
 
 - El PSBBN Definitive Project ahora se ha traducido completamente al húngaro. Puede cambiar el idioma de su instalación PSBBN desde el menú Extras opcionales.
 - Todos los paquetes de idiomas se han actualizado con correcciones y traducciones mejoradas.
@@ -110,8 +178,8 @@ Ambas opciones de instalación ofrecen:
 </details>
 
 <details>
-<summary>29 de julio de 2026: Selector de Juegos v2, OSDMenu 1.3.0 y más.</summary>
-<p><p>
+<summary><b>29 de julio de 2026: Selector de Juegos v2, OSDMenu 1.3.0 y más.</summary></b>
+<p></p>
 
 [![Actualización PSBBN: Selector de Juegos V2, OSDMenu 1.3.0 y Más.](https://github.com/user-attachments/assets/4395d7ec-7af4-4954-8e30-7b562c5cef3d)](https://youtu.be/UEsqDorgbew)
 
@@ -123,33 +191,33 @@ Ambas opciones de instalación ofrecen:
 **Menú OSD:**
 - [OSDMenu MBR](#osdmenu-mbr) y [HOSDMenu](#hosdmenu) actualizados a [v1.3.0](#https://github.com/pcm720/OSDMenu/releases/tag/v1.3.0).
 - Se redujo el tiempo de inicio de [PSBBN](#psbbn).
-- Se agregó soporte para [claves de inicio del gamepad] adicionales (#opciones-de-arranque). Ahora se admiten todas las claves excepto `L3` y `R3`.
+- Se agregó soporte para [teclas de inicio del gamepad] adicionales (#opciones-de-arranque). Ahora se admiten todas las claves excepto `L3` y `R3`.
 - [R3CONFIGURADOR](#configurador-r3) actualizado a [v1.3.0](https://github.com/saildot4k/R3CONFIGURATOR/releases/tag/v1.3.0).
 
 **Otros Cambios:**
-- [POPSLoader](#cargador-de-cop) actualizado a la última versión continua
-- [Instalación del controlador ATA BDM Assault](#instalaãão-dos-drivers-ata-bdm-assault) más sencilla con [POPSLoader](#cargador-de-cop)
+- POPSLoader actualizado a la última versión rodante
+- Instalación del controlador ATA BDM Assault más sencilla con POPSLoader
 - [wLaunchELF_R3Z](#lanzamientoelf-r3z) actualizado a [v4.75](#https://github.com/saildot4k/wLaunchELF_R3Z/releases/tag/v4.75)
-- La configuración de idioma para [wLaunchELF_R3Z](#lanzamientoelf-r3z) y [POPSLoader](#cargador-de-cop) ahora se configura automáticamente.
+- La configuración de idioma para [wLaunchELF_R3Z](#lanzamientoelf-r3z) y POPSLoader ahora se configura automáticamente.
 - La configuración de [Configuración del botón](#reassign-X-and-Círculo-buttons) para [wLaunchELF_R3Z](#lanzamientoelf-r3z) ahora se establece automáticamente.
 - Se agregó una traducción al portugués brasileño de [PSBBN Definitive Project README](https://github.com/CosmicScale/PSBBN-Definitive-Project/blob/main/README-PT-BR.md).
 - Varias correcciones de errores y limpieza de código.
 </details>
 
 <details>
-<summary>02 de julio de 2026: localización mejorada, selector de juegos, PS1 en exFAT, POPSLoader, wLaunchELF-R3Z y R3CONFIGURATOR</summary>
-<p><p>
+<summary><b>2 de julio de 2026: localización mejorada, selector de juegos, PS1 en exFAT, POPSLoader, wLaunchELF-R3Z y R3CONFIGURATOR</summary></b>
+<p></p>
 
 [![¡Localización Mejorada, Selector de Juegos, PS1 en ExFAT, POPSLoader y Más!](https://github.com/user-attachments/assets/c1828dbf-e1ba-4c67-8ae0-ccff79f4a524)](https://youtu.be/Bqf8XCfa0QM)  
 
 **Nuevas Características:**
 - Ahora se muestra un registro de cambios antes de [Menú Principal](#menú-principal) cada vez que se publica una nueva actualización.
-- Los scripts **PSBBN Definitive Project** se han traducido completamente al inglés, japonés, francés, español, alemán, italiano y portugués de Brasil. El idioma de su sistema operativo se detecta automáticamente y el proyecto se ejecuta en ese idioma, siendo el inglés de forma predeterminada si no está disponible. Los usuarios de **Windows** deberán actualizar a la última versión de **[PSBBN Launcher for Windows](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)** para que esta función funcione.
+- Los scripts **PSBBN Definitive Project** se han traducido completamente al inglés, japonés, francés, español, alemán, italiano y portugués de Brasil. El idioma de su sistema operativo se detecta automáticamente y el proyecto se ejecuta en ese idioma, siendo el inglés de forma predeterminada si no está disponible. Los usuarios de **Windows** deberán actualizar a la última versión de **[PSBBN Launcher for Windows](https://github.com/CosmicScale/PSBBN-Definitive-Project/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)** para que esta función funcione.
 - El [Instalador de juegos](#instalar-juegos-y-aplicaciones) ahora cuenta con un [Selector de juegos](#selector-de-juegos), que le permite seleccionar qué juegos mostrar en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Si tiene una colección grande, limitar la cantidad de juegos mostrados puede mejorar su experiencia de navegación.
-- Los juegos de PS1 ahora se instalan en la partición exFAT junto con los juegos y aplicaciones de PS2, eliminando las limitaciones de espacio causadas por APA. Los juegos previamente instalados permanecerán en la partición `POPS` y seguirán siendo reproducibles. Para jugar juegos de PS1 desde la partición exFAT, **DEBE** instalar los [controladores ATA BDM Assault](#instalaãão-dos-drivers-ata-bdm-assault) en una tarjeta de memoria de PS2.
-- Los juegos de PS1 almacenados en un [recurso compartido de red SMB](#lanzamiento-de-juegos-de-ps1-desde-smb) ahora se pueden iniciar desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Coloque un `POPSTARTER.ELF` renombrado con el prefijo `SB.` en la carpeta `POPS` y luego ejecute el [Instalador del juego](#instalar-juegos-y-aplicaciones).
-- Se ha agregado la aplicación [POPSLoader](#cargador-de-cop). Esto te permite navegar y cargar fácilmente juegos de PS1. [POPSLoader](#cargador-de-cop) se puede iniciar desde la [Colección de juegos](#colección-de-juegos) o Menu Navigator, el [HOSDMenu](#hosdmenu) Navegador o menú del sistema, y ​​manteniendo presionado [△](#opciones-de-arranque) en el arranque.
-- Se agregó la integración de [POPSLoader](#cargador-de-cop) al [Instalador de juegos](#instalar-juegos-y-aplicaciones), las ilustraciones del juego se descargan automáticamente para todos tus juegos de PS1.
+- Los juegos de PS1 ahora se instalan en la partición exFAT junto con los juegos y aplicaciones de PS2, eliminando las limitaciones de espacio causadas por APA. Los juegos previamente instalados permanecerán en la partición `POPS` y seguirán siendo reproducibles. Para jugar juegos de PS1 desde la partición exFAT, **DEBE** instalar los controladores ATA BDM Assault en una tarjeta de memoria de PS2.
+- Los juegos de PS1 almacenados en un [recurso compartido de red SMB](#launching-ps1-games-from-smb) ahora se pueden iniciar desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Coloque un `POPSTARTER.ELF` renombrado con el prefijo `SB.` en la carpeta `POPS`, luego ejecute el [Instalador del juego] (#instalar-juegos-y-aplicaciones).
+- Se ha agregado la aplicación POPSLoader. Esto te permite navegar y cargar fácilmente juegos de PS1. POPSLoader se puede iniciar desde la [Colección de juegos](#colección-de-juegos) o Menu Navigator, el [HOSDMenu](#hosdmenu) Navegador o menú del sistema, y ​​manteniendo presionado [△](#opciones-de-arranque) en el arranque.
+- La integración de POPSLoader se agregó al [Instalador de juegos] (#instalar-juegos-y-aplicaciones), las ilustraciones del juego se descargan automáticamente para todos tus juegos de PS1.
 - **wLaunchELF-ISR** ha sido reemplazado por [wLaunchELF-R3Z](#lanzamientoelf-r3z), agregando soporte para administrar archivos en la partición exFAT del disco interno. Ahora se puede iniciar en el arranque manteniendo presionado el botón [START](#opciones-de-arranque).
 - **OSDMenu Configurator** ha sido reemplazado por [R3CONFIGURATOR](#configurador-r3), agregando soporte multilingüe.
 
@@ -159,8 +227,8 @@ Ambas opciones de instalación ofrecen:
   - Se ha eliminado la selección de idioma. Ahora se instala automáticamente en el mismo idioma que su sistema operativo y, de forma predeterminada, se instala en inglés si ese idioma no está disponible.
 - [Instalador exclusivo de HOSDMenu](#instalar-hosdmenu-únicamente):
   - Le permite reservar espacio para futuras particiones APA. Se puede reservar hasta el 50% de la capacidad del disco (máximo 2 TB).
-- [Instalador del juego](#instalar-juegos-y-aplicaciones):
-  - La configuración de idioma y botones ahora se establece automáticamente en [OPL](#open-ps2-loader-opl) y [R3CONFIGURATOR](#configurador-r3) para que coincida con la configuración de instalación.
+- [Instalador del juego](https://u0.link):
+  - La configuración de idioma y botones ahora se establece automáticamente en OPL y [R3CONFIGURATOR](#configurador-r3) para que coincida con la configuración de instalación.
   - Los juegos de PS2 ahora se muestran primero en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu), seguidos de los juegos de PS1 y las aplicaciones caseras.
   - La salida del [Game Installer](#instalar-juegos-y-aplicaciones) se ha optimizado y ahora incluye barras de progreso.
   - Ahora tienes la opción de desactivar [PS2 VMC](#tarjetas-de-memoria-virtuales) si estaban activados anteriormente.
@@ -174,10 +242,10 @@ Ambas opciones de instalación ofrecen:
 
 **Corrección de Errores:**
 - Se impide que el script se ejecute en modo no interactivo.
-- [OPL](#open-ps2-loader-opl) se actualizó a v1.2.0-Beta-2245-3e3f34e, solucionando un problema de lectura de configuración al inicio que algunos usuarios estaban experimentando.
+- OPL se actualizó a v1.2.0-Beta-2245-3e3f34e, solucionando un problema de lectura de configuración al inicio que algunos usuarios estaban experimentando.
 - El [Instalador de música](#instalar-música) ahora admite el manejo de caracteres internacionales.
 - El [Instalador del juego](#instalar-juegos-y-aplicaciones) ahora omite los archivos ocultos, evitando que se instalen.
-- Se evita que los archivos `.ZSO` duplicados se descompriman cuando los archivos `.ZSO` están presentes y [NHDDL](#nhddl) está seleccionado como iniciador del juego.
+- Se evita que los archivos `.ZSO` duplicados se descompriman cuando los archivos `.ZSO` están presentes y se selecciona NHDDL como iniciador del juego.
 - Muestra una advertencia si falta un archivo `.bin` al convertir a `.iso`. Omite la conversión de `.VCD` si falta el archivo `.bin`
 - Comprobaciones mejoradas para la creación exitosa de las listas de juegos.
 - Maneja correctamente las ID de juegos duplicadas incluso cuando los archivos están en carpetas diferentes.
@@ -186,26 +254,26 @@ Ambas opciones de instalación ofrecen:
 </details>
 
 <details>
-<summary>16 de abril de 2026: compatibilidad mejorada con PS1, VMC de PS2, actualización de OPL y más.</summary>
-<p><p>
+<summary><b>16 de abril de 2026: compatibilidad mejorada con PS1, VMC de PS2, actualización de OPL y más.</summary></b>
+<p></p>
 
 [![¡Compatibilidad Mejorada Con PS1, VMC de PS2, Actualización de OPL y Más!](https://github.com/user-attachments/assets/1dc75789-bbd4-45df-9615-7e9bd8bd3ac5)](https://youtu.be/oRm3QIwdf1o)  
 
-- **[OPL](#open-ps2-loader-opl)** actualizado a **v1.2.0 Beta-2241-39afed2**: soluciona problemas de lectura de configuración en la partición exFAT de la unidad interna
-- **[NHDDL](#nhddl)** actualizado a **[v1.2.2](https://github.com/pcm720/nhddl/releases/tag/v1.2.2)**
-- **[Neutrino](#nhddl)** actualizado a **[v1.8.0](https://github.com/rickgaiser/neutrino/releases/tag/v1.8.0)**: reduce el tiempo de inicio del juego en unos 4 segundos
+- **OPL** actualizado a **v1.2.0 Beta-2241-39afed2**: soluciona problemas de lectura de configuración en la partición exFAT de la unidad interna
+- **NHDDL** actualizado a **[v1.2.2](https://github.com/pcm720/nhddl/releases/tag/v1.2.2)**
+- **[Neutrino](#neutrino)** actualizado a **[v1.8.0](https://github.com/rickgaiser/neutrino/releases/tag/v1.8.0)**: reduce el tiempo de inicio del juego en unos 4 segundos
 - **[OSDMenu](#osdmenu-mbr)** actualizado a **v1.2.1**: soluciona problemas con los argumentos de inicio al iniciar ELF mediante el botón del gamepad al inicio
 
 **[Instalador del Juego](#instalar-juegos-y-aplicaciones):**
-- Asigna el iniciador del juego elegido ([OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl)) al botón □, lo que permite que se inicie rápidamente al inicio.
-- Crea un archivo de configuración **[OPL](#open-ps2-loader-opl)** en su unidad. BDM HDD, aplicaciones y obras de arte ahora se habilitan automáticamente
-- Los juegos en formato `ZSO` ahora tienen el "Modo de compatibilidad 1" habilitado automáticamente en sus configuraciones **[OPL](#open-ps2-loader-opl)** por juego.
+- Asigna el iniciador del juego elegido (OPL o NHDDL) al botón □, lo que permite que se inicie rápidamente al inicio
+- Crea un archivo de configuración **OPL** en tu disco. BDM HDD, aplicaciones y obras de arte ahora están habilitados automáticamente
+- Los juegos en el formato `ZSO` ahora tienen el "Modo de compatibilidad 1" habilitado automáticamente en sus configuraciones **OPL** por juego
 - Ahora se pueden instalar varios juegos que comparten el mismo ID de título, lo que permite la instalación de una variedad de modificaciones.
 - Los juegos de PS1 ahora cuentan con un nuevo borde estilo PSN en PSBBN **[Colección de juegos](#colección-de-juegos)**, lo que facilita la distinción entre juegos de PS1 y PS2.
 - Instalación automática de **[correcciones de HugoPocked POPSarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/)**, mejorando la compatibilidad con más de 100 juegos de PS1.
 
 **Corrección de Errores:**
-- **OSDMenu Configurator** ahora tiene la ilustración correcta en la pestaña Aplicaciones en **[OPL](#open-ps2-loader-opl)**
+- **OSDMenu Configurator** ahora tiene el diseño correcto en la pestaña Aplicaciones en **OPL**
 - Se corrigió el cambio de nombre de `.vcd` a `.VCD` en sistemas de archivos que no distinguen entre mayúsculas y minúsculas
 - Elimina la carpeta `neutrino` existente antes de actualizar para evitar conflictos
 - Garantiza que los archivos de configuración de OSDMenu terminen con una nueva línea antes de agregar contenido
@@ -215,12 +283,12 @@ Ambas opciones de instalación ofrecen:
 - Se agregó una tabla para [teclas de acceso rápido de POPSarter](#iniciador-pop)
 - Se agregó Debian a la lista de [sistemas operativos recomendados](#instalación-en-linux)
 - Se agregaron nuevas funciones a la sección [Instalar juegos y aplicaciones](#instalar-juegos-y-aplicaciones)
-- Se cambiaron las referencias de Neutrino a [NHDDL](#nhddl), lo que refleja cómo se lanzan ahora los juegos.
+- Se cambiaron las referencias de [Neutrino](#neutrino) a NHDDL, lo que refleja cómo se lanzan ahora los juegos.
 - Mejoras generales
 
 **27 de Marzo de 2026: Tarjetas de Memoria Virtuales (VMCs) para Juegos de PS2**
 - El **[Instalador de juegos](#instalar-juegos-y-aplicaciones)** ahora ofrece la opción de habilitar **[VMC](#tarjetas-de-memoria-virtuales)** para juegos de PS2. No es necesaria ninguna configuración adicional
-- Esta función es compatible con **[OPL](#open-ps2-loader-opl)** y **[NHDDL](#nhddl)**
+- Esta característica es compatible con **OPL** y **NHDDL**
 - Compatible con **[Grupos de VMC](#tarjetas-de-memoria-virtuales)**
 
 **26 de Marzo de 2026 - Actualización 4.2.0: Nuevos Canales en Línea Más Localización en Francés**
@@ -232,8 +300,8 @@ Ambas opciones de instalación ofrecen:
 </details>
 
 <details>
-<summary>05 de marzo de 2026: instaladores de películas y fotografías, OSDMenu Configurator y más.</summary>
-<p><p>
+<summary><b>05 de marzo de 2026: instaladores de películas y fotografías, OSDMenu Configurator y más.</summary></b>
+<p></p>
 
 [![¡Instaladores de Películas y Fotografías, OSDMenu Configurator y Más!](https://github.com/user-attachments/assets/f0fae1ee-bf04-4aea-88a6-89e030926282)](https://youtu.be/_jKzzsClgOY)
 
@@ -263,7 +331,7 @@ Ambas opciones de instalación ofrecen:
 
 **[Instalaciones Exclusivas de HOSDMenu:](#instalar-hosdmenu-únicamente)**
 - Aumento del tamaño máximo de partición **[POPS](#iniciador-pop)** a 130 GB.
-- Se agregó selección de idioma. El instalador del juego utiliza el idioma seleccionado para los títulos de juegos y el **[mensaje POPS IGR](#salir-de-juegos)**
+- Se agregó selección de idioma. El instalador del juego utiliza el idioma seleccionado para los títulos de juegos y el **mensaje POPS IGR**
 - **[HOSDMenu-only](#hosdmenu)** los usuarios ahora pueden cambiar el idioma de su instalación en el **[Menú de extras opcionales](#extras-opcionales)**
 
 **[Cambiar Configuración de Pantalla:](#cambiar-la-configuración-de-la-pantalla)**
@@ -277,7 +345,7 @@ Ambas opciones de instalación ofrecen:
 
 **[PSBBN Launcher For Windows:](#instalación-en-windows)**
 - Se agregó soporte para instalar juegos desde una unidad de red.
-- Se agregó un mensaje que muestra los archivos compatibles para **[Movie Installer](#instalar-películas)** y **[Photo Installer](#instalar-fotos)**
+- Se agregó un mensaje que muestra los archivos compatibles para **[Instalador de películas](#instalar-películas)** y **[Photo Installer](#instalar-fotos)**
 - Mensaje de advertencia de capacidad mínima de la unidad corregido
 - Corrección de errores
 
@@ -296,8 +364,8 @@ Ambas opciones de instalación ofrecen:
 </details>
 
 <details>
-<summary>08 de enero de 2026 - PSBBN Definitive Project: nuevo nombre y soporte multilingüe</b></summary>
-<p><p>
+<summary><b>8 de enero de 2026: PSBBN Definitive Project: nuevo nombre y soporte multilingüe</b></summary>
+<p></p>
 
 [![PSBBN Definitive Project: Nuevo Nombre y Soporte Multilingüe](https://github.com/user-attachments/assets/32bb93f2-c009-4b82-ba62-67933ff30e83)](https://www.youtube.com/watch?v=dvCt_ExHwro)
 
@@ -332,7 +400,7 @@ Cuando el idioma está configurado en japonés, los títulos de los juegos de la
 **`TitlesDB_PS1.csv` y `TitlesDB_PS2.csv`:**  
 - Se agregaron títulos de juegos japoneses para todos los juegos de la región japonesa.
 
-`list-Builder.py`:**
+**`list-Builder.py`:**
 - Actualizado para manejar títulos de juegos japoneses.
 
 **PSBBN Definitive Patch Actualizado a V4.1.0**
@@ -341,16 +409,16 @@ Cuando el idioma está configurado en japonés, los títulos de los juegos de la
 
 **General**:
 - El idioma del sistema ahora está configurado en el idioma PSBBN seleccionado y ya no se restablece a inglés o japonés al iniciar PSBBN
-- Se agregó `libicu-dev` y `pkg-config` a las dependencias
+- Se agregaron `libicu-dev` y `pkg-config` a las dependencias
 - Mensaje IGR POPS en inglés mejorado
 - Se agregó una advertencia para evitar que los scripts internos se ejecuten directamente
-- Se agregó una verificación de validación de instalación para cancelar instalaciones no compatibles.
-- **[NHDDL](#nhddl)** actualizado a la versión 1.2.1
+- Se agregó validación de instalación marque para cancelar instalaciones no compatibles
+- **NHDDL** actualizado a la versión 1.2.1
 </details>
 
 <details>
-<summary>14 de noviembre de 2025 - PSBBN Definitive Patch v4.0 - ¡Menú OSDM, adaptadores HDD de terceros y más!</b></summary>
-<p><p>
+<summary><b>14 de noviembre de 2025 - PSBBN Definitive Patch v4.0 - ¡Menú OSDM, adaptadores HDD de terceros y más!</b></summary>
+<p></p>
 
 [![PSBBN Definitive Patch V4.0: Menú OSDM, Adaptadores HDD de Terceros y Más.](https://github.com/user-attachments/assets/1a3f2d69-6bec-4fe4-aa27-c367f5d98f98)](https://www.youtube.com/watch?v=fT368C90Trc)
 
@@ -373,36 +441,36 @@ Parcha **HDD-OSD** e introduce varias mejoras:
 - Soporte para iniciar aplicaciones desde dispositivos MMCE, MX4SIO, UDPBD, iLink y discos duros con formato APA y exFAT
 - GSM integrado para juegos y aplicaciones en disco
 - Soporte para 1080i y 480p
-- Y más: consulte el [repositorio de GitHub](https://github.com/pcm720/OSDMenu) para obtener todos los detalles.
+- Y más: consulta el [repositorio de GitHub](https://github.com/pcm720/OSDMenu) para obtener todos los detalles.
 
 **[¡NUEVO! Instale PSBBN y HOSDMenu:](#instale-psbbn-y-hosdmenu)**
 - El instalador PSBBN ahora instala **[HOSDMenu](#hosdmenu)** junto con **[PSBBN](#psbbn)**
 - Muestra las últimas notas de la versión al instalar y actualizar
 - Admite unidades más pequeñas: capacidad mínima reducida de 200 GB a 32 GB
 - Aumento del tamaño máximo de partición APA a 112 GB
-- Después de la partición, cualquier espacio no asignado ahora se asigna a la partición **[OPL](#open-ps2-loader-opl)**
+- Después de la partición, cualquier espacio no asignado ahora se asigna a la partición **OPL**
 - Aconseja a los usuarios que consulten [archive.org](https://archive.org/) o utilicen una VPN si fallan las descargas.
 
 **[¡NUEVO! Instale HOSDMenu Únicamente:](#instalar-hosdmenu-únicamente)**
 - Agrega una opción para instalar **[HOSDMenu](#hosdmenu)** únicamente (para usuarios con adaptadores HDD de terceros)
-- Cree una partición **[POPS](#iniciador-pop)** de tamaño personalizado (hasta 118 GB), asignando automáticamente el espacio restante a la partición **[OPL](#open-ps2-loader-opl)** (hasta 2 TB)
+- Cree una partición **[POPS](#iniciador-pop)** de tamaño personalizado (hasta 118 GB), asignando automáticamente el espacio restante a la partición **OPL** (hasta 2 TB)
 
 **[Instalador del Juego:](#instalar-juegos-y-aplicaciones)**
 - **[Game Installer](#instalar-juegos-y-aplicaciones)** ahora requiere **PSBBN Definitive Project v4.0.0** y superior o **[HOSDMenu-only](#instalar-hosdmenu-únicamente)**
 - Agrega compatibilidad solo con configuraciones **[HOSDMenu](#hosdmenu)**
 - Actualizaciones **[OSDMenu MBR](#osdmenu-mbr)** y **[HOSDMenu](#hosdmenu)** si hay versiones más nuevas disponibles
-- Actualiza **Menu Navigator** con accesos directos al iniciador de juegos seleccionado (**[OPL](#open-ps2-loader-opl)** o **[NHDDL](#nhddl)**), **[HOSDMenu](#hosdmenu)** y **[wLaunchELF_ISR](#wlaunchelf_isr)**
+- Actualiza **Menu Navigator** con accesos directos al iniciador de juegos seleccionado (**OPL** o **NHDDL**), **[HOSDMenu](#hosdmenu)** y **[wLaunchELF_ISR](#wlaunchelf_isr)**
 - Actualiza la configuración **[HOSDMenu](#hosdmenu)** para mostrar las aplicaciones homebrew instaladas en el **menú OSDSYS**
 - Convierte automáticamente archivos `BIN/CUE` de PS1 a `VCD` y archivos `BIN/CUE` de PS2 a `ISO`
 - Los juegos de PS1 ahora se copian y sincronizan a través de `PFS FUSE` usando `rsync`, con progreso visible durante la transferencia
-- Copia solo archivos válidos de juegos y homebrew al sincronizar o agregar juegos y aplicaciones. `rsync` ahora ignora los archivos de metadatos `:Zone.Identifier` de Windows que podrían provocar errores de sincronización
+- Copia solo archivos válidos de juegos y homebrew al sincronizar o agregar juegos y aplicaciones. `rsync` ahora ignora los archivos de metadatos `:Zone.Identifier` de Windows que podrían causar fallas de sincronización
 - Pone en mayúsculas automáticamente las extensiones `.VCD` en minúsculas para garantizar la compatibilidad con **[POPSarter](#iniciador-pop)**
-- Se reubicaron `OPNPS2LD.ELF` y `nhddl.elf` a `__system/launcher` y `POPSTARTER.ELF` a `__common/POPS` desde exFAT.
+- Se reubicaron `OPNPS2LD.ELF` y `nhddl.elf` a `__system/launcher` y `POPSTARTER.ELF` a `__common/POPS` desde exFAT
 
-`list-Builder.py`:**
-- Ahora escanea la partición PFS `__.POPS` en busca de archivos `VCD` en lugar de la carpeta `POPS` local.
+**`list-Builder.py`:**
+- Ahora escanea la partición PFS `__.POPS` en busca de archivos `VCD` en lugar de la carpeta local `POPS`
 
-`art_Downloader.py`:**
+**`art_Downloader.py`:**
 - Se convirtió `art_downloader` de JavaScript a Python, eliminando dependencias en Node.js, npm, Puppeteer y Chromium.
 
 **[Instalar Música:](#instalar-música)**
@@ -425,7 +493,7 @@ Parcha **HDD-OSD** e introduce varias mejoras:
 - Se actualizó la entrada del número de disco para admitir valores mayores que 9
 - Sale correctamente si falla el montaje del disco.
 
-**[NHDDL:](#nhddl)**
+**NHDDL:**
 - Actualizado a la versión v1.2.0
 
 **`Setup.sh` y `flake.nix`:**
@@ -439,7 +507,7 @@ Parcha **HDD-OSD** e introduce varias mejoras:
 
 **General:**
 - Se agregó soporte para sistemas ARM64. Probado en una Raspberry Pi con la última versión del sistema operativo Raspberry Pi
-- `BOOT.ELF` reemplazado por [compatible con SAS](#save-application-system-sas) [wLaunchELF_ISR](#wlaunchelf_isr) versión 4.43x_isr-bb13043
+- `BOOT.ELF` reemplazado con [compatible con SAS](#save-application-system-sas) [wLaunchELF_ISR](#wlaunchelf_isr) versión 4.43x_isr-bb13043
 - Se eliminó `PS1VModeNeg.elf`
 - Cambia la configuración regional de `en_US.UTF-8` a `C.UTF-8` (algunos sistemas carecían de `en_US.UTF-8`), lo que garantiza que la salida del script y los registros permanezcan en inglés y previene fallas relacionadas
 - Manejo mejorado del montaje y desmontaje de particiones APA
@@ -449,8 +517,8 @@ Parcha **HDD-OSD** e introduce varias mejoras:
 </details>
 
 <details>
-<summary>09 de septiembre de 2025: PSBBN Launcher for Windows: instalación y configuración sencillas</b></summary>
-<p><p>
+<summary><b>09 de septiembre de 2025: PSBBN Launcher for Windows: instalación y configuración sencillas</b></summary>
+<p></p>
 
 [![PSBBN Launcher For Windows: Instalación y Configuración Sencillas](https://github.com/user-attachments/assets/981e4abc-10b0-49d2-8d52-3e19ea80650b)](https://www.youtube.com/watch?v=O5ZvJoW4oNw)
 
@@ -460,8 +528,8 @@ Un agradecimiento especial a Yornn por todo su trabajo en esta función.
 </details>
 
 <details>
-<summary>28 de agosto de 2025 - PSBBN Definitive Patch v3.00 - ¡Instalador de música, sistema de menús, instalaciones más rápidas y más!</b></summary>
-<p><p>
+<summary><b>28 de agosto de 2025 - PSBBN Definitive Patch v3.00 - ¡Instalador de música, sistema de menús, instalaciones más rápidas y más!</b></summary>
+<p></p>
 
 [![PSBBN Parche Definitivo en Inglés 3.0](https://github.com/user-attachments/assets/3b82d809-28d5-4675-87c2-c7f1abf96ae6)](https://www.youtube.com/watch?v=lUMKZck6G08) 
   
@@ -497,8 +565,8 @@ Un agradecimiento especial a Yornn por todo su trabajo en esta función.
 </details>
 
 <details>
-<summary>17 de julio de 2025 - Parche definitivo v2.11 - ¡Seguridad de arranque parcheada! ¡Intercambio de botones, Grupos de VMC y más!</b></summary>
-<p><p>
+<summary><b>17 de julio de 2025 - Parche definitivo v2.11 - ¡Seguridad de arranque parcheada! ¡Intercambio de botones, Grupos de VMC y más!</b></summary>
+<p></p>
 
 [![PSBBN Definitive Patch V2.11](https://github.com/user-attachments/assets/49511803-429b-4cd8-8546-40334be3f244)](https://www.youtube.com/watch?v=kgXe8rlqsr0)
 
@@ -513,7 +581,7 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - La **Guía de PlayStation BB** se ha actualizado para reflejar el intercambio de botones y la reubicación de la [Colección de juegos](#colección-de-juegos). Se ha agregado una nueva sección que cubre los canales en línea. Numerosas mejoras en la traducción al inglés.
 - Mejora el proceso de actualización. No se necesitarán una unidad USB ni un teclado para futuras actualizaciones.
 
-`02-PSBBN-Installer.sh`:**
+**`02-PSBBN-Installer.sh`:**
 - Ahora puede establecer un tamaño personalizado para la partición [POPS](#iniciador-pop). Anteriormente, llenaba todo el espacio restante después de crear la partición de música.
 
 **`03-Game-Installer.sh`, `ps2iconmaker.sh` y `txt_To_Icon_Sys.py`:**
@@ -522,15 +590,15 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - [POPStarter Grupos de VMC](#tarjetas-de-memoria-virtuales) para juegos de PS1: los juegos que pueden interactuar con los datos guardados de otros ahora comparten un único VMC. Por ejemplo, las licencias obtenidas en Gran Turismo se pueden transferir a Gran Turismo 2, y Psycho Mantis de Metal Gear Solid puede comentar sobre otros juegos de Konami que hayas jugado.
 - Los VMC ahora muestran títulos más claros en **Save Data Management** y **Browser 2.0** con íconos personalizados para cada juego y grupo.
 - El instalador del juego ahora genera automáticamente íconos HDD-OSD (Navegador 2.0) si no se encuentran en [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Si las imágenes de portada de un juego están disponibles en OPL Manager Art Database, se generará automáticamente un ícono 3D para el juego. También se crean íconos 3D para VMC cuando hay un logotipo de juego disponible. Todos los íconos recién generados se agregan automáticamente a HDD-OSD Icon Database y se informan los íconos que faltan.
-- Se corrigió un error por el cual se podía mostrar información incorrecta del editor para archivos `ELF`
+- Se corrigió un error por el cual se podía mostrar información incorrecta del editor para los archivos `ELF`.
 
-`list-Builder.py`:**
+**`list-Builder.py`:**
 
 - Extracción de ID de juego mejorada para casos extremos. Ahora maneja ID no estándar como `LSP99016.101` y juegos de PS1 con archivos `system.cnf` no estándar.
 
-**Neutrino Actualizado a la Versión 1.7.0**
+**[Neutrino](#neutrino) Actualizado a la Versión 1.7.0**
 
-- El registro de cambios completo de Neutrino se puede encontrar [aquí](https://github.com/rickgaiser/neutrino/releases/tag/v1.7.0)
+- El registro de cambios completo para [Neutrino](#neutrino) se puede encontrar [aquí](https://github.com/rickgaiser/neutrino/releases/tag/v1.7.0)
 
 **Open PS2 Loader Actualizado a V1.2.0 Beta-2210-6b300b0**
 - Agrega soporte para Grupos de VMC y corrección de errores.
@@ -541,8 +609,8 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 </details>
 
 <details>
-<summary>05 de junio de 2025 - PSBBN Definitive Patch v2.10 – ¡Cambios en el instalador de juegos importantes y más!</b></summary>
-<p><p>
+<summary><b>05 de junio de 2025: PSBBN Definitive Patch v2.10 – ¡Cambios en el instalador de juegos importantes y más!</b></summary>
+<p></p>
 
 [![PSBBN Definitive Patch V2.10](https://github.com/user-attachments/assets/ff4e6e5b-8556-4fe2-88b2-99e7eb09121c)](https://www.youtube.com/watch?v=XTacIPOGAwE)
 
@@ -561,12 +629,12 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - La partición PS2 Linux ahora usa `ext2` en lugar de `reiserfs`
 - Se eliminó la configuración del ISP del menú superior
 - Se eliminó el acceso directo Open PS2 Loader del Menu Navigator (el usuario puede agregar un acceso directo al iniciador del juego que elija manualmente)
-- Accesos directos modificados para [LaunchELF](https://github.com/ps2homebrew/wLaunchELF) y [Launch Disc](#launch-disc)
+- Accesos directos modificados para [LaunchELF](https://github.com/ps2homebrew/wLaunchELF) y Launch Disc
 - Se actualizó la página Acerca de PlayStation BB Navigator
 - Se habilitó el acceso telnet a PSBBN para fines de desarrollo
 - Correcciones a la traducción al inglés
 
-`02-PSBBN-Installer.sh`:**
+**`02-PSBBN-Installer.sh`:**
 
 - Evita que el script instale PSBBN Definitive Patch si la versión es inferior a 2.10
 - Particiona el espacio restante de los primeros 128 GB de la unidad:
@@ -576,7 +644,7 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - Se eliminó el instalador [POPS](#iniciador-pop) (ahora manejado por el script del instalador del juego)
 - El código se ha limpiado y optimizado significativamente.
 
-`03-Game-Installer.sh`:**
+**`03-Game-Installer.sh`:**
 
 - Se agregó una advertencia para los usuarios que ejecutan PSBBN Definitive Patch por debajo de la versión 2.10
 - La unidad PS2 ahora se detecta automáticamente
@@ -587,18 +655,18 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - Mejoras generales en la verificación de errores y mensajería
 - Se corrigieron problemas al detectar el éxito/fallo de algunos comandos `rsync`
 - `rsync` ahora se ejecuta solo cuando es necesario
-- Proceso de actualización mejorado para [POPSarter](#iniciador-pop), [OPL](#open-ps2-loader-opl), [NHDDL y Neutrino](#nhddl)
+- Proceso de actualización mejorado para [POPSarter](#iniciador-pop), OPL, NHDDL y [Neutrino](#neutrino)
 - Game Installer ahora instala archivos binarios [POPS](#iniciador-pop) si faltan
 - Número reducido de comandos ejecutados con `sudo`
 - Los archivos `ELF` ahora se instalan en carpetas e incluyen un `title.cfg`
 - El código se ha limpiado y optimizado significativamente.
 
-`list-Builder.py`:**
+**`list-Builder.py`:**
 
 - Se fusionaron `list-builder-ps1.py` y `list-builder-ps2.py` en un solo script
 - Ahora extrae los ID de los juegos de PS1 y PS2.
 
-`list-Sorter.py`:**
+**`list-Sorter.py`:**
 
 - La lógica de clasificación de juegos se ha movido aquí desde los scripts de creación de listas anteriores
 - La clasificación se ha mejorado significativamente
@@ -612,7 +680,7 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 </details>
 
 <details>
-<summary>01 de mayo de 2025: ¡SAS, HDD-OSD, PS2BBL y más!</b></summary>
+<summary><b>01 de mayo de 2025: ¡SAS, HDD-OSD, PS2BBL y más!</b></summary>
 
 [![¡SAS, HDD-OSD, PS2BBL y Más!](https://github.com/user-attachments/assets/be5b32d2-665c-4505-aefe-3c9ab864f72a)](https://www.youtube.com/watch?v=vpbHlS8nY58)
 
@@ -620,46 +688,46 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - Se agregó soporte para HDD-OSD al script `03-Game-Installer.sh`. Los iconos 3D ahora se descargan desde [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database)
 - Nuevo script: [04-Extras.sh](#extras-opcionales). Se agregó la capacidad de instalar HDD-OSD y [PlayStation 2 Basic Boot Loader (PS2BBL)](#playstation-2-basic-boot-loader-ps2bbl)
 - Cree sus propios íconos HDD-OSD con las [Plantillas de íconos HDD-OSD] (https://github.com/CosmicScale/HDD-OSD-Icon-Database/releases/download/v1.0.0/HDD-OSD-Icon-Templates.zip)
-- Traduzca PSBBN usando el [Paquete de traducción](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/issues/299) para localizar el software a diferentes idiomas.
+- Traduzca PSBBN usando el [Paquete de traducción](https://github.com/CosmicScale/PSBBN-Definitive-Project/issues/299) para localizar el software a diferentes idiomas.
 
 </details>
 
 <details>
-<summary>28 de marzo de 2025: ¡Lanzador de cerveza casera y más!</b></summary>
-<p><p>
+<summary><b>28 de marzo de 2025: ¡Lanzador de homebrew y más!</b></summary>
+<p></p>
 
-[![¡Lanzador de Cerveza Casera y Más!](https://github.com/user-attachments/assets/57e7842c-f5b5-46b0-950e-246eebfb0e4a)](https://www.youtube.com/watch?v=q9LvE_OPIPo)
+[![¡Lanzador de Homebrew y Más!](https://github.com/user-attachments/assets/57e7842c-f5b5-46b0-950e-246eebfb0e4a)](https://www.youtube.com/watch?v=q9LvE_OPIPo)
 
-- [Open PS2 Loader](#open-ps2-loader-opl) actualizado a la versión 1.2.0-Beta-2201-4b6cc21:
+- Open PS2 Loader actualizado a la versión 1.2.0-Beta-2201-4b6cc21:
   - Modo BDM UDMA máximo limitado a UDMA4 para evitar problemas de compatibilidad con varios adaptadores SATA/IDE2SD
 - Se agregó un manual para juegos de PS1. Se puede acceder a él en la [Colección de juegos](#colección-de-juegos) seleccionando un juego, presionando **△** y luego seleccionando **Manual**
 - Se realizó la transición a **BBN Launcher (BBNL)** versión 2.0:
-  - Se eliminó la compatibilidad con PFS a favor de cargar [OPL](#open-ps2-loader-opl), [POPSarter](#iniciador-pop), [Neutrino](#nhddl) y archivos de configuración desde la partición exFAT para acelerar la inicialización.
+  - Se eliminó la compatibilidad con PFS a favor de cargar OPL, [POPSarter](#iniciador-pop), [Neutrino](#neutrino) y archivos de configuración desde la partición exFAT para acelerar la inicialización.
   - Se movió **BBNL** al encabezado APA para mejorar aún más los tiempos de carga.
-  - Se eliminó la dependencia de archivos [POPSarter](#iniciador-pop) `ELF` renombrados para iniciar VCD de PS1; [POPStarter](#iniciador-pop) ahora se inicia directamente con un argumento de inicio.
+  - Se eliminó la dependencia de archivos `ELF` renombrados [POPSarter](#iniciador-pop) para iniciar VCD de PS1; [POPStarter](#iniciador-pop) ahora se inicia directamente con un argumento de inicio.
   - [NHDDL](https://github.com/pcm720/nhddl) ahora se inicia en modo ATA, lo que mejora el tiempo de inicio y evita posibles mensajes de error.
-- Actualizado [Neutrino](#nhddl) a la versión 1.6.1
-- Actualizado [NHDDL](#nhddl) a la versión MMCE + HDL Beta 4.17
+- Actualizado [Neutrino](#neutrino) a la versión 1.6.1
+- NHDDL actualizado a la versión MMCE + HDL Beta 4.17
 - Se agregó la portada de las [copias de seguridad de OPL Manager Art DB] (https://oplmanager.com/site/index.php?backups). Las ilustraciones de los juegos de PS2 ahora se muestran en OPL/NHDDL
-- Se agregó compatibilidad con homebrew al script `03-Game-Installer.sh`. Los archivos `ELF` colocados en la carpeta local `games/APPS` de su PC se instalarán y aparecerán en la [Colección de juegos](#colección-de-juegos) en PSBBN y en la pestaña Aplicaciones en OPL.
+- Se agregó soporte homebrew al script `03-Game-Installer.sh`. Los archivos `ELF` colocados en la carpeta local `games/APPS` de su PC se instalarán y aparecerán en la [Colección de juegos](#colección-de-juegos) en PSBBN y en la pestaña Aplicaciones en OPL.
 - Las aplicaciones ahora admiten [Game ID](#id-del-juego) tanto para Pixel FX Retro GEM como para MemCard Pro/SD2PSX.
 
 </details>
 
 <details>
-<summary>19 de febrero de 2025: BBN Launcher, Neutrino y NHDDL</b></summary>
-<p><p>
+<summary><b>19 de febrero de 2025: Lanzador BBN, Neutrino y NHDDL</b></summary>
+<p></p>
 
 [![Lanzador BBN, Neutrino y NHDDL](https://github.com/user-attachments/assets/8007d102-3019-4037-8c52-24d1454777da)](https://www.youtube.com/watch?v=0vpSiAa6ITc)
 
 - [OPL-Launcher-BDM](https://github.com/CosmicScale/OPL-Launcher-BDM) ha sido reemplazado por **BBN Launcher (BBNL)**
-- Se agregó compatibilidad con [Neutrino](#nhddl). Ahora puedes elegir entre [Open PS2 Loader](#open-ps2-loader-opl) y [Neutrino](#nhddl) como iniciador de juego.
-- Al usar Neutrino como iniciador de juegos, se puede usar [NHDDL](#nhddl) para realizar configuraciones por juego.
+- Se agregó compatibilidad con [Neutrino](#neutrino). Ahora puedes elegir entre Open PS2 Loader y [Neutrino](#neutrino) como iniciador de juego.
+- Cuando usa Neutrino como iniciador de juegos, NHDDL se puede usar para realizar configuraciones por juego
 
 </details>
 
 <details>
-<summary>22 de enero de 2025: ID del juego, base de datos de arte PSBBN, tutorial actualizado y más.</b></summary>
+<summary><b>22 de enero de 2025: ID del juego, base de datos de arte PSBBN, tutorial actualizado y más.</b></summary>
 
 [![ID del Juego, Base de Datos de Arte PSBBN, Tutorial Actualizado y Más.](https://github.com/user-attachments/assets/1bae03fe-b3eb-447e-99da-8f184279a848)](https://www.youtube.com/watch?v=sHz0yKYybhk)
 
@@ -675,9 +743,9 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 - Imagen PSBBN actualizada a la versión 2.01:
   - Configure la distribución del teclado USB en inglés de EE. UU. Presione `ALT+~` para alternar entre kana y entrada directa
   - Correcciones menores a la traducción al inglés
-- Se agregó [Open PS2 Loader](#open-ps2-loader-opl) y [Disco de lanzamiento](#launch-disc) a la [Colección de juegos](#colección-de-juegos)
+- Se agregó Open PS2 Loader y disco de inicio a la [Colección de juegos](#colección-de-juegos)
 - El script del instalador del juego se ha actualizado para crear y eliminar particiones del juego según sea necesario. ¡Diga adiós a esos molestos marcadores de posición "Próximamente..."!
-- Los archivos ubicados en las carpetas `CFG`, `CHT`, `LNG`, `THM` y `APPS` de tu PC ahora se copiarán en la unidad de PS2 durante la sincronización del juego
+- Los archivos colocados en las carpetas `CFG`, `CHT`, `LNG`, `THM` y `APPS` en tu PC ahora se copiarán a la unidad de PS2 durante la sincronización del juego
 - Los scripts ahora se actualizan automáticamente cuando hay una actualización disponible
 - Obra de arte optimizada
 - Presentamos la [base de datos de arte PSBBN](https://github.com/CosmicScale/psbbn-art-database)
@@ -686,8 +754,8 @@ El parche v2.11 se puede instalar ejecutando el [script del instalador PSBBN] (#
 </details>
 
 <details>
-<summary>11 de diciembre de 2024: PSBBN Parche definitivo en inglés 2.0</b></summary>
-<p><p>
+<summary><b>11 de diciembre de 2024: PSBBN Parche definitivo en inglés 2.0</b></summary>
+<p></p>
 
 [![PSBBN Parche Definitivo en Inglés 2.0](https://github.com/user-attachments/assets/608c9430-25d8-4918-8111-023eac16ab62)](https://www.youtube.com/watch?v=ooH0FjltsyE)
 
@@ -732,10 +800,10 @@ Para obtener la mejor experiencia, se recomienda un modelo PS2 Fat (series SCPH-
 - [PSBBN](#psbbn) no admite adaptadores HDD de terceros[*](#problemas-conocidos). Los adaptadores de terceros solo son compatibles con la [instalación exclusiva de HOSDMenu](#instalar-hosdmenu-únicamente).
 - [PSBBN](#psbbn) y [HOSDMenu](#hosdmenu) son compatibles con los modelos PS2 Slim SCPH-700xx que utilizan un IDE Resurrector (o mod de hardware equivalente) y los primeros modelos de PS2 (series SCPH-10000 a SCPH-18000) con una carcasa de disco duro externa oficial. [Se requiere configuración adicional para ambas configuraciones](#consolas-anteriores-scph-1000018000-y-delgadas-scph-700xx).
 
-**PSBBN Definitive Project** requiere una PC x86-64 o ARM64 para su instalación. Los Mac con Apple Silicon también son compatibles. Conecta el HDD o SSD al ordenador mediante SATA o un adaptador USB.
+**PSBBN Definitive Project** requiere una PC x86-64 o ARM64 para su instalación. También se admiten Mac Apple Silicon. Conecte el HDD o SSD a la computadora mediante SATA o un adaptador USB.
 
 ## Instalación en Linux
-Se admiten distribuciones basadas en Debian de 64 bits que utilizan `apt`, distribuciones basadas en Arch que utilizan `pacman` y distribuciones basadas en Fedora[*](#solución-de-problemas) que utilizan `dnf`. Los sistemas basados ​​en Nix también son compatibles mediante flakes. Las distribuciones recomendadas son Linux Mint, Debian y, para Raspberry Pi, Raspberry Pi OS.
+Se admiten distribuciones basadas en Debian de 64 bits que usan `apt`, distribuciones basadas en Arch que usan `pacman`, distribuciones basadas en Fedora[*](#solución-de-problemas) que usan `dnf` y distribuciones basadas en Gentoo que usan `emerge`. Los sistemas basados ​​en Nix también son compatibles mediante flakes. Las distribuciones recomendadas son Linux Mint, Debian y, para Raspberry Pi, Raspberry Pi OS.
 
 **PSBBN Definitive Project Es Una Versión Continua. para Obtener Actualizaciones Automáticas y las Últimas Correcciones de Errores, Debe Instalar los Scripts Usando `git Clone`.**
 
@@ -753,8 +821,8 @@ Luego puede cambiar al directorio `PSBBN-Definitive-Project` y ejecutar `PSBBN-D
 cd PSBBN-Definitive-Project
 ./PSBBN-Definitive-Patch.sh
 ```
-## Instalación en macOS
-Instala [Homebrew](https://brew.sh) si aún no está instalado. Si brew solicita las herramientas de línea de comandos de Xcode, instálalas y vuelve a ejecutar brew.
+## Instalación en MacOS
+Instale [Homebrew](https://brew.sh) si aún no está instalado. Si `brew` solicita las herramientas de línea de comandos de Xcode, instálelas y ejecute `brew` nuevamente.
 
 **PSBBN Definitive Project Es Una Versión Continua. para Obtener Actualizaciones Automáticas y las Últimas Correcciones de Errores, Debe Instalar los Scripts Usando `git Clone`.**
 
@@ -767,9 +835,9 @@ Luego puede cambiar al directorio `PSBBN-Definitive-Project` y ejecutar `PSBBN-D
 cd PSBBN-Definitive-Project
 ./PSBBN-Definitive-Patch.sh
 ```
-**Nota:**
-- Al instalar [PSBBN y HOSDMenu](#instale-psbbn-y-hosdmenu) o [solo HOSDMenu](#instalar-hosdmenu-únicamente), aparecerá una ventana de advertencia con el mensaje: «El disco que conectaste no se podía leer en este ordenador». Haz clic en **Ignorar** para cerrar la advertencia.
-- Sal siempre del **[menú principal de PSBBN Definitive Project](#menú-principal)** pulsando `q`. Antes de desconectar la unidad, expúlsala desde Finder.
+**NOTA:**  
+- Al instalar [PSBBN y HOSDMenu](#instale-psbbn-y-hosdmenu) o [HOSDMenu solamente](#instalar-hosdmenu-únicamente), aparecerá una ventana de advertencia con el mensaje: "Esta computadora no pudo leer el disco que adjuntó". Haga clic en **Ignorar** para descartar la advertencia.
+- Salga siempre de **[PSBBN Definitive Project Menú Principal](main-menu)** presionando `q`. Antes de desconectar la unidad, extráigala del Finder.
 
 ## Instalación en Windows
 La forma recomendada de instalar **PSBBN Definitive Project** en Windows es mediante **PSBBN Launcher for Windows**. **PSBBN Launcher for Windows** es compatible con las ediciones Windows 10 y 11 Home; Es posible que otras ediciones no sean compatibles. Para una experiencia sin problemas, asegúrese de que Windows esté completamente actualizado.
@@ -781,7 +849,7 @@ La forma recomendada de instalar **PSBBN Definitive Project** en Windows es medi
 **Habilitando la Virtualización:**  
 Puede que sea necesario habilitar el modo SVM (para CPU AMD) o VT-x (para CPU Intel) en la configuración de su BIOS si aún no está habilitado. Las instrucciones sobre cómo hacer esto se pueden encontrar [aquí](https://www.elevenforum.com/t/enable-or-disable-cpu-virtualization-in-uefi-bios-firmware-settings-on-windows-pc.4928/).
 
-Descargue **PSBBN Launcher for Windows [aquí](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)**.
+Descargue **PSBBN Launcher for Windows [aquí](https://github.com/CosmicScale/PSBBN-Definitive-Project/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)**.
 
 **Establezca la Política de Ejecución de PowerShell:**  
 Antes de ejecutar el script por primera vez, debe cambiar la política de ejecución en PowerShell:
@@ -876,54 +944,57 @@ El **Instalador de juegos** Automatiza completamente la instalación de juegos d
 - Detecta automáticamente tu unidad de PS2
 - Para usuarios de Linux, te permite establecer una ruta personalizada en tu PC para almacenar juegos y aplicaciones antes de la instalación
 - Ofrece la opción de [sincronizar](#sincronizar-todos-los-juegos-y-aplicaciones) los juegos y aplicaciones de tu PC con el disco de tu PS2, o [agregar](#agregar-juegos-y-aplicaciones-adicionales) juegos y aplicaciones adicionales
-- Te da la opción de [Open PS2 Loader (OPL)](#open-ps2-loader-opl) o [NHDDL](#nhddl) para el iniciador del juego.
-- Asigna el iniciador de juegos elegido, [POPSLoader](#cargador-de-cop), [R3CONFIGURATOR](#configurador-r3) y [wLaunchELF-R3Z](#lanzamientoelf-r3z) al [botón de inicio](#opciones-de-arranque)
-- Instala todas las actualizaciones disponibles para [Open PS2 Loader (OPL)](#open-ps2-loader-opl), [NHDDL](#nhddl), [Neutrino](#nhddl), [POPSLoader](#cargador-de-cop), [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3)
-- Descarga e instala los binarios [POPS](#iniciador-pop) e instala [POPSarter](#iniciador-pop)
-- Cuando se selecciona [Open PS2 Loader (OPL)](#open-ps2-loader-opl) como iniciador del juego, ofrece una opción para instalar hacks de pantalla panorámica para juegos de PS2, lo que permite una verdadera compatibilidad con pantalla panorámica 16:9 con un campo de visión más amplio en juegos compatibles.
+- Te da la opción de OPL o [Neutrino](#neutrino) para el núcleo del cargador de PS2
+- Asigna [RiptOPL](#riptopl), [R3CONFIGURATOR](#configurador-r3) y [wLaunchELF-R3Z](#lanzamientoelf-r3z) al [botón de inicio](#opciones-de-arranque)
+- Instala todas las actualizaciones disponibles para [RiptOPL](#riptopl), [Neutrino](#neutrino), [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3)
+- Ofrece una opción para habilitar [RetroAchievements](#retroachievements) para juegos de PS2 compatibles
+- Ofrece una opción para instalar hacks de pantalla panorámica para juegos de PS2, lo que permite una verdadera compatibilidad con pantalla panorámica 16:9 con un campo de visión más amplio en juegos compatibles.
 - Ofrece la opción de aplicar una solución HDTV para juegos de PS1, útil para usuarios con un televisor que no admite 240p
-- Convierte automáticamente juegos de PS2 en formato `BIN/CUE` a `ISO` cuando se colocan en la carpeta `CD` de tu PC, y juegos de PS1 en formato `BIN/CUE` a `VCD` cuando se colocan en la carpeta `POPS` de tu computadora
-- Cuando se selecciona [Open PS2 Loader (OPL)](#open-ps2-loader-opl) como iniciador del juego, ofrece la opción de comprimir archivos `ISO` a `ZSO`, lo que permite instalar más juegos en su disco.
-- Para juegos en el formato `ZSO`, el "Modo de compatibilidad 1" se habilita automáticamente en sus configuraciones [OPL](#open-ps2-loader-opl) por juego.
+- Convierte automáticamente juegos de PS2 en formato `BIN/CUE` a `ISO` cuando se colocan en la carpeta `CD` de su PC, y juegos de PS1 en formato `VCD` a `BIN/CUE` cuando se colocan en la Carpeta `Ember` en su PC
+- Cuando se selecciona OPL como núcleo del cargador, ofrece la opción de comprimir archivos `ISO` a `ZSO`, lo que permite instalar más juegos en su disco.
+- Para juegos en el formato `ZSO`, el "Modo de compatibilidad 1" se habilita automáticamente en sus configuraciones por juego [RiptOPL](#riptopl)
 - Crea [Tarjetas de Memoria Virtuales (VMCs)](#tarjetas-de-memoria-virtuales) para todos los juegos de PS1, con la opción de habilitar VMC para todos los juegos de PS2. También crea [Grupos de VMC](#tarjetas-de-memoria-virtuales) que permite que los juegos compatibles compartan partidas guardadas, desbloqueando funciones y bonificaciones basadas en los juegos que hayas jugado.
 - Configura juegos de PS1 multidisco para permitir el intercambio de discos
-- Descarga e instala automáticamente [correcciones HugoPocked POPSarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/), mejorando la compatibilidad con más de 100 juegos de PS1.
 - Crea todos los recursos, incluidos metadatos, ilustraciones e íconos para todos tus juegos y aplicaciones:
   - Descarga ilustraciones para PSBBN [Colección de juegos](#colección-de-juegos) de la [Base de datos de arte PSBBN](https://github.com/CosmicScale/psbbn-art-database) o IGN si no se encuentra en la base de datos
   - Contribuye automáticamente con el arte del juego descargado de IGN e informa el arte faltante a la [PSBBN Art Database](https://github.com/CosmicScale/psbbn-art-database)
-  - Descarga la portada de los juegos de PS2 y PS1 desde [OPL Manager Art Database](https://oplmanager.com/site/?backups) para mostrarla en [OPL](#open-ps2-loader-opl), [NHDDL](#nhddl) y [POPSLoader](#cargador-de-cop)
-  - Descarga iconos para el [Navegador](#hosdmenu) desde [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Si los íconos no están disponibles, pero las imágenes de un juego están disponibles en [OPL Manager Art Database](https://oplmanager.com/site/?backups), se crearán íconos 3D automáticamente.
+  - Descarga la portada de los juegos de PS2 y PS1 desde [OPL Manager Art Database](https://oplmanager.com) para mostrarla en [RiptOPL](#riptopl) y otros lanzadores de juegos.
+  - Completa archivos `CFG` con títulos de juegos, descripciones, modos de video, calificaciones y más para mostrarlos en [RiptOPL](#riptopl) y otros lanzadores de juegos.
+  - Descarga iconos para el [Navegador](#hosdmenu) desde [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database). Si los íconos no están disponibles, pero las imágenes de un juego están disponibles en [OPL Manager Art Database](https://oplmanager.com), se crearán íconos 3D automáticamente.
   - Aporta automáticamente íconos HDD-OSD e informa los íconos faltantes al [HDD-OSD Icon Database](https://github.com/cosmicscale/hdd-osd-icon-database)
 - Le permite seleccionar qué juegos y aplicaciones caseras desea mostrar en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
-- Crea **particiones de inicio** que permiten que los juegos y aplicaciones seleccionados instalados en su disco, junto con los juegos de PS1 almacenados en un recurso compartido de red SMB, se inicien desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
-- Actualiza accesos directos para aplicaciones caseras en [PSBBN Menu Navigator](#colección-de-juegos) y en [HOSDMenu](#hosdmenu) **menú OSDSYS**
-- Habilita BDM HDD, aplicaciones e ilustraciones en el archivo de configuración [OPL](#open-ps2-loader-opl)
-- Establece el idioma y la [configuración del botón](#reassign-X-and-Círculo-buttons) en los archivos de configuración [OPL](#open-ps2-loader-opl), [POPSLoader](#cargador-de-cop), [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3) para que coincidan con la configuración de instalación.
+- Crea **particiones de inicio** que permiten que los juegos y aplicaciones seleccionados instalados en su disco, junto con los juegos de PS1 almacenados en un recurso compartido de red SMB o en un disco externo como USB, se inicien desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
+- Actualiza los accesos directos para aplicaciones caseras en [PSBBN Menu Navigator](#colección-de-juegos) y en [HOSDMenu](#hosdmenu) **menú OSDSYS**
+- Habilita BDM HDD, aplicaciones e ilustraciones en el archivo de configuración [RiptOPL](#riptopl)
+- Establece el idioma y la [configuración del botón](#reassign-X-and-Círculo-buttons) en los archivos de configuración [RiptOPL](#riptopl), [wLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3) para que coincidan con la configuración de instalación.
 
-**NOTA:** Para usar archivos `ZSO`, debes seleccionar [OPL](#open-ps2-loader-opl) como iniciador del juego. Cuando se utiliza [NHDDL](#nhddl), cualquier archivo `ZSO` en la carpeta de juegos de su PC o en la unidad de PS2 se descomprime en archivos `ISO`.
+**NOTA:**  
+Para usar la compresión `ZSO` para juegos de PS2, debes seleccionar OPL como núcleo del cargador. Dado que ni [Neutrino](#neutrino) ni [RetroAchievements](#retroachievements) admiten archivos `ZSO`, se le darán dos opciones:
+- Inicie los archivos `ZSO` existentes utilizando el núcleo del cargador OPL y desactive [RetroAchievements](#retroachievements).
+- Descomprima cualquier archivo `ZSO` existente.
 
 ### Sincronizar Todos los Juegos y Aplicaciones
 Esta opción actualiza el contenido del almacenamiento de tu PS2 para que coincida con el contenido de la carpeta que seleccionaste en tu PC. Todos los juegos o aplicaciones nuevos se copian y los que se eliminaron de su PC se eliminan de la consola.
 
 El script le permite establecer una ruta personalizada en su PC para almacenar los juegos que se instalarán. Simplemente coloque sus archivos en la subcarpeta correcta:
-- Los archivos `ISO`, `ZSO` o `BIN/CUE` de PS2 van en la carpeta `CD`
-- Los archivos `ISO` o `ZSO` de PS2 en la carpeta `DVD`
-- Los archivos `VCD` o `BIN/CUE` de PS1 en la carpeta `DVD` Carpeta <código>POPS`
-- Archivos `ELF` o archivos `PSU` [compatibles con SAS](#save-application-system-sas) en la carpeta `APPS`
+- Los archivos PS2 `ISO`, `ZSO` o `BIN/CUE` van en la carpeta `CD`
+- Los archivos PS2 `ISO` o `ZSO` en la carpeta `DVD`
+- PS1 `VCD` o Archivos `BIN/CUE` en la carpeta `Ember`
+- Archivos `ELF` o archivos [compatibles con SAS](#save-application-system-sas) `PSU` en la carpeta `APPS`
 
 Para agregar o eliminar juegos y aplicaciones, simplemente modifique el contenido de la carpeta en su PC, luego seleccione **Sincronizar todos los juegos y aplicaciones**.
 
 ### Agregar Juegos y Aplicaciones Adicionales
 Alternativamente, puedes agregar juegos y aplicaciones caseras directamente al sistema de archivos exFAT en tu unidad PS2 colocando:
-- Archivos `ISO` o `ZSO` de PS2 en las carpetas `CD` o `DVD`
-- Archivos `VCD` de PS1 en la carpeta `POPS`
-- Archivos `ELF` o archivos `PSU` [compatibles con SAS](#save-application-system-sas) en la carpeta `APPS`
+- Archivos PS2 `ISO` o `ZSO` en las carpetas `CD` o `DVD`
+- Archivos PS1 `BIN/CUE` en la carpeta `Ember`
+- Archivos `ELF` o archivos [compatibles con SAS](#save-application-system-sas) `PSU` en la carpeta `APPS`
 
 Además, se instalarán todos los juegos o aplicaciones nuevos que se encuentren en la carpeta seleccionada de su PC. Al igual que con la sincronización, coloque:
-- Los archivos `ISO`, `ZSO` o `BIN/CUE` de PS2 van en la carpeta `CD`
-- Los archivos `ISO` o `ZSO` de PS2 en la carpeta `DVD`
-- Los archivos `VCD` o `BIN/CUE` de PS1 en el Carpeta <código>POPS`
-- Archivos `ELF` o archivos `PSU` [compatibles con SAS](#save-application-system-sas) en la carpeta `APPS`
+- Los archivos PS2 `ISO`, `ZSO` o `BIN/CUE` van en la carpeta `CD`
+- Los archivos PS2 `ISO` o `ZSO` en la carpeta `DVD`
+- PS1 `VCD` o `BIN/CUE` archivos en la carpeta `Ember`
+- Archivos `ELF` o archivos [compatibles con SAS](#save-application-system-sas) `PSU` en la carpeta `APPS`
 
 Al seleccionar **Agregar juegos y aplicaciones adicionales**, se descargan metadatos e ilustraciones de todo el contenido recién agregado.
 
@@ -935,26 +1006,17 @@ Los juegos y aplicaciones se pueden eliminar manualmente del sistema de archivos
 ### Aplicaciones de Elaboración Casera de ELF
 Al instalar aplicaciones en el formato `ELF`, el archivo se compara con una base de datos. Esto permite al instalador recuperar el título, el desarrollador, el ID del título y la categoría de la aplicación, así como descargar automáticamente el arte y el icono apropiados. Para obtener mejores resultados, se recomienda no cambiar el nombre del archivo `ELF`.
 
-### Lanzamiento de Juegos de PS1 Desde SMB
-Los juegos de PS1 en formato `.VCD` almacenados en un recurso compartido de red SMB se pueden iniciar desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Antes de ejecutar el instalador del juego:
-1. Instala tus juegos de PS1 y los archivos de soporte necesarios en tu dispositivo externo. Las instrucciones se pueden encontrar [aquí](https://nathanneurotic.github.io/POPSTARTERINFO/smb-network.html)
-2. Coloque los archivos `POPSTARTER.ELF` renombrados con el prefijo `SB.` en la carpeta `POPS`, ya sea en su PC o directamente en la unidad de su PS2.
+### Lanzamiento de Juegos de PS1 Desde SMB y Dispositivos Externos
+Los juegos de PS1 en formato `.VCD` almacenados en un recurso compartido de red SMB, o en un dispositivo externo como USB o MMCE, se pueden iniciar desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Antes de ejecutar el instalador del juego:
+1. Instala tus juegos de PS1 y los archivos de soporte necesarios en tu dispositivo externo. Las instrucciones se pueden encontrar [aquí](https://nathanneurotic.github.io/POPSTARTERINFO/)
+2. Coloque los archivos `POPSTARTER.ELF` renombrados con el prefijo `SB.` para SMB, o el prefijo `XX.` para otros dispositivos externos en la carpeta `POPS`, ya sea en su PC o directamente en la unidad de su PS2.
 
 ### Selector de Juegos
 Al ejecutar el instalador de juegos, se le presentará una lista de todos los juegos y aplicaciones instalados, lo que le permitirá elegir qué títulos aparecen en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Si tiene una colección grande, limitar la cantidad de títulos mostrados puede mejorar su experiencia de navegación.
 
-Se pueden mostrar hasta 800 títulos en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Todos los juegos de PS2 seguirán disponibles en el iniciador de juegos elegido ([OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl)), y todos los juegos de PS1 seguirán disponibles en [POPSLoader](#cargador-de-cop). Todas las aplicaciones permanecerán disponibles en [OPL](#open-ps2-loader-opl) y [HOSDMenu's](#hosdmenu) **Menú OSDSYS**.
+Se pueden mostrar hasta 800 títulos en la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Todos los juegos de PS1 y PS2, además de las aplicaciones caseras, seguirán disponibles en [RiptOPL](#riptopl). Las primeras 200 aplicaciones también se mostrarán en [HOSDMenu's](#hosdmenu) **Menú OSDSYS**.
 
 También puedes personalizar el orden en que aparecen las categorías, como Juegos de PS2, Juegos de PS1, Iniciadores y Aplicaciones, lo que te brinda control total sobre cómo está organizada tu biblioteca.
-
-### InstalaÃ§Ã£o dos drivers ATA BDM Assault
-Para iniciar juegos de PS1 desde la [Colección de juegos](#colección-de-juegos) o el [Navegador](#hosdmenu), primero debes instalar los **controladores ATA BDM Assault** en una tarjeta de memoria de PS2.
-
-1. Inserta una tarjeta de memoria PS2 en tu consola PS2.
-2. Inicie [POPSLoader](#cargador-de-cop).
-3. Inicie cualquier juego de PS1.
-
-Los controladores necesarios se instalarán automáticamente en la tarjeta de memoria de PS2.
 
 ## Instalar Medios
 **NOTA: Estas Funciones Son Solo para Usuarios de PSBBN.**  
@@ -969,22 +1031,22 @@ Seleccione **Instalar medios** en Menú Principal y se le presentará la siguien
 ### Instalar Música
 Instale música para reproducirla en el [Canal de música PSBBN] (#canal-de-música). Para utilizar el instalador de música, debe ejecutar **PSBBN Definitive Patch versión 3.00 o posterior**. Si ya actualizó desde una versión anterior, primero debe [Inicializar la partición de música](#inicializar-partición-de-música).
 
-Los formatos admitidos son `.mp3`, `.m4a`, `.flac` y `.ogg`. Los metadatos de cada archivo deben incluir el título del álbum y el número de pista. Coloque sus archivos de música en la carpeta `music` predeterminada de su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios](#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `music`.
+Los formatos admitidos son `.mp3`, `.m4a`, `.flac` y `.ogg`. Los metadatos de cada archivo deben incluir el título del álbum y el número de pista. Coloque sus archivos de música en la carpeta `music` predeterminada en su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios] (#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `music`.
 
 ### Instalar Películas
-Instale videos para reproducirlos en el [Canal de películas PSBBN] (#canal-de-peliculas). Para utilizar Movie Installer, debe ejecutar **PSBBN Definitive Patch versión 3.00 o posterior**. Su PC también debe tener un procesador x86.
+Instale videos para reproducirlos en el [Canal de películas PSBBN] (#canal-de-peliculas). Para utilizar Instalador de películas, debe ejecutar **PSBBN Definitive Patch versión 3.00 o posterior**. Su PC también debe tener un procesador x86.
 
-Movie Installer admite `MP4`, `M4V`, `MKV`, `VOB` y otros formatos populares, así como los formatos de vídeo de PlayStation 2 `pss` y `psm`. Los vídeos más cortos están codificados con una tasa de bits más alta que los vídeos más largos. Debes limitar la duración del vídeo a 2 horas y 15 minutos; Los vídeos más largos pueden codificarse mal o no poder convertirse.
+Instalador de películas admite `MP4`, `M4V`, `MKV`, `VOB` y otros formatos populares, así como los formatos de vídeo de PlayStation 2 `pss` y `psm`. Los vídeos más cortos se codifican con una tasa de bits más alta que los vídeos más largos. Debes limitar la duración del vídeo a 2 horas y 15 minutos; Los vídeos más largos pueden codificarse mal o no poder convertirse.
 
-Coloque sus archivos de video en la carpeta `movie` predeterminada de su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios](#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `movie`.
+Coloque sus archivos de video en la carpeta `movie` predeterminada en su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios](#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `movie`.
 
 ### Instalar Fotos
 Instale imágenes para verlas en el [Canal de fotos PSBBN] (#canal-de-fotos). Para utilizar Photo Installer, debe ejecutar **PSBBN Definitive Patch versión 3.00 o posterior**.
 
-Formatos admitidos, incluidos `JPG`, `PNG`, `TIF`, `GIF`, `BMP` y más. Coloque sus archivos de imagen en la carpeta `photo` predeterminada de su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios](#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `photo`.
+Formatos admitidos, incluidos `JPG`, `PNG`, `TIF`, `GIF`, `BMP` y más. Coloque sus archivos de imagen en la carpeta `photo` predeterminada en su PC, o elija una ubicación personalizada usando [Establecer ubicación de medios](#establecer-ubicación-de-medios) y coloque los archivos en la subcarpeta `photo`.
 
 ### Establecer Ubicación de Medios
-Establezca una ubicación personalizada para su carpeta `media`. La música debe colocarse en una subcarpeta `music`, los vídeos deben colocarse en una subcarpeta `movie` y las imágenes deben colocarse en una subcarpeta `photo`.
+Establezca una ubicación personalizada para su carpeta `media`. La música debe colocarse en una subcarpeta `music`, los videos deben colocarse en una subcarpeta `movie` y las imágenes deben colocarse en una subcarpeta `photo`.
 
 ### Inicializar Partición de Música
 Esta opción borra todos los datos de música y restablece la base de datos de música utilizada por el [Canal de música PSBBN] (#canal-de-música). Utilice esta opción si ha actualizado desde una versión de **PSBBN Definitive Patch** inferior a 3.0 y desea utilizar el [Instalador de música](#instalar-música). También puede utilizar esta opción si tiene problemas con el [Canal de Música] (#canal-de-música).
@@ -1023,20 +1085,19 @@ Al instalar PS2 Linux por primera vez, o al reinstalar una versión que venía p
 ### Reasignar Botones de Cruz y Círculo
 Esta opción le permite intercambiar las funciones de los botones × y ○ en su controlador. Puede elegir entre el diseño estándar (× = Confirmar, ○ = volver) o el diseño alternativo (○ = Confirmar, × = volver), según su preferencia.
 
-**NOTA: Esta Función Solo Se Aplica a [PSBBN](#psbbn), [OPL](#open-ps2-loader-opl), [WLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3). no Cambia el Diseño del Botón para el Cuadro de Diálogo [POPS](#iniciador-pop) in-Game Reset al Salir de un Juego de PS1, o [HOSDMenu](#hosdmenu).**  
+**NOTA: Esta Función Solo Se Aplica a [PSBBN](#psbbn), [RiptOPL](#riptopl), [WLaunchELF-R3Z](#lanzamientoelf-r3z) y [R3CONFIGURATOR](#configurador-r3). no Cambia el Diseño del Botón para [HOSDMenu](#hosdmenu).**
 
 ### Cambiar Idioma
-Cuando se instala [PSBBN](#psbbn), esta opción cambia el idioma del sistema de PSBBN. Seleccione entre inglés, alemán, italiano, portugués brasileño, español, francés, húngaro y japonés original. Se agregarán más idiomas con futuras actualizaciones. Para los usuarios japoneses, también descarga e instala las versiones japonesas de los [Canales en línea] (#canal-de-internet).
+Cuando se instala [PSBBN](#psbbn), esta opción cambia el idioma del sistema de PSBBN y los manuales de juegos de PlayStation para juegos de PS1 almacenados en [dispositivos externos](#lanzamiento-de-juegos-de-ps1-desde-smb-y-dispositivos-externos). Seleccione entre inglés, alemán, italiano, portugués brasileño, español, francés, húngaro y japonés original. Se agregarán más idiomas con futuras actualizaciones. Para los usuarios japoneses, también descarga e instala las versiones japonesas de los [Canales en línea] (#canal-de-internet).
 
-Para los usuarios de [PSBBN](#psbbn) y [HOSDMenu](#hosdmenu), esta opción también cambia el idioma de [OPL](#open-ps2-loader-opl), [wLaunchELF-R3Z](#lanzamientoelf-r3z), [R3CONFIGURATOR](#configurador-r3), [POPSLoader](#cargador-de-cop) y el mensaje [POPS](#iniciador-pop) In-Game Reset (IGR), así como la preferencia de idioma utilizada por el [Instalador del juego](#instalar-juegos-y-aplicaciones).
+Para los usuarios de [PSBBN](#psbbn) y [HOSDMenu](#hosdmenu), esta opción también cambia el idioma de [RiptOPL](#riptopl), [wLaunchELF-R3Z](#lanzamientoelf-r3z), [R3CONFIGURATOR](#configurador-r3), así como la preferencia de idioma utilizada por el [Juego Instalador](#instalar-juegos-y-aplicaciones).
 
-Después de cambiar el idioma, se recomienda volver a ejecutar el [Instalador de juegos](#instalar-juegos-y-aplicaciones) y seleccionar *Agregar juegos y aplicaciones adicionales* para actualizar los títulos de los juegos al idioma seleccionado (solo inglés y japonés). Para los usuarios de [PSBBN](#psbbn), esto también actualizará los manuales de los juegos de PlayStation.
+Después de cambiar el idioma, se recomienda volver a ejecutar el [Instalador de juegos](#instalar-juegos-y-aplicaciones) y seleccionar *Agregar juegos y aplicaciones adicionales* para actualizar los títulos y descripciones de los juegos al idioma seleccionado.
 
 ### Cambiar la Configuración de la Pantalla
-**NOTA: Esta Función Es Solo para PSBBN.**  
-[PSBBN](#psbbn) normalmente bloquea la configuración del sistema de pantalla en **4:3**. Esta opción le permite cambiar la configuración de la pantalla. Puede elegir entre **4:3**, **Completo** y **16:9**.
+[PSBBN](#psbbn) normalmente bloquea la configuración del sistema de pantalla en **4:3**. Esta opción le permite cambiar la configuración de la pantalla. Puede elegir entre **4:3**, **Completo** y **16:9**. Esta configuración la utilizan algunos juegos y [HOSDMenu](#hosdmenu). No cambia la relación de aspecto de [PSBBN](#psbbn) en sí.
 
-Esta configuración la utilizan algunos juegos y [HOSDMenu](#hosdmenu). No cambia la relación de aspecto de [PSBBN](#psbbn) en sí.
+Esta opción también configura el modo de visualización [RiptOPL](#riptopl) en pantalla ancha.
 
 ### Borrar Caché de Arte e Íconos
 Esta opción elimina todas las ilustraciones y los íconos del juego que están almacenados localmente en su PC. La próxima vez que ejecutes el instalador del juego, escaneará tu colección de juegos, luego descargará y aplicará copias nuevas de las ilustraciones y los íconos necesarios.
@@ -1054,8 +1115,7 @@ Puedes mantener presionados los botones del controlador mientras enciendes la co
 | Ninguno | Solo HOSDMenu | Arranca automáticamente [HOSDMenu](#hosdmenu) |
 | ✕ | PSBBN + HOSDMenu | Botas [HOSDMenu](#hosdmenu) |
 | ○ | PSBBN + HOSDMenu | Arranca [PS2 Linux](#instalar-ps2-linux) (si está instalado) |
-| □ | Cualquier configuración | Inicia el iniciador del juego seleccionado ([OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl)) |
-| △ | Cualquier configuración | Botas [POPSLoader](#cargador-de-cop) |
+| □ | Cualquier configuración | Botas [RiptOPL](#riptopl) |
 | START | Cualquier configuración | Botas [wLaunchELF-R3Z](#lanzamientoelf-r3z) |
 | SELECT | Cualquier configuración | Botas [R3CONFIGURADOR](#configurador-r3) |
 
@@ -1069,6 +1129,9 @@ El **Parche Definitivo** mejora y amplía su funcionalidad, ofreciendo:
 - [OSDMenu MBR](#osdmenu-mbr): un reemplazo casero del programa MBR original de Sony con numerosas mejoras con respecto a la implementación original
 - Un `osdboot.elf` parcheado para evitar el control de seguridad CRC, permitiendo el uso de kernels personalizados
 - Compatibilidad con discos duros grandes: originalmente limitado a 128 GB. Ahora se admiten unidades de hasta 2 TB mediante [APA-Jail](#apa-jail)
+- Las actualizaciones del sistema en línea se redirigen a un servidor personalizado, lo que permite instalar actualizaciones de parches definitivas directamente en su consola.
+- [Inicie discos de juegos de PS1 y PS2](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2) con soporte para Game ID, MechaPwn y PS1VmodeNeg integrado
+- Carga más rápida de listas de juegos grandes en la [Colección de juegos](#colección-de-juegos)
 - Una partición de música de hasta 114 GB para alrededor de 180 álbumes[*](#problemas-conocidos); originalmente limitado a 5 GB
 - Una partición de contenidos de hasta 114 GB para el almacenamiento de películas y fotografías; originalmente limitado a 5 GB
 - Un enlace directo a la [Colección de juegos](#colección-de-juegos) en el **Menú superior** para un acceso rápido
@@ -1091,7 +1154,7 @@ Puedes encontrar la **Colección de juegos** en PSBBN **Menú superior**. Este e
 - Los juegos están ordenados alfabéticamente y por series, con las entradas dentro de cada serie ordenadas por fecha de lanzamiento.
 - Cuando el idioma está configurado en japonés, los títulos de juegos de la región japonesa se muestran en su japonés original y se ordenan en orden “gojūon” (五十音).
 - Las aplicaciones Homebrew se dividen en las siguientes categorías: emuladores, juegos, demostraciones, aplicaciones, aplicaciones de PS1, aplicaciones de sistema, herramientas de diagnóstico, aplicaciones de depuración y entornos de ejecución.
-- Puede ver un manual para juegos de PS1 que enumera las [teclas de acceso rápido] compatibles (#iniciador-pop). Para acceder al manual, presione **△** en un juego de PS1 resaltado y seleccione *Manual*.
+- Puede ver un manual para juegos de PS1 almacenados en [dispositivos externos](#lanzamiento-de-juegos-de-ps1-desde-smb-y-dispositivos-externos) que enumera las [teclas de acceso rápido](#iniciador-pop) compatibles. Para acceder al manual, presione **△** en un juego de PS1 resaltado y seleccione *Manual*.
 - Puedes configurar atajos para hasta cuatro elementos presionando **△** en un juego resaltado y seleccionando *Agregar a Menu Navigator*. Puede acceder rápidamente a sus accesos directos presionando **SELECT**.
 
 ### Canal de Música
@@ -1115,34 +1178,51 @@ En el **Canal de Internet**, puede acceder a archivos de los canales en línea d
 ## HOSDMenu
 **HDD-OSD** es el software oficial de Sony que amplía el menú del sistema de PlayStation 2 (OSDSYS) con soporte para disco duro, lo que le permite administrar software, guardar datos e iniciar juegos y aplicaciones directamente desde el disco duro a través del navegador 2.0. **HOSDMenu**, escrito por [pcm720](https://github.com/pcm720), parchea **HDD-OSD** y agrega características adicionales, que incluyen:
 - Compatibilidad con unidades más grandes: **HDD-OSD** se limitaba anteriormente a 1 TB
-- Inicie aplicaciones caseras directamente desde el menú personalizado **OSDSYS**
+- Inicie aplicaciones homebrew directamente desde el menú personalizado **OSDSYS**
 - Inicie [aplicaciones compatibles con SAS](#save-application-system-sas) desde tarjetas de memoria y desde la unidad interna en **Browser 2.0**
 - Soporte para iniciar aplicaciones desde dispositivos MMCE, MX4SIO, UDPBD, iLink y discos duros con formato APA y exFAT
 - [Inicie discos de juegos de PS1 y PS2](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2) con soporte para Game ID, MechaPwn y PS1VmodeNeg integrado
 - GSM integrado para juegos y aplicaciones en disco
 - Soporte para 1080i y 480p
-- Y más: consulte el [repositorio de GitHub](https://github.com/pcm720/OSDMenu) para obtener todos los detalles.
+- Y más: consulta el [repositorio de GitHub](https://github.com/pcm720/OSDMenu) para obtener todos los detalles.
 
 Si se instala junto con [PSBBN](#psbbn), se puede iniciar desde la [Colección de juegos](#colección-de-juegos), a través de un [atajo en Menu Navigator](#colección-de-juegos), o manteniendo presionado el botón × mientras se inicia la consola. Si solo se instaló **HOSDMenu**, se iniciará automáticamente.
 
 Cuando se instala con el [Instalador del juego](#instalar-juegos-y-aplicaciones):
-- Todas las aplicaciones aparecerán en el **menú OSDSYS**, lo que permitirá un inicio rápido
-- [aplicaciones y juegos seleccionados](#selector-de-juegos) aparecerán en el **Navegador**. Los juegos se mostrarán como íconos 3D únicos modelados en sus estuches físicos de DVD/CD, obtenidos de [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database)
+- Todas las aplicaciones (máximo 200) aparecerán en el menú **OSDSYS**, lo que permitirá un acceso y un inicio rápidos.
+- [Aplicaciones y juegos seleccionados](#selector-de-juegos) aparecerán en el **Navegador**. Los iconos provienen de [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database). Los juegos se mostrarán como íconos 3D únicos modelados en sus estuches físicos de DVD/CD.
 - Las [aplicaciones compatibles con SAS](#save-application-system-sas) descargadas de la [PS2 Homebrew Store](https://ps2homebrewstore.com/) y los archivos `ELF` también aparecerán en el **Navegador** representados por íconos únicos.
 
-## Open PS2 Loader (OPL)
-[Open PS2 Loader (OPL)](https://github.com/ps2homebrew/Open-PS2-Loader) es un cargador de aplicaciones y juegos 100% de código abierto para PS2. Todos los juegos de PS2 instalados se mostrarán en OPL. Si selecciona OPL como iniciador de juegos al [instalar juegos y aplicaciones](#instalar-juegos-y-aplicaciones), la configuración por juego asignada en OPL se reflejará al iniciar juegos desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
+## RiptOPL
+[RiptOPL](https://github.com/NathanNeurotic/RiptOPL) es una bifurcación C++/ps2build de Open PS2 Loader para juegos de PS2, juegos de PS1 y homebrew, con vistas de biblioteca flexibles, múltiples fuentes de almacenamiento y selección de núcleos por juego (OPL, [Neutrino](#neutrino), [Ember](#ember), [POPSarter](#iniciador-pop)).
 
-## NHDDL
-[NHDDL](https://github.com/pcm720/nhddl) es un lanzador para [Neutrino](https://github.com/rickgaiser/neutrino), un emulador de dispositivo PS2 pequeño, rápido y modular. Todos los juegos de PS2 instalados se mostrarán en NHDDL. Si selecciona NHDDL como iniciador de juegos al [instalar juegos y aplicaciones](#instalar-juegos-y-aplicaciones), la configuración por juego asignada en NHDDL se refleja al iniciar juegos desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu).
+Con funciones avanzadas como [Logros Retro](#retroachievements) y un menú en el juego, **RiptOPL** es una opción natural para **PSBBN Definitive Project**. Sirve como backend para iniciar juegos desde la [Colección de juegos](#colección-de-juegos) y el [Navegador](#hosdmenu). Las configuraciones por juego se configuran en **RiptOPL** y se aplican automáticamente al iniciar juegos a través de cualquiera de las interfaces.
 
-## Cargador de COP
-[POPSLoader](https://github.com/NathanNeurotic/POPSLoader) es un iniciador gráfico diseñado para explorar e iniciar fácilmente tus juegos de PS1 (usando [POPSarter](#iniciador-pop)) desde varios dispositivos de almacenamiento. Todos los juegos de PS1 instalados se mostrarán en **POPSLoader**.
+## Núcleos de Cargador
+Al instalar juegos, se te dará la opción de seleccionar un **Loader Core** para juegos de PS2. Tanto el núcleo [OPL](#opl) como el [Neutrino](#neutrino) admiten trucos, trucos en pantalla ancha y [Logros retro](#retroachievements). Sin embargo, cada núcleo tiene sus pros y sus contras.
 
-## Iniciador POP
-**POPS** es un emulador oficial de Sony PS1 para PS2, lanzado originalmente exclusivamente en Japón como una forma de distribuir juegos de PS1 a través de Internet a usuarios de [PSBBN](#psbbn). **POPSarter** es un iniciador casero para **POPS** que permite al emulador jugar cualquier juego de PS1 desde unidades internas y externas.
+### OPL
+El núcleo del cargador predeterminado, recomendado para la mayoría de los usuarios. Ofrece:
+- Un [menú del juego](#menú-del-juego) para ver logros y reiniciar o apagar la consola.
+- Compresión `ZSO`, lo que le permite colocar más juegos en su disco.
+- Carga del juego más rápida en comparación con [Neutrino](#neutrino).
 
-Al instalar juegos de PS1, **[correcciones de HugoPocked POPSarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/)** se descargan e instalan automáticamente, lo que mejora la compatibilidad con más de 100 juegos de PS1.
+### Neutrino
+[Neutrino](https://github.com/rickgaiser/neutrino) es un emulador de dispositivo PS2 pequeño, rápido y modular, disponible como alternativa a [OPL](#opl). Prioriza la compatibilidad del juego sobre funciones adicionales y tiene algunas limitaciones:
+- Sin menú en el juego.
+- No hay soporte de compresión `ZSO` en unidades locales.
+- No es posible restablecer o apagar la consola con el controlador.
+- Carga del juego más lenta en comparación con [OPL](#opl).
+
+### Ember
+[Ember](https://github.com/Gageformer/Ember) es un emulador de PS1 para PS2. La compatibilidad ha mejorado significativamente con respecto a [POPSarter](#iniciador-pop), y ahora funcionan muchos juegos que antes no se podían reproducir. También cuenta con un menú del juego con soporte para intercambio de discos y otras funciones.
+
+**Ember** se utiliza como núcleo de carga para todos los juegos de PS1 instalados en el disco interno.
+
+### Iniciador POP
+**POPS** es un emulador oficial de Sony PS1 para PS2, lanzado originalmente exclusivamente en Japón como una forma de distribuir juegos de PS1 a través de Internet a usuarios de [PSBBN](#psbbn). POPSarter es un lanzador casero para POPS que le permite ejecutar juegos de PS1 además de los distribuidos originalmente por Sony.
+
+**POPSarter** se utiliza como cargador para juegos de PS1 instalados en [dispositivos externos](#lanzamiento-de-juegos-de-ps1-desde-smb-y-dispositivos-externos), como recursos compartidos SMB, USB y MMCE.
 
 Se admiten combinaciones de botones de acceso rápido para el intercambio de discos y varias otras opciones:
 
@@ -1160,24 +1240,38 @@ Se admiten combinaciones de botones de acceso rápido para el intercambio de dis
 | SELECT + L2 + R2 + ↓ | Insertar disco 3 |
 | SELECT + L2 + R2 + ← | Insertar disco 4 |
 | SELECT + L2 + R2 + □ | Cerrar la tapa del CD de PlayStation |
+| SELECT + START + L1 | Salir del juego |
 
-Los detalles sobre las teclas de acceso rápido también se pueden encontrar en el **Manual** de cada juego de PS1 instalado. Para acceder a él, en **[Colección de juegos](#colección-de-juegos)**, presiona **△** y luego selecciona **Manual**.
+Los detalles sobre las teclas de acceso rápido también se pueden encontrar en el **Manual** de cada juego de PS1 instalado. Para acceder a él, en **PSBBN [Colección de juegos](#colección-de-juegos)**, presiona **△** y luego selecciona **Manual**.
 
-## Salir de Juegos
-Se admiten combinaciones de botones de acceso rápido para salir de juegos y apagar la consola.
+## RetroAchievements
+**RetroAchievements** en una PlayStation 2 real se proporciona a través de [RiptOPL](#riptopl) y [xeRAbora](https://github.com/hacan359/xerabora). Cuando está habilitado, los juegos de PS2 iniciados a través de PSBBN [Colección de juegos](#colección-de-juegos), [Navegador](#hosdmenu) y [RiptOPL](#riptopl) pueden obtener logros.
 
-**NOTA: Si Seleccionó [NHDDL](#nhddl) Como Iniciador de Juegos, no Podrá Realizar Estas Funciones Mientras Juega Juegos de PS2.**
+RetroAchievements requiere:
+- Una cuenta de RetroAchievements (regístrese [aquí](https://retroachievements.org/))
+- Un adaptador de red oficial de Sony
+- Una conexión a Internet activa
+- Una PC o un teléfono inteligente Android con xeRAbora instalado, conectado a la misma red que tu PS2
 
-| Tecla de acceso rápido | Función |
-|------------------------------------|------------------------------------|
-| SELECT + START + L1 | Salir del juego de PS1 |
-| L1 + L2 + R1 + R2 + SELECT + START | Salir de los juegos de PS2 |
-| L1 + L2 + L3 + R1 + R2 + R3 | Apagar la consola (solo juegos de PS2) |
+Descargue la aplicación xeRAbora [aquí](https://github.com/hacan359/xerabora/releases) e instálela. Inicie la aplicación, luego abra la pestaña *CONFIGURACIÓN*, inicie sesión con su cuenta RetroAchievements y pegue su clave Web API (disponible en su perfil en el sitio web de RetroAchievements).
+
+En [RiptOPL](#riptopl), es posible que necesite ajustar la configuración de red para que coincida con la configuración de su red doméstica. Puede probar la conexión a su PC o teléfono inteligente presionando △ mientras un juego de PS2 está resaltado en la lista de juegos y luego seleccionando "Probar enlace de PC de RetroAchievements".
+
+Si la prueba tiene éxito, ¡estás listo para comenzar a recolectar logros! Si tiene problemas, consulte la guía de solución de problemas de xeRAbora [aquí](#problemas-con-retroachievements).
+
+## Menú del Juego
+Al usar los núcleos de carga [OPL](#opl) o [Ember](#ember), puedes acceder al menú del juego presionando **L1 + L2 + R1 + R2 + SELECT + START**.
+
+El menú del juego te permite salir del juego o apagar la consola. Las opciones adicionales dependen del tipo de juego:
+- PS2: Ver RetroAchievements.
+- PS1: Intercambia discos en juegos multidisco.
+
+**NOTA: Si Seleccionó [Neutrino](#neutrino) Como Núcleo del Cargador, el Menú del Juego no Estará Disponible Cuando Juegue Juegos de PS2.**
 
 ## Tarjetas de Memoria Virtuales
 Una **Tarjeta de Memoria Virtual (VMC)** te permite almacenar el progreso del juego en la unidad interna de tu PlayStation 2 en lugar de en una tarjeta de memoria estándar.
 
-Se crea un **POPStarter VMC** para cada juego de PS1 y, cuando ejecutes el [Instalador de juegos](#instalar-juegos-y-aplicaciones), tendrás la opción de habilitar **VMC** para todos tus juegos de PS2.
+Se crea una **VMC** para cada juego de PS1 y, cuando ejecutes el [Instalador de juegos](#instalar-juegos-y-aplicaciones), tendrás la opción de habilitar **VMC** para todos tus juegos de PS2.
 
 Tanto los juegos de PS1 como los de PS2 son compatibles con **Grupos de VMC**, lo que permite que ciertos juegos compartan un VMC y accedan a datos guardados creados por otros títulos. Por ejemplo, Psycho Mantis de *Metal Gear Solid* puede comentar sobre otros juegos de Konami que hayas jugado, y los créditos de *Gran Turismo 3* se pueden transferir a *Gran Turismo 4*.
 
@@ -1186,7 +1280,7 @@ La función Game ID en **Retro GEM**, **MemCard Pro 2** y **SD2PSX** es totalmen
 
 **Retro GEM** es una actualización de salida HDMI digital a digital para múltiples consolas. **Retro GEM Game ID** permite el cambio automático de perfiles de visualización por juego. Puede obtener más información sobre **Retro GEM** en el [sitio web de Pixel FX](https://www.pixelfx.co/hdmi-retro-gem).
 
-**MemCard Pro 2** y **SD2PSX** permiten almacenar datos guardados en una tarjeta SD, lo que admite múltiples **Tarjetas de Memoria Virtuales (VMCs)** y muchas otras funciones. El **Game ID** identifica qué juego se está ejecutando, lo que permite asignar a cada juego su propio **VMC** y cambiar automáticamente a la tarjeta correcta cuando se inicia el juego. Puede obtener más información sobre **MemCard Pro 2** en el [sitio web de 8BitMods](https://8bitmods.com/accessories/memcard-pro/) y sobre **SD2PSX** en el [sitio web de SD2PSX](https://sd2psx.net/)
+**MemCard Pro 2** y **SD2PSX** permiten almacenar datos guardados en una tarjeta SD, admitiendo múltiples **Tarjetas de Memoria Virtuales (VMCs)** y muchas otras funciones. El **Game ID** identifica qué juego se está ejecutando, lo que permite asignar a cada juego su propio **VMC** y cambiar automáticamente a la tarjeta correcta cuando se inicia el juego. Puede obtener más información sobre **MemCard Pro 2** en el [sitio web de 8BitMods](https://8bitmods.com/accessories/memcard-pro/) y sobre **SD2PSX** en el [sitio web de SD2PSX](https://sd2psx.net/)
 
 ## Lanzamiento de Discos de Juegos de PS1 y PS2
 Cuando ejecute [PSBBN](#psbbn) o [HOSDMenu](#hosdmenu), simplemente inserte un disco de juego en la unidad de DVD. El juego se iniciará y configurará el [ID del juego](#id-del-juego) tanto en **Retro GEM** como en **MemCard Pro** o **SD2PSX** según corresponda.
@@ -1204,7 +1298,7 @@ Puede encontrar todos los detalles en la [página GitHub de R3CONFIGURATOR](http
 ## OSDMenu MBR
 **OSDMenu MBR** es un componente principal de **PSBBN Definitive Project**. Escrito por [pcm720](https://github.com/pcm720). Este programa se ejecuta en cada inicio del sistema y cuando se inicia una aplicación desde [PSBBN](#psbbn). Es un reemplazo casero del programa MBR original de Sony. Es responsable de inicializar el hardware, así como de iniciar aplicaciones y discos de juegos.
 
-**OSDMenu MBR** viene con muchas ventajas sobre la implementación original, incluida la compatibilidad con el lanzamiento de ELF manteniendo presionado un botón del gamepad al inicio, parcheo automático del logotipo de PS2 al [iniciar discos de juegos de PS2](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2), ajuste de modos de video al [iniciar discos de juegos de PS1 importados](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2), [Visual Game ID](#id-del-juego) para **Retro GEM**, sistema de modificación configuraciones e iniciar aplicaciones y juegos caseros a través de [OPL](#open-ps2-loader-opl), [NHDDL](#nhddl) y [POPSarter](#iniciador-pop).
+**OSDMenu MBR** viene con muchas ventajas sobre la implementación original, incluida la compatibilidad con el lanzamiento de ELF manteniendo presionado un botón del gamepad al inicio, parcheo automático del logotipo de PS2 al [iniciar discos de juegos de PS2](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2), ajuste de modos de video al [iniciar discos de juegos de PS1 importados](#lanzamiento-de-discos-de-juegos-de-ps1-y-ps2), [Visual Game ID](#id-del-juego) para **Retro GEM**, sistema de modificación configuraciones e iniciar aplicaciones y juegos caseros a través de [RiptOPL](#riptopl), [Ember](#ember) y otros cargadores de juegos.
 
 El README completo se puede encontrar [aquí](https://github.com/pcm720/OSDMenu/blob/main/mbr/README.md).
 
@@ -1215,7 +1309,7 @@ El README completo se puede encontrar [aquí](https://github.com/pcm720/OSDMenu/
 
 **APA-Jail**, creado y desarrollado por [Berion](https://www.psx-place.com/resources/authors/berion.1431/), permite que las particiones APA de la PS2 coexistan con una partición exFAT. Para [PSBBN](#psbbn), se pueden reservar hasta 128 GB de la unidad para particiones APA, mientras que el espacio restante (hasta 2 TB) se formatea como exFAT. Esta configuración permite instalar [PSBBN](#psbbn) y [HOSDMenu](#hosdmenu) en las particiones APA, mientras que los juegos y aplicaciones caseras se instalan en la partición exFAT.
 
-[OSDMenu MBR](#osdmenu-mbr) reside en una partición APA especial. Cuando se selecciona un elemento de la [Colección de juegos](#colección-de-juegos), [OSDMenu MBR](#osdmenu-mbr) carga juegos y aplicaciones caseras desde la partición exFAT. Los juegos de PS1 se manejan a través de [POPSarter](#iniciador-pop) y los juegos de PS2 a través de [OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl).
+[OSDMenu MBR](#osdmenu-mbr) reside en una partición APA especial. Cuando se selecciona un elemento de la [Colección de juegos](#colección-de-juegos), [OSDMenu MBR](#osdmenu-mbr) carga juegos y aplicaciones caseras desde la partición exFAT. Los juegos de PS1 se manejan a través de [Ember](#ember) y los juegos de PS2 a través de [RiptOPL](#riptopl).
 
 **Advertencia: la Creación Manual de Nuevas Particiones APA en su Unidad PS2 y Exceder el Espacio Asignado para APA Dañará la Unidad.**
 
@@ -1232,7 +1326,7 @@ También debe descargar los [Controladores de disco duro externos] (https://isra
 | europeo | SISTEMA BEEXEC |
 | Chino | SISTEMA BCEXEC |
 
-Los modelos **SCPH-10000 a SCPH-18000** con una carcasa de disco duro externa oficial no tienen la capacidad de iniciarse automáticamente sin software adicional. Para iniciar PSBBN, se recomienda utilizar **PlayStation 2 Basic Boot Loader (PS2BBL)**. [Instala PS2BBL como actualización del sistema](https://israpps.github.io/PlayStation2-Basic-BootLoader/Downloads/) en tu tarjeta de memoria PS2. En el archivo de configuración, establezca `LK_AUTO_E1` en `hdd0:/__system/p2lboot/osdboot.elf`.
+Los modelos **SCPH-10000 a SCPH-18000** con una carcasa de disco duro externa oficial no tienen la capacidad de iniciarse automáticamente sin software adicional. Para iniciar PSBBN, se recomienda utilizar el **PlayStation 2 Basic Boot Loader (PS2BBL)**. [Instala PS2BBL como actualización del sistema](https://israpps.github.io/PlayStation2-Basic-BootLoader/Downloads/) en tu tarjeta de memoria PS2. En el archivo de configuración, establezca `LK_AUTO_E1` en `hdd0:/__system/p2lboot/osdboot.elf`.
 
 # Solución de Problemas
 ⚠️ **Problema conocido**: La instalación en **Fedora** es actualmente problemática. Se recomienda utilizar una distribución **basada en Debian** o **[PSBBN Launcher for Windows](#instalación-en-windows)**.
@@ -1250,7 +1344,7 @@ Los modelos **SCPH-10000 a SCPH-18000** con una carcasa de disco duro externa of
 
 **Si Recibe el Error "Error al Crear la Lista de Juegos":**
 
-Es probable que el archivo `ISO`, `ZSO` o `VCD` que se está procesando no sea válido o esté dañado. Elimine el archivo tanto de la carpeta local de su PC como de su unidad PS2, luego inténtelo nuevamente.
+Es probable que el archivo `ISO`, `ZSO` o `BIN` que se está procesando no sea válido o esté dañado. Elimine el archivo tanto de la carpeta local de su PC como de su unidad PS2, luego inténtelo nuevamente.
 
 Para evitar este problema, asegúrese de que la imagen de su juego sea un buen volcado verificado. Verifique la suma de verificación MD5 o SHA-1 de su archivo `ISO` o `BIN` y confirme que coincida con la entrada correspondiente en [redump.org](http://redump.org).
 
@@ -1264,17 +1358,17 @@ Para otros problemas, continúe con los pasos de solución de problemas a contin
 ```
 wsl --unregister PSBBN
 ```
-2. Descargue la última versión del script `PSBBN-Launcher-For-Windows.ps1` [aquí](https://github.com/CosmicScale/PSBBN-Definitive-English-Patch/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
+2. Descargue la última versión del script `PSBBN-Launcher-For-Windows.ps1` [aquí](https://github.com/CosmicScale/PSBBN-Definitive-Project/releases/download/latest/PSBBN-Launcher-For-Windows.ps1)
 3. Asegúrese de tener una conexión a Internet activa. Si está utilizando una VPN, intente deshabilitarla
 4. Ejecute el script `PSBBN-Launcher-For-Windows.ps1` nuevamente
 
-**Si estás usando [macOS](#instalación-en-macos) y el script se cierra antes de mostrar el menú:**
-`/bin/bash` en macOS es demasiado antiguo para ejecutar este script. Instala Bash mediante Homebrew con `brew install bash` y vuelve a ejecutar `./PSBBN-Definitive-Patch.sh`. Si falla la escritura en una partición, comprueba que `e2fsprogs` y `mtools` estén instalados y que hayas aceptado la solicitud de autorización del administrador. Si esto no resuelve el problema, continúa con los pasos siguientes.
+**Si Está Utilizando [MacOS](#instalación-en-macos) y el Script Sale Antes del Menú:**
+`/bin/bash` en macOS es demasiado antiguo para este script. Instale Homebrew bash con `brew install bash` y ejecute `./PSBBN-Definitive-Patch.sh` nuevamente. Si falla la escritura de una partición, confirme que `e2fsprogs` y `mtools` estén instalados y que se haya aprobado el mensaje del administrador. Si esto no resuelve el problema, continúe con los pasos a continuación.
 
-**Si estás usando [Linux](#instalación-en-linux) o [macOS](#instalación-en-macos) y tienes problemas:**
-1. Elimine la carpeta `PSBBN-Definitive-Project`
-2. Reinicia el ordenador
-3. Vuelva a clonar el repositorio con el siguiente comando:
+**Si Está Utilizando [Linux](#instalación-en-linux) o [MacOS](#instalación-en-macos) y Tiene Problemas:**
+1. Elimina la carpeta `PSBBN-Definitive-Project`
+2. Reinicia tu computadora
+3. Vuelve a clonar el repositorio con el siguiente comando:
 ```
 git clone https://github.com/CosmicScale/PSBBN-Definitive-Project.git
 ```
@@ -1291,57 +1385,70 @@ Si su consola arranca en el OSD normal, se congela o muestra un error, debe inte
 1. Retire todas las tarjetas de memoria PS2 de su consola
 2. Si instaló [PSBBN](#psbbn), asegúrese de estar utilizando un **adaptador de red oficial de Sony**; PSBBN no admite adaptadores HDD de terceros
 3. Verifique que los conectores de la consola y la red o el adaptador HDD estén limpios y libres de polvo/residuos
-4. Asegúrese de que la red o el adaptador HDD y la unidad estén bien conectados a la consola
+4. Asegúrese de que la red o el adaptador HDD y la unidad estén conectados firmemente a la consola
 5. Si usa un mod SATA, asegúrese de que se haya instalado correctamente
 6. Utilice una unidad diferente y reinstale [PSBBN](#instale-psbbn-y-hosdmenu) o [HOSDMenu](#instalar-hosdmenu-únicamente)
-7. Si su consola tiene instalado un convertidor IDE o un mod SATA, intente usar un convertidor o mod diferente.
-8. Utilice un adaptador de red oficial de Sony diferente o un adaptador HDD de terceros
+7. Si su consola tiene un convertidor IDE o un mod SATA instalado, intente usar un convertidor o mod diferente
+8. Utilice un adaptador de red Sony oficial diferente o un adaptador HDD de terceros
 9. Utilice una consola PS2 diferente
 
 ## los Juegos no Funcionan
 Es posible que algunos juegos no se inicien o presenten problemas de compatibilidad. Primero, asegúrate de que la imagen de tu juego sea un buen volcado verificado. Verifique la suma de verificación MD5 o SHA-1 de su archivo `ISO` o `BIN` y confirme que coincida con la entrada correspondiente en [redump.org](http://redump.org).
 
-Si seleccionaste [OPL](#open-ps2-loader-opl) como iniciador del juego, intenta desactivar los trucos:
-1. Inicie [OPL](#open-ps2-loader-opl), resalte el juego con el que tiene problemas en la lista de juegos y presione △
-2. Selecciona "Configuración de trucos" y desactiva "PS2RD Cheat Engine"
-3. Guarda los cambios e inicia el juego.
+Para juegos de PS2, intente desactivar los trucos y [RetroAchievements](#retroachievements) en [RiptOPL](#riptopl).
 
-Si aún tienes problemas con juegos específicos de PS2, si seleccionaste [OPL](#open-ps2-loader-opl) como iniciador de juegos, puedes verificar si hay problemas existentes o informar uno nuevo [aquí](https://github.com/ps2homebrew/Open-PS2-Loader/issues). Si seleccionó [NHDDL](#nhddl), puede hacerlo [aquí](https://github.com/rickgaiser/neutrino/issues).
+Para desactivar los trucos:
+1. Resalte el juego con el que tiene problemas en la lista de juegos y presione △
+2. Seleccione "Configuración de trucos" y apague "PS2RD Cheat Engine"
+3. Guarde los cambios
+
+Para desactivar RetroAchievements:
+1. Presione *START* para acceder al menú y seleccione "Configuración"
+2. Seleccione "Red" y desactive "Telemetría de RetroAchievements"
+3. Guarde los cambios
+
+Si aún tienes problemas con juegos específicos de PS2, si seleccionaste **OPL** como tu núcleo de carga, puedes verificar si hay problemas existentes o informar uno nuevo [aquí](https://github.com/NathanNeurotic/RiptOPL/issues). Si seleccionó [Neutrino](#neutrino), puede hacerlo [aquí](https://github.com/rickgaiser/neutrino/issues).
+
+Si tienes problemas con juegos específicos de PS1, puedes verificar si hay problemas existentes o informar uno nuevo [aquí](https://github.com/Gageformer/Ember/issues).
 
 Si todos los juegos de PS1 o PS2 no se inician, sigue los pasos a continuación:
 
 Si los juegos no se inician desde la [Colección de juegos](#colección-de-juegos) o el [Navegador](#hosdmenu), intenta lo siguiente:
 1. Si tienes un [chip mod](#problemas-conocidos), desactívalo
-2. Si tienes problemas para iniciar juegos de PS1, asegúrate de haber instalado correctamente los **controladores ATA BDM Assault** en una tarjeta de memoria de PS2 y de que la tarjeta esté insertada en tu consola. Las instrucciones de instalación se pueden encontrar [aquí](#instalaãão-dos-drivers-ata-bdm-assault)
-3. Si tienes problemas para iniciar juegos de PS2, retira todas las tarjetas de memoria de PS2 de tu consola e inténtalo de nuevo. Si esto resuelve el problema, elimine los archivos guardados de `Su configuración del sistema` de las tarjetas de memoria, ya que los datos de configuración dañados pueden impedir que los juegos se inicien
-4. Compruebe que los conectores de la consola y el adaptador de red o HDD estén limpios y libres de polvo o residuos.
-5. Asegúrese de que la red o el adaptador HDD y la unidad estén bien conectados a la consola
+2. Retire todas las tarjetas de memoria PS2 de su consola y vuelva a intentarlo. Si esto resuelve el problema, elimine los archivos guardados `Your System Configuration` de las tarjetas de memoria, ya que los datos de configuración dañados pueden impedir que se inicien los juegos
+4. Compruebe que los conectores de la consola y el adaptador de red o HDD estén limpios y libres de polvo o suciedad.
+5. Asegúrese de que la red o el adaptador HDD y la unidad estén conectados firmemente a la consola
 6. Si usa un mod SATA, asegúrese de que se haya instalado correctamente
 
-Si los juegos aún no se inician, intente cargar juegos de PS2 usando [OPL](#open-ps2-loader-opl) o [NHDDL](#nhddl) y juegos de PS1 usando [POPSLoader](#cargador-de-cop).
+Si los juegos aún no se inician, intente cargarlos usando [RiptOPL](#riptopl).
 
-Si OPL se congela al inicio, elimine cualquier archivo de configuración de OPL existente de sus tarjetas de memoria PS2 o dispositivos USB conectados. También puede mantener presionado `START` mientras se inicia OPL para evitar la lectura del archivo de configuración.
+Si [RiptOPL](#riptopl) se congela al inicio, elimine cualquier archivo de configuración de RiptOPL existente de sus tarjetas de memoria PS2 o dispositivos USB conectados. También puede mantener presionado `START` mientras se inicia RiptOPL para evitar la lectura del archivo de configuración.
 
-Para mostrar la lista de juegos en OPL, ajuste las siguientes configuraciones:
-1. Configuración > Modo de inicio HDD (APA): Desactivado
-2. Configuración > Modo de inicio BDM: Automático
+Para mostrar la lista de juegos en RiptOPL, ajuste las siguientes configuraciones:
+1. Configuración > HDD (APA) Modo de inicio: Desactivado
+2. Configuración > BDM Modo de inicio: Automático
 3. Configuración > Dispositivos BDM > HDD (GPT/MBR): Activado
 4. Configuración > Guardar cambios
 
-Si los juegos de PS2 no aparecen en la lista de juegos en [NHDDL](#nhddl) o [OPL](#open-ps2-loader-opl) (después de modificar la configuración de OPL como se describe arriba), o los juegos de PS1 no aparecen en [POPSLoader](#cargador-de-cop), intente lo siguiente:
+Si los juegos no aparecen en la lista de juegos en [RiptOPL](#riptopl) (después de modificar la configuración como se describe arriba), intente lo siguiente:
 1. Conecte la unidad PS2 directamente a su PC usando una conexión SATA interna o un adaptador SATA a USB diferente, luego reinstale [PSBBN](#instale-psbbn-y-hosdmenu) o [HOSDMenu](#instalar-hosdmenu-únicamente)
 2. Utilice una unidad diferente y reinstale [PSBBN](#instale-psbbn-y-hosdmenu) o [HOSDMenu](#instalar-hosdmenu-únicamente)
 3. Si su consola tiene un convertidor IDE o un mod SATA instalado, intente usar un convertidor o mod diferente
-4. Utilice un adaptador de red oficial de Sony diferente o un adaptador HDD de terceros
+4. Utilice un adaptador de red Sony oficial diferente o un adaptador HDD de terceros
 5. Utilice una consola PS2 diferente
+
+## Problemas Con RetroAchievements
+No todos los juegos de PS2 son compatibles con RetroAchievements y algunos pueden fallar cuando está habilitado. Si tienes problemas con un juego en particular, intenta desactivar RetroAchievements o cerrar la aplicación xeRAbora mientras juegas.
+
+Puede encontrar más consejos para la solución de problemas en el sitio web de xeRAbora [aquí](https://github.com/hacan359/xerabora/blob/main/docs/TROUBLESHOOTING.md).
 
 ## Problemas Conocidos
 - PSBBN se congelará en el logotipo de "PlayStation 2" al iniciar, si se utiliza un adaptador HDD no oficial de terceros. **Se requiere un adaptador de red oficial de Sony**.
 - PSBBN se congelará al iniciar juegos o aplicaciones si un chip mod está activo. Para usar PSBBN, los chips mod deben estar desactivados.
 - En PSBBN, el intercambio de botones × y ○ solo se admite en controladores DualShock 2
-- En PSBBN, los botones multimedia en el control remoto de DVD de PS2 solo se admiten en consolas SCPH-5000x con un receptor de infrarrojos incorporado. El control remoto puede comportarse de manera errática si no hay ningún controlador conectado al puerto 1 del controlador.
+- En PSBBN, los botones multimedia en el control remoto de DVD de PS2 solo se admiten en consolas SCPH-5000x con un receptor de infrarrojos incorporado. El control remoto puede comportarse de manera errática si no hay ningún controlador conectado al puerto del controlador 1.
 - La compatibilidad con MiniDisc no funciona a partir de la versión del parche 2.10 y superiores. Espero solucionar este problema en una actualización futura
-- El teclado en pantalla predeterminado de PSBBN está configurado en japonés. Sin embargo, se agregó un teclado en pantalla en inglés de EE. UU., aunque deberá presionar el botón `SELECT` varias veces para cambiar a él. Hay un error por el cual la barra espaciadora no funciona en el teclado en pantalla en inglés de EE. UU., pero puedes ingresar un espacio presionando el botón **△** en el controlador.
+- PSBBN tiene por defecto un teclado japonés en pantalla. También está disponible un teclado en inglés de EE. UU. Presione SELECT repetidamente para cambiar a él. Debido a un error, la barra espaciadora del teclado en inglés de EE. UU. no funciona. En su lugar, use el botón △ en el controlador para ingresar un espacio.
 - La música instalada con Music Installer solo se puede reproducir si se escribe en los primeros 3 GB de la partición de música. La música extraída de CD de audio en el [Canal de música](#canal-de-música) no se ve afectada y puede utilizar toda la capacidad de la partición.
 - PSBBN solo admite fechas hasta finales de 2030. Al configurar la hora y la fecha, el año debe establecerse en 2030 o menos.
 - Las instalaciones japonesas de PSBBN fallarán en unidades de menos de 128 GB.
@@ -1350,13 +1457,16 @@ Si los juegos de PS2 no aparecen en la lista de juegos en [NHDDL](#nhddl) o [OPL
 - Las particiones APA no deben crearse más allá del espacio reservado para APA durante la instalación. Al hacerlo, se sobrescribirán los datos en la partición exFAT.
 - Casos en feega donde algún texto japonés no se pudo traducir debido a que estaba codificado en un archivo cifrado. El software Atok no ha sido traducido.
 
-## Informar Problemas
+## Problemas de Informes
 Si ha probado los pasos relevantes anteriores y el problema persiste, verifique si existe un problema o abra uno nuevo [aquí](https://github.com/CosmicScale/PSBBN-Definitive-Project/issues).
 Incluya todos los archivos de registro relevantes:
 - `setup.log`
 - `PSBBN-installer.log`
-- `HOSDMenu.log`
+- `hosdmenu.log`
 - `game-installer.log`
+- `ps2-id.log`
+- `ember-id.log`
+- `pfs-pops-id.log`
 - `extras.log`
 - `media.log`
 
@@ -1371,7 +1481,7 @@ Los usuarios de **Linux** pueden encontrar estos registros en `PSBBN-Definitive-
 - Utiliza el código APA-Jail del [PS2 HDD Decryption Helper](https://www.psx-place.com/resources/ps2-hdd-decryption-helper.1507/) de [Berion](https://www.psx-place.com/members/berion.1431/)
 - Contiene código de [`list_builder.py`](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin/blob/main/List%20Builder/list_builder.py) de [XEB+ neutrino Launcher Plugin](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin) de [sync-on-luma](https://github.com/sync-on-luma)
 - Contiene código de [`ps2iconmaker.sh`](https://github.com/CosmicScale/HDD-OSD-Icon-Database/issues/1#issuecomment-2852499188) de [Sakitoshi](https://github.com/Sakitoshi)
-- Contiene datos de [`TitlesDB_PS1_English.txt`](https://github.com/GDX-X/PFS-BatchKit-Manager/blob/main/PFS-BatchKit-Manager/BAT/TitlesDB/TitlesDB_PS1_English.txt) y [`TitlesDB_PS2_English.txt`](https://github.com/GDX-X/PFS-BatchKit-Manager/blob/main/PFS-BatchKit-Manager/BAT/TitlesDB/TitlesDB_PS2_English.txt) del [PFS-BatchKit-Manager](https://github.com/GDX-X/PFS-BatchKit-Manager) de [GDX-X](https://github.com/GDX-X)
+- Contiene datos del [OPL-Games-Infos-Database-Project](https://github.com/GDX-X/OPL-Games-Infos-Database-Project) de [GDX-X](https://github.com/GDX-X)
 - Contiene datos de [`vmc_groups.list`](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin/blob/main/List%20Builder/vmc_groups.list) de [XEB+ neutrino Launcher Plugin](https://github.com/sync-on-luma/xebplus-neutrino-loader-plugin) de [sync-on-luma](https://github.com/sync-on-luma)
 - PSBBN Equipo de localización
   - Inglés — [CosmicScale](https://github.com/CosmicScale)
@@ -1385,29 +1495,27 @@ Los usuarios de **Linux** pueden encontrar estos registros en `PSBBN-Definitive-
 **PSBBN Definitive Project Utiliza las Siguientes Herramientas y Aplicaciones Caseras de PS2:**
 - [Base de datos de arte PSBBN](https://github.com/CosmicScale/psbbn-art-database) creada y mantenida por [CosmicScale](https://github.com/CosmicScale)
 - [HDD-OSD Icon Database](https://github.com/CosmicScale/HDD-OSD-Icon-Database) creado y mantenido por [CosmicScale](https://github.com/CosmicScale)
+- [open-bn](https://github.com/MatteoTurri/open-bn) por [MatteoTurri](https://github.com/MatteoTurri)
 - [Menú OSDM](https://github.com/pcm720/OSDMenu) por [pcm720](https://github.com/pcm720)
 - [Comprobador de encabezado de partición APA](https://github.com/pink1stools/APA-Partition-Header-Checksumer/) por [Pink1](https://github.com/pink1stools) y [Berion](https://www.psx-place.com/members/berion.1431/). [Puerto Linux](https://github.com/bucanero/save-decrypters/tree/master/ps2-apa-header-checksum) por [Bucanero](https://github.com/Bucanero)
 - [PFS Shell](https://github.com/AKuHAK/pfsshell/tree/ext2) y [HDL Dump](https://github.com/AKuHAK/hdl-dump/tree/8M) con partición APA de 8 MB y modificaciones EXT2 mediante [AKuHAK](https://github.com/AKuHAK)
 - PFS Fuse de [PFS Shell](https://github.com/ps2homebrew/pfsshell) por [PS2 Homebrew Projects](https://github.com/ps2homebrew)
 - Extractor de PSU de [PSV Save Converter](https://github.com/bucanero/psv-save-converter) de [Bucanero](https://github.com/Bucanero)
-- [`ziso.py`](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/pc/ziso.py) por Virtuous Flame
-- cue2pops de [pops2cue](https://github.com/bucanero/pops2cue) por [Bucanero](https://github.com/Bucanero)
-- [Open PS2 Loader](https://github.com/ps2homebrew/Open-PS2-Loader) de [PS2 Homebrew Projects](https://github.com/ps2homebrew) con contribuciones BDM de [KrahJohlito](https://github.com/KrahJohlito) y modificaciones de inicio automático de [CosmicScale](https://github.com/CosmicScale)
-- [Open PS2 Loader Widescreen Hacks](https://github.com/PS2-Widescreen/OPL-Widescreen-Cheats) por [PS2-Widescreen](https://github.com/PS2-Widescreen)
+- [`ziso.py`](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/pc/ziso.py) por Llama Virtuosa
+- [pops2cue](https://github.com/bucanero/pops2cue) por [Bucanero](https://github.com/Bucanero)
+- [RiptOPL](https://github.com/NathanNeurotic/RiptOPL) por [NathanNeurotic](https://github.com/NathanNeurotic)
+- [xeRAbora](https://github.com/hacan359/xerabora) por [hacan359](https://github.com/hacan359)
 - [Neutrino](https://github.com/rickgaiser/neutrino) por [Rick Gaiser](https://github.com/rickgaiser)
-- [NHDDL](https://github.com/pcm720/nhddl) por [pcm720](https://github.com/pcm720)
-- [POPStarter](https://www.psx-place.com/resources/popstarter.683/) por [KrHACKen](https://www.psx-place.com/members/krhacken.98/)
-- [POPSLoader](https://github.com/NathanNeurotic/POPSLoader) por [NathanNeurotic (Ripto)](https://github.com/NathanNeurotic)
-- [Correcciones de HugoPocked POPSarter](https://www.psx-place.com/threads/hugopocked-fixes-for-popstarter.39750/) por [HugoPocked](https://ko-fi.com/hugopocked)
-- [ATA BDM Assault](https://github.com/saildot4k/ATA-Assault) por [R3Z3N](https://github.com/saildot4k)
+- [Ember](https://github.com/Gageformer/Ember) por [Gageformer](https://github.com/Gageformer)
 - [wLaunchELF_R3Z](https://github.com/saildot4k/wLaunchELF_R3Z) por [R3Z3N](https://github.com/saildot4k)
 - [R3CONFIGURADOR](https://github.com/saildot4k/R3CONFIGURATOR) por [R3Z3N](https://github.com/saildot4k)
-- Portada de PS2 de [copias de seguridad de OPL Manager Art DB](https://oplmanager.com/site/index.php?backups)
+- [Open PS2 Loader Widescreen Hacks](https://github.com/PS2-Widescreen/OPL-Widescreen-Cheats) por [PS2-Widescreen](https://github.com/PS2-Widescreen)
+- Ilustraciones del juego de [OPL Manager](https://oplmanager.com)
 - Diseño de la aplicación de [OPL B-APPS Cover Pack](https://www.psx-place.com/resources/opl-b-apps-cover-pack.1440/) y [OPL Discs & Boxes Pack](https://www.psx-place.com/resources/opl-discs-boxes-pack.1439/) cortesía de [Berion](https://www.psx-place.com/resources/authors/berion.1431/)
-- Canales en línea alojados y traducidos al inglés por vitas155 en [PSBBN.ru](https://psbbn.ru/), con la excepción de PlayStation Now! y Konami Channel, traducido al inglés por [CosmicScale](https://github.com/CosmicScale)
+- Canales en línea alojados y traducidos al inglés por vitas155 en [PSBBN.ru](https://psbbn.ru/), con la excepción de PlayStation Now! y Canal Konami, traducido al inglés por [CosmicScale](https://github.com/CosmicScale)
 
 **Bibliotecas y Binarios de Terceros:**  
-- `vmlinux` **BB Navigator kernel (Linux 2.4.17)** – Código fuente disponible [aquí](https://github.com/CosmicScale/PSBBN-Definitive-Patch-Kernel)
+- `vmlinux` **Núcleo de BB Navigator (Linux 2.4.17)** – Código fuente disponible [aquí](https://github.com/CosmicScale/PSBBN-Definitive-Patch-Kernel)
 - **SQLite v2.8.17** de [sqlite.org](https://www.sqlite.org)
 - **mkfs.exfat (exfatprogs 1.2.2)** de [exfatprogs](https://github.com/exfatprogs/exfatprogs)
 - `binmerge.py` de [binmerge](https://github.com/putnam/binmerge)
@@ -1417,4 +1525,7 @@ Los usuarios de **Linux** pueden encontrar estos registros en `PSBBN-Definitive-
 **Gracias:**
 - [Bucanero](https://github.com/Bucanero) por compilar los binarios de ARM64
 - A todos los miembros del [equipo SAS/UMCS](https://ps2homebrewstore.com/thanks/) por su trabajo continuo en la [PS2 Homebrew Store](https://ps2homebrewstore.com/)
-- Un agradecimiento especial a [pcm720](https://github.com/pcm720) por parchear `osdboot.elf` para evitar la verificación de seguridad CRC.
+
+**Agradecimiento Especial:**  
+- [pcm720](https://github.com/pcm720) para parchear `osdboot.elf` para evitar la verificación de seguridad CRC
+- [MatteoTurri](https://github.com/MatteoTurri) para descompilar `bn`, el ejecutable principal de PSBBN.
