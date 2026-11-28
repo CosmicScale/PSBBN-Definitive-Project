@@ -234,14 +234,23 @@ def normalize_game_id(game_id):
 
     return game_id
 
-def clean_name_from_filename(name, game_id):
+def clean_name_from_filename(name, game_id=None):
     base_name = os.path.splitext(name)[0]
 
-    if base_name.upper().startswith(game_id):
-        stripped = base_name[len(game_id):].lstrip('_. ')
+    # Match either:
+    # SLES_113.70
+    # LSP05010.101
+    match = re.match(
+        r'^(?:[A-Z]{4}_\d{3}\.\d{2}|LSP\d{5}\.\d{3})',
+        base_name,
+        re.IGNORECASE
+    )
+
+    if match:
+        stripped = base_name[match.end():].lstrip('_. -')
         return stripped if stripped else base_name
-    else:
-        return base_name
+
+    return base_name
 
 def make_partition_label(game_id, title, suffix):
     # Format game id correctly for partition name
